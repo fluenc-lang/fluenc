@@ -1,0 +1,23 @@
+int bar(int p1, int p2, int p3)
+{
+	var p5 = 12;
+
+	if (p3 > 2)
+	{
+		var p4 = 2 + p5;
+
+		if (p4 < 5)
+		{
+			return p5;
+		}
+
+		return p4;
+	}
+
+	return p1 + p2 + p3 + p5;
+}
+
+int main()
+{
+	return bar(1, 2, 3);
+}
