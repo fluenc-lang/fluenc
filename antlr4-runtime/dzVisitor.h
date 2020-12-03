@@ -21,6 +21,10 @@ public:
    */
     virtual antlrcpp::Any visitProgram(dzParser::ProgramContext *context) = 0;
 
+    virtual antlrcpp::Any visitStructure(dzParser::StructureContext *context) = 0;
+
+    virtual antlrcpp::Any visitField(dzParser::FieldContext *context) = 0;
+
     virtual antlrcpp::Any visitFunction(dzParser::FunctionContext *context) = 0;
 
     virtual antlrcpp::Any visitCall(dzParser::CallContext *context) = 0;

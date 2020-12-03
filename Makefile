@@ -52,12 +52,20 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = main.cpp \
+SOURCES       = CompilerException.cpp \
+		UndeclaredIdentifierException.cpp \
+		UnknownTypeException.cpp \
+		VisitorV1.cpp \
+		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
 		antlr4-runtime/dzParser.cpp \
 		antlr4-runtime/dzVisitor.cpp 
-OBJECTS       = main.o \
+OBJECTS       = CompilerException.o \
+		UndeclaredIdentifierException.o \
+		UnknownTypeException.o \
+		VisitorV1.o \
+		main.o \
 		dzBaseVisitor.o \
 		dzLexer.o \
 		dzParser.o \
@@ -363,10 +371,18 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/exceptions.prf \
 		/usr/lib/qt/mkspecs/features/yacc.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
-		dz.pro antlr4-runtime/dzBaseVisitor.h \
+		dz.pro CompilerException.h \
+		UndeclaredIdentifierException.h \
+		UnknownTypeException.h \
+		VisitorV1.h \
+		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzLexer.h \
 		antlr4-runtime/dzParser.h \
-		antlr4-runtime/dzVisitor.h main.cpp \
+		antlr4-runtime/dzVisitor.h CompilerException.cpp \
+		UndeclaredIdentifierException.cpp \
+		UnknownTypeException.cpp \
+		VisitorV1.cpp \
+		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
 		antlr4-runtime/dzParser.cpp \
@@ -1002,8 +1018,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents CompilerException.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h $(DISTDIR)/
+	$(COPY_FILE) --parents CompilerException.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1051,10 +1067,47 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
-main.o: main.cpp antlr4-runtime/dzBaseVisitor.h \
+CompilerException.o: CompilerException.cpp CompilerException.h \
+		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzVisitor.h \
 		antlr4-runtime/dzParser.h \
 		antlr4-runtime/dzLexer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CompilerException.o CompilerException.cpp
+
+UndeclaredIdentifierException.o: UndeclaredIdentifierException.cpp UndeclaredIdentifierException.h \
+		CompilerException.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h \
+		antlr4-runtime/dzLexer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o UndeclaredIdentifierException.o UndeclaredIdentifierException.cpp
+
+UnknownTypeException.o: UnknownTypeException.cpp UnknownTypeException.h \
+		CompilerException.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h \
+		antlr4-runtime/dzLexer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o UnknownTypeException.o UnknownTypeException.cpp
+
+VisitorV1.o: VisitorV1.cpp VisitorV1.h \
+		UnknownTypeException.h \
+		CompilerException.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h \
+		antlr4-runtime/dzLexer.h \
+		UndeclaredIdentifierException.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV1.o VisitorV1.cpp
+
+main.o: main.cpp antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h \
+		antlr4-runtime/dzLexer.h \
+		VisitorV1.h \
+		UnknownTypeException.h \
+		CompilerException.h \
+		UndeclaredIdentifierException.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 dzBaseVisitor.o: antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzBaseVisitor.h \

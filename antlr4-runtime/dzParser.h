@@ -13,13 +13,14 @@ class  dzParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, INT = 10, OP = 11, WS = 12, ID = 13
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, INT = 13, OP = 14, 
+    WS = 15, ID = 16
   };
 
   enum {
-    RuleProgram = 0, RuleFunction = 1, RuleExpression = 2, RuleAssignment = 3, 
-    RuleRet = 4, RuleConditional = 5, RuleStatement = 6, RuleBlock = 7, 
-    RuleArgument = 8, RuleTypeName = 9
+    RuleProgram = 0, RuleStructure = 1, RuleField = 2, RuleFunction = 3, 
+    RuleExpression = 4, RuleAssignment = 5, RuleRet = 6, RuleConditional = 7, 
+    RuleStatement = 8, RuleBlock = 9, RuleArgument = 10, RuleTypeName = 11
   };
 
   dzParser(antlr4::TokenStream *input);
@@ -33,6 +34,8 @@ public:
 
 
   class ProgramContext;
+  class StructureContext;
+  class FieldContext;
   class FunctionContext;
   class ExpressionContext;
   class AssignmentContext;
@@ -49,6 +52,8 @@ public:
     virtual size_t getRuleIndex() const override;
     std::vector<FunctionContext *> function();
     FunctionContext* function(size_t i);
+    std::vector<StructureContext *> structure();
+    StructureContext* structure(size_t i);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -56,6 +61,35 @@ public:
   };
 
   ProgramContext* program();
+
+  class  StructureContext : public antlr4::ParserRuleContext {
+  public:
+    StructureContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ID();
+    std::vector<FieldContext *> field();
+    FieldContext* field(size_t i);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  StructureContext* structure();
+
+  class  FieldContext : public antlr4::ParserRuleContext {
+  public:
+    FieldContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    TypeNameContext *typeName();
+    antlr4::tree::TerminalNode *ID();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FieldContext* field();
 
   class  FunctionContext : public antlr4::ParserRuleContext {
   public:
@@ -148,9 +182,12 @@ public:
 
   class  RetContext : public antlr4::ParserRuleContext {
   public:
+    dzParser::ExpressionContext *value = nullptr;;
+    dzParser::ExpressionContext *chained = nullptr;;
     RetContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ExpressionContext *expression();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;

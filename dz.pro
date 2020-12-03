@@ -1,4 +1,8 @@
 SOURCES += \
+	CompilerException.cpp \
+	UndeclaredIdentifierException.cpp \
+	UnknownTypeException.cpp \
+	VisitorV1.cpp \
 	main.cpp \
 	antlr4-runtime/dzBaseVisitor.cpp \
 	antlr4-runtime/dzLexer.cpp \
@@ -6,6 +10,10 @@ SOURCES += \
 	antlr4-runtime/dzVisitor.cpp
 
 HEADERS += \
+	CompilerException.h \
+	UndeclaredIdentifierException.h \
+	UnknownTypeException.h \
+	VisitorV1.h \
 	antlr4-runtime/dzBaseVisitor.h \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \

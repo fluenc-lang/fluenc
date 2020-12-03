@@ -1,7 +1,15 @@
 grammar dz;
 
 program 
-	: function+ 
+	: (function | structure)*
+	;
+
+structure
+	: 'struct' ID '{' field+ '}'
+	;
+
+field
+	: typeName ID
 	;
 	
 function 
@@ -20,7 +28,7 @@ assignment
 	;
 
 ret
-	: 'return' expression
+	: 'return' value=expression? ('->' chained=expression)?
 	;
 
 conditional
@@ -41,7 +49,7 @@ argument
 	;
 
 typeName
-	: ID
+	: ID '..'?
 	;
 	
 INT
