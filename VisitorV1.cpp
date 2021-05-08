@@ -9,27 +9,27 @@ VisitorV1::VisitorV1(LLVMContext &context, Module &module, BasicBlock *block, Fu
 {
 }
 
-antlrcpp::Any VisitorV1::visitAssignment(dzParser::AssignmentContext *context)
-{
-	IRBuilder<> builder(m_block);
+//antlrcpp::Any VisitorV1::visitAssignment(dzParser::AssignmentContext *context)
+//{
+//	IRBuilder<> builder(m_block);
 
-	auto name = context->ID()->getText();
-	auto expression = context->expression();
+//	auto name = context->ID()->getText();
+//	auto expression = context->expression();
 
-	auto value = visitAs<Value *>(expression);
+//	auto value = visitAs<Value *>(expression);
 
-	auto alloc = builder.CreateAlloca(value->getType());
+//	auto alloc = builder.CreateAlloca(value->getType());
 
-	builder.CreateStore(value, alloc);
+//	builder.CreateStore(value, alloc);
 
-	return builder.CreateLoad(alloc, name);
-}
+//	return builder.CreateLoad(alloc, name);
+//}
 
 antlrcpp::Any VisitorV1::visitFunction(dzParser::FunctionContext *context)
 {
 	auto returnType = visitAs<Type *>(context->typeName());
 	auto arguments = context->argument();
-	auto name = context->ID()->getText();
+	auto name = context->name->getText();
 
 	std::vector<Type *> argumentTypes;
 	std::map<std::string, Value *> locals;
@@ -73,23 +73,23 @@ antlrcpp::Any VisitorV1::visitTypeName(dzParser::TypeNameContext *context)
 	throw new UnknownTypeException(context, typeName);
 }
 
-antlrcpp::Any VisitorV1::visitBlock(dzParser::BlockContext *context)
-{
-	auto outer = BasicBlock::Create(m_context, "entry", m_function);
+//antlrcpp::Any VisitorV1::visitBlock(dzParser::BlockContext *context)
+//{
+//	auto outer = BasicBlock::Create(m_context, "entry", m_function);
 
-	VisitorV1 visitor(m_context, m_module, outer, m_function, m_locals);
+//	VisitorV1 visitor(m_context, m_module, outer, m_function, m_locals);
 
-	auto statements = context->statement();
+//	auto statements = context->statement();
 
-	auto inner = populateBlock(visitor
-		, begin(statements)
-		, end(statements)
-		);
+//	auto inner = populateBlock(visitor
+//		, begin(statements)
+//		, end(statements)
+//		);
 
-	inner.visit(context->ret());
+//	inner.visit(context->ret());
 
-	return outer;
-}
+//	return outer;
+//}
 
 antlrcpp::Any VisitorV1::visitRet(dzParser::RetContext *context)
 {
@@ -243,39 +243,39 @@ antlrcpp::Any VisitorV1::visitStructure(dzParser::StructureContext *context)
 	return nullptr;
 }
 
-VisitorV1 VisitorV1::populateBlock(VisitorV1 visitor
-	, std::vector<dzParser::StatementContext *>::const_iterator iterator
-	, std::vector<dzParser::StatementContext *>::const_iterator end
-	)
-{
-	if (iterator == end)
-	{
-		return visitor;
-	}
+//VisitorV1 VisitorV1::populateBlock(VisitorV1 visitor
+//	, std::vector<dzParser::StatementContext *>::const_iterator iterator
+//	, std::vector<dzParser::StatementContext *>::const_iterator end
+//	)
+//{
+//	if (iterator == end)
+//	{
+//		return visitor;
+//	}
 
-	auto result = visitor.visit(*iterator);
+//	auto result = visitor.visit(*iterator);
 
-	if (result.is<BasicBlock *>())
-	{
-		auto block = result.as<BasicBlock *>();
+//	if (result.is<BasicBlock *>())
+//	{
+//		auto block = result.as<BasicBlock *>();
 
-		VisitorV1 child(m_context, m_module, block, m_function, visitor.m_locals);
+//		VisitorV1 child(m_context, m_module, block, m_function, visitor.m_locals);
 
-		return populateBlock(child, next(iterator), end);
-	}
+//		return populateBlock(child, next(iterator), end);
+//	}
 
-	if (result.is<LoadInst *>())
-	{
-		auto local = result.as<LoadInst *>();
+//	if (result.is<LoadInst *>())
+//	{
+//		auto local = result.as<LoadInst *>();
 
-		auto locals = visitor.m_locals;
+//		auto locals = visitor.m_locals;
 
-		locals[local->getName().str()] = local;
+//		locals[local->getName().str()] = local;
 
-		VisitorV1 child(m_context, m_module, visitor.m_block, m_function, locals);
+//		VisitorV1 child(m_context, m_module, visitor.m_block, m_function, locals);
 
-		return populateBlock(child, next(iterator), end);
-	}
+//		return populateBlock(child, next(iterator), end);
+//	}
 
-	return populateBlock(visitor, next(iterator), end);
-}
+//	return populateBlock(visitor, next(iterator), end);
+//}

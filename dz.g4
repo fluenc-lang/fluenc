@@ -13,7 +13,7 @@ field
 	;
 	
 function 
-	: typeName ID '(' (argument (',' argument)*)? ')' block
+	: attribute=ID? typeName name=ID '(' (argument (',' argument)*)? ')' block?
 	;
 	
 expression
@@ -21,10 +21,6 @@ expression
 	| INT											#constant
 	| left=expression op=OP right=expression		#binary
 	| ID											#member
-	;
-
-assignment
-	: 'var' ID '=' expression
 	;
 
 ret
@@ -35,13 +31,8 @@ conditional
 	: 'if' '(' expression ')' block
 	;
 
-statement
-	: assignment
-	| conditional
-	;
-
 block
-	: '{' statement* ret '}'
+	: '{' conditional* ret '}'
 	;
 
 argument
@@ -49,7 +40,7 @@ argument
 	;
 
 typeName
-	: ID '..'?
+	: ID '...'?
 	;
 	
 INT
@@ -74,15 +65,13 @@ WS
 	;
 
 ID
-    :   CHAR (CHAR | DIGIT)*
-    ;
+	: CHAR (CHAR | DIGIT)*
+	;
 
-fragment
-CHAR
-    : [a-zA-Z_]
-    ;
+fragment CHAR
+	: [a-zA-Z_]
+	;
 
-fragment
-DIGIT
-    : [0-9]
-    ;
+fragment DIGIT
+	: [0-9]
+	;

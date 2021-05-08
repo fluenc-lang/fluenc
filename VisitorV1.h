@@ -35,10 +35,10 @@ class VisitorV1 : public dzBaseVisitor
 	public:
 		VisitorV1(LLVMContext &context, Module &module, BasicBlock *block, Function *function, std::map<std::string, Value *> locals);
 
-		antlrcpp::Any visitAssignment(dzParser::AssignmentContext *context) override;
+//		antlrcpp::Any visitAssignment(dzParser::AssignmentContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
 		antlrcpp::Any visitTypeName(dzParser::TypeNameContext *context) override;
-		antlrcpp::Any visitBlock(dzParser::BlockContext *context) override;
+//		antlrcpp::Any visitBlock(dzParser::BlockContext *context) override;
 		antlrcpp::Any visitRet(dzParser::RetContext *context) override;
 		antlrcpp::Any visitConstant(dzParser::ConstantContext *context) override;
 		antlrcpp::Any visitMember(dzParser::MemberContext *context) override;
@@ -48,10 +48,10 @@ class VisitorV1 : public dzBaseVisitor
 		antlrcpp::Any visitStructure(dzParser::StructureContext *context) override;
 
 	private:
-		VisitorV1 populateBlock(VisitorV1 visitor
-			, std::vector<dzParser::StatementContext *>::const_iterator iterator
-			, std::vector<dzParser::StatementContext *>::const_iterator end
-			);
+//		VisitorV1 populateBlock(VisitorV1 visitor
+//			, std::vector<dzParser::StatementContext *>::const_iterator iterator
+//			, std::vector<dzParser::StatementContext *>::const_iterator end
+//			);
 
 		template<class T>
 		T visitAs(tree::ParseTree *tree)

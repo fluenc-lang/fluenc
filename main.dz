@@ -1,23 +1,51 @@
-int bar(int p1, int p2, int p3)
+import int fopen(string filename, string mode);
+
+function barr(int v)
 {
-	var p5 = 12;
-
-	if (p3 > 2)
-	{
-		var p4 = 2 + p5;
-
-		if (p4 < 5)
-		{
-			return p5;
-		}
-
-		return p4;
-	}
-
-	return p1 + p2 + p3 + p5;
+	return v * 2;
 }
 
-int main()
+function bar(int v)
 {
-	return bar(1, 2, 3);
+	return v;
+}
+
+function foo(int v)
+{
+	return bar(v + 2) + bar(v + 3);
+}
+
+function f1()
+{
+	return 2;
+}
+
+function f2(int v)
+{
+	return v * 4;
+}
+
+export int main()
+{
+	return foo(1);
+}
+
+function mains()
+{
+	return f2(foo(f1() + 2));
+}
+
+function oob1()
+{
+	return 2 + koo(ba());
+}
+
+function oob2()
+{
+	return koo(ba()) + 2;
+}
+
+function oob3()
+{
+	return tor(koo(ba()) + 2);
 }

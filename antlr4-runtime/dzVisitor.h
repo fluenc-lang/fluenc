@@ -35,13 +35,9 @@ public:
 
     virtual antlrcpp::Any visitMember(dzParser::MemberContext *context) = 0;
 
-    virtual antlrcpp::Any visitAssignment(dzParser::AssignmentContext *context) = 0;
-
     virtual antlrcpp::Any visitRet(dzParser::RetContext *context) = 0;
 
     virtual antlrcpp::Any visitConditional(dzParser::ConditionalContext *context) = 0;
-
-    virtual antlrcpp::Any visitStatement(dzParser::StatementContext *context) = 0;
 
     virtual antlrcpp::Any visitBlock(dzParser::BlockContext *context) = 0;
 

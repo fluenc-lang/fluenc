@@ -31,15 +31,19 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <numeric>
 
 #include "antlr4-runtime/dzBaseVisitor.h"
 #include "antlr4-runtime/dzLexer.h"
 #include "antlr4-runtime/dzParser.h"
 
 #include "VisitorV1.h"
+#include "DzValue.h"
+#include "VisitorV2.h"
 
 using namespace llvm;
 using namespace antlr4;
+
 
 int main()
 {
@@ -62,98 +66,100 @@ int main()
 	LLVMContext context;
 	Module module("dz", context);
 
-	VisitorV1 visitor(context, module, nullptr, nullptr, std::map<std::string, Value *>());
+	VisitorV2 visitor(FunctionAttribute::None, nullptr, nullptr);
 
-	try
-	{
-		program->accept(&visitor);
-	}
-	catch (CompilerException *exception)
-	{
-		std::cout << "main.dz:" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
-		std::cout << std::setw(5) << exception->row() << " | ";
+	visitor.visit(program);
 
-		stream.seekg(0);
+//	try
+//	{
 
-		std::string line;
+//	}
+//	catch (CompilerException *exception)
+//	{
+//		std::cout << "main.dz:" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
+//		std::cout << std::setw(5) << exception->row() << " | ";
 
-		for (int i = 0; i < exception->row(); i++)
-		{
-			std::getline(stream, line);
-		}
+//		stream.seekg(0);
 
-		auto trimmed = std::find_if(begin(line), end(line), [](unsigned char ch)
-		{
-			return !std::isspace(ch);
-		});
+//		std::string line;
 
-		for (auto i = trimmed; i != end(line); i++)
-		{
-			std::cout << *i;
-		}
+//		for (int i = 0; i < exception->row(); i++)
+//		{
+//			std::getline(stream, line);
+//		}
 
-		std::cout << std::endl;
-		std::cout << std::setw(8) << "| ";
+//		auto trimmed = std::find_if(begin(line), end(line), [](unsigned char ch)
+//		{
+//			return !std::isspace(ch);
+//		});
 
-		for (auto i = trimmed; i != end(line); i++)
-		{
-			auto tokenSelector = [&]
-			{
-				if (i == begin(line) + exception->column())
-				{
-					return "^";
-				}
+//		for (auto i = trimmed; i != end(line); i++)
+//		{
+//			std::cout << *i;
+//		}
 
-				if (i < begin(line) + exception->column())
-				{
-					return " ";
-				}
+//		std::cout << std::endl;
+//		std::cout << std::setw(8) << "| ";
 
-				if (i > begin(line) + exception->column() + exception->length())
-				{
-					return " ";
-				}
+//		for (auto i = trimmed; i != end(line); i++)
+//		{
+//			auto tokenSelector = [&]
+//			{
+//				if (i == begin(line) + exception->column())
+//				{
+//					return "^";
+//				}
 
-				return "~";
-			};
+//				if (i < begin(line) + exception->column())
+//				{
+//					return " ";
+//				}
 
-			std::cout << tokenSelector();
-		}
+//				if (i > begin(line) + exception->column() + exception->length())
+//				{
+//					return " ";
+//				}
 
-		std::cout << std::endl;
+//				return "~";
+//			};
 
-		return 1;
-	}
+//			std::cout << tokenSelector();
+//		}
 
-	module.print(llvm::errs(), nullptr);
+//		std::cout << std::endl;
 
-	std::string error;
+//		return 1;
+//	}
 
-	auto targetTriple = sys::getDefaultTargetTriple();
-	auto target = TargetRegistry::lookupTarget(targetTriple, error);
+//	module.print(llvm::errs(), nullptr);
 
-	if (!target)
-	{
-		errs() << error;
+//	std::string error;
 
-		return 1;
-	}
+//	auto targetTriple = sys::getDefaultTargetTriple();
+//	auto target = TargetRegistry::lookupTarget(targetTriple, error);
 
-	auto relocModel = Optional<Reloc::Model>();
-	auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), relocModel);
+//	if (!target)
+//	{
+//		errs() << error;
 
-	module.setDataLayout(targetMachine->createDataLayout());
+//		return 1;
+//	}
 
-	std::error_code EC;
-	raw_fd_ostream dest("output.o", EC, sys::fs::OF_None);
+//	auto relocModel = Optional<Reloc::Model>();
+//	auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", TargetOptions(), relocModel);
 
-	legacy::PassManager pm;
+//	module.setDataLayout(targetMachine->createDataLayout());
 
-	targetMachine->addPassesToEmitFile(pm, dest, nullptr, CGFT_ObjectFile);
+//	std::error_code EC;
+//	raw_fd_ostream dest("output.o", EC, sys::fs::OF_None);
 
-	pm.run(module);
+//	legacy::PassManager pm;
 
-	dest.flush();
+//	targetMachine->addPassesToEmitFile(pm, dest, nullptr, CGFT_ObjectFile);
+
+//	pm.run(module);
+
+//	dest.flush();
 
 	return 0;
 

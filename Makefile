@@ -52,19 +52,49 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = CompilerException.cpp \
+SOURCES       = CallContext.cpp \
+		CompilerException.cpp \
+		DzBinary.cpp \
+		DzClosure.cpp \
+		DzConstant.cpp \
+		DzConsumer.cpp \
+		DzFunction.cpp \
+		DzFunctionCall.cpp \
+		DzMember.cpp \
+		DzMemberAccess.cpp \
+		DzParameter.cpp \
+		DzReturn.cpp \
+		DzTerminator.cpp \
+		DzTypeName.cpp \
+		EntryPoint.cpp \
 		UndeclaredIdentifierException.cpp \
 		UnknownTypeException.cpp \
 		VisitorV1.cpp \
+		VisitorV2.cpp \
 		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
 		antlr4-runtime/dzParser.cpp \
 		antlr4-runtime/dzVisitor.cpp 
-OBJECTS       = CompilerException.o \
+OBJECTS       = CallContext.o \
+		CompilerException.o \
+		DzBinary.o \
+		DzClosure.o \
+		DzConstant.o \
+		DzConsumer.o \
+		DzFunction.o \
+		DzFunctionCall.o \
+		DzMember.o \
+		DzMemberAccess.o \
+		DzParameter.o \
+		DzReturn.o \
+		DzTerminator.o \
+		DzTypeName.o \
+		EntryPoint.o \
 		UndeclaredIdentifierException.o \
 		UnknownTypeException.o \
 		VisitorV1.o \
+		VisitorV2.o \
 		main.o \
 		dzBaseVisitor.o \
 		dzLexer.o \
@@ -125,6 +155,8 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_KDeclarative.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KDESu.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KDNSSD.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KDSoapClient.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KDSoapServer.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KEmoticons.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KFileMetaData.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KGantt.pri \
@@ -160,6 +192,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_KMailTransport.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KMailTransportAkonadi.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KManageSieve.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KMbox.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KMime.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KNewStuff.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KNewStuffCore.pri \
@@ -172,6 +205,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_KPeopleWidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KPIMTextEdit.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KPty.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KQuickImageEditor.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KrossCore.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KrossUi.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KRunner.pri \
@@ -195,6 +229,30 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_KXmlGui.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KXmlRpcClient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_Ldap.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri \
@@ -265,6 +323,16 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmlworkerscript_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3d.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3d_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dassetimport.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dassetimport_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3drender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3drender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3druntimerender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3druntimerender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dutils.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dutils_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri \
@@ -280,9 +348,13 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_sslserver.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_sslserver_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_svg.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_svg_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_testlib.pri \
@@ -328,7 +400,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_MailCommon.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MailImporter.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MailImporterAkonadi.pri \
-		/usr/lib/qt/mkspecs/modules/qt_Mbox.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MessageComposer.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MessageCore.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MessageList.pri \
@@ -344,6 +415,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_Solid.pri \
 		/usr/lib/qt/mkspecs/modules/qt_SonnetCore.pri \
 		/usr/lib/qt/mkspecs/modules/qt_SonnetUi.pri \
+		/usr/lib/qt/mkspecs/modules/qt_Syndication.pri \
 		/usr/lib/qt/mkspecs/modules/qt_TemplateParser.pri \
 		/usr/lib/qt/mkspecs/modules/qt_ThreadWeaver.pri \
 		/usr/lib/qt/mkspecs/modules/qt_WebEngineViewer.pri \
@@ -371,17 +443,49 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/exceptions.prf \
 		/usr/lib/qt/mkspecs/features/yacc.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
-		dz.pro CompilerException.h \
+		dz.pro CallContext.h \
+		CompilerException.h \
+		DzBinary.h \
+		DzClosure.h \
+		DzConstant.h \
+		DzConsumer.h \
+		DzFunction.h \
+		DzFunctionCall.h \
+		DzMember.h \
+		DzMemberAccess.h \
+		DzParameter.h \
+		DzReturn.h \
+		DzTerminator.h \
+		DzTypeName.h \
+		DzValue.h \
+		EntryPoint.h \
+		FunctionAttribute.h \
 		UndeclaredIdentifierException.h \
 		UnknownTypeException.h \
 		VisitorV1.h \
+		VisitorV2.h \
 		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzLexer.h \
 		antlr4-runtime/dzParser.h \
-		antlr4-runtime/dzVisitor.h CompilerException.cpp \
+		antlr4-runtime/dzVisitor.h CallContext.cpp \
+		CompilerException.cpp \
+		DzBinary.cpp \
+		DzClosure.cpp \
+		DzConstant.cpp \
+		DzConsumer.cpp \
+		DzFunction.cpp \
+		DzFunctionCall.cpp \
+		DzMember.cpp \
+		DzMemberAccess.cpp \
+		DzParameter.cpp \
+		DzReturn.cpp \
+		DzTerminator.cpp \
+		DzTypeName.cpp \
+		EntryPoint.cpp \
 		UndeclaredIdentifierException.cpp \
 		UnknownTypeException.cpp \
 		VisitorV1.cpp \
+		VisitorV2.cpp \
 		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
@@ -453,6 +557,8 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_KDeclarative.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KDESu.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KDNSSD.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KDSoapClient.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KDSoapServer.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KEmoticons.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KFileMetaData.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KGantt.pri \
@@ -488,6 +594,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_KMailTransport.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KMailTransportAkonadi.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KManageSieve.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KMbox.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KMime.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KNewStuff.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KNewStuffCore.pri \
@@ -500,6 +607,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_KPeopleWidgets.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KPIMTextEdit.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KPty.pri \
+		/usr/lib/qt/mkspecs/modules/qt_KQuickImageEditor.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KrossCore.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KrossUi.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KRunner.pri \
@@ -523,6 +631,30 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_KXmlGui.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KXmlRpcClient.pri \
 		/usr/lib/qt/mkspecs/modules/qt_Ldap.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri \
@@ -593,6 +725,16 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_lib_qmlworkerscript_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3d.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3d_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dassetimport.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dassetimport_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3drender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3drender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3druntimerender.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3druntimerender_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dutils.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_quick3dutils_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri \
@@ -608,9 +750,13 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_sslserver.pri \
+		/usr/lib/qt/mkspecs/modules/qt_lib_sslserver_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_svg.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_svg_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_testlib.pri \
@@ -656,7 +802,6 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_MailCommon.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MailImporter.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MailImporterAkonadi.pri \
-		/usr/lib/qt/mkspecs/modules/qt_Mbox.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MessageComposer.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MessageCore.pri \
 		/usr/lib/qt/mkspecs/modules/qt_MessageList.pri \
@@ -672,6 +817,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/modules/qt_Solid.pri \
 		/usr/lib/qt/mkspecs/modules/qt_SonnetCore.pri \
 		/usr/lib/qt/mkspecs/modules/qt_SonnetUi.pri \
+		/usr/lib/qt/mkspecs/modules/qt_Syndication.pri \
 		/usr/lib/qt/mkspecs/modules/qt_TemplateParser.pri \
 		/usr/lib/qt/mkspecs/modules/qt_ThreadWeaver.pri \
 		/usr/lib/qt/mkspecs/modules/qt_WebEngineViewer.pri \
@@ -756,6 +902,8 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_KDeclarative.pri:
 /usr/lib/qt/mkspecs/modules/qt_KDESu.pri:
 /usr/lib/qt/mkspecs/modules/qt_KDNSSD.pri:
+/usr/lib/qt/mkspecs/modules/qt_KDSoapClient.pri:
+/usr/lib/qt/mkspecs/modules/qt_KDSoapServer.pri:
 /usr/lib/qt/mkspecs/modules/qt_KEmoticons.pri:
 /usr/lib/qt/mkspecs/modules/qt_KFileMetaData.pri:
 /usr/lib/qt/mkspecs/modules/qt_KGantt.pri:
@@ -791,6 +939,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_KMailTransport.pri:
 /usr/lib/qt/mkspecs/modules/qt_KMailTransportAkonadi.pri:
 /usr/lib/qt/mkspecs/modules/qt_KManageSieve.pri:
+/usr/lib/qt/mkspecs/modules/qt_KMbox.pri:
 /usr/lib/qt/mkspecs/modules/qt_KMime.pri:
 /usr/lib/qt/mkspecs/modules/qt_KNewStuff.pri:
 /usr/lib/qt/mkspecs/modules/qt_KNewStuffCore.pri:
@@ -803,6 +952,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_KPeopleWidgets.pri:
 /usr/lib/qt/mkspecs/modules/qt_KPIMTextEdit.pri:
 /usr/lib/qt/mkspecs/modules/qt_KPty.pri:
+/usr/lib/qt/mkspecs/modules/qt_KQuickImageEditor.pri:
 /usr/lib/qt/mkspecs/modules/qt_KrossCore.pri:
 /usr/lib/qt/mkspecs/modules/qt_KrossUi.pri:
 /usr/lib/qt/mkspecs/modules/qt_KRunner.pri:
@@ -826,6 +976,30 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_KXmlGui.pri:
 /usr/lib/qt/mkspecs/modules/qt_KXmlRpcClient.pri:
 /usr/lib/qt/mkspecs/modules/qt_Ldap.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3danimation.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3danimation_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dcore.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dcore_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dextras.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dextras_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dinput.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dinput_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dlogic_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquick.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquick_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickanimation_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickextras_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickinput_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickrender_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3dquickscene2d_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3drender.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_3drender_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri:
@@ -896,6 +1070,16 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_lib_qmlworkerscript_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_qtmultimediaquicktools_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_quick.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3d.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3d_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3dassetimport.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3dassetimport_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3drender.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3drender_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3druntimerender.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3druntimerender_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3dutils.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_quick3dutils_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_quick_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_quickcontrols2_private.pri:
@@ -911,9 +1095,13 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_lib_scripttools_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_sensors.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_sensors_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_serialport.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_serialport_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_service_support_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_sql.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_sql_private.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_sslserver.pri:
+/usr/lib/qt/mkspecs/modules/qt_lib_sslserver_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_svg.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_svg_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_testlib.pri:
@@ -959,7 +1147,6 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_MailCommon.pri:
 /usr/lib/qt/mkspecs/modules/qt_MailImporter.pri:
 /usr/lib/qt/mkspecs/modules/qt_MailImporterAkonadi.pri:
-/usr/lib/qt/mkspecs/modules/qt_Mbox.pri:
 /usr/lib/qt/mkspecs/modules/qt_MessageComposer.pri:
 /usr/lib/qt/mkspecs/modules/qt_MessageCore.pri:
 /usr/lib/qt/mkspecs/modules/qt_MessageList.pri:
@@ -975,6 +1162,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/modules/qt_Solid.pri:
 /usr/lib/qt/mkspecs/modules/qt_SonnetCore.pri:
 /usr/lib/qt/mkspecs/modules/qt_SonnetUi.pri:
+/usr/lib/qt/mkspecs/modules/qt_Syndication.pri:
 /usr/lib/qt/mkspecs/modules/qt_TemplateParser.pri:
 /usr/lib/qt/mkspecs/modules/qt_ThreadWeaver.pri:
 /usr/lib/qt/mkspecs/modules/qt_WebEngineViewer.pri:
@@ -1018,8 +1206,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents CompilerException.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h $(DISTDIR)/
-	$(COPY_FILE) --parents CompilerException.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.h CompilerException.h DzBinary.h DzClosure.h DzConstant.h DzConsumer.h DzFunction.h DzFunctionCall.h DzMember.h DzMemberAccess.h DzParameter.h DzReturn.h DzTerminator.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h VisitorV2.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.cpp CompilerException.cpp DzBinary.cpp DzClosure.cpp DzConstant.cpp DzConsumer.cpp DzFunction.cpp DzFunctionCall.cpp DzMember.cpp DzMemberAccess.cpp DzParameter.cpp DzReturn.cpp DzTerminator.cpp DzTypeName.cpp EntryPoint.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV2.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1067,12 +1255,108 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
+CallContext.o: CallContext.cpp CallContext.h \
+		FunctionAttribute.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CallContext.o CallContext.cpp
+
 CompilerException.o: CompilerException.cpp CompilerException.h \
 		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzVisitor.h \
 		antlr4-runtime/dzParser.h \
 		antlr4-runtime/dzLexer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CompilerException.o CompilerException.cpp
+
+DzBinary.o: DzBinary.cpp DzBinary.h \
+		antlr4-runtime/dzParser.h \
+		DzValue.h \
+		VisitorV2.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		FunctionAttribute.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzBinary.o DzBinary.cpp
+
+DzClosure.o: DzClosure.cpp DzClosure.h \
+		DzValue.h \
+		DzParameter.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzClosure.o DzClosure.cpp
+
+DzConstant.o: DzConstant.cpp DzConstant.h \
+		DzValue.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzConstant.o DzConstant.cpp
+
+DzConsumer.o: DzConsumer.cpp DzConsumer.h \
+		DzValue.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzConsumer.o DzConsumer.cpp
+
+DzFunction.o: DzFunction.cpp DzFunction.h \
+		DzValue.h \
+		FunctionAttribute.h \
+		DzMember.h \
+		DzTypeName.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzFunction.o DzFunction.cpp
+
+DzFunctionCall.o: DzFunctionCall.cpp DzFunctionCall.h \
+		antlr4-runtime/dzParser.h \
+		DzValue.h \
+		DzReturn.h \
+		DzClosure.h \
+		DzParameter.h \
+		VisitorV2.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		FunctionAttribute.h \
+		EntryPoint.h \
+		DzFunction.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzFunctionCall.o DzFunctionCall.cpp
+
+DzMember.o: DzMember.cpp DzMember.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMember.o DzMember.cpp
+
+DzMemberAccess.o: DzMemberAccess.cpp DzMemberAccess.h \
+		DzValue.h \
+		EntryPoint.h \
+		UndeclaredIdentifierException.h \
+		CompilerException.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h \
+		antlr4-runtime/dzLexer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMemberAccess.o DzMemberAccess.cpp
+
+DzParameter.o: DzParameter.cpp DzParameter.h \
+		DzValue.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzParameter.o DzParameter.cpp
+
+DzReturn.o: DzReturn.cpp DzReturn.h \
+		DzValue.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzReturn.o DzReturn.cpp
+
+DzTerminator.o: DzTerminator.cpp DzTerminator.h \
+		antlr4-runtime/dzParser.h \
+		DzValue.h \
+		VisitorV2.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		FunctionAttribute.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzTerminator.o DzTerminator.cpp
+
+DzTypeName.o: DzTypeName.cpp DzTypeName.h \
+		DzValue.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzTypeName.o DzTypeName.cpp
+
+EntryPoint.o: EntryPoint.cpp EntryPoint.h \
+		DzFunction.h \
+		DzValue.h \
+		FunctionAttribute.h \
+		DzTypeName.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EntryPoint.o EntryPoint.cpp
 
 UndeclaredIdentifierException.o: UndeclaredIdentifierException.cpp UndeclaredIdentifierException.h \
 		CompilerException.h \
@@ -1100,6 +1384,28 @@ VisitorV1.o: VisitorV1.cpp VisitorV1.h \
 		UndeclaredIdentifierException.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV1.o VisitorV1.cpp
 
+VisitorV2.o: VisitorV2.cpp VisitorV2.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h \
+		FunctionAttribute.h \
+		DzBinary.h \
+		DzValue.h \
+		DzMemberAccess.h \
+		DzConstant.h \
+		DzReturn.h \
+		DzClosure.h \
+		DzParameter.h \
+		DzFunctionCall.h \
+		DzTerminator.h \
+		CallContext.h \
+		EntryPoint.h \
+		DzFunction.h \
+		DzTypeName.h \
+		DzMember.h \
+		DzConsumer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV2.o VisitorV2.cpp
+
 main.o: main.cpp antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzVisitor.h \
 		antlr4-runtime/dzParser.h \
@@ -1107,7 +1413,10 @@ main.o: main.cpp antlr4-runtime/dzBaseVisitor.h \
 		VisitorV1.h \
 		UnknownTypeException.h \
 		CompilerException.h \
-		UndeclaredIdentifierException.h
+		UndeclaredIdentifierException.h \
+		DzValue.h \
+		VisitorV2.h \
+		FunctionAttribute.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 dzBaseVisitor.o: antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzBaseVisitor.h \

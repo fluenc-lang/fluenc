@@ -47,19 +47,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitAssignment(dzParser::AssignmentContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitRet(dzParser::RetContext *ctx) override {
     return visitChildren(ctx);
   }
 
   virtual antlrcpp::Any visitConditional(dzParser::ConditionalContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitStatement(dzParser::StatementContext *ctx) override {
     return visitChildren(ctx);
   }
 
