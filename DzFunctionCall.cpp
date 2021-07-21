@@ -26,7 +26,11 @@ void DzFunctionCall::addArgument(DzValue *argument)
 
 llvm::Value *DzFunctionCall::build(const EntryPoint &entryPoint) const
 {
-	auto target = getTarget(entryPoint);
+	auto closure = entryPoint.closure();
+//	auto context = entryPoint.context();
+	auto locals = entryPoint.locals();
+
+	std::cout << m_name << "(";
 
 	std::vector<llvm::Value *> arguments;
 
@@ -35,7 +39,11 @@ llvm::Value *DzFunctionCall::build(const EntryPoint &entryPoint) const
 		auto value = argument->build(entryPoint);
 
 		arguments.push_back(value);
+
+		std::cout << ", ";
 	}
+
+	arguments.push_back(closure);
 
 	if (m_parent)
 	{
@@ -44,7 +52,11 @@ llvm::Value *DzFunctionCall::build(const EntryPoint &entryPoint) const
 		arguments.push_back(consumer);
 	}
 
+	std::cout << ")";
+
 	llvm::IRBuilder<> builder(entryPoint.block());
+
+	auto target = getTarget(entryPoint);
 
 	return builder.CreateCall(target, arguments);
 }
@@ -59,7 +71,7 @@ llvm::FunctionCallee DzFunctionCall::getTarget(const EntryPoint &entryPoint) con
 
 	if (local != locals.end())
 	{
-		auto functionPointer = local->second;
+		auto functionPointer = local->second->build(entryPoint);
 
 		auto type = functionPointer->getType();
 		auto pet = type->getPointerElementType();

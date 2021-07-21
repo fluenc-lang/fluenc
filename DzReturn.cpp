@@ -1,5 +1,7 @@
 #include <llvm/IR/IRBuilder.h>
 
+#include <iostream>
+
 #include "DzReturn.h"
 #include "EntryPoint.h"
 

@@ -1,10 +1,5 @@
 import int fopen(string filename, string mode);
 
-function barr(int v)
-{
-	return v * 2;
-}
-
 function bar(int v)
 {
 	return v;
@@ -13,6 +8,11 @@ function bar(int v)
 function foo(int v)
 {
 	return bar(v + 2) + bar(v + 3);
+}
+
+function kask(int v)
+{
+	return bar(v + 2) + 1;
 }
 
 function f1()
@@ -27,7 +27,7 @@ function f2(int v)
 
 export int main()
 {
-	return foo(1);
+	return kask(1);
 }
 
 function mains()

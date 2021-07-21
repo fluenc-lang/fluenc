@@ -1,6 +1,8 @@
 #include <llvm/IR/Type.h>
 #include <llvm/IR/DerivedTypes.h>
 
+#include <iostream>
+
 #include "DzTypeName.h"
 #include "EntryPoint.h"
 
@@ -23,11 +25,20 @@ llvm::Type *DzTypeName::type(const EntryPoint &entryPoint) const
 		return llvm::Type::getInt32Ty(*context);
 	}
 
+	if (m_typeName == "context")
+	{
+		return llvm::Type::getInt32PtrTy(*context);
+	}
+
 	if (m_typeName == "consumer")
 	{
 		auto returnType = entryPoint.returnType();
 
-		std::vector<llvm::Type *> argumentTypes = { llvm::Type::getInt32Ty(*context) };
+		std::vector<llvm::Type *> argumentTypes =
+		{
+			llvm::Type::getInt32Ty(*context),
+			llvm::Type::getInt32PtrTy(*context),
+		};
 
 		return llvm::PointerType::getUnqual(llvm::FunctionType::get(returnType, argumentTypes, false));
 	}

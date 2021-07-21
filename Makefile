@@ -54,8 +54,10 @@ OBJECTS_DIR   = ./
 
 SOURCES       = CallContext.cpp \
 		CompilerException.cpp \
+		DebugPrinter.cpp \
 		DzBinary.cpp \
 		DzClosure.cpp \
+		DzClosureAccessor.cpp \
 		DzConstant.cpp \
 		DzConsumer.cpp \
 		DzFunction.cpp \
@@ -78,8 +80,10 @@ SOURCES       = CallContext.cpp \
 		antlr4-runtime/dzVisitor.cpp 
 OBJECTS       = CallContext.o \
 		CompilerException.o \
+		DebugPrinter.o \
 		DzBinary.o \
 		DzClosure.o \
+		DzClosureAccessor.o \
 		DzConstant.o \
 		DzConsumer.o \
 		DzFunction.o \
@@ -445,8 +449,10 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
 		dz.pro CallContext.h \
 		CompilerException.h \
+		DebugPrinter.h \
 		DzBinary.h \
 		DzClosure.h \
+		DzClosureAccessor.h \
 		DzConstant.h \
 		DzConsumer.h \
 		DzFunction.h \
@@ -469,8 +475,10 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		antlr4-runtime/dzParser.h \
 		antlr4-runtime/dzVisitor.h CallContext.cpp \
 		CompilerException.cpp \
+		DebugPrinter.cpp \
 		DzBinary.cpp \
 		DzClosure.cpp \
+		DzClosureAccessor.cpp \
 		DzConstant.cpp \
 		DzConsumer.cpp \
 		DzFunction.cpp \
@@ -1206,8 +1214,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents CallContext.h CompilerException.h DzBinary.h DzClosure.h DzConstant.h DzConsumer.h DzFunction.h DzFunctionCall.h DzMember.h DzMemberAccess.h DzParameter.h DzReturn.h DzTerminator.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h VisitorV2.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h $(DISTDIR)/
-	$(COPY_FILE) --parents CallContext.cpp CompilerException.cpp DzBinary.cpp DzClosure.cpp DzConstant.cpp DzConsumer.cpp DzFunction.cpp DzFunctionCall.cpp DzMember.cpp DzMemberAccess.cpp DzParameter.cpp DzReturn.cpp DzTerminator.cpp DzTypeName.cpp EntryPoint.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV2.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.h CompilerException.h DebugPrinter.h DzBinary.h DzClosure.h DzClosureAccessor.h DzConstant.h DzConsumer.h DzFunction.h DzFunctionCall.h DzMember.h DzMemberAccess.h DzParameter.h DzReturn.h DzTerminator.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h VisitorV2.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.cpp CompilerException.cpp DebugPrinter.cpp DzBinary.cpp DzClosure.cpp DzClosureAccessor.cpp DzConstant.cpp DzConsumer.cpp DzFunction.cpp DzFunctionCall.cpp DzMember.cpp DzMemberAccess.cpp DzParameter.cpp DzReturn.cpp DzTerminator.cpp DzTypeName.cpp EntryPoint.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV2.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1266,6 +1274,9 @@ CompilerException.o: CompilerException.cpp CompilerException.h \
 		antlr4-runtime/dzLexer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CompilerException.o CompilerException.cpp
 
+DebugPrinter.o: DebugPrinter.cpp DebugPrinter.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DebugPrinter.o DebugPrinter.cpp
+
 DzBinary.o: DzBinary.cpp DzBinary.h \
 		antlr4-runtime/dzParser.h \
 		DzValue.h \
@@ -1278,9 +1289,16 @@ DzBinary.o: DzBinary.cpp DzBinary.h \
 
 DzClosure.o: DzClosure.cpp DzClosure.h \
 		DzValue.h \
+		DzClosureAccessor.h \
+		EntryPoint.h \
 		DzParameter.h \
-		EntryPoint.h
+		DzMemberAccess.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzClosure.o DzClosure.cpp
+
+DzClosureAccessor.o: DzClosureAccessor.cpp DzClosureAccessor.h \
+		DzValue.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzClosureAccessor.o DzClosureAccessor.cpp
 
 DzConstant.o: DzConstant.cpp DzConstant.h \
 		DzValue.h \
@@ -1296,6 +1314,7 @@ DzFunction.o: DzFunction.cpp DzFunction.h \
 		FunctionAttribute.h \
 		DzMember.h \
 		DzTypeName.h \
+		DzClosureAccessor.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzFunction.o DzFunction.cpp
 

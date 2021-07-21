@@ -15,35 +15,44 @@ class DzTypeName;
 class EntryPoint
 {
 	public:
-		EntryPoint(llvm::BasicBlock *block
+		EntryPoint(const EntryPoint *parent
+			, llvm::BasicBlock *block
 			, llvm::LLVMContext *context
 			, llvm::Module *module
+			, llvm::Value *closure
 			, DzTypeName *returnType
 			, const std::map<std::string, DzFunction *> &functions
-			, const std::map<std::string, llvm::Value *> &locals
+			, const std::map<std::string, DzValue *> &locals
 			);
+
+		const EntryPoint *parent() const;
 
 		llvm::BasicBlock *block() const;
 		llvm::LLVMContext *context() const;
 		llvm::Module *module() const;
 		llvm::Type *returnType() const;
-		llvm::Function *function() const;
+		llvm::Value *closure() const;
 
 		std::map<std::string, DzFunction *> functions() const;
-		std::map<std::string, llvm::Value *> locals() const;
+		std::map<std::string, DzValue *> locals() const;
 
-		EntryPoint withLocals(const std::map<std::string, llvm::Value *> &locals) const;
+		EntryPoint withLocals(const std::map<std::string, DzValue *> &locals) const;
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
+		EntryPoint withClosure(llvm::Value *closure) const;
+		EntryPoint withParent(const EntryPoint *parent) const;
 
 	private:
+		const EntryPoint *m_parent;
+
 		llvm::BasicBlock *m_block;
 		llvm::LLVMContext *m_context;
 		llvm::Module *m_module;
+		llvm::Value *m_closure;
 
 		DzTypeName *m_returnType;
 
 		std::map<std::string, DzFunction *> m_functions;
-		std::map<std::string, llvm::Value *> m_locals;
+		std::map<std::string, DzValue *> m_locals;
 };
 
 

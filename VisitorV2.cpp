@@ -171,11 +171,15 @@ antlrcpp::Any VisitorV2::visitFunction(dzParser::FunctionContext *ctx)
 
 	if (attribute == FunctionAttribute::None)
 	{
-		// TODO! What is the types produced by this function?
+		auto context = new DzMember("parent"
+			, new DzTypeName("context")
+			);
 
-		auto ct = new DzTypeName("consumer");
-		auto consumer = new DzMember("consumer", ct);
+		auto consumer = new DzMember("consumer"
+			, new DzTypeName("consumer")
+			);
 
+		arguments.push_back(context);
 		arguments.push_back(consumer);
 	}
 
@@ -234,9 +238,9 @@ antlrcpp::Any VisitorV2::visitProgram(dzParser::ProgramContext *ctx)
 
 	for (auto root : roots)
 	{
-		std::map<std::string, llvm::Value *> locals;
+		std::map<std::string, DzValue *> locals;
 
-		EntryPoint entryPoint(nullptr, &context, &module, root->returnType(), functions, locals);
+		EntryPoint entryPoint(nullptr, nullptr, &context, &module, nullptr, root->returnType(), functions, locals);
 
 		root->build(entryPoint);
 	}
@@ -274,25 +278,6 @@ antlrcpp::Any VisitorV2::visitProgram(dzParser::ProgramContext *ctx)
 	return defaultResult();
 }
 
-class DzClosureData : public DzValue
-{
-	public:
-		DzClosureData(DzValue *value)
-			: m_value(value)
-		{
-		}
-
-		llvm::Value *build(const EntryPoint &entryPoint) const override
-		{
-//			llvm::StructType::create(
-
-			return nullptr;
-		}
-
-	private:
-		DzValue *m_value;
-};
-
 antlrcpp::Any VisitorV2::visitRet(dzParser::RetContext *ctx)
 {
 	if (m_attribute == FunctionAttribute::None)
@@ -308,9 +293,6 @@ antlrcpp::Any VisitorV2::visitRet(dzParser::RetContext *ctx)
 		auto value = node.value();
 		auto root = node.root();
 
-//		auto data = new DzClosureData(value);
-
-//		call->addArgument(data);
 		call->addArgument(value);
 
 		auto ret = new DzReturn(root);

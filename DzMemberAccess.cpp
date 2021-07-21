@@ -19,5 +19,7 @@ llvm::Value *DzMemberAccess::build(const EntryPoint &context) const
 		return nullptr;
 	}
 
-	return result->second;
+	std::cout << m_name;
+
+	return result->second->build(context);
 }

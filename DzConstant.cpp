@@ -1,6 +1,8 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Type.h>
 
+#include <iostream>
+
 #include "DzConstant.h"
 #include "EntryPoint.h"
 

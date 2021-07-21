@@ -3,8 +3,10 @@ CONFIG += DEBUG
 SOURCES += \
 	CallContext.cpp \
 	CompilerException.cpp \
+	DebugPrinter.cpp \
 	DzBinary.cpp \
 	DzClosure.cpp \
+	DzClosureAccessor.cpp \
 	DzConstant.cpp \
 	DzConsumer.cpp \
 	DzFunction.cpp \
@@ -29,8 +31,10 @@ SOURCES += \
 HEADERS += \
 	CallContext.h \
 	CompilerException.h \
+	DebugPrinter.h \
 	DzBinary.h \
 	DzClosure.h \
+	DzClosureAccessor.h \
 	DzConstant.h \
 	DzConsumer.h \
 	DzFunction.h \

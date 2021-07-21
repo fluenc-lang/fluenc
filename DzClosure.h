@@ -10,7 +10,7 @@ class DzClosure : public DzValue
 	public:
 		DzClosure(int id, DzValue *parent);
 
-		DzParameter *parameter();
+		DzValue *parameter();
 
 		llvm::Value *build(const EntryPoint &entryPoint) const override;
 
