@@ -1,0 +1,16 @@
+import int fopen(string filename, string mode);
+
+function addFive(int v)
+{
+    return v + 5;
+}
+
+function calc(int v)
+{
+        return addFive(v) + addFive(2);
+}
+
+export int main()
+{
+        return calc(2 + 1);
+}

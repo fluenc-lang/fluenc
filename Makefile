@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_QML_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_QML_DEBUG -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR='"/home/znurre/Program/Develop/C++/dz"'
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I/usr/include/antlr4-runtime -I/usr/include/qt -I/usr/include/qt/QtGui -I/usr/include/qt/QtCore -I. -I/usr/lib/qt/mkspecs/linux-g++
+INCPATH       = -I. -I/usr/include/antlr4-runtime -I/usr/include/qt -I/usr/include/qt/QtGui -I/usr/include/qt/QtTest -I/usr/include/qt/QtCore -I. -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = dz1.0.0
 DISTDIR = /home/znurre/Program/Develop/C++/dz/.tmp/dz1.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) -lLLVM-11 -lantlr4-runtime /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so -lGL -lpthread   
+LIBS          = $(SUBLIBS) -lLLVM-12 -lantlr4-runtime /usr/lib/libQt5Gui.so /usr/lib/libQt5Test.so /usr/lib/libQt5Core.so -lGL -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -69,15 +69,18 @@ SOURCES       = CallContext.cpp \
 		DzTerminator.cpp \
 		DzTypeName.cpp \
 		EntryPoint.cpp \
+		KaleidoscopeJIT.cpp \
+		Tests.cpp \
 		UndeclaredIdentifierException.cpp \
 		UnknownTypeException.cpp \
 		VisitorV1.cpp \
 		VisitorV2.cpp \
+		VisitorV3.cpp \
 		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
 		antlr4-runtime/dzParser.cpp \
-		antlr4-runtime/dzVisitor.cpp 
+		antlr4-runtime/dzVisitor.cpp moc_wobjectdefs.cpp
 OBJECTS       = CallContext.o \
 		CompilerException.o \
 		DebugPrinter.o \
@@ -95,15 +98,19 @@ OBJECTS       = CallContext.o \
 		DzTerminator.o \
 		DzTypeName.o \
 		EntryPoint.o \
+		KaleidoscopeJIT.o \
+		Tests.o \
 		UndeclaredIdentifierException.o \
 		UnknownTypeException.o \
 		VisitorV1.o \
 		VisitorV2.o \
+		VisitorV3.o \
 		main.o \
 		dzBaseVisitor.o \
 		dzLexer.o \
 		dzParser.o \
-		dzVisitor.o
+		dzVisitor.o \
+		moc_wobjectdefs.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -439,6 +446,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/resources_functions.prf \
 		/usr/lib/qt/mkspecs/features/resources.prf \
 		/usr/lib/qt/mkspecs/features/moc.prf \
+		/usr/lib/qt/mkspecs/features/testlib_defines.prf \
 		/usr/lib/qt/mkspecs/features/unix/opengl.prf \
 		/usr/lib/qt/mkspecs/features/unix/thread.prf \
 		/usr/lib/qt/mkspecs/features/qmake_use.prf \
@@ -466,14 +474,19 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		DzValue.h \
 		EntryPoint.h \
 		FunctionAttribute.h \
+		KaleidoscopeJIT.h \
+		Tests.h \
 		UndeclaredIdentifierException.h \
 		UnknownTypeException.h \
 		VisitorV1.h \
 		VisitorV2.h \
+		VisitorV3.h \
 		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzLexer.h \
 		antlr4-runtime/dzParser.h \
-		antlr4-runtime/dzVisitor.h CallContext.cpp \
+		antlr4-runtime/dzVisitor.h \
+		wobjectdefs.h \
+		wobjectimpl.h CallContext.cpp \
 		CompilerException.cpp \
 		DebugPrinter.cpp \
 		DzBinary.cpp \
@@ -490,10 +503,13 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		DzTerminator.cpp \
 		DzTypeName.cpp \
 		EntryPoint.cpp \
+		KaleidoscopeJIT.cpp \
+		Tests.cpp \
 		UndeclaredIdentifierException.cpp \
 		UnknownTypeException.cpp \
 		VisitorV1.cpp \
 		VisitorV2.cpp \
+		VisitorV3.cpp \
 		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
@@ -845,6 +861,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 		/usr/lib/qt/mkspecs/features/resources_functions.prf \
 		/usr/lib/qt/mkspecs/features/resources.prf \
 		/usr/lib/qt/mkspecs/features/moc.prf \
+		/usr/lib/qt/mkspecs/features/testlib_defines.prf \
 		/usr/lib/qt/mkspecs/features/unix/opengl.prf \
 		/usr/lib/qt/mkspecs/features/unix/thread.prf \
 		/usr/lib/qt/mkspecs/features/qmake_use.prf \
@@ -1190,6 +1207,7 @@ Makefile: dz.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/fe
 /usr/lib/qt/mkspecs/features/resources_functions.prf:
 /usr/lib/qt/mkspecs/features/resources.prf:
 /usr/lib/qt/mkspecs/features/moc.prf:
+/usr/lib/qt/mkspecs/features/testlib_defines.prf:
 /usr/lib/qt/mkspecs/features/unix/opengl.prf:
 /usr/lib/qt/mkspecs/features/unix/thread.prf:
 /usr/lib/qt/mkspecs/features/qmake_use.prf:
@@ -1214,8 +1232,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents CallContext.h CompilerException.h DebugPrinter.h DzBinary.h DzClosure.h DzClosureAccessor.h DzConstant.h DzConsumer.h DzFunction.h DzFunctionCall.h DzMember.h DzMemberAccess.h DzParameter.h DzReturn.h DzTerminator.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h VisitorV2.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h $(DISTDIR)/
-	$(COPY_FILE) --parents CallContext.cpp CompilerException.cpp DebugPrinter.cpp DzBinary.cpp DzClosure.cpp DzClosureAccessor.cpp DzConstant.cpp DzConsumer.cpp DzFunction.cpp DzFunctionCall.cpp DzMember.cpp DzMemberAccess.cpp DzParameter.cpp DzReturn.cpp DzTerminator.cpp DzTypeName.cpp EntryPoint.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV2.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.h CompilerException.h DebugPrinter.h DzBinary.h DzClosure.h DzClosureAccessor.h DzConstant.h DzConsumer.h DzFunction.h DzFunctionCall.h DzMember.h DzMemberAccess.h DzParameter.h DzReturn.h DzTerminator.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h KaleidoscopeJIT.h Tests.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h VisitorV2.h VisitorV3.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h wobjectdefs.h wobjectimpl.h $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.cpp CompilerException.cpp DebugPrinter.cpp DzBinary.cpp DzClosure.cpp DzClosureAccessor.cpp DzConstant.cpp DzConsumer.cpp DzFunction.cpp DzFunctionCall.cpp DzMember.cpp DzMemberAccess.cpp DzParameter.cpp DzReturn.cpp DzTerminator.cpp DzTypeName.cpp EntryPoint.cpp KaleidoscopeJIT.cpp Tests.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV2.cpp VisitorV3.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1247,8 +1265,14 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all:
+compiler_moc_header_make_all: moc_wobjectdefs.cpp
 compiler_moc_header_clean:
+	-$(DEL_FILE) moc_wobjectdefs.cpp
+moc_wobjectdefs.cpp: wobjectdefs.h \
+		moc_predefs.h \
+		/usr/bin/moc
+	/usr/bin/moc $(DEFINES) --include /home/znurre/Program/Develop/C++/dz/moc_predefs.h -I/usr/lib/qt/mkspecs/linux-g++ -I/home/znurre/Program/Develop/C++/dz -I/usr/include/antlr4-runtime -I/usr/include/qt -I/usr/include/qt/QtGui -I/usr/include/qt/QtTest -I/usr/include/qt/QtCore -I/usr/include/c++/10.2.0 -I/usr/include/c++/10.2.0/x86_64-pc-linux-gnu -I/usr/include/c++/10.2.0/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include-fixed -I/usr/include wobjectdefs.h -o moc_wobjectdefs.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -1259,7 +1283,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_predefs_clean 
+compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean 
 
 ####### Compile
 
@@ -1377,6 +1401,12 @@ EntryPoint.o: EntryPoint.cpp EntryPoint.h \
 		DzTypeName.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EntryPoint.o EntryPoint.cpp
 
+KaleidoscopeJIT.o: KaleidoscopeJIT.cpp KaleidoscopeJIT.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o KaleidoscopeJIT.o KaleidoscopeJIT.cpp
+
+Tests.o: Tests.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Tests.o Tests.cpp
+
 UndeclaredIdentifierException.o: UndeclaredIdentifierException.cpp UndeclaredIdentifierException.h \
 		CompilerException.h \
 		antlr4-runtime/dzBaseVisitor.h \
@@ -1425,6 +1455,13 @@ VisitorV2.o: VisitorV2.cpp VisitorV2.h \
 		DzConsumer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV2.o VisitorV2.cpp
 
+VisitorV3.o: VisitorV3.cpp VisitorV3.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h \
+		FunctionAttribute.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV3.o VisitorV3.cpp
+
 main.o: main.cpp antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzVisitor.h \
 		antlr4-runtime/dzParser.h \
@@ -1435,7 +1472,12 @@ main.o: main.cpp antlr4-runtime/dzBaseVisitor.h \
 		UndeclaredIdentifierException.h \
 		DzValue.h \
 		VisitorV2.h \
-		FunctionAttribute.h
+		FunctionAttribute.h \
+		VisitorV3.h \
+		KaleidoscopeJIT.h \
+		Tests.h \
+		wobjectdefs.h \
+		wobjectimpl.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 dzBaseVisitor.o: antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzBaseVisitor.h \
@@ -1453,6 +1495,9 @@ dzParser.o: antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.h \
 dzVisitor.o: antlr4-runtime/dzVisitor.cpp antlr4-runtime/dzVisitor.h \
 		antlr4-runtime/dzParser.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dzVisitor.o antlr4-runtime/dzVisitor.cpp
+
+moc_wobjectdefs.o: moc_wobjectdefs.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_wobjectdefs.o moc_wobjectdefs.cpp
 
 ####### Install
 

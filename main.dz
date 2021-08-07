@@ -27,7 +27,7 @@ function f2(int v)
 
 export int main()
 {
-	return kask(1);
+        return kask(1);
 }
 
 function mains()

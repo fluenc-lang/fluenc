@@ -1,3 +1,5 @@
+QT += testlib
+
 CONFIG += DEBUG
 
 SOURCES += \
@@ -18,10 +20,13 @@ SOURCES += \
 	DzTerminator.cpp \
 	DzTypeName.cpp \
 	EntryPoint.cpp \
+	KaleidoscopeJIT.cpp \
+	Tests.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
 	VisitorV1.cpp \
 	VisitorV2.cpp \
+	VisitorV3.cpp \
 	main.cpp \
 	antlr4-runtime/dzBaseVisitor.cpp \
 	antlr4-runtime/dzLexer.cpp \
@@ -48,19 +53,25 @@ HEADERS += \
 	DzValue.h \
 	EntryPoint.h \
 	FunctionAttribute.h \
+	KaleidoscopeJIT.h \
+	Tests.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \
 	VisitorV1.h \
 	VisitorV2.h \
+	VisitorV3.h \
 	antlr4-runtime/dzBaseVisitor.h \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \
-	antlr4-runtime/dzVisitor.h
+	antlr4-runtime/dzVisitor.h \
+	wobjectdefs.h \
+	wobjectimpl.h
 
 OTHER_FILES += dz.g4 \
-	main.dz
+        main.dz \
+	foo.dz
 
-LIBS += -lLLVM-11 -lantlr4-runtime
+LIBS += -lLLVM-12 -lantlr4-runtime
 
 DEPENDPATH += /usr/include/antlr4-runtime
 INCLUDEPATH += /usr/include/antlr4-runtime

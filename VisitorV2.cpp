@@ -142,6 +142,23 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 	return FunctionAttribute::None;
 }
 
+class DzInlineFunction : public DzValue
+{
+	public:
+		DzInlineFunction(DzValue *block)
+			: m_block(block)
+		{
+		}
+
+		llvm::Value *build(const EntryPoint &entryPoint) const override
+		{
+			return nullptr;
+		}
+
+	private:
+		DzValue *m_block;
+};
+
 antlrcpp::Any VisitorV2::visitFunction(dzParser::FunctionContext *ctx)
 {
 	auto name = ctx->name->getText();
@@ -169,20 +186,6 @@ antlrcpp::Any VisitorV2::visitFunction(dzParser::FunctionContext *ctx)
 		return new DzFunction(name, arguments, FunctionAttribute::Import, returnType, nullptr);
 	}
 
-	if (attribute == FunctionAttribute::None)
-	{
-		auto context = new DzMember("parent"
-			, new DzTypeName("context")
-			);
-
-		auto consumer = new DzMember("consumer"
-			, new DzTypeName("consumer")
-			);
-
-		arguments.push_back(context);
-		arguments.push_back(consumer);
-	}
-
 	auto block = ctx->block();
 
 	if (block)
@@ -193,6 +196,11 @@ antlrcpp::Any VisitorV2::visitFunction(dzParser::FunctionContext *ctx)
 		auto value = function
 			.as<Node>()
 			.value();
+
+		if (attribute == FunctionAttribute::None)
+		{
+			return new DzInlineFunction(value);
+		}
 
 		return new DzFunction(name, arguments, attribute, returnType, value);
 	}
