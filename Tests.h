@@ -8,6 +8,7 @@
 #include "VisitorV3.h"
 #include "KaleidoscopeJIT.h"
 
+#include "VisitorV4.h"
 #include "wobjectdefs.h"
 #include "wobjectimpl.h"
 
@@ -20,6 +21,52 @@ class Tests : public QObject
 
 	private:
 		void scenario1()
+		{
+			auto result = exec(R"(
+				export int main()
+				{
+					return 2 + 1;
+				}
+			)");
+
+			QCOMPARE(result, 3);
+		}
+
+		void scenario2()
+		{
+			auto result = exec(R"(
+				function foo()
+				{
+					return 1;
+				}
+
+				export int main()
+				{
+					return foo();
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
+		void scenario3()
+		{
+			auto result = exec(R"(
+				function addFive(int v)
+				{
+					return v + 5;
+				}
+
+				export int main()
+				{
+					return addFive(1) + addFive(2);
+				}
+			)");
+
+			QCOMPARE(result, 13);
+		}
+
+		void scenario4()
 		{
 			auto result = exec(R"(
 				function addFive(int v)
@@ -41,7 +88,107 @@ class Tests : public QObject
 			QCOMPARE(result, 15);
 		}
 
+		void scenario5()
+		{
+			auto result = exec(R"(
+				export int main()
+				{
+					return 1;
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
+		void scenario6()
+		{
+			auto result = exec(R"(
+				function producer()
+				{
+					return 2;
+				}
+
+				function consumer(int value)
+				{
+					return value + 1;
+				}
+
+				export int main()
+				{
+					return consumer(producer());
+				}
+			)");
+
+			QCOMPARE(result, 3);
+		}
+
+		void scenario7()
+		{
+			auto result = exec(R"(
+				function fn(int v)
+				{
+					return v;
+				}
+
+				function consumer(int v)
+				{
+					return fn(v);
+				}
+
+				function producer()
+				{
+					return 2;
+				}
+
+				export int main()
+				{
+					return consumer(producer());
+				}
+			)");
+
+			QCOMPARE(result, 2);
+		}
+
+		void scenario8()
+		{
+			auto result = exec(R"(
+				function bar(int v)
+				{
+					return v;
+				}
+
+				function foo(int v)
+				{
+					return bar(v + 2) + bar(v + 3);
+				}
+
+				function f1()
+				{
+					return 2;
+				}
+
+				function f2(int v)
+				{
+					return v * 4;
+				}
+
+				export int main()
+				{
+					return f2(foo(f1() + 2));
+				}
+			)");
+
+			QCOMPARE(result, 52);
+		}
+
 		W_SLOT(scenario1)
+		W_SLOT(scenario2)
+		W_SLOT(scenario3)
+		W_SLOT(scenario4)
+		W_SLOT(scenario5)
+		W_SLOT(scenario6)
+		W_SLOT(scenario7)
+		W_SLOT(scenario8)
 
 	private:
 		int exec(std::string source)
@@ -55,7 +202,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV3 visitor;
+			VisitorV4 visitor(nullptr);
 
 			auto moduleInfo = visitor
 				.visit(program)

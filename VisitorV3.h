@@ -34,10 +34,6 @@ class ModuleInfo
 class VisitorV3 : public dzBaseVisitor
 {
 	public:
-		VisitorV3();
-
-		// dzVisitor interface
-	public:
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
 		antlrcpp::Any visitArgument(dzParser::ArgumentContext *context) override;

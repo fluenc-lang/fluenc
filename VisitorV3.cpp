@@ -23,398 +23,35 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
 #include <llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h>
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include "llvm/ExecutionEngine/RTDyldMemoryManager.h"
-#include "llvm/ExecutionEngine/RuntimeDyld.h"
-#include "llvm/ExecutionEngine/SectionMemoryManager.h"
-#include "llvm/ExecutionEngine/Orc/CompileUtils.h"
-#include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
-#include "llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h"
-#include "llvm/ExecutionEngine/JITSymbol.h"
-#include "llvm/IR/DataLayout.h"
-#include "llvm/IR/Mangler.h"
-#include "llvm/Support/DynamicLibrary.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/TargetSelect.h"
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/ExecutionEngine/RTDyldMemoryManager.h>
+#include <llvm/ExecutionEngine/RuntimeDyld.h>
+#include <llvm/ExecutionEngine/SectionMemoryManager.h>
+#include <llvm/ExecutionEngine/Orc/CompileUtils.h>
+#include <llvm/ExecutionEngine/Orc/IRCompileLayer.h>
+#include <llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h>
+#include <llvm/ExecutionEngine/JITSymbol.h>
+#include <llvm/IR/DataLayout.h>
+#include <llvm/IR/Mangler.h>
+#include <llvm/Support/DynamicLibrary.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/TargetSelect.h>
+
+#include "DzBinaryNg.h"
+#include "DzCallNg.h"
+#include "DzConstantNg.h"
+#include "DzEntryPointNg.h"
+#include "DzFunctionNg.h"
+#include "DzMemberAccessNg.h"
+#include "DzMemberNg.h"
+#include "DzNodeNg.h"
+#include "DzReturnNg.h"
+#include "DzTypeNameNg.h"
+#include "EntryPointInfo.h"
 
 class DzTypeNameNg;
 class DzCallable;
 class DzValueNg;
-
-class EntryPointInfo
-{
-	public:
-		EntryPointInfo(DzTypeNameNg *returnType
-			, std::unique_ptr<llvm::LLVMContext> &context
-			, std::unique_ptr<llvm::Module> &module
-			, llvm::BasicBlock *block
-			, llvm::Function *function
-			, const std::map<std::string, DzCallable *> &functions
-			, const std::map<std::string, llvm::Value *> &locals
-			, const std::string &name
-			)
-			: m_returnType(returnType)
-			, m_context(context)
-			, m_module(module)
-			, m_block(block)
-			, m_function(function)
-			, m_functions(functions)
-			, m_locals(locals)
-			, m_name(name)
-		{
-		}
-
-		DzTypeNameNg *returnType() const
-		{
-			return m_returnType;
-		}
-
-		std::unique_ptr<llvm::LLVMContext> &context() const
-		{
-			return m_context;
-		}
-
-		std::unique_ptr<llvm::Module> &module() const
-		{
-			return m_module;
-		}
-
-		llvm::BasicBlock *block() const
-		{
-			return m_block;
-		}
-
-		llvm::Function *function() const
-		{
-			return m_function;
-		}
-
-		std::map<std::string, DzCallable *> functions() const
-		{
-			return m_functions;
-		}
-
-		std::map<std::string, llvm::Value *> locals() const
-		{
-			return m_locals;
-		}
-
-		std::string name() const
-		{
-			return m_name;
-		}
-
-		EntryPointInfo withBlock(llvm::BasicBlock *block) const
-		{
-			return EntryPointInfo(m_returnType
-				, m_context
-				, m_module
-				, block
-				, m_function
-				, m_functions
-				, m_locals
-				, m_name
-				);
-		}
-
-		EntryPointInfo withFunction(llvm::Function *function) const
-		{
-			return EntryPointInfo(m_returnType
-				, m_context
-				, m_module
-				, m_block
-				, function
-				, m_functions
-				, m_locals
-				, m_name
-				);
-		}
-
-		EntryPointInfo withLocals(const std::map<std::string, llvm::Value *> &locals) const
-		{
-			return EntryPointInfo(m_returnType
-				, m_context
-				, m_module
-				, m_block
-				, m_function
-				, m_functions
-				, locals
-				, m_name
-				);
-		}
-
-		EntryPointInfo withName(const std::string &name) const
-		{
-			return EntryPointInfo(m_returnType
-				, m_context
-				, m_module
-				, m_block
-				, m_function
-				, m_functions
-				, m_locals
-				, name
-				);
-		}
-
-	private:
-		DzTypeNameNg *m_returnType;
-
-		std::unique_ptr<llvm::LLVMContext> &m_context;
-		std::unique_ptr<llvm::Module> &m_module;
-
-		llvm::BasicBlock *m_block;
-		llvm::Function *m_function;
-
-		std::map<std::string, DzCallable *> m_functions;
-		std::map<std::string, llvm::Value *> m_locals;
-
-		std::string m_name;
-};
-
-class DzValueNg
-{
-	public:
-		virtual llvm::Value *build(const EntryPointInfo &entryPoint) const = 0;
-};
-
-class DzMemberNg
-{
-	public:
-		DzMemberNg(const std::string &name, DzTypeNameNg *type)
-			: m_name(name)
-			, m_type(type)
-		{
-		}
-
-		std::string name() const
-		{
-			return m_name;
-		}
-
-		DzTypeNameNg *type() const
-		{
-			return m_type;
-		}
-
-	private:
-		std::string m_name;
-
-		DzTypeNameNg *m_type;
-};
-
-class DzTypeNameNg
-{
-	public:
-		DzTypeNameNg(const std::string &name)
-			: m_name(name)
-		{
-		}
-
-		llvm::Type *build(const EntryPointInfo &entryPoint) const
-		{
-			auto &context = entryPoint.context();
-
-			if (m_name == "int")
-			{
-				return llvm::Type::getInt32Ty(*context);
-			}
-
-			return nullptr;
-		}
-
-	private:
-		std::string m_name;
-};
-
-class DzCallable : public DzValueNg
-{
-	public:
-		virtual std::string name() const = 0;
-		virtual std::vector<DzMemberNg *> arguments() const = 0;
-
-		virtual DzTypeNameNg *returnType() const = 0;
-
-		virtual FunctionAttribute attribute() const = 0;
-};
-
-class DzEntryPointNg : public DzCallable
-{
-	public:
-		DzEntryPointNg(DzValueNg *block
-			, DzTypeNameNg *returnType
-			, const std::string &name
-			, const std::vector<DzMemberNg *> &arguments
-			)
-			: m_block(block)
-			, m_returnType(returnType)
-			, m_name(name)
-			, m_arguments(arguments)
-		{
-		}
-
-		std::string name() const override
-		{
-			return m_name;
-		}
-
-		std::vector<DzMemberNg *> arguments() const override
-		{
-			return m_arguments;
-		}
-
-		FunctionAttribute attribute() const override
-		{
-			return FunctionAttribute::Export;
-		}
-
-		DzTypeNameNg *returnType() const override
-		{
-			return m_returnType;
-		}
-
-		llvm::Value *build(const EntryPointInfo &entryPoint) const override
-		{
-			auto returnType = entryPoint.returnType()->build(entryPoint);
-			auto &module = entryPoint.module();
-			auto &context = entryPoint.context();
-
-			std::vector<llvm::Type *> argumentTypes;
-
-			for (auto i = 0u; i < m_arguments.size(); i++)
-			{
-				auto argument = m_arguments[i];
-
-//				auto name = argument->name();
-				auto type = argument->type()->build(entryPoint);
-
-		//		locals[name] = new DzLocalAccess(i);
-
-				argumentTypes.push_back(type);
-			}
-
-			auto functionType = llvm::FunctionType::get(returnType, argumentTypes, false);
-			auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, m_name, module.get());
-			auto block = llvm::BasicBlock::Create(*context, "entry", function);
-
-			auto ep = entryPoint
-				.withBlock(block)
-				.withFunction(function)
-				.withName(m_name);
-
-			auto value = m_block->build(ep);
-
-			llvm::IRBuilder<> builder(block);
-
-			auto load = builder.CreateLoad(llvm::Type::getInt32Ty(*context), value);
-
-			builder.CreateRet(load);
-
-			for (auto i = function->begin(), j = std::next(i)
-				; i != function->end() && j != function->end()
-				; i++, j++
-				)
-			{
-				llvm::BranchInst::Create(&*j, &*i);
-			}
-
-			verifyFunction(*function);
-
-			return function;
-		}
-
-	private:
-		DzValueNg *m_block;
-		DzTypeNameNg *m_returnType;
-
-		std::string m_name;
-		std::vector<DzMemberNg *> m_arguments;
-};
-
-class DzFunctionNg : public DzCallable
-{
-	public:
-		DzFunctionNg(DzValueNg *block
-			, const std::string &name
-			, const std::vector<DzMemberNg *> arguments
-			)
-			: m_name(name)
-			, m_arguments(arguments)
-			, m_block(block)
-		{
-		}
-
-		std::string name() const override
-		{
-			return m_name;
-		}
-
-		std::vector<DzMemberNg *> arguments() const override
-		{
-			return m_arguments;
-		}
-
-		FunctionAttribute attribute() const override
-		{
-			return FunctionAttribute::None;
-		}
-
-		DzTypeNameNg *returnType() const override
-		{
-			return nullptr;
-		}
-
-		llvm::Value *build(const EntryPointInfo &entryPoint) const override
-		{
-			auto &context = entryPoint.context();
-			auto function = entryPoint.function();
-			auto parent = entryPoint.block();
-
-			auto block = llvm::BasicBlock::Create(*context, m_name, function, parent);
-
-			llvm::IRBuilder<> builder(block);
-
-			auto ep = entryPoint
-				.withBlock(block)
-				.withName(block->getName().str());
-
-			return m_block->build(ep);
-		}
-
-	private:
-		std::string m_name;
-		std::vector<DzMemberNg *> m_arguments;
-
-		DzValueNg *m_block;
-};
-
-class DzNodeNg
-{
-	public:
-		DzNodeNg(DzValueNg *top, DzValueNg *bottom)
-			: m_top(top)
-			, m_bottom(bottom)
-		{
-		}
-
-		DzValueNg *top() const
-		{
-			return m_top;
-		}
-
-		DzValueNg *bottom() const
-		{
-			return m_bottom;
-		}
-
-	private:
-		DzValueNg *m_top;
-		DzValueNg *m_bottom;
-};
-
-VisitorV3::VisitorV3()
-{
-
-}
 
 antlrcpp::Any VisitorV3::visitProgram(dzParser::ProgramContext *context)
 {
@@ -573,71 +210,14 @@ antlrcpp::Any VisitorV3::visitBlock(dzParser::BlockContext *context)
 	return visit(context->ret());
 }
 
-class DzReturnNg : public DzValueNg
-{
-	public:
-		DzReturnNg(DzValueNg *value)
-			: m_value(value)
-		{
-		}
-
-		llvm::Value *build(const EntryPointInfo &entryPoint) const override
-		{
-			auto &module = entryPoint.module();
-			auto &context = entryPoint.context();
-
-			std::ostringstream ss;
-			ss << entryPoint.name();
-			ss << "_ret";
-
-			auto k = ss.str();
-
-			auto c = module->getOrInsertGlobal(k, llvm::Type::getInt32Ty(*context), [&]
-			{
-				auto initializer = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0);
-
-				return new llvm::GlobalVariable(*module, llvm::Type::getInt32Ty(*context), false, llvm::GlobalValue::InternalLinkage, initializer, k);
-			});
-
-			auto v = m_value->build(entryPoint);
-
-			llvm::IRBuilder<> builder(entryPoint.block());
-			builder.CreateStore(v, c);
-
-			return c;
-		}
-
-	private:
-		DzValueNg *m_value;
-};
-
 antlrcpp::Any VisitorV3::visitRet(dzParser::RetContext *context)
 {
 	auto n = visit(context->value).as<DzNodeNg>();
 
-	auto ret = new DzReturnNg(n.top());
+	auto ret = new DzReturnNg(n.top(), nullptr);
 
 	return DzNodeNg(ret, ret);
 }
-
-class DzConstantNg : public DzValueNg
-{
-	public:
-		DzConstantNg(const std::string &value)
-			: m_value(value)
-		{
-		}
-
-		llvm::Value *build(const EntryPointInfo &entryPoint) const override
-		{
-			auto type = llvm::Type::getInt32Ty(*entryPoint.context());
-
-			return llvm::ConstantInt::get(type, m_value, 10);
-		}
-
-	private:
-		std::string m_value;
-};
 
 antlrcpp::Any VisitorV3::visitConstant(dzParser::ConstantContext *context)
 {
@@ -645,56 +225,6 @@ antlrcpp::Any VisitorV3::visitConstant(dzParser::ConstantContext *context)
 
 	return DzNodeNg(constant, constant);
 }
-
-class DzCallNg : public DzValueNg
-{
-	public:
-		DzCallNg(const std::string &name, std::vector<DzValueNg *> parameters)
-			: m_name(name)
-			, m_parameters(parameters)
-		{
-		}
-
-		llvm::Value *build(const EntryPointInfo &entryPoint) const override
-		{
-			auto &context = entryPoint.context();
-			auto functions = entryPoint.functions();
-			auto block = entryPoint.block();
-
-			auto iterator = functions.find(m_name);
-
-			if (iterator == functions.end())
-			{
-				return nullptr;
-			}
-
-			auto function = iterator->second;
-
-			auto locals = entryPoint.locals();
-
-			auto arg = function->arguments();
-
-			for (auto i = 0u; i < m_parameters.size() && i < arg.size(); i++)
-			{
-				auto name = arg[i]->name();
-
-				locals[name] = m_parameters[i]->build(entryPoint);
-			}
-
-			auto ep = entryPoint
-				.withLocals(locals);
-
-			auto addressOfReturnValue = iterator->second->build(ep);
-
-			llvm::IRBuilder<> builder(block);
-
-			return builder.CreateLoad(llvm::Type::getInt32Ty(*context), addressOfReturnValue);
-		}
-
-	private:
-		std::string m_name;
-		std::vector<DzValueNg *> m_parameters;
-};
 
 antlrcpp::Any VisitorV3::visitCall(dzParser::CallContext *context)
 {
@@ -713,68 +243,12 @@ antlrcpp::Any VisitorV3::visitCall(dzParser::CallContext *context)
 	return DzNodeNg(call, call);
 }
 
-class DzMemberAccessNg : public DzValueNg
-{
-	public:
-		DzMemberAccessNg(const std::string &name)
-			: m_name(name)
-		{
-		}
-
-		llvm::Value *build(const EntryPointInfo &entryPoint) const override
-		{
-			const auto &locals = entryPoint.locals();
-
-			auto iterator = locals.find(m_name);
-
-			if (iterator == locals.end())
-			{
-				return nullptr;
-			}
-
-			return iterator->second;
-		}
-
-	private:
-		std::string m_name;
-};
-
 antlrcpp::Any VisitorV3::visitMember(dzParser::MemberContext *context)
 {
 	auto member = new DzMemberAccessNg(context->ID()->getText());
 
 	return DzNodeNg(member, member);
 }
-
-class DzBinaryNg : public DzValueNg
-{
-	public:
-		DzBinaryNg(const std::string &op
-			, DzValueNg *left
-			, DzValueNg *right
-			)
-			: m_op(op)
-			, m_left(left)
-			, m_right(right)
-		{
-		}
-
-		llvm::Value *build(const EntryPointInfo &entryPoint) const override
-		{
-			auto left = m_left->build(entryPoint);
-			auto right = m_right->build(entryPoint);
-
-			llvm::IRBuilder<> builder(entryPoint.block());
-
-			return builder.CreateBinOp(llvm::Instruction::Add, left, right);
-		}
-
-	private:
-		std::string m_op;
-
-		DzValueNg *m_left;
-		DzValueNg *m_right;
-};
 
 antlrcpp::Any VisitorV3::visitBinary(dzParser::BinaryContext *context)
 {

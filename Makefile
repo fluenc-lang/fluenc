@@ -56,19 +56,32 @@ SOURCES       = CallContext.cpp \
 		CompilerException.cpp \
 		DebugPrinter.cpp \
 		DzBinary.cpp \
+		DzBinaryNg.cpp \
+		DzCallNg.cpp \
+		DzCallable.cpp \
 		DzClosure.cpp \
 		DzClosureAccessor.cpp \
 		DzConstant.cpp \
+		DzConstantNg.cpp \
 		DzConsumer.cpp \
+		DzEntryPointNg.cpp \
 		DzFunction.cpp \
 		DzFunctionCall.cpp \
+		DzFunctionNg.cpp \
 		DzMember.cpp \
 		DzMemberAccess.cpp \
+		DzMemberAccessNg.cpp \
+		DzMemberNg.cpp \
+		DzNodeNg.cpp \
 		DzParameter.cpp \
 		DzReturn.cpp \
+		DzReturnNg.cpp \
 		DzTerminator.cpp \
 		DzTypeName.cpp \
+		DzTypeNameNg.cpp \
+		DzValueNg.cpp \
 		EntryPoint.cpp \
+		EntryPointInfo.cpp \
 		KaleidoscopeJIT.cpp \
 		Tests.cpp \
 		UndeclaredIdentifierException.cpp \
@@ -76,6 +89,7 @@ SOURCES       = CallContext.cpp \
 		VisitorV1.cpp \
 		VisitorV2.cpp \
 		VisitorV3.cpp \
+		VisitorV4.cpp \
 		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
@@ -85,19 +99,32 @@ OBJECTS       = CallContext.o \
 		CompilerException.o \
 		DebugPrinter.o \
 		DzBinary.o \
+		DzBinaryNg.o \
+		DzCallNg.o \
+		DzCallable.o \
 		DzClosure.o \
 		DzClosureAccessor.o \
 		DzConstant.o \
+		DzConstantNg.o \
 		DzConsumer.o \
+		DzEntryPointNg.o \
 		DzFunction.o \
 		DzFunctionCall.o \
+		DzFunctionNg.o \
 		DzMember.o \
 		DzMemberAccess.o \
+		DzMemberAccessNg.o \
+		DzMemberNg.o \
+		DzNodeNg.o \
 		DzParameter.o \
 		DzReturn.o \
+		DzReturnNg.o \
 		DzTerminator.o \
 		DzTypeName.o \
+		DzTypeNameNg.o \
+		DzValueNg.o \
 		EntryPoint.o \
+		EntryPointInfo.o \
 		KaleidoscopeJIT.o \
 		Tests.o \
 		UndeclaredIdentifierException.o \
@@ -105,6 +132,7 @@ OBJECTS       = CallContext.o \
 		VisitorV1.o \
 		VisitorV2.o \
 		VisitorV3.o \
+		VisitorV4.o \
 		main.o \
 		dzBaseVisitor.o \
 		dzLexer.o \
@@ -459,20 +487,33 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		CompilerException.h \
 		DebugPrinter.h \
 		DzBinary.h \
+		DzBinaryNg.h \
+		DzCallNg.h \
+		DzCallable.h \
 		DzClosure.h \
 		DzClosureAccessor.h \
 		DzConstant.h \
+		DzConstantNg.h \
 		DzConsumer.h \
+		DzEntryPointNg.h \
 		DzFunction.h \
 		DzFunctionCall.h \
+		DzFunctionNg.h \
 		DzMember.h \
 		DzMemberAccess.h \
+		DzMemberAccessNg.h \
+		DzMemberNg.h \
+		DzNodeNg.h \
 		DzParameter.h \
 		DzReturn.h \
+		DzReturnNg.h \
 		DzTerminator.h \
 		DzTypeName.h \
+		DzTypeNameNg.h \
 		DzValue.h \
+		DzValueNg.h \
 		EntryPoint.h \
+		EntryPointInfo.h \
 		FunctionAttribute.h \
 		KaleidoscopeJIT.h \
 		Tests.h \
@@ -481,6 +522,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		VisitorV1.h \
 		VisitorV2.h \
 		VisitorV3.h \
+		VisitorV4.h \
 		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzLexer.h \
 		antlr4-runtime/dzParser.h \
@@ -490,19 +532,32 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		CompilerException.cpp \
 		DebugPrinter.cpp \
 		DzBinary.cpp \
+		DzBinaryNg.cpp \
+		DzCallNg.cpp \
+		DzCallable.cpp \
 		DzClosure.cpp \
 		DzClosureAccessor.cpp \
 		DzConstant.cpp \
+		DzConstantNg.cpp \
 		DzConsumer.cpp \
+		DzEntryPointNg.cpp \
 		DzFunction.cpp \
 		DzFunctionCall.cpp \
+		DzFunctionNg.cpp \
 		DzMember.cpp \
 		DzMemberAccess.cpp \
+		DzMemberAccessNg.cpp \
+		DzMemberNg.cpp \
+		DzNodeNg.cpp \
 		DzParameter.cpp \
 		DzReturn.cpp \
+		DzReturnNg.cpp \
 		DzTerminator.cpp \
 		DzTypeName.cpp \
+		DzTypeNameNg.cpp \
+		DzValueNg.cpp \
 		EntryPoint.cpp \
+		EntryPointInfo.cpp \
 		KaleidoscopeJIT.cpp \
 		Tests.cpp \
 		UndeclaredIdentifierException.cpp \
@@ -510,6 +565,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		VisitorV1.cpp \
 		VisitorV2.cpp \
 		VisitorV3.cpp \
+		VisitorV4.cpp \
 		main.cpp \
 		antlr4-runtime/dzBaseVisitor.cpp \
 		antlr4-runtime/dzLexer.cpp \
@@ -1232,8 +1288,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents CallContext.h CompilerException.h DebugPrinter.h DzBinary.h DzClosure.h DzClosureAccessor.h DzConstant.h DzConsumer.h DzFunction.h DzFunctionCall.h DzMember.h DzMemberAccess.h DzParameter.h DzReturn.h DzTerminator.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h KaleidoscopeJIT.h Tests.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h VisitorV2.h VisitorV3.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h wobjectdefs.h wobjectimpl.h $(DISTDIR)/
-	$(COPY_FILE) --parents CallContext.cpp CompilerException.cpp DebugPrinter.cpp DzBinary.cpp DzClosure.cpp DzClosureAccessor.cpp DzConstant.cpp DzConsumer.cpp DzFunction.cpp DzFunctionCall.cpp DzMember.cpp DzMemberAccess.cpp DzParameter.cpp DzReturn.cpp DzTerminator.cpp DzTypeName.cpp EntryPoint.cpp KaleidoscopeJIT.cpp Tests.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV2.cpp VisitorV3.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.h CompilerException.h DebugPrinter.h DzBinary.h DzBinaryNg.h DzCallNg.h DzCallable.h DzClosure.h DzClosureAccessor.h DzConstant.h DzConstantNg.h DzConsumer.h DzEntryPointNg.h DzFunction.h DzFunctionCall.h DzFunctionNg.h DzMember.h DzMemberAccess.h DzMemberAccessNg.h DzMemberNg.h DzNodeNg.h DzParameter.h DzReturn.h DzReturnNg.h DzTerminator.h DzTypeName.h DzTypeNameNg.h DzValue.h DzValueNg.h EntryPoint.h EntryPointInfo.h FunctionAttribute.h KaleidoscopeJIT.h Tests.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV1.h VisitorV2.h VisitorV3.h VisitorV4.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h wobjectdefs.h wobjectimpl.h $(DISTDIR)/
+	$(COPY_FILE) --parents CallContext.cpp CompilerException.cpp DebugPrinter.cpp DzBinary.cpp DzBinaryNg.cpp DzCallNg.cpp DzCallable.cpp DzClosure.cpp DzClosureAccessor.cpp DzConstant.cpp DzConstantNg.cpp DzConsumer.cpp DzEntryPointNg.cpp DzFunction.cpp DzFunctionCall.cpp DzFunctionNg.cpp DzMember.cpp DzMemberAccess.cpp DzMemberAccessNg.cpp DzMemberNg.cpp DzNodeNg.cpp DzParameter.cpp DzReturn.cpp DzReturnNg.cpp DzTerminator.cpp DzTypeName.cpp DzTypeNameNg.cpp DzValueNg.cpp EntryPoint.cpp EntryPointInfo.cpp KaleidoscopeJIT.cpp Tests.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV2.cpp VisitorV3.cpp VisitorV4.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1311,6 +1367,25 @@ DzBinary.o: DzBinary.cpp DzBinary.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzBinary.o DzBinary.cpp
 
+DzBinaryNg.o: DzBinaryNg.cpp DzBinaryNg.h \
+		DzValueNg.h \
+		EntryPointInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzBinaryNg.o DzBinaryNg.cpp
+
+DzCallNg.o: DzCallNg.cpp EntryPointInfo.h \
+		DzCallNg.h \
+		DzValueNg.h \
+		DzFunctionNg.h \
+		DzCallable.h \
+		FunctionAttribute.h \
+		DzMemberNg.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzCallNg.o DzCallNg.cpp
+
+DzCallable.o: DzCallable.cpp DzCallable.h \
+		DzValueNg.h \
+		FunctionAttribute.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzCallable.o DzCallable.cpp
+
 DzClosure.o: DzClosure.cpp DzClosure.h \
 		DzValue.h \
 		DzClosureAccessor.h \
@@ -1329,9 +1404,23 @@ DzConstant.o: DzConstant.cpp DzConstant.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzConstant.o DzConstant.cpp
 
+DzConstantNg.o: DzConstantNg.cpp DzConstantNg.h \
+		DzValueNg.h \
+		EntryPointInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzConstantNg.o DzConstantNg.cpp
+
 DzConsumer.o: DzConsumer.cpp DzConsumer.h \
 		DzValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzConsumer.o DzConsumer.cpp
+
+DzEntryPointNg.o: DzEntryPointNg.cpp DzEntryPointNg.h \
+		DzCallable.h \
+		DzValueNg.h \
+		FunctionAttribute.h \
+		EntryPointInfo.h \
+		DzMemberNg.h \
+		DzTypeNameNg.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzEntryPointNg.o DzEntryPointNg.cpp
 
 DzFunction.o: DzFunction.cpp DzFunction.h \
 		DzValue.h \
@@ -1356,6 +1445,13 @@ DzFunctionCall.o: DzFunctionCall.cpp DzFunctionCall.h \
 		DzFunction.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzFunctionCall.o DzFunctionCall.cpp
 
+DzFunctionNg.o: DzFunctionNg.cpp DzFunctionNg.h \
+		DzCallable.h \
+		DzValueNg.h \
+		FunctionAttribute.h \
+		EntryPointInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzFunctionNg.o DzFunctionNg.cpp
+
 DzMember.o: DzMember.cpp DzMember.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMember.o DzMember.cpp
 
@@ -1370,6 +1466,17 @@ DzMemberAccess.o: DzMemberAccess.cpp DzMemberAccess.h \
 		antlr4-runtime/dzLexer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMemberAccess.o DzMemberAccess.cpp
 
+DzMemberAccessNg.o: DzMemberAccessNg.cpp DzMemberAccessNg.h \
+		DzValueNg.h \
+		EntryPointInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMemberAccessNg.o DzMemberAccessNg.cpp
+
+DzMemberNg.o: DzMemberNg.cpp DzMemberNg.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMemberNg.o DzMemberNg.cpp
+
+DzNodeNg.o: DzNodeNg.cpp DzNodeNg.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzNodeNg.o DzNodeNg.cpp
+
 DzParameter.o: DzParameter.cpp DzParameter.h \
 		DzValue.h \
 		EntryPoint.h
@@ -1379,6 +1486,11 @@ DzReturn.o: DzReturn.cpp DzReturn.h \
 		DzValue.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzReturn.o DzReturn.cpp
+
+DzReturnNg.o: DzReturnNg.cpp DzReturnNg.h \
+		DzValueNg.h \
+		EntryPointInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzReturnNg.o DzReturnNg.cpp
 
 DzTerminator.o: DzTerminator.cpp DzTerminator.h \
 		antlr4-runtime/dzParser.h \
@@ -1394,12 +1506,22 @@ DzTypeName.o: DzTypeName.cpp DzTypeName.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzTypeName.o DzTypeName.cpp
 
+DzTypeNameNg.o: DzTypeNameNg.cpp DzTypeNameNg.h \
+		EntryPointInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzTypeNameNg.o DzTypeNameNg.cpp
+
+DzValueNg.o: DzValueNg.cpp DzValueNg.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzValueNg.o DzValueNg.cpp
+
 EntryPoint.o: EntryPoint.cpp EntryPoint.h \
 		DzFunction.h \
 		DzValue.h \
 		FunctionAttribute.h \
 		DzTypeName.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EntryPoint.o EntryPoint.cpp
+
+EntryPointInfo.o: EntryPointInfo.cpp EntryPointInfo.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EntryPointInfo.o EntryPointInfo.cpp
 
 KaleidoscopeJIT.o: KaleidoscopeJIT.cpp KaleidoscopeJIT.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o KaleidoscopeJIT.o KaleidoscopeJIT.cpp
@@ -1459,23 +1581,37 @@ VisitorV3.o: VisitorV3.cpp VisitorV3.h \
 		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzVisitor.h \
 		antlr4-runtime/dzParser.h \
-		FunctionAttribute.h
+		FunctionAttribute.h \
+		DzBinaryNg.h \
+		DzValueNg.h \
+		DzCallNg.h \
+		DzConstantNg.h \
+		DzEntryPointNg.h \
+		DzCallable.h \
+		DzFunctionNg.h \
+		DzMemberAccessNg.h \
+		DzMemberNg.h \
+		DzNodeNg.h \
+		DzReturnNg.h \
+		DzTypeNameNg.h \
+		EntryPointInfo.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV3.o VisitorV3.cpp
 
-main.o: main.cpp antlr4-runtime/dzBaseVisitor.h \
+VisitorV4.o: VisitorV4.cpp VisitorV4.h \
+		VisitorV3.h \
+		antlr4-runtime/dzBaseVisitor.h \
+		antlr4-runtime/dzVisitor.h \
+		antlr4-runtime/dzParser.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV4.o VisitorV4.cpp
+
+main.o: main.cpp Tests.h \
+		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzVisitor.h \
 		antlr4-runtime/dzParser.h \
 		antlr4-runtime/dzLexer.h \
-		VisitorV1.h \
-		UnknownTypeException.h \
-		CompilerException.h \
-		UndeclaredIdentifierException.h \
-		DzValue.h \
-		VisitorV2.h \
-		FunctionAttribute.h \
 		VisitorV3.h \
 		KaleidoscopeJIT.h \
-		Tests.h \
+		VisitorV4.h \
 		wobjectdefs.h \
 		wobjectimpl.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
