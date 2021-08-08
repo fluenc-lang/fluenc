@@ -5,10 +5,9 @@
 #include "antlr4-runtime/dzLexer.h"
 #include "antlr4-runtime/dzParser.h"
 
-#include "VisitorV3.h"
 #include "KaleidoscopeJIT.h"
-
 #include "VisitorV4.h"
+
 #include "wobjectdefs.h"
 #include "wobjectimpl.h"
 

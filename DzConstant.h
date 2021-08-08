@@ -6,11 +6,14 @@
 class DzConstant : public DzValue
 {
 	public:
-		DzConstant(std::string value);
+		DzConstant(DzValue *consumer, std::string value);
 
-		llvm::Value *build(const EntryPoint &context) const override;
+		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
 
 	private:
+		DzValue *m_consumer;
+
 		std::string m_value;
 };
+
 #endif // DZCONSTANT_H

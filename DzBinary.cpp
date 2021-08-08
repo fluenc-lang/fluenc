@@ -1,41 +1,86 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "DzBinary.h"
-#include "VisitorV2.h"
 #include "EntryPoint.h"
 
-DzBinary::DzBinary()
-	: m_left(nullptr)
-	, m_right(nullptr)
+DzBinary::DzBinary(DzValue *consumer, const std::string &op)
+	: m_consumer(consumer)
+	, m_op(op)
 {
 }
 
-DzValue *DzBinary::left() const
+llvm::Value *DzBinary::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
 {
-	return m_left;
+	auto op = resolveOp(entryPoint, values);
+
+	values.push_back(op);
+
+	return m_consumer->build(entryPoint, values);
 }
 
-void DzBinary::setLeft(DzValue *left)
+llvm::Value *DzBinary::resolveOp(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
 {
-	m_left = left;
-}
+	auto block = entryPoint.block();
 
-DzValue *DzBinary::right() const
-{
-	return m_right;
-}
+	auto left = values.back();
 
-void DzBinary::setRight(DzValue *right)
-{
-	m_right = right;
-}
+	values.pop_back();
 
-llvm::Value *DzBinary::build(const EntryPoint &entryPoint) const
-{
-	auto left = m_left->build(entryPoint);
-	auto right = m_right->build(entryPoint);
+	auto right = values.back();
 
-	llvm::IRBuilder<> builder(entryPoint.block());
+	values.pop_back();
 
-	return builder.CreateBinOp(llvm::Instruction::Add, left, right);
+	llvm::IRBuilder<> builder(block);
+
+	if (m_op == "+")
+	{
+		return builder.CreateAdd(left, right);
+	}
+
+	if (m_op == "-")
+	{
+		return builder.CreateSub(left, right);
+	}
+
+	if (m_op == "*")
+	{
+		return builder.CreateMul(left, right);
+	}
+
+	if (m_op == "/")
+	{
+		return builder.CreateSDiv(left, right);
+	}
+
+	if (m_op == "<")
+	{
+		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, left, right);
+	}
+
+	if (m_op == "<=")
+	{
+		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, left, right);
+	}
+
+	if (m_op == ">")
+	{
+		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGT, left, right);
+	}
+
+	if (m_op == ">=")
+	{
+		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGE, left, right);
+	}
+
+	if (m_op == "==")
+	{
+		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right);
+	}
+
+	if (m_op == "!=")
+	{
+		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right);
+	}
+
+	return nullptr;
 }

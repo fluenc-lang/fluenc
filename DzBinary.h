@@ -1,26 +1,21 @@
 #ifndef DZBINARY_H
 #define DZBINARY_H
 
-#include "antlr4-runtime/dzParser.h"
-
 #include "DzValue.h"
 
 class DzBinary : public DzValue
 {
 	public:
-		DzBinary();
+		DzBinary(DzValue *consumer, const std::string &op);
 
-		DzValue *left() const;
-		void setLeft(DzValue *left);
-
-		DzValue *right() const;
-		void setRight(DzValue *value);
-
-		llvm::Value *build(const EntryPoint &entryPoint) const override;
+		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
 
 	private:
-		DzValue *m_left;
-		DzValue *m_right;
+		llvm::Value *resolveOp(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const;
+
+		DzValue *m_consumer;
+
+		std::string m_op;
 };
 
 #endif // DZBINARY_H

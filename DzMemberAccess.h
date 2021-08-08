@@ -6,11 +6,14 @@
 class DzMemberAccess : public DzValue
 {
 	public:
-		DzMemberAccess(std::string name);
+		DzMemberAccess(DzValue *consumer, const std::string &name);
 
-		llvm::Value *build(const EntryPoint &context) const override;
+		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
 
 	private:
+		DzValue *m_consumer;
+
 		std::string m_name;
 };
+
 #endif // DZMEMBERACCESS_H

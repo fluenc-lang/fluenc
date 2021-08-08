@@ -1,98 +1,37 @@
-#include <sstream>
-#include <iterator>
-#include <numeric>
-
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Argument.h>
+#include <llvm/IR/BasicBlock.h>
 
 #include "DzFunctionCall.h"
-#include "DzReturn.h"
-#include "DzClosure.h"
-#include "DzParameter.h"
-#include "VisitorV2.h"
+#include "DzCallable.h"
 #include "EntryPoint.h"
-#include "DzFunction.h"
 
-DzFunctionCall::DzFunctionCall(std::string name, DzValue *parent)
-	: m_parent(parent)
+DzFunctionCall::DzFunctionCall(DzValue *consumer, const std::string name)
+	: m_consumer(consumer)
 	, m_name(name)
 {
 }
 
-void DzFunctionCall::addArgument(DzValue *argument)
+llvm::Value *DzFunctionCall::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
 {
-	m_arguments.push_back(argument);
-}
-
-llvm::Value *DzFunctionCall::build(const EntryPoint &entryPoint) const
-{
-	auto closure = entryPoint.closure();
-//	auto context = entryPoint.context();
-	auto locals = entryPoint.locals();
-
-	std::cout << m_name << "(";
-
-	std::vector<llvm::Value *> arguments;
-
-	for (auto argument : m_arguments)
-	{
-		auto value = argument->build(entryPoint);
-
-		arguments.push_back(value);
-
-		std::cout << ", ";
-	}
-
-	arguments.push_back(closure);
-
-	if (m_parent)
-	{
-		auto consumer = m_parent->build(entryPoint);
-
-		arguments.push_back(consumer);
-	}
-
-	std::cout << ")";
-
-	llvm::IRBuilder<> builder(entryPoint.block());
-
-	auto target = getTarget(entryPoint);
-
-	return builder.CreateCall(target, arguments);
-}
-
-llvm::FunctionCallee DzFunctionCall::getTarget(const EntryPoint &entryPoint) const
-{
-	auto locals = entryPoint.locals();
+	auto &context = entryPoint.context();
 	auto functions = entryPoint.functions();
-	auto module = entryPoint.module();
 
-	auto local = locals.find(m_name);
+	auto iterator = functions.find(m_name);
 
-	if (local != locals.end())
+	if (iterator == functions.end())
 	{
-		auto functionPointer = local->second->build(entryPoint);
-
-		auto type = functionPointer->getType();
-		auto pet = type->getPointerElementType();
-		auto functionType = llvm::cast<llvm::FunctionType>(pet);
-
-		return llvm::FunctionCallee(functionType, functionPointer);
+		return nullptr;
 	}
 
-	auto existing = module->getFunction(m_name);
+	auto function = iterator->second;
 
-	if (existing)
-	{
-		return existing;
-	}
+	auto returnValue = function->build(entryPoint, values);
 
-	auto dependency = functions[m_name];
+	values.push_back(returnValue);
 
-	if (dependency)
-	{
-		return (llvm::Function *)dependency->build(entryPoint);
-	}
+	auto block = llvm::BasicBlock::Create(*context);
 
-	return nullptr;
+	auto ep = entryPoint
+		.withBlock(block);
+
+	return m_consumer->build(ep, values);
 }

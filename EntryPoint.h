@@ -3,57 +3,42 @@
 
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Module.h>
-#include <llvm/IR/BasicBlock.h>
 
-#include <string>
-#include <map>
-
-class DzFunction;
-class DzValue;
-class DzTypeName;
+class DzCallable;
 
 class EntryPoint
 {
 	public:
-		EntryPoint(const EntryPoint *parent
-			, llvm::BasicBlock *block
-			, llvm::LLVMContext *context
-			, llvm::Module *module
-			, llvm::Value *closure
-			, DzTypeName *returnType
-			, const std::map<std::string, DzFunction *> &functions
-			, const std::map<std::string, DzValue *> &locals
+		EntryPoint(llvm::BasicBlock *block
+			, llvm::Function *function
+			, std::unique_ptr<llvm::Module> &module
+			, std::unique_ptr<llvm::LLVMContext> &context
+			, const std::map<std::string, DzCallable *> &functions
+			, const std::map<std::string, llvm::Value *> &locals
 			);
 
-		const EntryPoint *parent() const;
-
 		llvm::BasicBlock *block() const;
-		llvm::LLVMContext *context() const;
-		llvm::Module *module() const;
-		llvm::Type *returnType() const;
-		llvm::Value *closure() const;
+		llvm::Function *function() const;
 
-		std::map<std::string, DzFunction *> functions() const;
-		std::map<std::string, DzValue *> locals() const;
+		std::unique_ptr<llvm::Module> &module() const;
+		std::unique_ptr<llvm::LLVMContext> &context() const;
 
-		EntryPoint withLocals(const std::map<std::string, DzValue *> &locals) const;
+		std::map<std::string, DzCallable *> functions() const;
+		std::map<std::string, llvm::Value *> locals() const;
+
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
-		EntryPoint withClosure(llvm::Value *closure) const;
-		EntryPoint withParent(const EntryPoint *parent) const;
+		EntryPoint withFunction(llvm::Function *function) const;
+		EntryPoint withLocals(const std::map<std::string, llvm::Value *> &locals) const;
 
 	private:
-		const EntryPoint *m_parent;
-
 		llvm::BasicBlock *m_block;
-		llvm::LLVMContext *m_context;
-		llvm::Module *m_module;
-		llvm::Value *m_closure;
+		llvm::Function *m_function;
 
-		DzTypeName *m_returnType;
+		std::unique_ptr<llvm::Module> &m_module;
+		std::unique_ptr<llvm::LLVMContext> &m_context;
 
-		std::map<std::string, DzFunction *> m_functions;
-		std::map<std::string, DzValue *> m_locals;
+		std::map<std::string, DzCallable *> m_functions;
+		std::map<std::string, llvm::Value *> m_locals;
 };
-
 
 #endif // ENTRYPOINT_H

@@ -1,42 +1,28 @@
 #ifndef DZFUNCTION_H
 #define DZFUNCTION_H
 
-#include <sstream>
+#include "DzCallable.h"
 
-#include "DzValue.h"
-#include "FunctionAttribute.h"
-
-class EntryPoint;
-class DzTypeName;
-class DzMember;
-
-class DzFunction : public DzValue
+class DzFunction : public DzCallable
 {
 	public:
 		DzFunction(const std::string &name
-			, const std::vector<DzMember *> &arguments
-			, FunctionAttribute attribute
-			, DzTypeName *returnType
+			, std::vector<std::string> arguments
 			, DzValue *block
 			);
 
-		std::string name() const;
-		std::vector<DzMember *> arguments() const;
+		std::string name() const override;
 
-		FunctionAttribute attribute() const;
+		FunctionAttribute attribute() const override;
 
-		DzTypeName *returnType() const;
-
-		llvm::Value *build(const EntryPoint &entryPoint) const override;
+		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
 
 	private:
 		std::string m_name;
-		std::vector<DzMember *> m_arguments;
+		std::vector<std::string> m_arguments;
 
-		FunctionAttribute m_attribute;
-
-		DzTypeName *m_returnType;
 		DzValue *m_block;
 };
+
 
 #endif // DZFUNCTION_H

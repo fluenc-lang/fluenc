@@ -1,25 +1,24 @@
-#include <llvm/IR/IRBuilder.h>
-
 #include "DzMemberAccess.h"
 #include "EntryPoint.h"
-#include "UndeclaredIdentifierException.h"
 
-DzMemberAccess::DzMemberAccess(std::string name)
-	: m_name(name)
+DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
+	: m_consumer(consumer)
+	, m_name(name)
 {
 }
 
-llvm::Value *DzMemberAccess::build(const EntryPoint &context) const
+llvm::Value *DzMemberAccess::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
 {
-	auto locals = context.locals();
-	auto result = locals.find(m_name);
+	auto locals = entryPoint.locals();
 
-	if (result == locals.end())
+	auto iterator = locals.find(m_name);
+
+	if (iterator == locals.end())
 	{
 		return nullptr;
 	}
 
-	std::cout << m_name;
+	values.push_back(iterator->second);
 
-	return result->second->build(context);
+	return m_consumer->build(entryPoint, values);
 }

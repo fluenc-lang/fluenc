@@ -1,14 +1,42 @@
 #ifndef VISITORV4_H
 #define VISITORV4_H
 
-#include "VisitorV3.h"
+#include <llvm/IR/Module.h>
 
-class DzValueMkII;
+#include "antlr4-runtime/dzBaseVisitor.h"
+
+class DzValue;
+
+class ModuleInfo
+{
+	public:
+		ModuleInfo(std::unique_ptr<llvm::Module> module
+			, std::unique_ptr<llvm::LLVMContext> context
+			)
+			: m_module(std::move(module))
+			, m_context(std::move(context))
+		{
+		}
+
+		std::unique_ptr<llvm::Module> &module()
+		{
+			return m_module;
+		}
+
+		std::unique_ptr<llvm::LLVMContext> &context()
+		{
+			return m_context;
+		}
+
+	private:
+		std::unique_ptr<llvm::Module> m_module;
+		std::unique_ptr<llvm::LLVMContext> m_context;
+};
 
 class VisitorV4 : public dzBaseVisitor
 {
 	public:
-		VisitorV4(class DzValueMkII *consumer);
+		VisitorV4(class DzValue *consumer);
 
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
@@ -20,7 +48,7 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitMember(dzParser::MemberContext *context) override;
 
 	private:
-		DzValueMkII *m_consumer;
+		DzValue *m_consumer;
 };
 
 #endif // VISITORV4_H

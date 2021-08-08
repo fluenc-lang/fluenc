@@ -1,19 +1,13 @@
 #ifndef DZCALLABLE_H
 #define DZCALLABLE_H
 
-#include "DzValueNg.h"
+#include "DzValue.h"
 #include "FunctionAttribute.h"
 
-class DzMemberNg;
-class DzTypeNameNg;
-
-class DzCallable : public DzValueNg
+class DzCallable : public DzValue
 {
 	public:
 		virtual std::string name() const = 0;
-		virtual std::vector<DzMemberNg *> arguments() const = 0;
-
-		virtual DzTypeNameNg *returnType() const = 0;
 
 		virtual FunctionAttribute attribute() const = 0;
 };

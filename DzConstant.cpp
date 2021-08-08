@@ -1,19 +1,21 @@
 #include <llvm/IR/Constants.h>
-#include <llvm/IR/Type.h>
-
-#include <iostream>
 
 #include "DzConstant.h"
 #include "EntryPoint.h"
 
-DzConstant::DzConstant(std::string value)
-	: m_value(value)
+DzConstant::DzConstant(DzValue *consumer, std::string value)
+	: m_consumer(consumer)
+	, m_value(value)
 {
 }
 
-llvm::Value *DzConstant::build(const EntryPoint &context) const
+llvm::Value *DzConstant::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
 {
-	auto type = llvm::Type::getInt32Ty(*context.context());
+	auto &context = entryPoint.context();
 
-	return llvm::ConstantInt::get(type, m_value, 10);
+	auto value = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), m_value, 10);
+
+	values.push_back(value);
+
+	return m_consumer->build(entryPoint, values);
 }
