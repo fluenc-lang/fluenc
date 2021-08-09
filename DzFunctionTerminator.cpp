@@ -11,7 +11,7 @@ DzFunctionTerminator::DzFunctionTerminator(const std::string &name)
 {
 }
 
-llvm::Value *DzFunctionTerminator::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzFunctionTerminator::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
@@ -35,9 +35,7 @@ llvm::Value *DzFunctionTerminator::build(const EntryPoint &entryPoint, std::dequ
 		return new llvm::GlobalVariable(*module, llvm::Type::getInt32Ty(*context), false, llvm::GlobalValue::InternalLinkage, initializer, globalName);
 	});
 
-	auto value = values.back();
-
-	values.pop_back();
+	auto value = values.pop();
 
 	llvm::IRBuilder<> builder(block);
 
@@ -45,5 +43,7 @@ llvm::Value *DzFunctionTerminator::build(const EntryPoint &entryPoint, std::dequ
 
 	auto load = builder.CreateLoad(llvm::Type::getInt32Ty(*context), global);
 
-	return load;
+	values.push(load);
+
+	return values;
 }

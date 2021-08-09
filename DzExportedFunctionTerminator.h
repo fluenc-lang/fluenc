@@ -6,7 +6,7 @@
 class DzExportedFunctionTerminator : public DzValue
 {
 	public:
-		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
+		Stack build(const EntryPoint &entryPoint, Stack values) const override;
 };
 
 #endif // DZEXPORTEDFUNCTIONTERMINATOR_H

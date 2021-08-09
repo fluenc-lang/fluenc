@@ -24,18 +24,13 @@ FunctionAttribute DzFunction::attribute() const
 	return FunctionAttribute::None;
 }
 
-llvm::Value *DzFunction::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	std::map<std::string, llvm::Value *> locals;
 
-	std::transform(begin(m_arguments), end(m_arguments), rbegin(values), std::inserter(locals, end(locals)), [](auto name, auto value)
+	for (const auto &argument : m_arguments)
 	{
-		return std::make_pair(name, value);
-	});
-
-	for (auto i = 0u; i < m_arguments.size(); i++)
-	{
-		values.pop_back();
+		locals[argument] = values.pop();
 	}
 
 	auto ep = entryPoint

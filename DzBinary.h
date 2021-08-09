@@ -8,10 +8,10 @@ class DzBinary : public DzValue
 	public:
 		DzBinary(DzValue *consumer, const std::string &op);
 
-		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
+		Stack build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		llvm::Value *resolveOp(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const;
+		llvm::Value *resolveOp(const EntryPoint &entryPoint, llvm::Value *left, llvm::Value *right) const;
 
 		DzValue *m_consumer;
 

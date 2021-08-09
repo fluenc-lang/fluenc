@@ -15,7 +15,7 @@ class DzFunction : public DzCallable
 
 		FunctionAttribute attribute() const override;
 
-		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
+		Stack build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		std::string m_name;

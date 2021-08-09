@@ -9,26 +9,21 @@ DzBinary::DzBinary(DzValue *consumer, const std::string &op)
 {
 }
 
-llvm::Value *DzBinary::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzBinary::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto op = resolveOp(entryPoint, values);
+	auto left = values.pop();
+	auto right = values.pop();
 
-	values.push_back(op);
+	auto op = resolveOp(entryPoint, left, right);
+
+	values.push(op);
 
 	return m_consumer->build(entryPoint, values);
 }
 
-llvm::Value *DzBinary::resolveOp(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+llvm::Value *DzBinary::resolveOp(const EntryPoint &entryPoint, llvm::Value *left, llvm::Value *right) const
 {
 	auto block = entryPoint.block();
-
-	auto left = values.back();
-
-	values.pop_back();
-
-	auto right = values.back();
-
-	values.pop_back();
 
 	llvm::IRBuilder<> builder(block);
 

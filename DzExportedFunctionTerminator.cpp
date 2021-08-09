@@ -3,7 +3,7 @@
 #include "DzExportedFunctionTerminator.h"
 #include "EntryPoint.h"
 
-llvm::Value *DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
@@ -13,9 +13,7 @@ llvm::Value *DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, s
 
 	llvm::IRBuilder<> builder(block);
 
-	auto returnValue = values.back();
-
-	values.pop_back();
+	auto returnValue = values.pop();
 
 	builder.CreateRet(returnValue);
 
@@ -27,5 +25,5 @@ llvm::Value *DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, s
 		llvm::BranchInst::Create(&*j, &*i);
 	}
 
-	return function;
+	return values;
 }

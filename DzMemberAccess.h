@@ -8,7 +8,7 @@ class DzMemberAccess : public DzValue
 	public:
 		DzMemberAccess(DzValue *consumer, const std::string &name);
 
-		llvm::Value *build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const override;
+		Stack build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		DzValue *m_consumer;

@@ -7,7 +7,7 @@ DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 {
 }
 
-llvm::Value *DzMemberAccess::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto locals = entryPoint.locals();
 
@@ -15,10 +15,10 @@ llvm::Value *DzMemberAccess::build(const EntryPoint &entryPoint, std::deque<llvm
 
 	if (iterator == locals.end())
 	{
-		return nullptr;
+		return values;
 	}
 
-	values.push_back(iterator->second);
+	values.push(iterator->second);
 
 	return m_consumer->build(entryPoint, values);
 }

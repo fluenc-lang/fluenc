@@ -9,13 +9,13 @@ DzConstant::DzConstant(DzValue *consumer, std::string value)
 {
 }
 
-llvm::Value *DzConstant::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzConstant::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
 
 	auto value = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), m_value, 10);
 
-	values.push_back(value);
+	values.push(value);
 
 	return m_consumer->build(entryPoint, values);
 }

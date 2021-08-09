@@ -49,7 +49,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	{
 		EntryPoint entryPoint(nullptr, nullptr, module, llvmContext, functions, locals);
 
-		std::deque<llvm::Value *> values;
+		Stack values;
 
 		root->build(entryPoint, values);
 	}

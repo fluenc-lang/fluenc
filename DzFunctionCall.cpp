@@ -10,7 +10,7 @@ DzFunctionCall::DzFunctionCall(DzValue *consumer, const std::string name)
 {
 }
 
-llvm::Value *DzFunctionCall::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
 	auto functions = entryPoint.functions();
@@ -19,19 +19,17 @@ llvm::Value *DzFunctionCall::build(const EntryPoint &entryPoint, std::deque<llvm
 
 	if (iterator == functions.end())
 	{
-		return nullptr;
+		return values;
 	}
 
 	auto function = iterator->second;
 
-	auto returnValue = function->build(entryPoint, values);
-
-	values.push_back(returnValue);
+	auto returnValues = function->build(entryPoint, values);
 
 	auto block = llvm::BasicBlock::Create(*context);
 
 	auto ep = entryPoint
 		.withBlock(block);
 
-	return m_consumer->build(ep, values);
+	return m_consumer->build(ep, returnValues);
 }

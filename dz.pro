@@ -1,6 +1,6 @@
 QT += testlib
 
-CONFIG += DEBUG c++20
+CONFIG += DEBUG
 
 SOURCES += \
 	CompilerException.cpp \
@@ -14,6 +14,7 @@ SOURCES += \
 	DzMemberAccess.cpp \
 	EntryPoint.cpp \
 	KaleidoscopeJIT.cpp \
+	Stack.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
 	VisitorV1.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
 	EntryPoint.h \
 	FunctionAttribute.h \
 	KaleidoscopeJIT.h \
+	Stack.h \
 	Tests.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \

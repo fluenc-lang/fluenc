@@ -20,7 +20,7 @@ FunctionAttribute DzExportedFunction::attribute() const
 	return FunctionAttribute::Export;
 }
 
-llvm::Value *DzExportedFunction::build(const EntryPoint &entryPoint, std::deque<llvm::Value *> &values) const
+Stack DzExportedFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
