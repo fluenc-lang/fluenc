@@ -20,6 +20,15 @@ FunctionAttribute DzExportedFunction::attribute() const
 	return FunctionAttribute::Export;
 }
 
+bool DzExportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values, size_t numberOfArguments) const
+{
+	UNUSED(entryPoint);
+	UNUSED(values);
+	UNUSED(numberOfArguments);
+
+	return true;
+}
+
 Stack DzExportedFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();

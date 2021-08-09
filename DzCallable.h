@@ -10,6 +10,8 @@ class DzCallable : public DzValue
 		virtual std::string name() const = 0;
 
 		virtual FunctionAttribute attribute() const = 0;
+
+		virtual bool hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values, size_t numberOfArguments) const = 0;
 };
 
 #endif // DZCALLABLE_H

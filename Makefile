@@ -16,7 +16,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_GUI_LIB -DQT_TESTLIB_LIB -DQT_CORE_LIB -DQT_TESTCASE_BUILDDIR='"/home/znurre/Program/Develop/C++/dz"'
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -std=c++20 -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -I/usr/include/antlr4-runtime -I/usr/include/qt -I/usr/include/qt/QtGui -I/usr/include/qt/QtTest -I/usr/include/qt/QtCore -I. -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
@@ -52,7 +52,9 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = CompilerException.cpp \
+SOURCES       = AllIterator.cpp \
+		CompilerException.cpp \
+		DzArgument.cpp \
 		DzBinary.cpp \
 		DzConstant.cpp \
 		DzExportedFunction.cpp \
@@ -61,6 +63,7 @@ SOURCES       = CompilerException.cpp \
 		DzFunctionCall.cpp \
 		DzFunctionTerminator.cpp \
 		DzMemberAccess.cpp \
+		DzTypeName.cpp \
 		EntryPoint.cpp \
 		KaleidoscopeJIT.cpp \
 		Stack.cpp \
@@ -73,7 +76,9 @@ SOURCES       = CompilerException.cpp \
 		antlr4-runtime/dzLexer.cpp \
 		antlr4-runtime/dzParser.cpp \
 		antlr4-runtime/dzVisitor.cpp moc_wobjectdefs.cpp
-OBJECTS       = CompilerException.o \
+OBJECTS       = AllIterator.o \
+		CompilerException.o \
+		DzArgument.o \
 		DzBinary.o \
 		DzConstant.o \
 		DzExportedFunction.o \
@@ -82,6 +87,7 @@ OBJECTS       = CompilerException.o \
 		DzFunctionCall.o \
 		DzFunctionTerminator.o \
 		DzMemberAccess.o \
+		DzTypeName.o \
 		EntryPoint.o \
 		KaleidoscopeJIT.o \
 		Stack.o \
@@ -439,7 +445,9 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/exceptions.prf \
 		/usr/lib/qt/mkspecs/features/yacc.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
-		dz.pro CompilerException.h \
+		dz.pro AllIterator.h \
+		CompilerException.h \
+		DzArgument.h \
 		DzBinary.h \
 		DzCallable.h \
 		DzConstant.h \
@@ -449,6 +457,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		DzFunctionCall.h \
 		DzFunctionTerminator.h \
 		DzMemberAccess.h \
+		DzTypeName.h \
 		DzValue.h \
 		EntryPoint.h \
 		FunctionAttribute.h \
@@ -457,13 +466,16 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		Tests.h \
 		UndeclaredIdentifierException.h \
 		UnknownTypeException.h \
+		Utility.h \
 		VisitorV4.h \
 		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzLexer.h \
 		antlr4-runtime/dzParser.h \
 		antlr4-runtime/dzVisitor.h \
 		wobjectdefs.h \
-		wobjectimpl.h CompilerException.cpp \
+		wobjectimpl.h AllIterator.cpp \
+		CompilerException.cpp \
+		DzArgument.cpp \
 		DzBinary.cpp \
 		DzConstant.cpp \
 		DzExportedFunction.cpp \
@@ -472,6 +484,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		DzFunctionCall.cpp \
 		DzFunctionTerminator.cpp \
 		DzMemberAccess.cpp \
+		DzTypeName.cpp \
 		EntryPoint.cpp \
 		KaleidoscopeJIT.cpp \
 		Stack.cpp \
@@ -1201,8 +1214,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents CompilerException.h DzBinary.h DzCallable.h DzConstant.h DzExportedFunction.h DzExportedFunctionTerminator.h DzFunction.h DzFunctionCall.h DzFunctionTerminator.h DzMemberAccess.h DzValue.h EntryPoint.h FunctionAttribute.h KaleidoscopeJIT.h Stack.h Tests.h UndeclaredIdentifierException.h UnknownTypeException.h VisitorV4.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h wobjectdefs.h wobjectimpl.h $(DISTDIR)/
-	$(COPY_FILE) --parents CompilerException.cpp DzBinary.cpp DzConstant.cpp DzExportedFunction.cpp DzExportedFunctionTerminator.cpp DzFunction.cpp DzFunctionCall.cpp DzFunctionTerminator.cpp DzMemberAccess.cpp EntryPoint.cpp KaleidoscopeJIT.cpp Stack.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV4.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents AllIterator.h CompilerException.h DzArgument.h DzBinary.h DzCallable.h DzConstant.h DzExportedFunction.h DzExportedFunctionTerminator.h DzFunction.h DzFunctionCall.h DzFunctionTerminator.h DzMemberAccess.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h KaleidoscopeJIT.h Stack.h Tests.h UndeclaredIdentifierException.h UnknownTypeException.h Utility.h VisitorV4.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h wobjectdefs.h wobjectimpl.h $(DISTDIR)/
+	$(COPY_FILE) --parents AllIterator.cpp CompilerException.cpp DzArgument.cpp DzBinary.cpp DzConstant.cpp DzExportedFunction.cpp DzExportedFunctionTerminator.cpp DzFunction.cpp DzFunctionCall.cpp DzFunctionTerminator.cpp DzMemberAccess.cpp DzTypeName.cpp EntryPoint.cpp KaleidoscopeJIT.cpp Stack.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV4.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1232,7 +1245,7 @@ compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
 moc_predefs.h: /usr/lib/qt/mkspecs/features/data/dummy.cpp
-	g++ -pipe -g -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
+	g++ -pipe -std=c++20 -g -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/qt/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: moc_wobjectdefs.cpp
 compiler_moc_header_clean:
@@ -1256,6 +1269,9 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
+AllIterator.o: AllIterator.cpp AllIterator.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o AllIterator.o AllIterator.cpp
+
 CompilerException.o: CompilerException.cpp CompilerException.h \
 		antlr4-runtime/dzBaseVisitor.h \
 		antlr4-runtime/dzVisitor.h \
@@ -1263,15 +1279,20 @@ CompilerException.o: CompilerException.cpp CompilerException.h \
 		antlr4-runtime/dzLexer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CompilerException.o CompilerException.cpp
 
+DzArgument.o: DzArgument.cpp DzArgument.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzArgument.o DzArgument.cpp
+
 DzBinary.o: DzBinary.cpp DzBinary.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzBinary.o DzBinary.cpp
 
 DzConstant.o: DzConstant.cpp DzConstant.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzConstant.o DzConstant.cpp
 
@@ -1279,6 +1300,7 @@ DzExportedFunction.o: DzExportedFunction.cpp DzExportedFunction.h \
 		DzCallable.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		FunctionAttribute.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzExportedFunction.o DzExportedFunction.cpp
@@ -1286,6 +1308,7 @@ DzExportedFunction.o: DzExportedFunction.cpp DzExportedFunction.h \
 DzExportedFunctionTerminator.o: DzExportedFunctionTerminator.cpp DzExportedFunctionTerminator.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzExportedFunctionTerminator.o DzExportedFunctionTerminator.cpp
 
@@ -1293,13 +1316,19 @@ DzFunction.o: DzFunction.cpp DzFunction.h \
 		DzCallable.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		FunctionAttribute.h \
-		EntryPoint.h
+		DzArgument.h \
+		DzTypeName.h \
+		EntryPoint.h \
+		AllIterator.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzFunction.o DzFunction.cpp
 
 DzFunctionCall.o: DzFunctionCall.cpp DzFunctionCall.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
+		DzFunction.h \
 		DzCallable.h \
 		FunctionAttribute.h \
 		EntryPoint.h
@@ -1308,14 +1337,20 @@ DzFunctionCall.o: DzFunctionCall.cpp DzFunctionCall.h \
 DzFunctionTerminator.o: DzFunctionTerminator.cpp DzFunctionTerminator.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzFunctionTerminator.o DzFunctionTerminator.cpp
 
 DzMemberAccess.o: DzMemberAccess.cpp DzMemberAccess.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMemberAccess.o DzMemberAccess.cpp
+
+DzTypeName.o: DzTypeName.cpp DzTypeName.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzTypeName.o DzTypeName.cpp
 
 EntryPoint.o: EntryPoint.cpp EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o EntryPoint.o EntryPoint.cpp
@@ -1354,6 +1389,7 @@ VisitorV4.o: VisitorV4.cpp VisitorV4.h \
 		DzCallable.h \
 		DzValue.h \
 		Stack.h \
+		Utility.h \
 		FunctionAttribute.h \
 		DzExportedFunctionTerminator.h \
 		DzExportedFunction.h \
@@ -1361,7 +1397,9 @@ VisitorV4.o: VisitorV4.cpp VisitorV4.h \
 		DzConstant.h \
 		DzBinary.h \
 		DzFunctionCall.h \
-		DzMemberAccess.h
+		DzMemberAccess.h \
+		DzArgument.h \
+		DzTypeName.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV4.o VisitorV4.cpp
 
 main.o: main.cpp Tests.h \

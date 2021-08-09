@@ -4,6 +4,7 @@
 #include <llvm/IR/Value.h>
 
 #include "Stack.h"
+#include "Utility.h"
 
 class EntryPoint;
 

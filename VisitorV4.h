@@ -36,16 +36,19 @@ class ModuleInfo
 class VisitorV4 : public dzBaseVisitor
 {
 	public:
-		VisitorV4(class DzValue *consumer);
+		VisitorV4(DzValue *consumer);
 
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
+		antlrcpp::Any visitTypeName(dzParser::TypeNameContext *context) override;
+		antlrcpp::Any visitArgument(dzParser::ArgumentContext *context) override;
 		antlrcpp::Any visitConstant(dzParser::ConstantContext *context) override;
 		antlrcpp::Any visitRet(dzParser::RetContext *context) override;
 		antlrcpp::Any visitBlock(dzParser::BlockContext *context) override;
 		antlrcpp::Any visitBinary(dzParser::BinaryContext *context) override;
 		antlrcpp::Any visitCall(dzParser::CallContext *context) override;
 		antlrcpp::Any visitMember(dzParser::MemberContext *context) override;
+		antlrcpp::Any visitConditional(dzParser::ConditionalContext *context) override;
 
 	private:
 		DzValue *m_consumer;

@@ -1,5 +1,6 @@
 #include <deque>
 #include <numeric>
+#include <ranges>
 
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/IRBuilder.h>
@@ -14,6 +15,8 @@
 #include "DzBinary.h"
 #include "DzFunctionCall.h"
 #include "DzMemberAccess.h"
+#include "DzArgument.h"
+#include "DzTypeName.h"
 
 VisitorV4::VisitorV4(DzValue *consumer)
 	: m_consumer(consumer)
@@ -26,7 +29,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
 
 	std::vector<DzCallable *> roots;
-	std::map<std::string, DzCallable *> functions;
+	std::multimap<std::string, DzCallable *> functions;
 	std::map<std::string, llvm::Value *> locals;
 
 	for (auto function : context->function())
@@ -41,15 +44,15 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 		if (result->attribute() == FunctionAttribute::None)
 		{
-			functions[result->name()] = result;
+			functions.insert({ result->name(), result });
 		}
 	}
 
 	for (auto root : roots)
 	{
-		EntryPoint entryPoint(nullptr, nullptr, module, llvmContext, functions, locals);
-
 		Stack values;
+
+		EntryPoint entryPoint(nullptr, nullptr, module, llvmContext, functions, locals);
 
 		root->build(entryPoint, values);
 	}
@@ -91,13 +94,11 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	auto name = context->name->getText();
 	auto block = context->block();
 
-	std::vector<std::string> arguments;
+	std::vector<DzArgument *> arguments;
 
 	for (auto argument : context->argument())
 	{
-		auto argumentName = argument->ID()->getText();
-
-		arguments.push_back(argumentName);
+		arguments.push_back(visit(argument));
 	}
 
 	if (attribute == FunctionAttribute::Export)
@@ -125,6 +126,18 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	return static_cast<DzCallable *>(function);
 }
 
+antlrcpp::Any VisitorV4::visitTypeName(dzParser::TypeNameContext *context)
+{
+	return new DzTypeName(context->ID()->getText());
+}
+
+antlrcpp::Any VisitorV4::visitArgument(dzParser::ArgumentContext *context)
+{
+	return new DzArgument(context->ID()->getText()
+		, visit(context->typeName())
+		);
+}
+
 antlrcpp::Any VisitorV4::visitConstant(dzParser::ConstantContext *context)
 {
 	auto constant = new DzConstant(m_consumer
@@ -139,8 +152,47 @@ antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 	return visit(context->value);
 }
 
+//class DzConditional : public DzValue
+//{
+//	public:
+//		Stack build(const EntryPoint &entryPoint, Stack values) const override
+//		{
+//			return values;
+//		}
+//};
+
+//class DzBlock : public DzValue
+//{
+//	public:
+//		DzBlock(const std::vector<DzConditional *> &conditionals
+//			, DzValue *)
+//			: m_conditionals(conditionals)
+//		{
+//		}
+
+//		Stack build(const EntryPoint &entryPoint, Stack values) const override
+//		{
+//			return values;
+//		}
+
+//	private:
+//		std::vector<DzConditional *> m_conditionals;
+//};
+
 antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
 {
+//	std::vector<DzConditional *> conditionals;
+
+//	auto co = context->conditional();
+
+//	std::transform(begin(co), end(co), std::back_inserter(conditionals), [this](dzParser::ConditionalContext *c)
+//	{
+//		return visit(c)
+//			.as<DzConditional *>();
+//	});
+
+
+
 	return visit(context->ret());
 }
 
@@ -165,13 +217,14 @@ antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
 
 antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 {
-	auto call = new DzFunctionCall(m_consumer
-		, context->ID()->getText()
-		);
-
 	auto expression = context->expression();
 
-	auto value = std::accumulate(begin(expression), end(expression), (DzValue *)call, [](DzValue *consumer, dzParser::ExpressionContext *parameter)
+	auto call = new DzFunctionCall(m_consumer
+		, context->ID()->getText()
+		, expression.size()
+		);
+
+	auto value = std::accumulate(begin(expression), end(expression), static_cast<DzValue *>(call), [](DzValue *consumer, dzParser::ExpressionContext *parameter)
 	{
 		VisitorV4 visitor(consumer);
 
@@ -194,3 +247,7 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 	return static_cast<DzValue *>(member);
 }
 
+antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
+{
+	return defaultResult();
+}

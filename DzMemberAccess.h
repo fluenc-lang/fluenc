@@ -11,7 +11,7 @@ class DzMemberAccess : public DzValue
 		Stack build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		DzValue *m_consumer;
+		DzValue * m_consumer;
 
 		std::string m_name;
 };

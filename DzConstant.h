@@ -6,7 +6,7 @@
 class DzConstant : public DzValue
 {
 	public:
-		DzConstant(DzValue *consumer, std::string value);
+		DzConstant(DzValue *consumer, const std::string &value);
 
 		Stack build(const EntryPoint &entryPoint, Stack values) const override;
 

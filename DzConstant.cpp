@@ -3,7 +3,7 @@
 #include "DzConstant.h"
 #include "EntryPoint.h"
 
-DzConstant::DzConstant(DzValue *consumer, std::string value)
+DzConstant::DzConstant(DzValue *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
 {

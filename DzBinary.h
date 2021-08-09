@@ -13,7 +13,7 @@ class DzBinary : public DzValue
 	private:
 		llvm::Value *resolveOp(const EntryPoint &entryPoint, llvm::Value *left, llvm::Value *right) const;
 
-		DzValue *m_consumer;
+		DzValue * m_consumer;
 
 		std::string m_op;
 };

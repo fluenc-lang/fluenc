@@ -180,6 +180,60 @@ class Tests : public QObject
 			QCOMPARE(result, 52);
 		}
 
+		void scenario9()
+		{
+			auto result = exec(R"(
+				function func(long v)
+				{
+					return 3;
+				}
+
+				function func(int v, int f)
+				{
+					return 2;
+				}
+
+				function func(int v)
+				{
+					return 1;
+				}
+
+				export int main()
+				{
+					return func(1);
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
+		void scenario10()
+		{
+			auto result = exec(R"(
+				function func(long v)
+				{
+					return 3;
+				}
+
+				function func(int v, int f)
+				{
+					return 2;
+				}
+
+				function func(int v)
+				{
+					return 1;
+				}
+
+				export int main()
+				{
+					return func(1) + 1;
+				}
+			)");
+
+			QCOMPARE(result, 2);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -188,6 +242,8 @@ class Tests : public QObject
 		W_SLOT(scenario6)
 		W_SLOT(scenario7)
 		W_SLOT(scenario8)
+		W_SLOT(scenario9)
+		W_SLOT(scenario10)
 
 	private:
 		int exec(std::string source)

@@ -3,7 +3,9 @@ QT += testlib
 CONFIG += DEBUG
 
 SOURCES += \
+	AllIterator.cpp \
 	CompilerException.cpp \
+	DzArgument.cpp \
 	DzBinary.cpp \
 	DzConstant.cpp \
 	DzExportedFunction.cpp \
@@ -12,6 +14,7 @@ SOURCES += \
 	DzFunctionCall.cpp \
 	DzFunctionTerminator.cpp \
 	DzMemberAccess.cpp \
+	DzTypeName.cpp \
 	EntryPoint.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
@@ -26,7 +29,9 @@ SOURCES += \
 	antlr4-runtime/dzVisitor.cpp
 
 HEADERS += \
+	AllIterator.h \
 	CompilerException.h \
+	DzArgument.h \
 	DzBinary.h \
 	DzCallable.h \
 	DzConstant.h \
@@ -36,6 +41,7 @@ HEADERS += \
 	DzFunctionCall.h \
 	DzFunctionTerminator.h \
 	DzMemberAccess.h \
+	DzTypeName.h \
 	DzValue.h \
 	EntryPoint.h \
 	FunctionAttribute.h \
@@ -44,6 +50,7 @@ HEADERS += \
 	Tests.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \
+	Utility.h \
 	VisitorV4.h \
 	antlr4-runtime/dzBaseVisitor.h \
 	antlr4-runtime/dzLexer.h \
@@ -55,6 +62,8 @@ HEADERS += \
 OTHER_FILES += dz.g4 \
         main.dz \
 	foo.dz
+
+QMAKE_CXXFLAGS += -std=c++20
 
 LIBS += -lLLVM-12 -lantlr4-runtime
 
