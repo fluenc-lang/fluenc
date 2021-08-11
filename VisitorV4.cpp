@@ -1,5 +1,7 @@
 #include <numeric>
 
+#include <llvm/IR/Verifier.h>
+
 #include "VisitorV4.h"
 #include "EntryPoint.h"
 #include "DzFunction.h"
@@ -49,12 +51,17 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	{
 		Stack values;
 
-		EntryPoint entryPoint(nullptr, nullptr, &module, &llvmContext, "term", functions, locals);
+		EntryPoint entryPoint(nullptr, nullptr, nullptr, &module, &llvmContext, "term", functions, locals);
 
 		root->build(entryPoint, values);
 	}
 
 	module->print(llvm::errs(), nullptr);
+
+	if (verifyModule(*module, &llvm::errs()))
+	{
+		throw new std::exception();
+	}
 
 	return new ModuleInfo(std::move(module), std::move(llvmContext));
 }

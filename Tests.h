@@ -18,6 +18,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
+
+	public:
+		Tests()
+		{
+			scenario11();
+		}
 	private:
 		void scenario1()
 		{

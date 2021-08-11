@@ -6,18 +6,23 @@
 std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
+
 	auto function = entryPoint.function();
-	auto b = entryPoint.block();
+	auto previous = entryPoint.block();
+	auto rva = entryPoint.returnValueAddress();
 
 	auto block = llvm::BasicBlock::Create(*context, "entry", function);
 
-	llvm::BranchInst::Create(block, b);
+	llvm::BranchInst::Create(block, previous);
 
 	llvm::IRBuilder<> builder(block);
 
 	auto returnValue = values.pop();
 
-	builder.CreateRet(returnValue);
+	builder.CreateStore(returnValue, rva);
 
-	return std::vector<DzResult>();
+	auto ep = entryPoint
+		.withBlock(block);
+
+	return {{ ep, values }};
 }
