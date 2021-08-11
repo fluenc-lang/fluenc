@@ -1,4 +1,5 @@
 #include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Instructions.h>
 
 #include "DzFunctionCall.h"
 #include "DzFunction.h"
@@ -11,7 +12,7 @@ DzFunctionCall::DzFunctionCall(DzValue *consumer, const std::string name, size_t
 {
 }
 
-Stack DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
 	auto functions = entryPoint.functions();
@@ -22,14 +23,28 @@ Stack DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
 
 		if (function->hasMatchingSignature(entryPoint, values, m_numberOfArguments))
 		{
-			auto returnValues = function->build(entryPoint, values);
+			std::vector<DzResult> result;
 
-			auto block = llvm::BasicBlock::Create(*context);
+			auto functionResults = function->build(entryPoint, values);
 
-			auto ep = entryPoint
-				.withBlock(block);
+			for (const auto &[iep, value] : functionResults)
+			{
+				auto block = llvm::BasicBlock::Create(*context);
 
-			return m_consumer->build(ep, returnValues);
+				llvm::BranchInst::Create(block, iep.block());
+
+				auto ep = entryPoint
+					.withBlock(block);
+
+				auto v = m_consumer->build(ep, value);
+
+				for (const auto &f : v)
+				{
+					result.push_back(f);
+				}
+			}
+
+			return result;
 		}
 	}
 

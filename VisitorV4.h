@@ -48,7 +48,6 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitBinary(dzParser::BinaryContext *context) override;
 		antlrcpp::Any visitCall(dzParser::CallContext *context) override;
 		antlrcpp::Any visitMember(dzParser::MemberContext *context) override;
-		antlrcpp::Any visitConditional(dzParser::ConditionalContext *context) override;
 
 	private:
 		DzValue *m_consumer;

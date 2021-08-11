@@ -8,7 +8,7 @@ class DzFunctionTerminator : public DzValue
 	public:
 		DzFunctionTerminator(const std::string &name);
 
-		Stack build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		std::string m_name;

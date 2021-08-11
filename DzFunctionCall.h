@@ -8,7 +8,7 @@ class DzFunctionCall : public DzValue
 	public:
 		DzFunctionCall(DzValue * consumer, const std::string name, size_t numberOfArguments);
 
-		Stack build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		DzValue *m_consumer;

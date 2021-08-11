@@ -234,6 +234,28 @@ class Tests : public QObject
 			QCOMPARE(result, 2);
 		}
 
+		void scenario11()
+		{
+			auto result = exec(R"(
+				function sign(int v)
+				{
+					if (v < 0)
+					{
+						return -1;
+					}
+
+					return 1;
+				}
+
+				export int main()
+				{
+					return sign(3);
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -244,6 +266,7 @@ class Tests : public QObject
 		W_SLOT(scenario8)
 		W_SLOT(scenario9)
 		W_SLOT(scenario10)
+		W_SLOT(scenario11)
 
 	private:
 		int exec(std::string source)

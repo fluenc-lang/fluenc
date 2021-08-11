@@ -9,7 +9,7 @@ DzBinary::DzBinary(DzValue *consumer, const std::string &op)
 {
 }
 
-Stack DzBinary::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> DzBinary::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto left = values.pop();
 	auto right = values.pop();

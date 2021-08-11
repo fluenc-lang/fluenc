@@ -29,7 +29,7 @@ bool DzExportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, cons
 	return true;
 }
 
-Stack DzExportedFunction::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> DzExportedFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
@@ -40,7 +40,7 @@ Stack DzExportedFunction::build(const EntryPoint &entryPoint, Stack values) cons
 
 	auto functionType = llvm::FunctionType::get(returnType, argumentTypes, false);
 	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, m_name, module.get());
-	auto block = llvm::BasicBlock::Create(*context, "entry");
+	auto block = llvm::BasicBlock::Create(*context);
 
 	auto ep = entryPoint
 		.withFunction(function)

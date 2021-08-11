@@ -6,7 +6,7 @@
 class DzExportedFunctionTerminator : public DzValue
 {
 	public:
-		Stack build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 };
 
 #endif // DZEXPORTEDFUNCTIONTERMINATOR_H

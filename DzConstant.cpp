@@ -9,7 +9,7 @@ DzConstant::DzConstant(DzValue *consumer, const std::string &value)
 {
 }
 
-Stack DzConstant::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> DzConstant::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
 

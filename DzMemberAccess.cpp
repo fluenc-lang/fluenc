@@ -7,7 +7,7 @@ DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 {
 }
 
-Stack DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto locals = entryPoint.locals();
 
@@ -15,7 +15,7 @@ Stack DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
 
 	if (iterator == locals.end())
 	{
-		return values;
+		return std::vector<DzResult>();
 	}
 
 	values.push(iterator->second);

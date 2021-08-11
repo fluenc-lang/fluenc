@@ -8,7 +8,7 @@ class DzBinary : public DzValue
 	public:
 		DzBinary(DzValue *consumer, const std::string &op);
 
-		Stack build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		llvm::Value *resolveOp(const EntryPoint &entryPoint, llvm::Value *left, llvm::Value *right) const;

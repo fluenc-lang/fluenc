@@ -1,5 +1,5 @@
 
-// Generated from dz.g4 by ANTLR 4.8
+// Generated from dz.g4 by ANTLR 4.9.2
 
 #pragma once
 
@@ -22,7 +22,7 @@ public:
     RuleArgument = 8, RuleTypeName = 9
   };
 
-  dzParser(antlr4::TokenStream *input);
+  explicit dzParser(antlr4::TokenStream *input);
   ~dzParser();
 
   virtual std::string getGrammarFileName() const override;
@@ -90,8 +90,8 @@ public:
 
   class  FunctionContext : public antlr4::ParserRuleContext {
   public:
-    antlr4::Token *attribute = nullptr;;
-    antlr4::Token *name = nullptr;;
+    antlr4::Token *attribute = nullptr;
+    antlr4::Token *name = nullptr;
     FunctionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     TypeNameContext *typeName();
@@ -168,8 +168,8 @@ public:
   ExpressionContext* expression(int precedence);
   class  RetContext : public antlr4::ParserRuleContext {
   public:
-    dzParser::ExpressionContext *value = nullptr;;
-    dzParser::ExpressionContext *chained = nullptr;;
+    dzParser::ExpressionContext *value = nullptr;
+    dzParser::ExpressionContext *chained = nullptr;
     RetContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<ExpressionContext *> expression();

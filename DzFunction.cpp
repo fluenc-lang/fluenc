@@ -56,7 +56,7 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 	return result;
 }
 
-Stack DzFunction::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	std::map<std::string, llvm::Value *> locals;
 
@@ -68,6 +68,7 @@ Stack DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 	}
 
 	auto ep = entryPoint
+		.withName(m_name)
 		.withLocals(locals);
 
 	return m_block->build(ep, values);

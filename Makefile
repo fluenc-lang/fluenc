@@ -56,6 +56,7 @@ SOURCES       = AllIterator.cpp \
 		CompilerException.cpp \
 		DzArgument.cpp \
 		DzBinary.cpp \
+		DzConditional.cpp \
 		DzConstant.cpp \
 		DzExportedFunction.cpp \
 		DzExportedFunctionTerminator.cpp \
@@ -63,12 +64,14 @@ SOURCES       = AllIterator.cpp \
 		DzFunctionCall.cpp \
 		DzFunctionTerminator.cpp \
 		DzMemberAccess.cpp \
+		DzReturn.cpp \
 		DzTypeName.cpp \
 		EntryPoint.cpp \
 		KaleidoscopeJIT.cpp \
 		Stack.cpp \
 		UndeclaredIdentifierException.cpp \
 		UnknownTypeException.cpp \
+		Utility.cpp \
 		VisitorV1.cpp \
 		VisitorV4.cpp \
 		main.cpp \
@@ -80,6 +83,7 @@ OBJECTS       = AllIterator.o \
 		CompilerException.o \
 		DzArgument.o \
 		DzBinary.o \
+		DzConditional.o \
 		DzConstant.o \
 		DzExportedFunction.o \
 		DzExportedFunctionTerminator.o \
@@ -87,12 +91,14 @@ OBJECTS       = AllIterator.o \
 		DzFunctionCall.o \
 		DzFunctionTerminator.o \
 		DzMemberAccess.o \
+		DzReturn.o \
 		DzTypeName.o \
 		EntryPoint.o \
 		KaleidoscopeJIT.o \
 		Stack.o \
 		UndeclaredIdentifierException.o \
 		UnknownTypeException.o \
+		Utility.o \
 		VisitorV1.o \
 		VisitorV4.o \
 		main.o \
@@ -450,6 +456,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		DzArgument.h \
 		DzBinary.h \
 		DzCallable.h \
+		DzConditional.h \
 		DzConstant.h \
 		DzExportedFunction.h \
 		DzExportedFunctionTerminator.h \
@@ -457,6 +464,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		DzFunctionCall.h \
 		DzFunctionTerminator.h \
 		DzMemberAccess.h \
+		DzReturn.h \
 		DzTypeName.h \
 		DzValue.h \
 		EntryPoint.h \
@@ -477,6 +485,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		CompilerException.cpp \
 		DzArgument.cpp \
 		DzBinary.cpp \
+		DzConditional.cpp \
 		DzConstant.cpp \
 		DzExportedFunction.cpp \
 		DzExportedFunctionTerminator.cpp \
@@ -484,12 +493,14 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		DzFunctionCall.cpp \
 		DzFunctionTerminator.cpp \
 		DzMemberAccess.cpp \
+		DzReturn.cpp \
 		DzTypeName.cpp \
 		EntryPoint.cpp \
 		KaleidoscopeJIT.cpp \
 		Stack.cpp \
 		UndeclaredIdentifierException.cpp \
 		UnknownTypeException.cpp \
+		Utility.cpp \
 		VisitorV1.cpp \
 		VisitorV4.cpp \
 		main.cpp \
@@ -1214,8 +1225,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents AllIterator.h CompilerException.h DzArgument.h DzBinary.h DzCallable.h DzConstant.h DzExportedFunction.h DzExportedFunctionTerminator.h DzFunction.h DzFunctionCall.h DzFunctionTerminator.h DzMemberAccess.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h KaleidoscopeJIT.h Stack.h Tests.h UndeclaredIdentifierException.h UnknownTypeException.h Utility.h VisitorV4.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h wobjectdefs.h wobjectimpl.h $(DISTDIR)/
-	$(COPY_FILE) --parents AllIterator.cpp CompilerException.cpp DzArgument.cpp DzBinary.cpp DzConstant.cpp DzExportedFunction.cpp DzExportedFunctionTerminator.cpp DzFunction.cpp DzFunctionCall.cpp DzFunctionTerminator.cpp DzMemberAccess.cpp DzTypeName.cpp EntryPoint.cpp KaleidoscopeJIT.cpp Stack.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp VisitorV1.cpp VisitorV4.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents AllIterator.h CompilerException.h DzArgument.h DzBinary.h DzCallable.h DzConditional.h DzConstant.h DzExportedFunction.h DzExportedFunctionTerminator.h DzFunction.h DzFunctionCall.h DzFunctionTerminator.h DzMemberAccess.h DzReturn.h DzTypeName.h DzValue.h EntryPoint.h FunctionAttribute.h KaleidoscopeJIT.h Stack.h Tests.h UndeclaredIdentifierException.h UnknownTypeException.h Utility.h VisitorV4.h antlr4-runtime/dzBaseVisitor.h antlr4-runtime/dzLexer.h antlr4-runtime/dzParser.h antlr4-runtime/dzVisitor.h wobjectdefs.h wobjectimpl.h $(DISTDIR)/
+	$(COPY_FILE) --parents AllIterator.cpp CompilerException.cpp DzArgument.cpp DzBinary.cpp DzConditional.cpp DzConstant.cpp DzExportedFunction.cpp DzExportedFunctionTerminator.cpp DzFunction.cpp DzFunctionCall.cpp DzFunctionTerminator.cpp DzMemberAccess.cpp DzReturn.cpp DzTypeName.cpp EntryPoint.cpp KaleidoscopeJIT.cpp Stack.cpp UndeclaredIdentifierException.cpp UnknownTypeException.cpp Utility.cpp VisitorV1.cpp VisitorV4.cpp main.cpp antlr4-runtime/dzBaseVisitor.cpp antlr4-runtime/dzLexer.cpp antlr4-runtime/dzParser.cpp antlr4-runtime/dzVisitor.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1289,6 +1300,13 @@ DzBinary.o: DzBinary.cpp DzBinary.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzBinary.o DzBinary.cpp
 
+DzConditional.o: DzConditional.cpp DzConditional.h \
+		DzValue.h \
+		Stack.h \
+		Utility.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzConditional.o DzConditional.cpp
+
 DzConstant.o: DzConstant.cpp DzConstant.h \
 		DzValue.h \
 		Stack.h \
@@ -1348,6 +1366,13 @@ DzMemberAccess.o: DzMemberAccess.cpp DzMemberAccess.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzMemberAccess.o DzMemberAccess.cpp
 
+DzReturn.o: DzReturn.cpp DzReturn.h \
+		DzValue.h \
+		Stack.h \
+		Utility.h \
+		EntryPoint.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzReturn.o DzReturn.cpp
+
 DzTypeName.o: DzTypeName.cpp DzTypeName.h \
 		EntryPoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o DzTypeName.o DzTypeName.cpp
@@ -1377,6 +1402,9 @@ UnknownTypeException.o: UnknownTypeException.cpp UnknownTypeException.h \
 		antlr4-runtime/dzLexer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o UnknownTypeException.o UnknownTypeException.cpp
 
+Utility.o: Utility.cpp Utility.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Utility.o Utility.cpp
+
 VisitorV1.o: VisitorV1.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV1.o VisitorV1.cpp
 
@@ -1399,7 +1427,8 @@ VisitorV4.o: VisitorV4.cpp VisitorV4.h \
 		DzFunctionCall.h \
 		DzMemberAccess.h \
 		DzArgument.h \
-		DzTypeName.h
+		DzTypeName.h \
+		DzConditional.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o VisitorV4.o VisitorV4.cpp
 
 main.o: main.cpp Tests.h \

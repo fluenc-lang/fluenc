@@ -1,9 +1,4 @@
-#include <deque>
 #include <numeric>
-#include <ranges>
-
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/IRBuilder.h>
 
 #include "VisitorV4.h"
 #include "EntryPoint.h"
@@ -17,6 +12,8 @@
 #include "DzMemberAccess.h"
 #include "DzArgument.h"
 #include "DzTypeName.h"
+#include "DzConditional.h"
+#include "DzReturn.h"
 
 VisitorV4::VisitorV4(DzValue *consumer)
 	: m_consumer(consumer)
@@ -52,7 +49,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	{
 		Stack values;
 
-		EntryPoint entryPoint(nullptr, nullptr, module, llvmContext, functions, locals);
+		EntryPoint entryPoint(nullptr, nullptr, &module, &llvmContext, "term", functions, locals);
 
 		root->build(entryPoint, values);
 	}
@@ -149,51 +146,30 @@ antlrcpp::Any VisitorV4::visitConstant(dzParser::ConstantContext *context)
 
 antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 {
-	return visit(context->value);
+	auto ret = new DzReturn(m_consumer);
+
+	VisitorV4 visitor(ret);
+
+	return visitor
+		.visit(context->value);
 }
-
-//class DzConditional : public DzValue
-//{
-//	public:
-//		Stack build(const EntryPoint &entryPoint, Stack values) const override
-//		{
-//			return values;
-//		}
-//};
-
-//class DzBlock : public DzValue
-//{
-//	public:
-//		DzBlock(const std::vector<DzConditional *> &conditionals
-//			, DzValue *)
-//			: m_conditionals(conditionals)
-//		{
-//		}
-
-//		Stack build(const EntryPoint &entryPoint, Stack values) const override
-//		{
-//			return values;
-//		}
-
-//	private:
-//		std::vector<DzConditional *> m_conditionals;
-//};
 
 antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
 {
-//	std::vector<DzConditional *> conditionals;
+	auto conditionals = context->conditional();
 
-//	auto co = context->conditional();
+	auto result = std::accumulate(rbegin(conditionals), rend(conditionals), visit(context->ret()), [this](DzValue *ifFalse, dzParser::ConditionalContext *conditional)
+	{
+		auto value = new DzConditional(ifFalse
+			, visit(conditional->block())
+			, visit(conditional->expression())
+			, m_consumer
+			);
 
-//	std::transform(begin(co), end(co), std::back_inserter(conditionals), [this](dzParser::ConditionalContext *c)
-//	{
-//		return visit(c)
-//			.as<DzConditional *>();
-//	});
+		return static_cast<DzValue *>(value);
+	});
 
-
-
-	return visit(context->ret());
+	return static_cast<DzValue *>(result);
 }
 
 antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
@@ -212,7 +188,7 @@ antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
 
 	auto right = rightVisitor.visit(context->right);
 
-	return right;
+	return static_cast<DzValue *>(right);
 }
 
 antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
@@ -245,9 +221,4 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 		);
 
 	return static_cast<DzValue *>(member);
-}
-
-antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
-{
-	return defaultResult();
 }

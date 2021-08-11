@@ -8,7 +8,7 @@ class DzMemberAccess : public DzValue
 	public:
 		DzMemberAccess(DzValue *consumer, const std::string &name);
 
-		Stack build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		DzValue * m_consumer;

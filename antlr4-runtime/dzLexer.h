@@ -1,5 +1,5 @@
 
-// Generated from dz.g4 by ANTLR 4.8
+// Generated from dz.g4 by ANTLR 4.9.2
 
 #pragma once
 
@@ -16,7 +16,7 @@ public:
     T__7 = 8, T__8 = 9, T__9 = 10, INT = 11, OP = 12, WS = 13, ID = 14
   };
 
-  dzLexer(antlr4::CharStream *input);
+  explicit dzLexer(antlr4::CharStream *input);
   ~dzLexer();
 
   virtual std::string getGrammarFileName() const override;

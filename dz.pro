@@ -7,6 +7,7 @@ SOURCES += \
 	CompilerException.cpp \
 	DzArgument.cpp \
 	DzBinary.cpp \
+	DzConditional.cpp \
 	DzConstant.cpp \
 	DzExportedFunction.cpp \
 	DzExportedFunctionTerminator.cpp \
@@ -14,12 +15,14 @@ SOURCES += \
 	DzFunctionCall.cpp \
 	DzFunctionTerminator.cpp \
 	DzMemberAccess.cpp \
+	DzReturn.cpp \
 	DzTypeName.cpp \
 	EntryPoint.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
+	Utility.cpp \
 	VisitorV1.cpp \
 	VisitorV4.cpp \
 	main.cpp \
@@ -34,6 +37,7 @@ HEADERS += \
 	DzArgument.h \
 	DzBinary.h \
 	DzCallable.h \
+	DzConditional.h \
 	DzConstant.h \
 	DzExportedFunction.h \
 	DzExportedFunctionTerminator.h \
@@ -41,6 +45,7 @@ HEADERS += \
 	DzFunctionCall.h \
 	DzFunctionTerminator.h \
 	DzMemberAccess.h \
+	DzReturn.h \
 	DzTypeName.h \
 	DzValue.h \
 	EntryPoint.h \

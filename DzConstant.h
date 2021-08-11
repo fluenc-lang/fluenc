@@ -8,7 +8,7 @@ class DzConstant : public DzValue
 	public:
 		DzConstant(DzValue *consumer, const std::string &value);
 
-		Stack build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		DzValue *m_consumer;

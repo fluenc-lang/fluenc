@@ -2,15 +2,16 @@
 
 EntryPoint::EntryPoint(llvm::BasicBlock *block
 	, llvm::Function *function
-	, std::unique_ptr<llvm::Module> &module
-	, std::unique_ptr<llvm::LLVMContext> &context
-	, const std::multimap<std::string, DzCallable *> &functions
+	, std::unique_ptr<llvm::Module> *module
+	, std::unique_ptr<llvm::LLVMContext> *context
+	, const std::string &name, const std::multimap<std::string, DzCallable *> &functions
 	, const std::map<std::string, llvm::Value *> &locals
 	)
 	: m_block(block)
 	, m_function(function)
 	, m_module(module)
 	, m_context(context)
+	, m_name(name)
 	, m_functions(functions)
 	, m_locals(locals)
 {
@@ -28,12 +29,17 @@ llvm::Function *EntryPoint::function() const
 
 std::unique_ptr<llvm::Module> &EntryPoint::module() const
 {
-	return m_module;
+	return *m_module;
 }
 
 std::unique_ptr<llvm::LLVMContext> &EntryPoint::context() const
 {
-	return m_context;
+	return *m_context;
+}
+
+std::string EntryPoint::name() const
+{
+	return m_name;
 }
 
 std::multimap<std::string, DzCallable *> EntryPoint::functions() const
@@ -52,6 +58,7 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, m_function
 		, m_module
 		, m_context
+		, m_name
 		, m_functions
 		, m_locals
 		);
@@ -63,6 +70,7 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, function
 		, m_module
 		, m_context
+		, m_name
 		, m_functions
 		, m_locals
 		);
@@ -74,7 +82,20 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, llvm::Value *> &lo
 		, m_function
 		, m_module
 		, m_context
+		, m_name
 		, m_functions
 		, locals
+		);
+}
+
+EntryPoint EntryPoint::withName(const std::string &name) const
+{
+	return EntryPoint(m_block
+		, m_function
+		, m_module
+		, m_context
+		, name
+		, m_functions
+		, m_locals
 		);
 }

@@ -3,13 +3,15 @@
 #include "DzExportedFunctionTerminator.h"
 #include "EntryPoint.h"
 
-Stack DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, Stack values) const
 {
+	auto &context = entryPoint.context();
 	auto function = entryPoint.function();
-	auto block = entryPoint.block();
+	auto b = entryPoint.block();
 
-	block->setName("entry");
-	block->insertInto(function);
+	auto block = llvm::BasicBlock::Create(*context, "entry", function);
+
+	llvm::BranchInst::Create(block, b);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -17,13 +19,5 @@ Stack DzExportedFunctionTerminator::build(const EntryPoint &entryPoint, Stack va
 
 	builder.CreateRet(returnValue);
 
-	for (auto i = function->begin(), j = std::next(i)
-		 ; i != function->end() && j != function->end()
-		 ; i++, j++
-		 )
-	{
-		llvm::BranchInst::Create(&*j, &*i);
-	}
-
-	return values;
+	return std::vector<DzResult>();
 }

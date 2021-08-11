@@ -5,13 +5,18 @@
 
 #include "Stack.h"
 #include "Utility.h"
+#include "EntryPoint.h"
 
-class EntryPoint;
+struct DzResult
+{
+	EntryPoint entryPoint;
+	Stack values;
+};
 
 class DzValue
 {
 	public:
-		virtual Stack build(const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const = 0;
 };
 
 #endif // DZVALUE_H
