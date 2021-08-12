@@ -1,6 +1,15 @@
 #ifndef KASK_H
 #define KASK_H
 
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Host.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/Target/TargetOptions.h>
+
 #include "antlr4-runtime/dzBaseVisitor.h"
 #include "antlr4-runtime/dzLexer.h"
 #include "antlr4-runtime/dzParser.h"
@@ -18,12 +27,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
-
 	public:
 		Tests()
 		{
 			scenario11();
 		}
+
 	private:
 		void scenario1()
 		{
@@ -262,6 +271,55 @@ class Tests : public QObject
 			QCOMPARE(result, 1);
 		}
 
+		void scenario12()
+		{
+			auto result = exec(R"(
+				function sign(int v)
+				{
+					if (v < 0)
+					{
+						return -1;
+					}
+
+					return 1;
+				}
+
+				export int main()
+				{
+					return sign(-3) * 5;
+				}
+			)");
+
+			QCOMPARE(result, -5);
+		}
+
+		void scenario13()
+		{
+			auto result = exec(R"(
+				function timesFive(int v)
+				{
+					return v * 5;
+				}
+
+				function sign(int v)
+				{
+					if (v < 0)
+					{
+						return -1;
+					}
+
+					return 1;
+				}
+
+				export int main()
+				{
+					return timesFive(sign(-3));
+				}
+			)");
+
+			QCOMPARE(result, -5);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -273,6 +331,8 @@ class Tests : public QObject
 		W_SLOT(scenario9)
 		W_SLOT(scenario10)
 		W_SLOT(scenario11)
+		W_SLOT(scenario12)
+		W_SLOT(scenario13)
 
 	private:
 		int exec(std::string source)
@@ -292,22 +352,63 @@ class Tests : public QObject
 				.visit(program)
 				.as<ModuleInfo *>();
 
+//			std::string errors;
+
+//			auto targetTriple = llvm::sys::getDefaultTargetTriple();
+//			auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
+
+//			if (!target)
+//			{
+//				llvm::errs() << errors;
+
+//				return 1;
+//			}
+
+//			auto relocModel = llvm::Optional<llvm::Reloc::Model>();
+//			auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
+
+//			moduleInfo->module()->setDataLayout(targetMachine->createDataLayout());
+
+//			std::error_code EC;
+//			llvm::raw_fd_ostream dest("output.o", EC, llvm::sys::fs::OF_None);
+
+//			llvm::legacy::PassManager pm;
+
+//			targetMachine->addPassesToEmitFile(pm, dest, nullptr, llvm::CGFT_ObjectFile);
+
+//			pm.run(*moduleInfo->module());
+
+//			dest.flush();
+
 			auto threadSafeModule = llvm::orc::ThreadSafeModule(
 				std::move(moduleInfo->module()),
 				std::move(moduleInfo->context())
 				);
 
-			auto &jit = *KaleidoscopeJIT::create();
-			auto error = jit->addModule(std::move(threadSafeModule));
+			auto jit = KaleidoscopeJIT::Create();
+
+			if (!jit)
+			{
+				return -1;
+			}
+
+			auto &j = *jit;
+
+			auto error = j->addModule(std::move(threadSafeModule));
 
 			if (error)
 			{
 				return -1;
 			}
 
-			auto &mainSymbol = *jit->lookup("main");
+			auto mainSymbol = j->lookup("main");
 
-			auto main = (int(*)())mainSymbol.getAddress();
+			if (!mainSymbol)
+			{
+				return -1;
+			}
+
+			auto main = (int(*)())mainSymbol->getAddress();
 
 			return main();
 		}

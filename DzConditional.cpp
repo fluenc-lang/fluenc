@@ -25,9 +25,6 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 	auto ifTrue = llvm::BasicBlock::Create(*context, "true");
 	auto ifFalse = llvm::BasicBlock::Create(*context, "false");
 
-	ifTrue->insertInto(function);
-	ifFalse->insertInto(function);
-
 	llvm::IRBuilder<> builder(block);
 
 	for (auto &[_, value] : conditionValues)

@@ -9,7 +9,6 @@ std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entr
 
 	auto function = entryPoint.function();
 	auto previous = entryPoint.block();
-	auto rva = entryPoint.returnValueAddress();
 
 	auto block = llvm::BasicBlock::Create(*context, "entry", function);
 
@@ -19,10 +18,7 @@ std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entr
 
 	auto returnValue = values.pop();
 
-	builder.CreateStore(returnValue, rva);
+	builder.CreateRet(returnValue);
 
-	auto ep = entryPoint
-		.withBlock(block);
-
-	return {{ ep, values }};
+	return {{ entryPoint, values }};
 }
