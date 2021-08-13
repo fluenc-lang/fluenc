@@ -1,5 +1,13 @@
 # Binary
 dz
+a.out
+
+# Qt
+*.pro.user
+moc_*
 
 # C++ stuff
 *.o
+
+# Build
+Makefile
