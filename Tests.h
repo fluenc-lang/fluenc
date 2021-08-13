@@ -27,12 +27,6 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
-	public:
-		Tests()
-		{
-//			scenario14();
-		}
-
 	private:
 		void scenario1()
 		{
@@ -364,6 +358,28 @@ class Tests : public QObject
 			QCOMPARE(result, 7);
 		}
 
+		void fibonacci()
+		{
+			auto result = exec(R"(
+				function fibonacci(int current, int previous, int i, int count)
+				{
+					if (i < count)
+					{
+						return fibonacci(current + previous, current, i + 1, count);
+					}
+
+					return current;
+				}
+
+				export int main()
+				{
+					return fibonacci(1, 0, 0, 19);
+				}
+			)");
+
+			QCOMPARE(result, 6765);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -379,6 +395,7 @@ class Tests : public QObject
 		W_SLOT(scenario13)
 		W_SLOT(scenario14)
 		W_SLOT(scenario15)
+		W_SLOT(fibonacci)
 
 	private:
 		int exec(std::string source)
