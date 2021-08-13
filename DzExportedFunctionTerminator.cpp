@@ -12,12 +12,11 @@ std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entr
 
 	auto block = llvm::BasicBlock::Create(*context, "entry", function);
 
-	llvm::BranchInst::Create(block, previous);
-
-	llvm::IRBuilder<> builder(block);
+	linkBlocks(previous, block);
 
 	auto returnValue = values.pop();
 
+	llvm::IRBuilder<> builder(block);
 	builder.CreateRet(returnValue);
 
 	return {{ entryPoint, values }};

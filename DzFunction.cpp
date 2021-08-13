@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include <llvm/IR/Type.h>
+#include <llvm/IR/IRBuilder.h>
 
 #include "DzFunction.h"
 #include "DzArgument.h"
@@ -58,13 +59,27 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 
 std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
+	auto &module = entryPoint.module();
+	auto &context = entryPoint.context();
+
+	auto block = entryPoint.block();
+
+	auto dataLayout = module->getDataLayout();
+
 	std::map<std::string, llvm::Value *> locals;
 
 	for (const auto &argument : m_arguments)
 	{
 		auto name = argument->name();
 
-		locals[name] = values.pop();
+		auto addressOfArgument = values.pop();
+
+		auto argumentType = llvm::Type::getInt32Ty(*context);
+		auto align = dataLayout.getABITypeAlign(argumentType);
+
+		auto load = new llvm::LoadInst(argumentType, addressOfArgument, name, false, align, block);
+
+		locals[name] = load;
 	}
 
 	auto ep = entryPoint

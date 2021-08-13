@@ -70,7 +70,13 @@ OTHER_FILES += dz.g4 \
 
 QMAKE_CXXFLAGS += -std=c++20
 
-LIBS += -L/home/znurre/Program/Develop/C++/llvm-project/build/lib/ -lLLVM-14git -lantlr4-runtime
+LIBS += \
+    -L/home/znurre/Program/Develop/C++/llvm-project/build/lib/ \
+#    -lLLVM-14git \
+    -lLLVM-12 \
+    -lantlr4-runtime
 
-DEPENDPATH += /usr/include/antlr4-runtime /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ /home/znurre/Program/Develop/C++/llvm-project/build/include/
-INCLUDEPATH += /usr/include/antlr4-runtime /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ /home/znurre/Program/Develop/C++/llvm-project/build/include/
+DEPENDPATH += /usr/include/antlr4-runtime
+#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ /home/znurre/Program/Develop/C++/llvm-project/build/include/
+INCLUDEPATH += /usr/include/antlr4-runtime
+#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ /home/znurre/Program/Develop/C++/llvm-project/build/include/

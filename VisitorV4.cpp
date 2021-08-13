@@ -51,12 +51,12 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	{
 		Stack values;
 
-		EntryPoint entryPoint(nullptr, nullptr, nullptr, &module, &llvmContext, "term", functions, locals);
+		EntryPoint entryPoint(nullptr, nullptr, nullptr, nullptr, &module, &llvmContext, "term", functions, locals, values);
 
 		root->build(entryPoint, values);
 	}
 
-	module->print(llvm::errs(), nullptr);
+//	module->print(llvm::errs(), nullptr);
 
 	if (verifyModule(*module, &llvm::errs()))
 	{

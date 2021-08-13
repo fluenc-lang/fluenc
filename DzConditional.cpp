@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include <llvm/IR/IRBuilder.h>
 
 #include "DzConditional.h"
@@ -17,13 +19,13 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
 
-	block->setName("conditional");
+	block->setName("condition");
 	block->insertInto(function);
 
 	auto conditionValues = m_condition->build(entryPoint, values);
 
-	auto ifTrue = llvm::BasicBlock::Create(*context, "true");
-	auto ifFalse = llvm::BasicBlock::Create(*context, "false");
+	auto ifTrue = llvm::BasicBlock::Create(*context);
+	auto ifFalse = llvm::BasicBlock::Create(*context);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -33,11 +35,11 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 	}
 
 	auto epIfFalse = entryPoint
-		.withName("false")
+		.withName("ifFalse")
 		.withBlock(ifFalse);
 
 	auto epIfTrue = entryPoint
-		.withName("true")
+		.withName("ifTrue")
 		.withBlock(ifTrue);
 
 	auto valuesIfTrue = m_ifTrue->build(epIfTrue, values);

@@ -30,7 +30,7 @@ class Tests : public QObject
 	public:
 		Tests()
 		{
-			scenario11();
+//			scenario14();
 		}
 
 	private:
@@ -320,6 +320,50 @@ class Tests : public QObject
 			QCOMPARE(result, -5);
 		}
 
+		void scenario14()
+		{
+			auto result = exec(R"(
+				function max(int x, int y)
+				{
+					if (x > y)
+					{
+						return x;
+					}
+
+					return y;
+				}
+
+				export int main()
+				{
+					return max(3, 2);
+				}
+			)");
+
+			QCOMPARE(result, 3 );
+		}
+
+		void scenario15()
+		{
+			auto result = exec(R"(
+				function loop(int i, int count)
+				{
+					if (i < count)
+					{
+						return loop(i + 1, count);
+					}
+
+					return i;
+				}
+
+				export int main()
+				{
+					return loop(0, 5) + 2;
+				}
+			)");
+
+			QCOMPARE(result, 7);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -333,6 +377,8 @@ class Tests : public QObject
 		W_SLOT(scenario11)
 		W_SLOT(scenario12)
 		W_SLOT(scenario13)
+		W_SLOT(scenario14)
+		W_SLOT(scenario15)
 
 	private:
 		int exec(std::string source)
@@ -380,35 +426,23 @@ class Tests : public QObject
 
 //			dest.flush();
 
+
 			auto threadSafeModule = llvm::orc::ThreadSafeModule(
 				std::move(moduleInfo->module()),
 				std::move(moduleInfo->context())
 				);
 
-			auto jit = KaleidoscopeJIT::Create();
-
-			if (!jit)
-			{
-				return -1;
-			}
-
-			auto &j = *jit;
-
-			auto error = j->addModule(std::move(threadSafeModule));
+			auto &jit = *KaleidoscopeJIT::create();
+			auto error = jit->addModule(std::move(threadSafeModule));
 
 			if (error)
 			{
 				return -1;
 			}
 
-			auto mainSymbol = j->lookup("main");
+			auto &mainSymbol = *jit->lookup("main");
 
-			if (!mainSymbol)
-			{
-				return -1;
-			}
-
-			auto main = (int(*)())mainSymbol->getAddress();
+			auto main = (int(*)())mainSymbol.getAddress();
 
 			return main();
 		}

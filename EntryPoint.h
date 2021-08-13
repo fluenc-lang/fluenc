@@ -4,12 +4,15 @@
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Module.h>
 
+#include "Stack.h"
+
 class DzCallable;
 
 class EntryPoint
 {
 	public:
-		EntryPoint(llvm::BasicBlock *block
+		EntryPoint(const EntryPoint *parent
+			, llvm::BasicBlock *block
 			, llvm::Function *function
 			, llvm::Value *returnValueAddress
 			, std::unique_ptr<llvm::Module> *module
@@ -17,6 +20,7 @@ class EntryPoint
 			, const std::string &name
 			, const std::multimap<std::string, DzCallable *> &functions
 			, const std::map<std::string, llvm::Value *> &locals
+			, const Stack &values
 			);
 
 		EntryPoint() = default;
@@ -34,13 +38,20 @@ class EntryPoint
 		std::multimap<std::string, DzCallable *> functions() const;
 		std::map<std::string, llvm::Value *> locals() const;
 
+		Stack values() const;
+
+		const EntryPoint *byName(const std::string &name) const;
+
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, llvm::Value *> &locals) const;
 		EntryPoint withName(const std::string &name) const;
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
+		EntryPoint withValues(const Stack &values) const;
 
 	private:
+		const EntryPoint *m_parent;
+
 		llvm::BasicBlock *m_block;
 		llvm::Function *m_function;
 		llvm::Value *m_returnValueAddress;
@@ -52,6 +63,8 @@ class EntryPoint
 
 		std::multimap<std::string, DzCallable *> m_functions;
 		std::map<std::string, llvm::Value *> m_locals;
+
+		Stack m_values;
 };
 
 #endif // ENTRYPOINT_H

@@ -54,10 +54,7 @@ std::vector<DzResult> DzExportedFunction::build(const EntryPoint &entryPoint, St
 
 	auto result = m_block->build(ep, values);
 
-	if (verifyFunction(*function, &llvm::errs()))
-	{
-		throw new std::exception();
-	}
+	verifyFunction(*function, &llvm::errs());
 
 	return result;
 }

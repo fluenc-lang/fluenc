@@ -1,14 +1,17 @@
 #include "EntryPoint.h"
 
-EntryPoint::EntryPoint(llvm::BasicBlock *block
+EntryPoint::EntryPoint(const EntryPoint *parent
+	, llvm::BasicBlock *block
 	, llvm::Function *function
 	, llvm::Value *returnValueAddress
 	, std::unique_ptr<llvm::Module> *module
 	, std::unique_ptr<llvm::LLVMContext> *context
 	, const std::string &name, const std::multimap<std::string, DzCallable *> &functions
 	, const std::map<std::string, llvm::Value *> &locals
+	, const Stack &values
 	)
-	: m_block(block)
+	: m_parent(parent)
+	, m_block(block)
 	, m_function(function)
 	, m_returnValueAddress(returnValueAddress)
 	, m_module(module)
@@ -16,6 +19,7 @@ EntryPoint::EntryPoint(llvm::BasicBlock *block
 	, m_name(name)
 	, m_functions(functions)
 	, m_locals(locals)
+	, m_values(values)
 {
 }
 
@@ -59,9 +63,30 @@ std::map<std::string, llvm::Value *> EntryPoint::locals() const
 	return m_locals;
 }
 
+Stack EntryPoint::values() const
+{
+	return m_values;
+}
+
+const EntryPoint *EntryPoint::byName(const std::string &name) const
+{
+	if (m_name == name)
+	{
+		return this;
+	}
+
+	if (m_parent)
+	{
+		return m_parent->byName(name);
+	}
+
+	return nullptr;
+}
+
 EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 {
-	return EntryPoint(block
+	return EntryPoint(m_parent
+		, block
 		, m_function
 		, m_returnValueAddress
 		, m_module
@@ -69,12 +94,14 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_values
 		);
 }
 
 EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 {
-	return EntryPoint(m_block
+	return EntryPoint(m_parent
+		, m_block
 		, function
 		, m_returnValueAddress
 		, m_module
@@ -82,12 +109,14 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_values
 		);
 }
 
 EntryPoint EntryPoint::withLocals(const std::map<std::string, llvm::Value *> &locals) const
 {
-	return EntryPoint(m_block
+	return EntryPoint(m_parent
+		, m_block
 		, m_function
 		, m_returnValueAddress
 		, m_module
@@ -95,12 +124,14 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, llvm::Value *> &lo
 		, m_name
 		, m_functions
 		, locals
+		, m_values
 		);
 }
 
 EntryPoint EntryPoint::withName(const std::string &name) const
 {
-	return EntryPoint(m_block
+	return EntryPoint(this
+		, m_block
 		, m_function
 		, m_returnValueAddress
 		, m_module
@@ -108,12 +139,14 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		, name
 		, m_functions
 		, m_locals
+		, m_values
 		);
 }
 
 EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 {
-	return EntryPoint(m_block
+	return EntryPoint(m_parent
+		, m_block
 		, m_function
 		, address
 		, m_module
@@ -121,5 +154,21 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_values
+		);
+}
+
+EntryPoint EntryPoint::withValues(const Stack &values) const
+{
+	return EntryPoint(m_parent
+		, m_block
+		, m_function
+		, m_returnValueAddress
+		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, values
 		);
 }
