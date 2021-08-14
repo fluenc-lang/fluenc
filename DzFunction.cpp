@@ -44,14 +44,14 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 
 	auto result = true;
 
-	std::transform(begin(m_arguments), end(m_arguments), values.begin(), all_true(result), [=](auto argument, auto value)
+	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), all_true(result), [=](auto argument, auto value)
 	{
 		if (!value)
 		{
 			return false;
 		}
 
-		return argument->type()->resolve(entryPoint) == value->getType();
+		return argument->type(entryPoint) == value->getType();
 	});
 
 	return result;
@@ -60,8 +60,6 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
-
 	auto block = entryPoint.block();
 
 	auto dataLayout = module->getDataLayout();
@@ -71,13 +69,13 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 	for (const auto &argument : m_arguments)
 	{
 		auto name = argument->name();
+		auto type = argument->type(entryPoint);
 
 		auto addressOfArgument = values.pop();
 
-		auto argumentType = llvm::Type::getInt32Ty(*context);
-		auto align = dataLayout.getABITypeAlign(argumentType);
+		auto align = dataLayout.getABITypeAlign(type);
 
-		auto load = new llvm::LoadInst(argumentType, addressOfArgument, name, false, align, block);
+		auto load = new llvm::LoadInst(type, addressOfArgument, name, false, align, block);
 
 		locals[name] = load;
 	}

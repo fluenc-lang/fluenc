@@ -8,7 +8,7 @@
 #include "DzExportedFunctionTerminator.h"
 #include "DzExportedFunction.h"
 #include "DzFunctionTerminator.h"
-#include "DzConstant.h"
+#include "DzIntegralLiteral.h"
 #include "DzBinary.h"
 #include "DzFunctionCall.h"
 #include "DzMemberAccess.h"
@@ -16,6 +16,7 @@
 #include "DzTypeName.h"
 #include "DzConditional.h"
 #include "DzReturn.h"
+#include "DzBooleanLiteral.h"
 
 VisitorV4::VisitorV4(DzValue *consumer)
 	: m_consumer(consumer)
@@ -113,6 +114,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 		auto entryPoint = new DzExportedFunction(name
 			, visitor.visit(block)
+			, visitor.visit(context->typeName())
 			);
 
 		return static_cast<DzCallable *>(entryPoint);
@@ -140,15 +142,6 @@ antlrcpp::Any VisitorV4::visitArgument(dzParser::ArgumentContext *context)
 	return new DzArgument(context->ID()->getText()
 		, visit(context->typeName())
 		);
-}
-
-antlrcpp::Any VisitorV4::visitConstant(dzParser::ConstantContext *context)
-{
-	auto constant = new DzConstant(m_consumer
-		, context->INT()->getText()
-		);
-
-	return static_cast<DzValue *>(constant);
 }
 
 antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
@@ -228,4 +221,33 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 		);
 
 	return static_cast<DzValue *>(member);
+}
+
+antlrcpp::Any VisitorV4::visitInt32Literal(dzParser::Int32LiteralContext *context)
+{
+	auto constant = new DzIntegralLiteral(m_consumer
+		, DzTypeName::int32()
+		, context->INT()->getText()
+		);
+
+	return static_cast<DzValue *>(constant);
+}
+
+antlrcpp::Any VisitorV4::visitInt64Literal(dzParser::Int64LiteralContext *context)
+{
+	auto constant = new DzIntegralLiteral(m_consumer
+		, DzTypeName::int64()
+		, context->INT()->getText()
+		);
+
+	return static_cast<DzValue *>(constant);
+}
+
+antlrcpp::Any VisitorV4::visitBoolLiteral(dzParser::BoolLiteralContext *context)
+{
+	auto constant = new DzBooleanLiteral(m_consumer
+		, context->BOOL()->getText()
+		);
+
+	return static_cast<DzValue *>(constant);
 }

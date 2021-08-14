@@ -10,6 +10,16 @@ std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_iterator Stack:
 	return m_values.end();
 }
 
+std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_reverse_iterator Stack::rbegin() const
+{
+	return m_values.rbegin();
+}
+
+std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_reverse_iterator Stack::rend() const
+{
+	return m_values.rend();
+}
+
 llvm::Value *Stack::pop()
 {
 	auto value = m_values.back();

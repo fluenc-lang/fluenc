@@ -27,6 +27,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
+	public:
+		Tests()
+		{
+			scenario18();
+		}
+
 	private:
 		void scenario1()
 		{
@@ -380,6 +386,87 @@ class Tests : public QObject
 			QCOMPARE(result, 6765);
 		}
 
+		void scenario16()
+		{
+			auto result = exec(R"(
+				function consumer(int v)
+				{
+					return 1;
+				}
+
+				function consumer(long v)
+				{
+					return 2;
+				}
+
+				function producer(int v)
+				{
+					if (v > 0)
+					{
+						return 1;
+					}
+
+					return 2L;
+				}
+
+				export int main()
+				{
+					return consumer(producer(1)) + consumer(producer(-1));
+				}
+			)");
+
+			QCOMPARE(result, 3);
+		}
+
+		void scenario17()
+		{
+			auto result = exec(R"(
+				function isPositive(int v)
+				{
+					return v > 0;
+				}
+
+				function foo(bool b)
+				{
+					if (b)
+					{
+						return 3;
+					}
+
+					return -2;
+				}
+
+				export int main()
+				{
+					return foo(isPositive(7));
+				}
+			)");
+
+			QCOMPARE(result, 3);
+		}
+
+		void scenario18()
+		{
+			auto result = exec(R"(
+				function numberPlz(bool positive)
+				{
+					if (positive)
+					{
+						return 3;
+					}
+
+					return -2;
+				}
+
+				export int main()
+				{
+					return numberPlz(true) + numberPlz(false);
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -396,6 +483,9 @@ class Tests : public QObject
 		W_SLOT(scenario14)
 		W_SLOT(scenario15)
 		W_SLOT(fibonacci)
+		W_SLOT(scenario16)
+		W_SLOT(scenario17)
+		W_SLOT(scenario18)
 
 	private:
 		int exec(std::string source)

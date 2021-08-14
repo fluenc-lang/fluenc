@@ -27,6 +27,12 @@ public:
 
     virtual antlrcpp::Any visitFunction(dzParser::FunctionContext *context) = 0;
 
+    virtual antlrcpp::Any visitInt32Literal(dzParser::Int32LiteralContext *context) = 0;
+
+    virtual antlrcpp::Any visitInt64Literal(dzParser::Int64LiteralContext *context) = 0;
+
+    virtual antlrcpp::Any visitBoolLiteral(dzParser::BoolLiteralContext *context) = 0;
+
     virtual antlrcpp::Any visitCall(dzParser::CallContext *context) = 0;
 
     virtual antlrcpp::Any visitConstant(dzParser::ConstantContext *context) = 0;

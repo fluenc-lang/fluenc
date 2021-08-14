@@ -65,10 +65,12 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 			{
 				llvm::IRBuilder<> builder(block);
 
-				auto argumentType = builder.getInt32Ty();
+				auto value = *i;
+
+				auto argumentType = value->getType();
 				auto alloc = builder.CreateAlloca(argumentType);
 
-				builder.CreateStore(*i, alloc);
+				builder.CreateStore(value, alloc);
 
 				values.push(alloc);
 			}

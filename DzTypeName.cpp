@@ -25,5 +25,31 @@ llvm::Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 		return llvm::Type::getInt64Ty(*context);
 	}
 
+	if (m_name == "bool")
+	{
+		return llvm::Type::getInt1Ty(*context);
+	}
+
 	return nullptr;
+}
+
+DzTypeName *DzTypeName::int32()
+{
+	static DzTypeName typeName("int");
+
+	return &typeName;
+}
+
+DzTypeName *DzTypeName::int64()
+{
+	static DzTypeName typeName("long");
+
+	return &typeName;
+}
+
+DzTypeName *DzTypeName::boolean()
+{
+	static DzTypeName typeName("bool");
+
+	return &typeName;
 }

@@ -15,10 +15,16 @@ field
 function 
 	: attribute=ID? typeName name=ID '(' (argument (',' argument)*)? ')' block?
 	;
+
+literal
+	: INT #int32Literal
+	| INT'L' #int64Literal
+	| BOOL #boolLiteral
+	;
 	
 expression
 	: ID '(' (expression (',' expression)*)? ')'	#call
-	| INT											#constant
+	| literal										#constant
 	| left=expression op=OP right=expression		#binary
 	| ID											#member
 	;
@@ -45,6 +51,11 @@ typeName
 	
 INT
 	: '-'?[0-9]+
+	;
+
+BOOL
+	: 'true'
+	| 'false'
 	;
 
 OP

@@ -14,6 +14,9 @@ class Stack
 		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_iterator begin() const;
 		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_iterator end() const;
 
+		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_reverse_iterator rbegin() const;
+		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_reverse_iterator rend() const;
+
 		llvm::Value *pop();
 
 		void push(llvm::Value *value);

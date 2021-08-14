@@ -7,13 +7,14 @@ SOURCES += \
 	CompilerException.cpp \
 	DzArgument.cpp \
 	DzBinary.cpp \
+	DzBooleanLiteral.cpp \
 	DzConditional.cpp \
-	DzConstant.cpp \
 	DzExportedFunction.cpp \
 	DzExportedFunctionTerminator.cpp \
 	DzFunction.cpp \
 	DzFunctionCall.cpp \
 	DzFunctionTerminator.cpp \
+	DzIntegralLiteral.cpp \
 	DzMemberAccess.cpp \
 	DzReturn.cpp \
 	DzTypeName.cpp \
@@ -36,14 +37,15 @@ HEADERS += \
 	CompilerException.h \
 	DzArgument.h \
 	DzBinary.h \
+	DzBooleanLiteral.h \
 	DzCallable.h \
 	DzConditional.h \
-	DzConstant.h \
 	DzExportedFunction.h \
 	DzExportedFunctionTerminator.h \
 	DzFunction.h \
 	DzFunctionCall.h \
 	DzFunctionTerminator.h \
+	DzIntegralLiteral.h \
 	DzMemberAccess.h \
 	DzReturn.h \
 	DzTypeName.h \

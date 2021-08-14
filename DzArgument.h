@@ -3,7 +3,10 @@
 
 #include <string>
 
+#include <llvm/IR/Type.h>
+
 class DzTypeName;
+class EntryPoint;
 
 class DzArgument
 {
@@ -12,7 +15,7 @@ class DzArgument
 
 		std::string name() const;
 
-		DzTypeName *type() const;
+		llvm::Type *type(const EntryPoint &entryPoint) const;
 
 	private:
 		std::string m_name;

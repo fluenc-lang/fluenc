@@ -29,21 +29,22 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	stream << "_ret";
 
 	auto globalName = stream.str();
-
-	auto global = module->getOrInsertGlobal(globalName, llvm::Type::getInt32Ty(*context), [&]
-	{
-		auto initializer = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0);
-
-		return new llvm::GlobalVariable(*module, llvm::Type::getInt32Ty(*context), false, llvm::GlobalValue::InternalLinkage, initializer, globalName);
-	});
-
 	auto value = values.pop();
+
+	auto type = value->getType();
+
+	auto global = module->getOrInsertGlobal(globalName, type, [&]
+	{
+		auto initializer = llvm::ConstantInt::get(type, 0);
+
+		return new llvm::GlobalVariable(*module, type, false, llvm::GlobalValue::InternalLinkage, initializer, globalName);
+	});
 
 	llvm::IRBuilder<> builder(block);
 
 	builder.CreateStore(value, global);
 
-	auto load = builder.CreateLoad(llvm::Type::getInt32Ty(*context), global);
+	auto load = builder.CreateLoad(type, global);
 
 	values.push(load);
 

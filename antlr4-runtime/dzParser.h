@@ -13,13 +13,14 @@ class  dzParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, T__9 = 10, INT = 11, OP = 12, WS = 13, ID = 14
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, INT = 12, BOOL = 13, OP = 14, 
+    WS = 15, ID = 16
   };
 
   enum {
     RuleProgram = 0, RuleStructure = 1, RuleField = 2, RuleFunction = 3, 
-    RuleExpression = 4, RuleRet = 5, RuleConditional = 6, RuleBlock = 7, 
-    RuleArgument = 8, RuleTypeName = 9
+    RuleLiteral = 4, RuleExpression = 5, RuleRet = 6, RuleConditional = 7, 
+    RuleBlock = 8, RuleArgument = 9, RuleTypeName = 10
   };
 
   explicit dzParser(antlr4::TokenStream *input);
@@ -36,6 +37,7 @@ public:
   class StructureContext;
   class FieldContext;
   class FunctionContext;
+  class LiteralContext;
   class ExpressionContext;
   class RetContext;
   class ConditionalContext;
@@ -108,6 +110,48 @@ public:
 
   FunctionContext* function();
 
+  class  LiteralContext : public antlr4::ParserRuleContext {
+  public:
+    LiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    LiteralContext() = default;
+    void copyFrom(LiteralContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  Int64LiteralContext : public LiteralContext {
+  public:
+    Int64LiteralContext(LiteralContext *ctx);
+
+    antlr4::tree::TerminalNode *INT();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  BoolLiteralContext : public LiteralContext {
+  public:
+    BoolLiteralContext(LiteralContext *ctx);
+
+    antlr4::tree::TerminalNode *BOOL();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Int32LiteralContext : public LiteralContext {
+  public:
+    Int32LiteralContext(LiteralContext *ctx);
+
+    antlr4::tree::TerminalNode *INT();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  LiteralContext* literal();
+
   class  ExpressionContext : public antlr4::ParserRuleContext {
   public:
     ExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -136,7 +180,7 @@ public:
   public:
     ConstantContext(ExpressionContext *ctx);
 
-    antlr4::tree::TerminalNode *INT();
+    LiteralContext *literal();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

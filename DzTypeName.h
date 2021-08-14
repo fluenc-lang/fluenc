@@ -14,6 +14,10 @@ class DzTypeName
 
 		llvm::Type *resolve(const EntryPoint &entryPoint);
 
+		static DzTypeName *int32();
+		static DzTypeName *int64();
+		static DzTypeName *boolean();
+
 	private:
 		std::string m_name;
 };

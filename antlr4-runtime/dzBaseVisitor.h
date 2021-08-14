@@ -31,6 +31,18 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitInt32Literal(dzParser::Int32LiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitInt64Literal(dzParser::Int64LiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitBoolLiteral(dzParser::BoolLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitCall(dzParser::CallContext *ctx) override {
     return visitChildren(ctx);
   }

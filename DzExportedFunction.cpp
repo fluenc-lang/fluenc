@@ -8,11 +8,16 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "DzExportedFunction.h"
+#include "DzTypeName.h"
 #include "EntryPoint.h"
 
-DzExportedFunction::DzExportedFunction(const std::string &name, DzValue *block)
+DzExportedFunction::DzExportedFunction(const std::string &name
+	, DzValue *block
+	, DzTypeName *returnType
+	)
 	: m_name(name)
 	, m_block(block)
+	, m_returnType(returnType)
 {
 }
 
@@ -40,7 +45,7 @@ std::vector<DzResult> DzExportedFunction::build(const EntryPoint &entryPoint, St
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
-	auto returnType = llvm::Type::getInt32Ty(*context);
+	auto returnType = m_returnType->resolve(entryPoint);
 
 	std::vector<llvm::Type *> argumentTypes;
 
