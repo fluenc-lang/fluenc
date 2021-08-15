@@ -20,6 +20,7 @@ literal
 	: INT #int32Literal
 	| INT'L' #int64Literal
 	| BOOL #boolLiteral
+	| STRING #stringLiteral
 	;
 	
 expression
@@ -70,9 +71,13 @@ OP
 	| '<='
 	| '>='
 	;
+
+STRING
+	: '"' ~('"')+ '"'
+	;
 	
 WS
-	: [ \t\r\n;]+-> skip
+	: [ \t\r\n;]+ -> skip
 	;
 
 ID

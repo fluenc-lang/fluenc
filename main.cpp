@@ -1,16 +1,78 @@
+#include <stdio.h>
+
 #include <llvm/Support/TargetSelect.h>
 
 #include "Tests.h"
 
 #include <QTest>
 
-int main()
+extern "C" int putz(char *str)
+{
+	return puts(str);
+}
+
+int main(int argc, char **argv)
 {
 	llvm::InitializeAllTargetInfos();
 	llvm::InitializeAllTargets();
 	llvm::InitializeAllTargetMCs();
 	llvm::InitializeAllAsmParsers();
 	llvm::InitializeAllAsmPrinters();
+
+	if (argc > 1)
+	{
+		std::string_view inputFileName(*(argv + 1));
+
+		std::ostringstream outputFileName;
+		outputFileName << inputFileName.substr(0, inputFileName.size() - 3);
+		outputFileName << ".o";
+
+		std::ifstream stream;
+		stream.open(inputFileName.data());
+
+		antlr4::ANTLRInputStream input(stream);
+		dzLexer lexer(&input);
+		antlr4::CommonTokenStream tokens(&lexer);
+		dzParser parser(&tokens);
+
+		auto program = parser.program();
+
+		VisitorV4 visitor(nullptr);
+
+		auto moduleInfo = visitor
+			.visit(program)
+			.as<ModuleInfo *>();
+
+		std::string errors;
+
+		auto targetTriple = llvm::sys::getDefaultTargetTriple();
+		auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
+
+		if (!target)
+		{
+			llvm::errs() << errors;
+
+			return 1;
+		}
+
+		auto relocModel = llvm::Optional<llvm::Reloc::Model>();
+		auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
+
+		moduleInfo->module()->setDataLayout(targetMachine->createDataLayout());
+
+		std::error_code EC;
+		llvm::raw_fd_ostream dest(outputFileName.str(), EC, llvm::sys::fs::OF_None);
+
+		llvm::legacy::PassManager pm;
+
+		targetMachine->addPassesToEmitFile(pm, dest, nullptr, llvm::CGFT_ObjectFile);
+
+		pm.run(*moduleInfo->module());
+
+		dest.flush();
+
+		return 0;
+	}
 
 	Tests tests;
 

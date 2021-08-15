@@ -14,7 +14,7 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, INT = 12, BOOL = 13, OP = 14, 
-    WS = 15, ID = 16
+    STRING = 15, WS = 16, ID = 17
   };
 
   explicit dzLexer(antlr4::CharStream *input);

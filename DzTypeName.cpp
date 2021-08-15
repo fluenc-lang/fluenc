@@ -30,6 +30,11 @@ llvm::Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 		return llvm::Type::getInt1Ty(*context);
 	}
 
+	if (m_name == "string")
+	{
+		return llvm::Type::getInt8PtrTy(*context);
+	}
+
 	return nullptr;
 }
 
@@ -50,6 +55,13 @@ DzTypeName *DzTypeName::int64()
 DzTypeName *DzTypeName::boolean()
 {
 	static DzTypeName typeName("bool");
+
+	return &typeName;
+}
+
+DzTypeName *DzTypeName::string()
+{
+	static DzTypeName typeName("string");
 
 	return &typeName;
 }

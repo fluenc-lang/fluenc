@@ -17,6 +17,8 @@
 #include "DzConditional.h"
 #include "DzReturn.h"
 #include "DzBooleanLiteral.h"
+#include "DzStringLiteral.h"
+#include "DzImportedFunction.h"
 
 VisitorV4::VisitorV4(DzValue *consumer)
 	: m_consumer(consumer)
@@ -41,8 +43,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		{
 			roots.push_back(result);
 		}
-
-		if (result->attribute() == FunctionAttribute::None)
+		else
 		{
 			functions.insert({ result->name(), result });
 		}
@@ -57,7 +58,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		root->build(entryPoint, values);
 	}
 
-//	module->print(llvm::errs(), nullptr);
+	module->print(llvm::errs(), nullptr);
 
 	if (verifyModule(*module, &llvm::errs()))
 	{
@@ -89,21 +90,26 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 
 antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 {
-	auto attribute = getAttribute(context);
-
-	if (attribute == FunctionAttribute::Import)
-	{
-		return defaultResult();
-	}
-
-	auto name = context->name->getText();
-	auto block = context->block();
-
 	std::vector<DzArgument *> arguments;
 
 	for (auto argument : context->argument())
 	{
 		arguments.push_back(visit(argument));
+	}
+
+	auto name = context->name->getText();
+	auto block = context->block();
+
+	auto attribute = getAttribute(context);
+
+	if (attribute == FunctionAttribute::Import)
+	{
+		auto import = new DzImportedFunction(name
+			, arguments
+			, visit(context->typeName())
+			);
+
+		return static_cast<DzCallable *>(import);
 	}
 
 	if (attribute == FunctionAttribute::Export)
@@ -247,6 +253,15 @@ antlrcpp::Any VisitorV4::visitBoolLiteral(dzParser::BoolLiteralContext *context)
 {
 	auto constant = new DzBooleanLiteral(m_consumer
 		, context->BOOL()->getText()
+		);
+
+	return static_cast<DzValue *>(constant);
+}
+
+antlrcpp::Any VisitorV4::visitStringLiteral(dzParser::StringLiteralContext *context)
+{
+	auto constant = new DzStringLiteral(m_consumer
+		, context->STRING()->getText()
 		);
 
 	return static_cast<DzValue *>(constant);

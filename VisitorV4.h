@@ -50,6 +50,7 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitInt32Literal(dzParser::Int32LiteralContext *context) override;
 		antlrcpp::Any visitInt64Literal(dzParser::Int64LiteralContext *context) override;
 		antlrcpp::Any visitBoolLiteral(dzParser::BoolLiteralContext *context) override;
+		antlrcpp::Any visitStringLiteral(dzParser::StringLiteralContext *context) override;
 
 	private:
 		DzValue *m_consumer;

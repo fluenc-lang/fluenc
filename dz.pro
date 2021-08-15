@@ -14,9 +14,11 @@ SOURCES += \
 	DzFunction.cpp \
 	DzFunctionCall.cpp \
 	DzFunctionTerminator.cpp \
+	DzImportedFunction.cpp \
 	DzIntegralLiteral.cpp \
 	DzMemberAccess.cpp \
 	DzReturn.cpp \
+	DzStringLiteral.cpp \
 	DzTypeName.cpp \
 	EntryPoint.cpp \
 	KaleidoscopeJIT.cpp \
@@ -45,9 +47,11 @@ HEADERS += \
 	DzFunction.h \
 	DzFunctionCall.h \
 	DzFunctionTerminator.h \
+	DzImportedFunction.h \
 	DzIntegralLiteral.h \
 	DzMemberAccess.h \
 	DzReturn.h \
+	DzStringLiteral.h \
 	DzTypeName.h \
 	DzValue.h \
 	EntryPoint.h \

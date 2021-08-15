@@ -1,0 +1,94 @@
+#include <llvm/IR/IRBuilder.h>
+
+#include "DzImportedFunction.h"
+#include "DzTypeName.h"
+#include "DzArgument.h"
+#include "AllIterator.h"
+
+DzImportedFunction::DzImportedFunction(const std::string &name
+	, const std::vector<DzArgument *> &arguments
+	, DzTypeName *returnType
+	)
+	: m_name(name)
+	, m_arguments(arguments)
+	, m_returnType(returnType)
+{
+}
+
+std::string DzImportedFunction::name() const
+{
+	return m_name;
+}
+
+FunctionAttribute DzImportedFunction::attribute() const
+{
+	return FunctionAttribute::Import;
+}
+
+bool DzImportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values, size_t numberOfArguments) const
+{
+	// Sanity check.
+	// TODO: Introduce slicing of stack, to only expose a sane amount of values.
+	// Then this parameter (and check) can be removed.
+
+	if (m_arguments.size() != numberOfArguments)
+	{
+		return false;
+	}
+
+	auto result = true;
+
+	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), all_true(result), [=](auto argument, auto value)
+	{
+		if (!value)
+		{
+			return false;
+		}
+
+		return argument->type(entryPoint) == value->getType();
+	});
+
+	return result;
+}
+
+std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, Stack values) const
+{
+	UNUSED(values);
+
+	auto &module = entryPoint.module();
+	auto block = entryPoint.block();
+
+	auto dataLayout = module->getDataLayout();
+
+	auto returnType = m_returnType->resolve(entryPoint);
+
+	std::vector<llvm::Type *> argumentTypes;
+	std::vector<llvm::Value *> argumentValues;
+
+	for (const auto &argument : m_arguments)
+	{
+		auto name = argument->name();
+		auto type = argument->type(entryPoint);
+
+		auto addressOfArgument = values.pop();
+
+		auto align = dataLayout.getABITypeAlign(type);
+
+		auto load = new llvm::LoadInst(type, addressOfArgument, name, false, align, block);
+
+		argumentTypes.push_back(type);
+		argumentValues.push_back(load);
+	}
+
+	llvm::FunctionType *functionType = llvm::FunctionType::get(returnType, argumentTypes, false);
+
+	auto function = module->getOrInsertFunction(m_name, functionType);
+
+	llvm::IRBuilder<> builder(block);
+
+	auto call = builder.CreateCall(function, argumentValues);
+
+	values.push(call);
+
+	return {{ entryPoint, values }};
+}

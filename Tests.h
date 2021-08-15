@@ -27,12 +27,6 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
-	public:
-		Tests()
-		{
-			scenario18();
-		}
-
 	private:
 		void scenario1()
 		{
@@ -467,6 +461,23 @@ class Tests : public QObject
 			QCOMPARE(result, 1);
 		}
 
+		void scenario19()
+		{
+			auto result = exec(R"(
+				function func(string v)
+				{
+					return 1;
+				}
+
+				export int main()
+				{
+					return func("foo");
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -486,6 +497,7 @@ class Tests : public QObject
 		W_SLOT(scenario16)
 		W_SLOT(scenario17)
 		W_SLOT(scenario18)
+		W_SLOT(scenario19)
 
 	private:
 		int exec(std::string source)
@@ -504,35 +516,6 @@ class Tests : public QObject
 			auto moduleInfo = visitor
 				.visit(program)
 				.as<ModuleInfo *>();
-
-//			std::string errors;
-
-//			auto targetTriple = llvm::sys::getDefaultTargetTriple();
-//			auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
-
-//			if (!target)
-//			{
-//				llvm::errs() << errors;
-
-//				return 1;
-//			}
-
-//			auto relocModel = llvm::Optional<llvm::Reloc::Model>();
-//			auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
-
-//			moduleInfo->module()->setDataLayout(targetMachine->createDataLayout());
-
-//			std::error_code EC;
-//			llvm::raw_fd_ostream dest("output.o", EC, llvm::sys::fs::OF_None);
-
-//			llvm::legacy::PassManager pm;
-
-//			targetMachine->addPassesToEmitFile(pm, dest, nullptr, llvm::CGFT_ObjectFile);
-
-//			pm.run(*moduleInfo->module());
-
-//			dest.flush();
-
 
 			auto threadSafeModule = llvm::orc::ThreadSafeModule(
 				std::move(moduleInfo->module()),
