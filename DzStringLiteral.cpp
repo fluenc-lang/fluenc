@@ -15,7 +15,10 @@ std::vector<DzResult> DzStringLiteral::build(const EntryPoint &entryPoint, Stack
 
 	llvm::IRBuilder<> builder(block);
 
-	auto address = builder.CreateGlobalStringPtr(m_value, "", 0, module.get());
+	// I hate ANTLR... Wish I could do this in the grammar file instead.
+	auto string = m_value.substr(1, m_value.size() - 2);
+
+	auto address = builder.CreateGlobalStringPtr(string, "string", 0, module.get());
 
 	values.push(address);
 

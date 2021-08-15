@@ -58,7 +58,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		root->build(entryPoint, values);
 	}
 
-	module->print(llvm::errs(), nullptr);
+//	module->print(llvm::errs(), nullptr);
 
 	if (verifyModule(*module, &llvm::errs()))
 	{
