@@ -6,6 +6,7 @@ SOURCES += \
 	AllIterator.cpp \
 	CompilerException.cpp \
 	DzArgument.cpp \
+	DzAssignment.cpp \
 	DzBinary.cpp \
 	DzBooleanLiteral.cpp \
 	DzConditional.cpp \
@@ -13,16 +14,19 @@ SOURCES += \
 	DzExportedFunctionTerminator.cpp \
 	DzFunction.cpp \
 	DzFunctionCall.cpp \
-	DzFunctionTerminator.cpp \
 	DzImportedFunction.cpp \
+	DzInstantiation.cpp \
 	DzIntegralLiteral.cpp \
 	DzMemberAccess.cpp \
 	DzReturn.cpp \
 	DzStringLiteral.cpp \
+	DzStruct.cpp \
+	DzTerminator.cpp \
 	DzTypeName.cpp \
 	EntryPoint.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
+	TypedValue.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
 	Utility.cpp \
@@ -38,6 +42,7 @@ HEADERS += \
 	AllIterator.h \
 	CompilerException.h \
 	DzArgument.h \
+	DzAssignment.h \
 	DzBinary.h \
 	DzBooleanLiteral.h \
 	DzCallable.h \
@@ -46,12 +51,14 @@ HEADERS += \
 	DzExportedFunctionTerminator.h \
 	DzFunction.h \
 	DzFunctionCall.h \
-	DzFunctionTerminator.h \
 	DzImportedFunction.h \
+	DzInstantiation.h \
 	DzIntegralLiteral.h \
 	DzMemberAccess.h \
 	DzReturn.h \
 	DzStringLiteral.h \
+	DzStruct.h \
+	DzTerminator.h \
 	DzTypeName.h \
 	DzValue.h \
 	EntryPoint.h \
@@ -59,6 +66,7 @@ HEADERS += \
 	KaleidoscopeJIT.h \
 	Stack.h \
 	Tests.h \
+	TypedValue.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \
 	Utility.h \

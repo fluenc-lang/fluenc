@@ -1,6 +1,8 @@
 #ifndef DZARGUMENT_H
 #define DZARGUMENT_H
 
+#include "TypedValue.h"
+
 #include <string>
 
 #include <llvm/IR/Type.h>
@@ -15,7 +17,7 @@ class DzArgument
 
 		std::string name() const;
 
-		llvm::Type *type(const EntryPoint &entryPoint) const;
+		Type *type(const EntryPoint &entryPoint) const;
 
 	private:
 		std::string m_name;

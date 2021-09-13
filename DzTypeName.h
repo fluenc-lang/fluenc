@@ -4,6 +4,7 @@
 #include <llvm/IR/Type.h>
 
 class EntryPoint;
+class Type;
 
 class DzTypeName
 {
@@ -12,7 +13,7 @@ class DzTypeName
 
 		std::string name() const;
 
-		llvm::Type *resolve(const EntryPoint &entryPoint);
+		Type *resolve(const EntryPoint &entryPoint);
 
 		static DzTypeName *int32();
 		static DzTypeName *int64();

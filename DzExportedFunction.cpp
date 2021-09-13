@@ -46,10 +46,11 @@ std::vector<DzResult> DzExportedFunction::build(const EntryPoint &entryPoint, St
 	auto &context = entryPoint.context();
 
 	auto returnType = m_returnType->resolve(entryPoint);
+	auto storageType = returnType->storageType(*context);
 
 	std::vector<llvm::Type *> argumentTypes;
 
-	auto functionType = llvm::FunctionType::get(returnType, argumentTypes, false);
+	auto functionType = llvm::FunctionType::get(storageType, argumentTypes, false);
 	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, m_name, module.get());
 	auto block = llvm::BasicBlock::Create(*context);
 

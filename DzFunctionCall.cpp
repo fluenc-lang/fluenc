@@ -50,7 +50,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 		if (function->hasMatchingSignature(entryPoint, values, m_numberOfArguments))
 		{
-			std::vector<llvm::Value *> argumentValues;
+			std::vector<TypedValue> argumentValues;
 
 			for (auto i = 0u; i < m_numberOfArguments; i++)
 			{
@@ -65,12 +65,14 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 				auto value = *i;
 
-				auto argumentType = value->getType();
-				auto alloc = builder.CreateAlloca(argumentType);
+				auto argumentType = value.type();
+				auto storageType = argumentType->storageType(*context);
+
+				auto alloc = builder.CreateAlloca(storageType);
 
 				builder.CreateStore(value, alloc);
 
-				values.push(alloc);
+				values.push(TypedValue(argumentType, alloc));
 			}
 
 			if (function->attribute() == FunctionAttribute::Import)

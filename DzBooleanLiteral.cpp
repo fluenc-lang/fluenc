@@ -8,20 +8,20 @@ DzBooleanLiteral::DzBooleanLiteral(DzValue *consumer, const std::string &value)
 {
 }
 
-llvm::Value *DzBooleanLiteral::resolveValue(const EntryPoint &entryPoint) const
+TypedValue DzBooleanLiteral::resolveValue(const EntryPoint &entryPoint) const
 {
 	auto &context = entryPoint.context();
 
-	auto type = llvm::Type::getInt1Ty(*context);
+	auto type = BooleanType::instance();
 
 	if (m_value == "true")
 	{
-		return llvm::ConstantInt::get(type, 1);
+		return { type, llvm::ConstantInt::get(type->storageType(*context), 1) };
 	}
 
 	if (m_value == "false")
 	{
-		return llvm::ConstantInt::get(type, 0);
+		return { type, llvm::ConstantInt::get(type->storageType(*context), 0) };
 	}
 
 	throw new std::exception(); // TODO

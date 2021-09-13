@@ -13,9 +13,14 @@ DzIntegralLiteral::DzIntegralLiteral(DzValue *consumer, DzTypeName *type, const 
 
 std::vector<DzResult> DzIntegralLiteral::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto type = (llvm::IntegerType *)m_type->resolve(entryPoint);
+	auto &context = entryPoint.context();
 
-	auto value = llvm::ConstantInt::get(type, m_value, 10);
+	auto type = m_type->resolve(entryPoint);
+	auto storageType = type->storageType(*context);
+
+	auto value = TypedValue(type
+		,  llvm::ConstantInt::get((llvm::IntegerType *)storageType, m_value, 10)
+		);
 
 	values.push(value);
 

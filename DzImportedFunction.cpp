@@ -45,7 +45,10 @@ bool DzImportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, cons
 			return false;
 		}
 
-		return argument->type(entryPoint) == value->getType();
+		auto argumentType = argument->type(entryPoint);
+		auto valueType = value.type();
+
+		return argumentType->tag() == valueType->tag();
 	});
 
 	return result;
@@ -53,9 +56,9 @@ bool DzImportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, cons
 
 std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
-	UNUSED(values);
-
 	auto &module = entryPoint.module();
+	auto &context = entryPoint.context();
+
 	auto block = entryPoint.block();
 
 	auto dataLayout = module->getDataLayout();
@@ -69,18 +72,19 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 	{
 		auto name = argument->name();
 		auto type = argument->type(entryPoint);
+		auto storageType = type->storageType(*context);
 
 		auto addressOfArgument = values.pop();
 
-		auto align = dataLayout.getABITypeAlign(type);
+		auto align = dataLayout.getABITypeAlign(storageType);
 
-		auto load = new llvm::LoadInst(type, addressOfArgument, name, false, align, block);
+		auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
 
-		argumentTypes.push_back(type);
+		argumentTypes.push_back(storageType);
 		argumentValues.push_back(load);
 	}
 
-	llvm::FunctionType *functionType = llvm::FunctionType::get(returnType, argumentTypes, false);
+	llvm::FunctionType *functionType = llvm::FunctionType::get(returnType->storageType(*context), argumentTypes, false);
 
 	auto function = module->getOrInsertFunction(m_name, functionType);
 
@@ -88,7 +92,7 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 	auto call = builder.CreateCall(function, argumentValues);
 
-	values.push(call);
+	values.push(TypedValue(returnType, call));
 
 	return {{ entryPoint, values }};
 }

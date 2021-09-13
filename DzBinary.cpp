@@ -16,12 +16,14 @@ std::vector<DzResult> DzBinary::build(const EntryPoint &entryPoint, Stack values
 
 	auto op = resolveOp(entryPoint, left, right);
 
-	values.push(op);
+	TypedValue value(left.type(), op);
+
+	values.push(value);
 
 	return m_consumer->build(entryPoint, values);
 }
 
-llvm::Value *DzBinary::resolveOp(const EntryPoint &entryPoint, llvm::Value *left, llvm::Value *right) const
+llvm::Value *DzBinary::resolveOp(const EntryPoint &entryPoint, const TypedValue &left, const TypedValue &right) const
 {
 	auto block = entryPoint.block();
 

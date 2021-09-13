@@ -1,5 +1,11 @@
 import int fopen(string filename, string mode);
 
+struct Person
+{
+	firstName
+	lastName
+};
+
 function bar(int v)
 {
 	return v;
@@ -27,7 +33,7 @@ function f2(int v)
 
 export int main()
 {
-        return kask(1);
+	return kask(1);
 }
 
 function mains()

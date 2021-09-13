@@ -7,7 +7,7 @@
 #include "DzFunction.h"
 #include "DzExportedFunctionTerminator.h"
 #include "DzExportedFunction.h"
-#include "DzFunctionTerminator.h"
+#include "DzTerminator.h"
 #include "DzIntegralLiteral.h"
 #include "DzBinary.h"
 #include "DzFunctionCall.h"
@@ -19,6 +19,8 @@
 #include "DzBooleanLiteral.h"
 #include "DzStringLiteral.h"
 #include "DzImportedFunction.h"
+#include "DzStruct.h"
+#include "DzInstantiation.h"
 
 VisitorV4::VisitorV4(DzValue *consumer)
 	: m_consumer(consumer)
@@ -32,7 +34,8 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	std::vector<DzCallable *> roots;
 	std::multimap<std::string, DzCallable *> functions;
-	std::map<std::string, llvm::Value *> locals;
+	std::map<std::string, TypedValue> locals;
+	std::map<std::string, Prototype *> types;
 
 	for (auto function : context->function())
 	{
@@ -49,16 +52,35 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		}
 	}
 
+	for (auto structure : context->structure())
+	{
+		auto result = visit(structure)
+			.as<Prototype *>();
+
+		types.insert({ result->tag(), result });
+	}
+
 	for (auto root : roots)
 	{
 		Stack values;
 
-		EntryPoint entryPoint(nullptr, nullptr, nullptr, nullptr, &module, &llvmContext, "term", functions, locals, values);
+		EntryPoint entryPoint(nullptr
+			, nullptr
+			, nullptr
+			, nullptr
+			, &module
+			, &llvmContext
+			, "term"
+			, functions
+			, locals
+			, types
+			, values
+			);
 
 		root->build(entryPoint, values);
 	}
 
-//	module->print(llvm::errs(), nullptr);
+	module->print(llvm::errs(), nullptr);
 
 	if (verifyModule(*module, &llvm::errs()))
 	{
@@ -126,7 +148,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 		return static_cast<DzCallable *>(entryPoint);
 	}
 
-	auto terminator = new DzFunctionTerminator(name);
+	auto terminator = new DzTerminator(name);
 
 	VisitorV4 visitor(terminator);
 
@@ -222,9 +244,17 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 
 antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 {
-	auto member = new DzMemberAccess(m_consumer
-		, context->ID()->getText()
-		);
+	auto access = context->ID();
+
+	auto k = std::accumulate(begin(access) + 1, end(access), (*begin(access))->getText(), [](auto x, antlr4::tree::TerminalNode *y)
+	{
+		std::stringstream ss;
+		ss << x << "." << y->getText();
+
+		return ss.str();
+	});
+
+	auto member = new DzMemberAccess(m_consumer, k);
 
 	return static_cast<DzValue *>(member);
 }
@@ -265,4 +295,48 @@ antlrcpp::Any VisitorV4::visitStringLiteral(dzParser::StringLiteralContext *cont
 		);
 
 	return static_cast<DzValue *>(constant);
+}
+
+antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
+{
+	auto name = context->ID()->getText();
+
+	std::vector<std::string> fields;
+
+	for (auto field : context->field())
+	{
+		auto name = field->ID()->getText();
+
+		fields.push_back(name);
+	}
+
+	return new Prototype(name, fields);
+}
+
+antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *context)
+{
+	auto assignments = context->assignment();
+
+	std::vector<std::string> fields;
+
+	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](dzParser::AssignmentContext *assignment)
+	{
+		return assignment->field()->ID()->getText();
+	});
+
+	auto instantiation = new DzInstantiation(m_consumer
+		, visit(context->typeName())
+		, fields
+		);
+
+	auto value = std::accumulate(rbegin(assignments), rend(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
+	{
+		VisitorV4 visitor(consumer);
+
+		return visitor
+			.visit(assignment->expression())
+			.as<DzValue *>();
+	});
+
+	return static_cast<DzValue *>(value);
 }

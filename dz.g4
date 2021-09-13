@@ -5,11 +5,15 @@ program
 	;
 
 structure
-	: 'struct' ID '{' field+ '}'
+	: 'struct' ID '{' field (',' field)* '}'
+	;
+
+assignment
+	: field ':' expression
 	;
 
 field
-	: typeName ID
+	: ID
 	;
 	
 function 
@@ -27,7 +31,8 @@ expression
 	: ID '(' (expression (',' expression)*)? ')'	#call
 	| literal										#constant
 	| left=expression op=OP right=expression		#binary
-	| ID											#member
+	| ID ('.' ID)*									#member
+	| typeName '{' assignment (',' assignment)* '}'	#instantiation
 	;
 
 ret

@@ -1,6 +1,7 @@
 #include <map>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 #include <llvm/IR/Type.h>
 #include <llvm/IR/IRBuilder.h>
@@ -44,14 +45,17 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 
 	auto result = true;
 
-	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), all_true(result), [=](auto argument, auto value)
+	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), all_true(result), [=](DzArgument *argument, auto value)
 	{
 		if (!value)
 		{
 			return false;
 		}
 
-		return argument->type(entryPoint) == value->getType();
+		auto argumentType = argument->type(entryPoint);
+		auto valueType = value.type();
+
+		return argumentType->tag() == valueType->tag();
 	});
 
 	return result;
@@ -60,24 +64,63 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();
+	auto &context = entryPoint.context();
+
 	auto block = entryPoint.block();
 
 	auto dataLayout = module->getDataLayout();
 
-	std::map<std::string, llvm::Value *> locals;
+	std::map<std::string, TypedValue> locals;
 
 	for (const auto &argument : m_arguments)
 	{
 		auto name = argument->name();
-		auto type = argument->type(entryPoint);
 
 		auto addressOfArgument = values.pop();
 
-		auto align = dataLayout.getABITypeAlign(type);
+		auto argumentType = addressOfArgument.type();
 
-		auto load = new llvm::LoadInst(type, addressOfArgument, name, false, align, block);
+		if (auto userType = dynamic_cast<UserType *>(argumentType))
+		{
+			auto prototype = userType->prototype();
 
-		locals[name] = load;
+			auto i = 0;
+
+			for (auto &field : prototype->fields())
+			{
+				auto intType = llvm::Type::getInt32Ty(*context);
+
+				llvm::Value *indexes[] =
+				{
+					llvm::ConstantInt::get(intType, 0),
+					llvm::ConstantInt::get(intType, i++)
+				};
+
+				std::stringstream ss;
+				ss << name;
+				ss << ".";
+				ss << field;
+
+				auto align = dataLayout.getABITypeAlign(intType);
+
+				auto gep = llvm::GetElementPtrInst::CreateInBounds(addressOfArgument, indexes, field, block);
+
+				auto load = new llvm::LoadInst(intType, gep, name, false, align, block);
+
+				auto localName = ss.str();
+
+				locals[localName] = TypedValue(Int32Type::instance(), load);
+			}
+		}
+		else
+		{
+			auto storageType = argumentType->storageType(*context);
+			auto align = dataLayout.getABITypeAlign(storageType);
+
+			auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
+
+			locals[name] = TypedValue(argumentType, load);
+		}
 	}
 
 	auto ep = entryPoint

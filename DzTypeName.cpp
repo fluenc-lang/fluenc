@@ -1,5 +1,6 @@
 #include "DzTypeName.h"
 #include "EntryPoint.h"
+#include "TypedValue.h"
 
 DzTypeName::DzTypeName(const std::string &name)
 	: m_name(name)
@@ -11,31 +12,40 @@ std::string DzTypeName::name() const
 	return m_name;
 }
 
-llvm::Type *DzTypeName::resolve(const EntryPoint &entryPoint)
+Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 {
 	auto &context = entryPoint.context();
 
 	if (m_name == "int")
 	{
-		return llvm::Type::getInt32Ty(*context);
+		return Int32Type::instance();
 	}
 
 	if (m_name == "long")
 	{
-		return llvm::Type::getInt64Ty(*context);
+		return Int64Type::instance();
 	}
 
 	if (m_name == "bool")
 	{
-		return llvm::Type::getInt1Ty(*context);
+		return BooleanType::instance();
 	}
 
 	if (m_name == "string")
 	{
-		return llvm::Type::getInt8PtrTy(*context);
+		return StringType::instance();
 	}
 
-	return nullptr;
+	auto types = entryPoint.types();
+
+	auto iterator = types.find(m_name);
+
+	if (iterator == types.end())
+	{
+		throw new std::exception(); // TODO
+	}
+
+	return iterator->second;
 }
 
 DzTypeName *DzTypeName::int32()

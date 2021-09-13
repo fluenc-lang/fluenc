@@ -12,10 +12,20 @@ DzReturn::DzReturn(DzValue *consumer)
 {
 }
 
+llvm::Constant *getInitializer(llvm::Type *type)
+{
+	if (type->isStructTy())
+	{
+		return llvm::ConstantAggregateZero::get(type);
+	}
+
+	return llvm::ConstantInt::get(type, 0);
+}
+
 std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
+	auto &context = entryPoint.context();
 
 	auto name = entryPoint.name();
 	auto function = entryPoint.function();
@@ -31,22 +41,23 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	auto globalName = stream.str();
 	auto value = values.pop();
 
-	auto type = value->getType();
+	auto type = value.type();
+	auto storageType = type->storageType(*context);
 
-	auto global = module->getOrInsertGlobal(globalName, type, [&]
+	auto global = module->getOrInsertGlobal(globalName, storageType, [&]
 	{
-		auto initializer = llvm::ConstantInt::get(type, 0);
+		auto initializer = getInitializer(storageType);
 
-		return new llvm::GlobalVariable(*module, type, false, llvm::GlobalValue::InternalLinkage, initializer, globalName);
+		return new llvm::GlobalVariable(*module, storageType, false, llvm::GlobalValue::InternalLinkage, initializer, globalName);
 	});
 
 	llvm::IRBuilder<> builder(block);
 
 	builder.CreateStore(value, global);
 
-	auto load = builder.CreateLoad(type, global);
+	auto load = builder.CreateLoad(storageType, global);
 
-	values.push(load);
+	values.push(TypedValue(value.type(), load));
 
 	return m_consumer->build(entryPoint, values);
 }

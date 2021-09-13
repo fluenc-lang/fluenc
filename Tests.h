@@ -478,6 +478,38 @@ class Tests : public QObject
 			QCOMPARE(result, 1);
 		}
 
+		void scenario20()
+		{
+			auto result = exec(R"(
+				struct DeStruct
+				{
+					num1,
+					num2
+				};
+
+				function createStruct(int num1, int num2)
+				{
+					return DeStruct
+					{
+						num1: num1,
+						num2: num2
+					};
+				}
+
+				function func(DeStruct s)
+				{
+					return s.num1 + s.num2;
+				}
+
+				export int main()
+				{
+					return func(createStruct(4, 6));
+				}
+			)");
+
+			QCOMPARE(result, 10);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -498,6 +530,7 @@ class Tests : public QObject
 		W_SLOT(scenario17)
 		W_SLOT(scenario18)
 		W_SLOT(scenario19)
+		W_SLOT(scenario20)
 
 	private:
 		int exec(std::string source)

@@ -5,24 +5,26 @@
 
 #include <stack>
 
+#include "TypedValue.h"
+
 class Stack
 {
 	public:
 		Stack() = default;
 		Stack(const Stack &other) = default;
 
-		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_iterator begin() const;
-		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_iterator end() const;
+		std::vector<TypedValue, std::allocator<TypedValue>>::const_iterator begin() const;
+		std::vector<TypedValue, std::allocator<TypedValue>>::const_iterator end() const;
 
-		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_reverse_iterator rbegin() const;
-		std::vector<llvm::Value *, std::allocator<llvm::Value *>>::const_reverse_iterator rend() const;
+		std::vector<TypedValue, std::allocator<TypedValue>>::const_reverse_iterator rbegin() const;
+		std::vector<TypedValue, std::allocator<TypedValue>>::const_reverse_iterator rend() const;
 
-		llvm::Value *pop();
+		TypedValue pop();
 
-		void push(llvm::Value *value);
+		void push(const TypedValue &value);
 
 	private:
-		std::vector<llvm::Value *> m_values;
+		std::vector<TypedValue> m_values;
 };
 
 #endif // STACK_H

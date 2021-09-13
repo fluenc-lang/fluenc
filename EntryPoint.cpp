@@ -6,8 +6,10 @@ EntryPoint::EntryPoint(const EntryPoint *parent
 	, llvm::Value *returnValueAddress
 	, std::unique_ptr<llvm::Module> *module
 	, std::unique_ptr<llvm::LLVMContext> *context
-	, const std::string &name, const std::multimap<std::string, DzCallable *> &functions
-	, const std::map<std::string, llvm::Value *> &locals
+	, const std::string &name
+	, const std::multimap<std::string, DzCallable *> &functions
+	, const std::map<std::string, TypedValue> &locals
+	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
 	)
 	: m_parent(parent)
@@ -19,6 +21,7 @@ EntryPoint::EntryPoint(const EntryPoint *parent
 	, m_name(name)
 	, m_functions(functions)
 	, m_locals(locals)
+	, m_types(types)
 	, m_values(values)
 {
 }
@@ -58,9 +61,14 @@ std::multimap<std::string, DzCallable *> EntryPoint::functions() const
 	return m_functions;
 }
 
-std::map<std::string, llvm::Value *> EntryPoint::locals() const
+std::map<std::string, TypedValue> EntryPoint::locals() const
 {
 	return m_locals;
+}
+
+std::map<std::string, Prototype *> EntryPoint::types() const
+{
+	return m_types;
 }
 
 Stack EntryPoint::values() const
@@ -94,6 +102,7 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_types
 		, m_values
 		);
 }
@@ -109,11 +118,12 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_types
 		, m_values
 		);
 }
 
-EntryPoint EntryPoint::withLocals(const std::map<std::string, llvm::Value *> &locals) const
+EntryPoint EntryPoint::withLocals(const std::map<std::string, TypedValue> &locals) const
 {
 	return EntryPoint(m_parent
 		, m_block
@@ -124,6 +134,7 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, llvm::Value *> &lo
 		, m_name
 		, m_functions
 		, locals
+		, m_types
 		, m_values
 		);
 }
@@ -139,6 +150,7 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		, name
 		, m_functions
 		, m_locals
+		, m_types
 		, m_values
 		);
 }
@@ -154,6 +166,7 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_types
 		, m_values
 		);
 }
@@ -169,6 +182,7 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_types
 		, values
 		);
 }

@@ -7,6 +7,7 @@
 #include "Stack.h"
 
 class DzCallable;
+class DzStruct;
 
 class EntryPoint
 {
@@ -19,7 +20,8 @@ class EntryPoint
 			, std::unique_ptr<llvm::LLVMContext> *context
 			, const std::string &name
 			, const std::multimap<std::string, DzCallable *> &functions
-			, const std::map<std::string, llvm::Value *> &locals
+			, const std::map<std::string, TypedValue> &locals
+			, const std::map<std::string, Prototype *> &types
 			, const Stack &values
 			);
 
@@ -36,7 +38,8 @@ class EntryPoint
 		std::string name() const;
 
 		std::multimap<std::string, DzCallable *> functions() const;
-		std::map<std::string, llvm::Value *> locals() const;
+		std::map<std::string, TypedValue> locals() const;
+		std::map<std::string, Prototype *> types() const;
 
 		Stack values() const;
 
@@ -44,7 +47,7 @@ class EntryPoint
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withFunction(llvm::Function *function) const;
-		EntryPoint withLocals(const std::map<std::string, llvm::Value *> &locals) const;
+		EntryPoint withLocals(const std::map<std::string, TypedValue> &locals) const;
 		EntryPoint withName(const std::string &name) const;
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
 		EntryPoint withValues(const Stack &values) const;
@@ -62,7 +65,8 @@ class EntryPoint
 		std::string m_name;
 
 		std::multimap<std::string, DzCallable *> m_functions;
-		std::map<std::string, llvm::Value *> m_locals;
+		std::map<std::string, TypedValue> m_locals;
+		std::map<std::string, Prototype *> m_types;
 
 		Stack m_values;
 };
