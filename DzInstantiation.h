@@ -1,6 +1,8 @@
 #ifndef DZINSTANTIATION_H
 #define DZINSTANTIATION_H
 
+#include <unordered_set>
+
 #include "DzValue.h"
 
 class DzTypeName;
@@ -8,6 +10,14 @@ class DzAssignment;
 
 class DzInstantiation : public DzValue
 {
+	struct FieldEmbryo
+	{
+		int index;
+
+		PrototypeField field;
+		TypedValue value;
+	};
+
 	public:
 		DzInstantiation(DzValue *consumer
 			, DzTypeName *type
@@ -20,7 +30,7 @@ class DzInstantiation : public DzValue
 		DzValue *m_consumer;
 		DzTypeName *m_type;
 
-		std::vector<std::string> m_fields;
+		std::unordered_set<std::string> m_fields;
 };
 
 #endif // DZINSTANTIATION_H

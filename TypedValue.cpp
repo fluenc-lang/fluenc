@@ -1,8 +1,8 @@
 #include "TypedValue.h"
 
 TypedValue::TypedValue()
-	: m_value(nullptr)
-	, m_type(nullptr)
+	: m_type(nullptr)
+	, m_value(nullptr)
 {
 }
 

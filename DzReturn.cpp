@@ -57,7 +57,7 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	auto load = builder.CreateLoad(storageType, global);
 
-	values.push(TypedValue(value.type(), load));
+	values.push(TypedValue(type, load));
 
 	return m_consumer->build(entryPoint, values);
 }

@@ -81,94 +81,30 @@ class StringType : public BuiltinType<StringType>
 		}
 };
 
-class Prototype : public Type
+class UserTypeField
 {
 	public:
-		Prototype(const std::string &tag, const std::vector<std::string> &fields)
-			: m_tag(tag)
-			, m_fields(fields)
-		{
-		}
-
-		std::string tag() const override
-		{
-			return m_tag;
-		}
-
-		std::vector<std::string> fields() const
-		{
-			return m_fields;
-		}
-
-		llvm::Type *storageType(llvm::LLVMContext &context) const override
-		{
-			return llvm::Type::getInt8PtrTy(context);
-		}
-
-	private:
-		std::string m_tag;
-		std::vector<std::string> m_fields;
-};
-
-class UserType : public Type
-{
-	public:
-		UserType(Prototype *prototype, llvm::Type *type)
-			: m_prototype(prototype)
+		UserTypeField(const std::string &name, Type *type)
+			: m_name(name)
 			, m_type(type)
 		{
 		}
 
-		std::string tag() const override
+		std::string name() const
 		{
-			return m_prototype->tag();
+			return m_name;
 		}
 
-		Prototype *prototype() const
-		{
-			return m_prototype;
-		}
-
-		llvm::Type *storageType(llvm::LLVMContext &) const override
+		Type *type() const
 		{
 			return m_type;
 		}
 
 	private:
-		Prototype *m_prototype;
+		std::string m_name;
 
-		llvm::Type *m_type;
+		Type *m_type;
 };
-
-//class Type
-//{
-//	public:
-//		Type()
-//			: m_type(nullptr)
-//		{
-//		}
-
-//		Type(llvm::Type *type, const std::string &name)
-//			: m_type(type)
-//			, m_name(name)
-//		{
-//		}
-
-//		std::string name() const
-//		{
-//			return m_name;
-//		}
-
-//		operator llvm::Type *() const
-//		{
-//			return m_type;
-//		}
-
-//	private:
-//		llvm::Type *m_type;
-
-//		std::string m_name;
-//};
 
 class TypedValue
 {
@@ -184,6 +120,102 @@ class TypedValue
 		Type *m_type;
 
 		llvm::Value *m_value;
+};
+
+class DzValue;
+
+class PrototypeField
+{
+	public:
+		PrototypeField()
+			: m_defaultValue(nullptr)
+		{
+		}
+
+		PrototypeField(const std::string &name
+			, DzValue *defaultValue
+			)
+			: m_name(name)
+			, m_defaultValue(defaultValue)
+		{
+		}
+
+		std::string name() const
+		{
+			return m_name;
+		}
+
+		DzValue *defaultValue() const
+		{
+			return m_defaultValue;
+		}
+
+	private:
+		std::string m_name;
+
+		DzValue *m_defaultValue;
+};
+
+class Prototype : public Type
+{
+	public:
+		Prototype(const std::string &tag, const std::vector<PrototypeField> &fields)
+			: m_tag(tag)
+			, m_fields(fields)
+		{
+		}
+
+		std::string tag() const override
+		{
+			return m_tag;
+		}
+
+		std::vector<PrototypeField> fields() const
+		{
+			return m_fields;
+		}
+
+		llvm::Type *storageType(llvm::LLVMContext &context) const override
+		{
+			return llvm::Type::getInt8PtrTy(context);
+		}
+
+	private:
+		std::string m_tag;
+		std::vector<PrototypeField> m_fields;
+};
+
+class UserType : public Type
+{
+	public:
+		UserType(Prototype *prototype, llvm::Type *type, std::vector<UserTypeField *> fields)
+			: m_prototype(prototype)
+			, m_type(type)
+			, m_fields(fields)
+		{
+		}
+
+		std::string tag() const override
+		{
+			return m_prototype->tag();
+		}
+
+		llvm::Type *storageType(llvm::LLVMContext &) const override
+		{
+			return m_type;
+		}
+
+		std::vector<UserTypeField *> fields() const
+		{
+			return m_fields;
+		}
+
+	private:
+		Prototype *m_prototype;
+
+		llvm::Type *m_type;
+
+		std::vector<UserTypeField *> m_fields;
 };
 
 #endif // TYPEDVALUE_H

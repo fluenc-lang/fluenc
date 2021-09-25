@@ -82,13 +82,14 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 
 		if (auto userType = dynamic_cast<UserType *>(argumentType))
 		{
-			auto prototype = userType->prototype();
-
 			auto i = 0;
 
-			for (auto &field : prototype->fields())
+			for (auto &field : userType->fields())
 			{
 				auto intType = llvm::Type::getInt32Ty(*context);
+
+				auto fieldType = field->type();
+				auto fieldStorageType = fieldType->storageType(*context);
 
 				llvm::Value *indexes[] =
 				{
@@ -99,17 +100,17 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 				std::stringstream ss;
 				ss << name;
 				ss << ".";
-				ss << field;
+				ss << field->name();
 
-				auto align = dataLayout.getABITypeAlign(intType);
+				auto align = dataLayout.getABITypeAlign(fieldStorageType);
 
-				auto gep = llvm::GetElementPtrInst::CreateInBounds(addressOfArgument, indexes, field, block);
+				auto gep = llvm::GetElementPtrInst::CreateInBounds(addressOfArgument, indexes, field->name(), block);
 
-				auto load = new llvm::LoadInst(intType, gep, name, false, align, block);
+				auto load = new llvm::LoadInst(fieldStorageType, gep, name, false, align, block);
 
 				auto localName = ss.str();
 
-				locals[localName] = TypedValue(Int32Type::instance(), load);
+				locals[localName] = TypedValue(fieldType, load);
 			}
 		}
 		else

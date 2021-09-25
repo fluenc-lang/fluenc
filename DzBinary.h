@@ -11,7 +11,7 @@ class DzBinary : public DzValue
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		llvm::Value *resolveOp(const EntryPoint &entryPoint, const TypedValue &left, const TypedValue &right) const;
+		TypedValue resolveOp(const EntryPoint &entryPoint, const TypedValue &left, const TypedValue &right) const;
 
 		DzValue * m_consumer;
 

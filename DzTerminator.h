@@ -10,6 +10,8 @@ class DzTerminator : public DzValue
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
+		static DzTerminator *instance();
+
 	private:
 		std::string m_name;
 };

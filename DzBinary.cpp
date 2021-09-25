@@ -14,16 +14,14 @@ std::vector<DzResult> DzBinary::build(const EntryPoint &entryPoint, Stack values
 	auto left = values.pop();
 	auto right = values.pop();
 
-	auto op = resolveOp(entryPoint, left, right);
-
-	TypedValue value(left.type(), op);
+	auto value = resolveOp(entryPoint, left, right);
 
 	values.push(value);
 
 	return m_consumer->build(entryPoint, values);
 }
 
-llvm::Value *DzBinary::resolveOp(const EntryPoint &entryPoint, const TypedValue &left, const TypedValue &right) const
+TypedValue DzBinary::resolveOp(const EntryPoint &entryPoint, const TypedValue &left, const TypedValue &right) const
 {
 	auto block = entryPoint.block();
 
@@ -31,53 +29,53 @@ llvm::Value *DzBinary::resolveOp(const EntryPoint &entryPoint, const TypedValue 
 
 	if (m_op == "+")
 	{
-		return builder.CreateAdd(left, right);
+		return TypedValue(left.type(), builder.CreateAdd(left, right));
 	}
 
 	if (m_op == "-")
 	{
-		return builder.CreateSub(left, right);
+		return TypedValue(left.type(), builder.CreateSub(left, right));
 	}
 
 	if (m_op == "*")
 	{
-		return builder.CreateMul(left, right);
+		return TypedValue(left.type(), builder.CreateMul(left, right));
 	}
 
 	if (m_op == "/")
 	{
-		return builder.CreateSDiv(left, right);
+		return TypedValue(left.type(), builder.CreateSDiv(left, right));
 	}
 
 	if (m_op == "<")
 	{
-		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, left, right);
+		return TypedValue(BooleanType::instance(), builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLT, left, right));
 	}
 
 	if (m_op == "<=")
 	{
-		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, left, right);
+		return TypedValue(BooleanType::instance(), builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SLE, left, right));
 	}
 
 	if (m_op == ">")
 	{
-		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGT, left, right);
+		return TypedValue(BooleanType::instance(), builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGT, left, right));
 	}
 
 	if (m_op == ">=")
 	{
-		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGE, left, right);
+		return TypedValue(BooleanType::instance(), builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_SGE, left, right));
 	}
 
 	if (m_op == "==")
 	{
-		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right);
+		return TypedValue(BooleanType::instance(), builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right));
 	}
 
 	if (m_op == "!=")
 	{
-		return builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right);
+		return TypedValue(BooleanType::instance(), builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right));
 	}
 
-	return nullptr;
+	throw new std::exception();
 }

@@ -510,6 +510,84 @@ class Tests : public QObject
 			QCOMPARE(result, 10);
 		}
 
+		void scenario21()
+		{
+			auto result = exec(R"(
+				struct DeStruct
+				{
+					num
+				};
+
+				function createStruct()
+				{
+					return DeStruct
+					{
+						num: 2L
+					};
+				}
+
+				function consumer(int v)
+				{
+					return 1;
+				}
+
+				function consumer(long v)
+				{
+					return 2;
+				}
+
+				function func(DeStruct s)
+				{
+					return consumer(s.num);
+				}
+
+				export int main()
+				{
+					return func(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, 2);
+		}
+
+		void scenario22()
+		{
+			auto result = exec(R"(
+				struct DeStruct
+				{
+					num1: 1,
+					num2: 2L
+				};
+
+				function createStruct()
+				{
+					return DeStruct {};
+				}
+
+				function consumer(int v)
+				{
+					return 10;
+				}
+
+				function consumer(long v)
+				{
+					return 20;
+				}
+
+				function func(DeStruct s)
+				{
+					return consumer(s.num1) * consumer(s.num2);
+				}
+
+				export int main()
+				{
+					return func(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, 200);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -531,6 +609,8 @@ class Tests : public QObject
 		W_SLOT(scenario18)
 		W_SLOT(scenario19)
 		W_SLOT(scenario20)
+		W_SLOT(scenario21)
+		W_SLOT(scenario22)
 
 	private:
 		int exec(std::string source)

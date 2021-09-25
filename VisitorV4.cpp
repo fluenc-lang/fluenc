@@ -301,13 +301,26 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 {
 	auto name = context->ID()->getText();
 
-	std::vector<std::string> fields;
+	std::vector<PrototypeField> fields;
 
 	for (auto field : context->field())
 	{
 		auto name = field->ID()->getText();
 
-		fields.push_back(name);
+		if (field->literal())
+		{
+			VisitorV4 visitor(DzTerminator::instance());
+
+			auto defaultValue = visitor
+				.visit(field->literal())
+				.as<DzValue *>();
+
+			fields.push_back({ name, defaultValue });
+		}
+		else
+		{
+			fields.push_back({ name, nullptr });
+		}
 	}
 
 	return new Prototype(name, fields);

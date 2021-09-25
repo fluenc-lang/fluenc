@@ -13,7 +13,7 @@ assignment
 	;
 
 field
-	: ID
+	: ID (':' literal)?
 	;
 	
 function 
@@ -28,11 +28,11 @@ literal
 	;
 	
 expression
-	: ID '(' (expression (',' expression)*)? ')'	#call
-	| literal										#constant
-	| left=expression op=OP right=expression		#binary
-	| ID ('.' ID)*									#member
-	| typeName '{' assignment (',' assignment)* '}'	#instantiation
+	: ID '(' (expression (',' expression)*)? ')'		#call
+	| literal											#constant
+	| left=expression op=OP right=expression			#binary
+	| ID ('.' ID)*										#member
+	| typeName '{' assignment? (',' assignment)* '}'	#instantiation
 	;
 
 ret

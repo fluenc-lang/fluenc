@@ -2,6 +2,7 @@
 
 #include "DzInstantiation.h"
 #include "DzTypeName.h"
+#include "IndexIterator.h"
 
 DzInstantiation::DzInstantiation(DzValue *consumer
 	, DzTypeName *type
@@ -9,7 +10,7 @@ DzInstantiation::DzInstantiation(DzValue *consumer
 	)
 	: m_consumer(consumer)
 	, m_type(type)
-	, m_fields(fields)
+	, m_fields(begin(fields), end(fields))
 {
 }
 
@@ -18,57 +19,81 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
+	auto prototype = (Prototype *)m_type->resolve(entryPoint);
+
+	auto prototypeFields = prototype->fields();
+
+	std::vector<FieldEmbryo> fieldEmbryos;
+
+	std::transform(begin(prototypeFields), end(prototypeFields), index_iterator(), std::back_insert_iterator(fieldEmbryos), [&](auto field, auto index) -> FieldEmbryo
+	{
+		if (m_fields.contains(field.name()))
+		{
+			return { index, field, values.pop() };
+		}
+
+		auto defaultValue = field.defaultValue();
+
+		if (!defaultValue)
+		{
+			throw new std::exception();
+		}
+
+		for (auto &[_, defaultValues] : defaultValue->build(entryPoint, Stack()))
+		{
+			return { index, field, *defaultValues.begin() };
+		}
+
+		throw new std::exception();
+	});
+
 	std::vector<llvm::Type *> types;
 
-	std::transform(begin(m_fields), end(m_fields), values.begin(), std::back_insert_iterator(types), [&](std::string, TypedValue value)
+	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(types), [&](auto embryo)
 	{
-		auto type = value.type();
-
-		return type->storageType(*context);
+		return embryo.value.type()->storageType(*context);
 	});
 
 	auto block = entryPoint.block();
 
-	auto prototype = (Prototype *)m_type->resolve(entryPoint);
-
 	auto dataLayout = module->getDataLayout();
 
-	auto st = llvm::StructType::get(*context, types);
+	auto structType = llvm::StructType::get(*context, types);
 
 	auto addressSpace = dataLayout.getAllocaAddrSpace();
-	auto align = dataLayout.getABITypeAlign(st);
+	auto align = dataLayout.getABITypeAlign(structType);
 
-	auto alloc = new llvm::AllocaInst(st, addressSpace, nullptr, align, "instance", block);
+	auto alloc = new llvm::AllocaInst(structType, addressSpace, nullptr, align, "instance", block);
 
-	int i = 0;
+	std::vector<UserTypeField *> fields;
 
-	for (auto &k : m_fields)
+	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(fields), [&](auto embryo)
 	{
 		llvm::Value *indexes[] =
 		{
 			llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
-			llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), i++)
+			llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), embryo.index)
 		};
 
-		auto o = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, k, block);
+		auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, embryo.field.name(), block);
 
-		auto value = values.pop();
-
-		auto valueType = value.type();
+		auto valueType = embryo.value.type();
 		auto valueStorageType = valueType->storageType(*context);
 
 		auto valueAlign = dataLayout.getABITypeAlign(valueStorageType);
 
-		auto store = new llvm::StoreInst(value, o, false, valueAlign, block);
+		auto store = new llvm::StoreInst(embryo.value, gep, false, valueAlign, block);
 
 		UNUSED(store);
-	}
 
-	auto load = new llvm::LoadInst(st, alloc, "by_value", false, align, block);
+		return new UserTypeField(embryo.field.name(), valueType);
+	});
 
-	auto type = new UserType(prototype, st);
+	auto load = new llvm::LoadInst(structType, alloc, "by_value", false, align, block);
 
-	values.push(TypedValue(type, load));
+	auto type = new UserType(prototype, structType, fields);
+
+	values.push({ type, load });
 
 	return m_consumer->build(entryPoint, values);
 }

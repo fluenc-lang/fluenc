@@ -24,6 +24,7 @@ SOURCES += \
 	DzTerminator.cpp \
 	DzTypeName.cpp \
 	EntryPoint.cpp \
+	IndexIterator.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
 	TypedValue.cpp \
@@ -63,6 +64,7 @@ HEADERS += \
 	DzValue.h \
 	EntryPoint.h \
 	FunctionAttribute.h \
+	IndexIterator.h \
 	KaleidoscopeJIT.h \
 	Stack.h \
 	Tests.h \

@@ -15,3 +15,10 @@ std::vector<DzResult> DzTerminator::build(const EntryPoint &entryPoint, Stack va
 {
 	return {{ entryPoint, values }};
 }
+
+DzTerminator *DzTerminator::instance()
+{
+	static DzTerminator instance("pajs");
+
+	return &instance;
+}

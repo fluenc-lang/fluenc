@@ -14,8 +14,6 @@ std::string DzTypeName::name() const
 
 Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 {
-	auto &context = entryPoint.context();
-
 	if (m_name == "int")
 	{
 		return Int32Type::instance();
