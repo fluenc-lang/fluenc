@@ -3,8 +3,7 @@
 #include "DzIntegralLiteral.h"
 #include "DzTypeName.h"
 #include "EntryPoint.h"
-
-#include "types/Type.h"
+#include "Type.h"
 
 DzIntegralLiteral::DzIntegralLiteral(DzValue *consumer, DzTypeName *type, const std::string &value)
 	: m_consumer(consumer)
