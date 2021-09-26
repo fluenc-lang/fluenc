@@ -10,14 +10,6 @@ class DzAssignment;
 
 class DzInstantiation : public DzValue
 {
-	struct FieldEmbryo
-	{
-		int index;
-
-		PrototypeField field;
-		TypedValue value;
-	};
-
 	public:
 		DzInstantiation(DzValue *consumer
 			, DzTypeName *type

@@ -37,7 +37,15 @@ SOURCES += \
 	antlr4-runtime/dzBaseVisitor.cpp \
 	antlr4-runtime/dzLexer.cpp \
 	antlr4-runtime/dzParser.cpp \
-	antlr4-runtime/dzVisitor.cpp
+	antlr4-runtime/dzVisitor.cpp \
+	types/BooleanType.cpp \
+	types/Int32Type.cpp \
+	types/Int64Type.cpp \
+	types/Prototype.cpp \
+	types/PrototypeField.cpp \
+	types/StringType.cpp \
+	types/UserType.cpp \
+	types/UserTypeField.cpp
 
 HEADERS += \
 	AllIterator.h \
@@ -77,6 +85,16 @@ HEADERS += \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \
 	antlr4-runtime/dzVisitor.h \
+	types/BooleanType.h \
+	types/BuiltinType.h \
+	types/Int32Type.h \
+	types/Int64Type.h \
+	types/Prototype.h \
+	types/PrototypeField.h \
+	types/StringType.h \
+	Type.h \
+	types/UserType.h \
+	types/UserTypeField.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

@@ -8,6 +8,7 @@
 
 class DzCallable;
 class DzStruct;
+class Prototype;
 
 class EntryPoint
 {

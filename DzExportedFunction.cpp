@@ -10,6 +10,7 @@
 #include "DzExportedFunction.h"
 #include "DzTypeName.h"
 #include "EntryPoint.h"
+#include "Type.h"
 
 DzExportedFunction::DzExportedFunction(const std::string &name
 	, DzValue *block

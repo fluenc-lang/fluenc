@@ -4,6 +4,7 @@
 #include "DzTypeName.h"
 #include "DzArgument.h"
 #include "AllIterator.h"
+#include "Type.h"
 
 DzImportedFunction::DzImportedFunction(const std::string &name
 	, const std::vector<DzArgument *> &arguments

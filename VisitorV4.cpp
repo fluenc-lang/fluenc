@@ -22,6 +22,8 @@
 #include "DzStruct.h"
 #include "DzInstantiation.h"
 
+#include "types/Prototype.h"
+
 VisitorV4::VisitorV4(DzValue *consumer)
 	: m_consumer(consumer)
 {
@@ -246,15 +248,15 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 {
 	auto access = context->ID();
 
-	auto k = std::accumulate(begin(access) + 1, end(access), (*begin(access))->getText(), [](auto x, antlr4::tree::TerminalNode *y)
+	auto path = std::accumulate(begin(access) + 1, end(access), (*begin(access))->getText(), [](auto name, antlr4::tree::TerminalNode *node)
 	{
 		std::stringstream ss;
-		ss << x << "." << y->getText();
+		ss << name << "." << node->getText();
 
 		return ss.str();
 	});
 
-	auto member = new DzMemberAccess(m_consumer, k);
+	auto member = new DzMemberAccess(m_consumer, path);
 
 	return static_cast<DzValue *>(member);
 }
@@ -300,10 +302,11 @@ antlrcpp::Any VisitorV4::visitStringLiteral(dzParser::StringLiteralContext *cont
 antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 {
 	auto name = context->ID()->getText();
+	auto inputFields = context->field();
 
 	std::vector<PrototypeField> fields;
 
-	for (auto field : context->field())
+	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [](dzParser::FieldContext *field) -> PrototypeField
 	{
 		auto name = field->ID()->getText();
 
@@ -315,13 +318,11 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 				.visit(field->literal())
 				.as<DzValue *>();
 
-			fields.push_back({ name, defaultValue });
+			return { name, defaultValue };
 		}
-		else
-		{
-			fields.push_back({ name, nullptr });
-		}
-	}
+
+		return { name, nullptr };
+	});
 
 	return new Prototype(name, fields);
 }

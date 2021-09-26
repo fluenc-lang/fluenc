@@ -3,6 +3,8 @@
 #include "DzBinary.h"
 #include "EntryPoint.h"
 
+#include "types/BooleanType.h"
+
 DzBinary::DzBinary(DzValue *consumer, const std::string &op)
 	: m_consumer(consumer)
 	, m_op(op)

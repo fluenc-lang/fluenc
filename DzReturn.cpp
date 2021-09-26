@@ -6,6 +6,7 @@
 
 #include "DzReturn.h"
 #include "EntryPoint.h"
+#include "Type.h"
 
 DzReturn::DzReturn(DzValue *consumer)
 	: m_consumer(consumer)

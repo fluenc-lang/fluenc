@@ -2,6 +2,12 @@
 #include "EntryPoint.h"
 #include "TypedValue.h"
 
+#include "types/Int32Type.h"
+#include "types/Int64Type.h"
+#include "types/BooleanType.h"
+#include "types/StringType.h"
+#include "types/Prototype.h"
+
 DzTypeName::DzTypeName(const std::string &name)
 	: m_name(name)
 {

@@ -4,6 +4,9 @@
 #include "DzTypeName.h"
 #include "IndexIterator.h"
 
+#include "types/Prototype.h"
+#include "types/UserType.h"
+
 DzInstantiation::DzInstantiation(DzValue *consumer
 	, DzTypeName *type
 	, const std::vector<std::string> &fields
@@ -16,6 +19,14 @@ DzInstantiation::DzInstantiation(DzValue *consumer
 
 std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack values) const
 {
+	struct FieldEmbryo
+	{
+		int index;
+
+		PrototypeField field;
+		TypedValue value;
+	};
+
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
@@ -65,9 +76,9 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	auto alloc = new llvm::AllocaInst(structType, addressSpace, nullptr, align, "instance", block);
 
-	std::vector<UserTypeField *> fields;
+	std::vector<UserTypeField> fields;
 
-	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(fields), [&](auto embryo)
+	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(fields), [&](auto embryo) -> UserTypeField
 	{
 		llvm::Value *indexes[] =
 		{
@@ -86,7 +97,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 		UNUSED(store);
 
-		return new UserTypeField(embryo.field.name(), valueType);
+		return { embryo.field.name(), valueType };
 	});
 
 	auto load = new llvm::LoadInst(structType, alloc, "by_value", false, align, block);

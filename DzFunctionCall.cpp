@@ -7,6 +7,7 @@
 #include "DzFunctionCall.h"
 #include "DzFunction.h"
 #include "EntryPoint.h"
+#include "Type.h"
 
 DzFunctionCall::DzFunctionCall(DzValue *consumer, const std::string name, size_t numberOfArguments)
 	: m_consumer(consumer)

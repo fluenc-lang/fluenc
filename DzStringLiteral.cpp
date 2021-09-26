@@ -2,6 +2,8 @@
 
 #include "DzStringLiteral.h"
 
+#include "types/StringType.h"
+
 DzStringLiteral::DzStringLiteral(DzValue *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
@@ -20,7 +22,7 @@ std::vector<DzResult> DzStringLiteral::build(const EntryPoint &entryPoint, Stack
 
 	auto address = builder.CreateGlobalStringPtr(string, "string", 0, module.get());
 
-	values.push(TypedValue(StringType::instance(), address));
+	values.push({ StringType::instance(), address });
 
 	return m_consumer->build(entryPoint, values);
 }

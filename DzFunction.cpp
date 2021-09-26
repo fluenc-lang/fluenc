@@ -11,6 +11,9 @@
 #include "DzTypeName.h"
 #include "EntryPoint.h"
 #include "AllIterator.h"
+#include "Type.h"
+
+#include "types/UserType.h"
 
 DzFunction::DzFunction(const std::string &name
 	, std::vector<DzArgument *> arguments
@@ -88,7 +91,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 			{
 				auto intType = llvm::Type::getInt32Ty(*context);
 
-				auto fieldType = field->type();
+				auto fieldType = field.type();
 				auto fieldStorageType = fieldType->storageType(*context);
 
 				llvm::Value *indexes[] =
@@ -100,11 +103,11 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 				std::stringstream ss;
 				ss << name;
 				ss << ".";
-				ss << field->name();
+				ss << field.name();
 
 				auto align = dataLayout.getABITypeAlign(fieldStorageType);
 
-				auto gep = llvm::GetElementPtrInst::CreateInBounds(addressOfArgument, indexes, field->name(), block);
+				auto gep = llvm::GetElementPtrInst::CreateInBounds(addressOfArgument, indexes, field.name(), block);
 
 				auto load = new llvm::LoadInst(fieldStorageType, gep, name, false, align, block);
 

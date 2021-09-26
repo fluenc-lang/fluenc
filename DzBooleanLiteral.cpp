@@ -2,6 +2,8 @@
 
 #include "DzBooleanLiteral.h"
 
+#include "types/BooleanType.h"
+
 DzBooleanLiteral::DzBooleanLiteral(DzValue *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
