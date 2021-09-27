@@ -59,6 +59,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitConditional(dzParser::ConditionalContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitBinary(dzParser::BinaryContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -72,10 +76,6 @@ public:
   }
 
   virtual antlrcpp::Any visitRet(dzParser::RetContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitConditional(dzParser::ConditionalContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -45,7 +45,8 @@ SOURCES += \
 	types/PrototypeField.cpp \
 	types/StringType.cpp \
 	types/UserType.cpp \
-	types/UserTypeField.cpp
+	types/UserTypeField.cpp \
+	types/VoidType.cpp
 
 HEADERS += \
 	AllIterator.h \
@@ -95,6 +96,7 @@ HEADERS += \
 	Type.h \
 	types/UserType.h \
 	types/UserTypeField.h \
+	types/VoidType.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

@@ -20,7 +20,7 @@ public:
   enum {
     RuleProgram = 0, RuleStructure = 1, RuleAssignment = 2, RuleField = 3, 
     RuleFunction = 4, RuleLiteral = 5, RuleExpression = 6, RuleRet = 7, 
-    RuleConditional = 8, RuleBlock = 9, RuleArgument = 10, RuleTypeName = 11
+    RuleBlock = 8, RuleArgument = 9, RuleTypeName = 10
   };
 
   explicit dzParser(antlr4::TokenStream *input);
@@ -41,7 +41,6 @@ public:
   class LiteralContext;
   class ExpressionContext;
   class RetContext;
-  class ConditionalContext;
   class BlockContext;
   class ArgumentContext;
   class TypeNameContext; 
@@ -209,6 +208,16 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  ConditionalContext : public ExpressionContext {
+  public:
+    ConditionalContext(ExpressionContext *ctx);
+
+    ExpressionContext *expression();
+    BlockContext *block();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  BinaryContext : public ExpressionContext {
   public:
     BinaryContext(ExpressionContext *ctx);
@@ -262,27 +271,13 @@ public:
 
   RetContext* ret();
 
-  class  ConditionalContext : public antlr4::ParserRuleContext {
-  public:
-    ConditionalContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExpressionContext *expression();
-    BlockContext *block();
-
-
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
-
-  ConditionalContext* conditional();
-
   class  BlockContext : public antlr4::ParserRuleContext {
   public:
     BlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     RetContext *ret();
-    std::vector<ConditionalContext *> conditional();
-    ConditionalContext* conditional(size_t i);
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;

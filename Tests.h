@@ -27,6 +27,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
+	public:
+		Tests()
+		{
+			scenario24();
+		}
+
 	private:
 		void scenario1()
 		{
@@ -588,6 +594,81 @@ class Tests : public QObject
 			QCOMPARE(result, 200);
 		}
 
+		void scenario23()
+		{
+			auto result = compile(R"(
+				function foo(long renderer)
+				{
+					return 2;
+				}
+
+				function mainLoop(int init, long renderer)
+				{
+					return mainLoop(foo(renderer)
+						, renderer
+						);
+				}
+
+				export int main()
+				{
+					return mainLoop(0, 1L);
+				}
+			)");
+
+			QVERIFY(result);
+		}
+
+		void scenario24()
+		{
+			auto result = exec(R"(
+				function foo()
+				{
+					return 1;
+				}
+
+				export int main()
+				{
+					if (foo() != 0)
+					{
+						return 1;
+					}
+
+					return 0;
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
+		void scenario25()
+		{
+			auto result = exec(R"(
+				function bar()
+				{
+					return 2;
+				}
+
+				function foo()
+				{
+					return 1;
+				}
+
+				export int main()
+				{
+					if (foo() == 0)
+					{
+						return 1;
+					}
+
+					bar();
+
+					return 2;
+				}
+			)");
+
+			QCOMPARE(result, 2);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -611,9 +692,12 @@ class Tests : public QObject
 		W_SLOT(scenario20)
 		W_SLOT(scenario21)
 		W_SLOT(scenario22)
+		W_SLOT(scenario23)
+		W_SLOT(scenario24)
+		W_SLOT(scenario25)
 
 	private:
-		int exec(std::string source)
+		ModuleInfo *compile(std::string source)
 		{
 			std::stringstream stream(source);
 
@@ -624,11 +708,17 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr);
+			VisitorV4 visitor(nullptr, nullptr);
 
-			auto moduleInfo = visitor
+			return visitor
 				.visit(program)
 				.as<ModuleInfo *>();
+
+		}
+
+		int exec(std::string source)
+		{
+			auto moduleInfo = compile(source);
 
 			auto threadSafeModule = llvm::orc::ThreadSafeModule(
 				std::move(moduleInfo->module()),

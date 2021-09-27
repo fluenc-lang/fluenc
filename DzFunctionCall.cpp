@@ -76,15 +76,22 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 				values.push(TypedValue(argumentType, alloc));
 			}
 
+			auto functionBlock = llvm::BasicBlock::Create(*context);
+
+			linkBlocks(block, functionBlock);
+
+			auto functionEntryPoint = entryPoint
+				.withBlock(functionBlock);
+
 			if (function->attribute() == FunctionAttribute::Import)
 			{
 				std::vector<DzResult> result;
 
-				auto functionResults = function->build(entryPoint, values);
+				auto functionResults = function->build(functionEntryPoint, values);
 
 				for (const auto &[_, returnValue] : functionResults)
 				{
-					auto consumerResults = m_consumer->build(entryPoint, returnValue);
+					auto consumerResults = m_consumer->build(functionEntryPoint, returnValue);
 
 					for (const auto &consumerResult : consumerResults)
 					{
@@ -94,14 +101,6 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 				return result;
 			}
-
-			auto functionBlock = llvm::BasicBlock::Create(*context);
-
-			linkBlocks(block, functionBlock);
-
-			auto functionEntryPoint = entryPoint
-				.withValues(values)
-				.withBlock(functionBlock);
 
 			std::vector<DzResult> result;
 

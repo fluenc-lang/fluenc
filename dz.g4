@@ -33,18 +33,19 @@ expression
 	| left=expression op=OP right=expression			#binary
 	| ID ('.' ID)*										#member
 	| typeName '{' assignment? (',' assignment)* '}'	#instantiation
+	| 'if' '(' expression ')' block						#conditional
 	;
 
 ret
 	: 'return' value=expression? ('->' chained=expression)?
 	;
 
-conditional
-	: 'if' '(' expression ')' block
-	;
+//conditional
+//	: 'if' '(' expression ')' block
+//	;
 
 block
-	: '{' conditional* ret '}'
+	: '{' expression* ret '}'
 	;
 
 argument

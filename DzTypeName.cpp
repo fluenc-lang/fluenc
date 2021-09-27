@@ -6,6 +6,7 @@
 #include "types/Int64Type.h"
 #include "types/BooleanType.h"
 #include "types/StringType.h"
+#include "types/VoidType.h"
 #include "types/Prototype.h"
 
 DzTypeName::DzTypeName(const std::string &name)
@@ -38,6 +39,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 	if (m_name == "string")
 	{
 		return StringType::instance();
+	}
+
+	if (m_name == "void")
+	{
+		return VoidType::instance();
 	}
 
 	auto types = entryPoint.types();

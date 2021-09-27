@@ -5,11 +5,9 @@
 #include "DzConditional.h"
 #include "EntryPoint.h"
 
-DzConditional::DzConditional(DzValue *ifFalse, DzValue *ifTrue, DzValue *condition, DzValue *consumer)
+DzConditional::DzConditional(DzValue *ifFalse, DzValue *ifTrue)
 	: m_ifTrue(ifTrue)
 	, m_ifFalse(ifFalse)
-	, m_condition(condition)
-	, m_consumer(consumer)
 {
 }
 
@@ -22,17 +20,12 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 	block->setName("condition");
 	block->insertInto(function);
 
-	auto conditionValues = m_condition->build(entryPoint, values);
-
 	auto ifTrue = llvm::BasicBlock::Create(*context);
 	auto ifFalse = llvm::BasicBlock::Create(*context);
 
 	llvm::IRBuilder<> builder(block);
 
-	for (auto &[_, value] : conditionValues)
-	{
-		builder.CreateCondBr(value.pop(), ifTrue, ifFalse);
-	}
+	builder.CreateCondBr(values.pop(), ifTrue, ifFalse);
 
 	auto epIfFalse = entryPoint
 		.withName("ifFalse")

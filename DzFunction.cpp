@@ -69,6 +69,9 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
+	auto pep = entryPoint
+		.withValues(values);
+
 	auto block = entryPoint.block();
 
 	auto dataLayout = module->getDataLayout();
@@ -127,7 +130,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 		}
 	}
 
-	auto ep = entryPoint
+	auto ep = pep
 		.withName(m_name)
 		.withLocals(locals);
 

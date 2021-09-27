@@ -36,7 +36,7 @@ class ModuleInfo
 class VisitorV4 : public dzBaseVisitor
 {
 	public:
-		VisitorV4(DzValue *consumer);
+		VisitorV4(DzValue *alpha, DzValue *beta);
 
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
@@ -53,9 +53,11 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitStringLiteral(dzParser::StringLiteralContext *context) override;
 		antlrcpp::Any visitStructure(dzParser::StructureContext *context) override;
 		antlrcpp::Any visitInstantiation(dzParser::InstantiationContext *context) override;
+		antlrcpp::Any visitConditional(dzParser::ConditionalContext *context) override;
 
 	private:
-		DzValue *m_consumer;
+		DzValue *m_alpha;
+		DzValue *m_beta;
 };
 
 #endif // VISITORV4_H

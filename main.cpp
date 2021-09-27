@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
 		auto program = parser.program();
 
-		VisitorV4 visitor(nullptr);
+		VisitorV4 visitor(nullptr, nullptr);
 
 		auto moduleInfo = visitor
 			.visit(program)
