@@ -6,6 +6,10 @@
 #include "AllIterator.h"
 #include "Type.h"
 
+#include "types/VoidType.h"
+#include "types/UserType.h"
+#include "types/Prototype.h"
+
 DzImportedFunction::DzImportedFunction(const std::string &name
 	, const std::vector<DzArgument *> &arguments
 	, DzTypeName *returnType
@@ -73,16 +77,27 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 	{
 		auto name = argument->name();
 		auto type = argument->type(entryPoint);
+
 		auto storageType = type->storageType(*context);
+
+		argumentTypes.push_back(storageType);
 
 		auto addressOfArgument = values.pop();
 
-		auto align = dataLayout.getABITypeAlign(storageType);
+		if (dynamic_cast<Prototype *>(type))
+		{
+			auto cast = new llvm::BitCastInst(addressOfArgument, llvm::Type::getInt8PtrTy(*context), "cast", block);
 
-		auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
+			argumentValues.push_back(cast);
+		}
+		else
+		{
+			auto align = dataLayout.getABITypeAlign(storageType);
 
-		argumentTypes.push_back(storageType);
-		argumentValues.push_back(load);
+			auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
+
+			argumentValues.push_back(load);
+		}
 	}
 
 	llvm::FunctionType *functionType = llvm::FunctionType::get(returnType->storageType(*context), argumentTypes, false);
@@ -93,7 +108,10 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 	auto call = builder.CreateCall(function, argumentValues);
 
-	values.push(TypedValue(returnType, call));
+	if (returnType != VoidType::instance())
+	{
+		values.push({ returnType, call });
+	}
 
 	return {{ entryPoint, values }};
 }

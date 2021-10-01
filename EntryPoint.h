@@ -12,6 +12,8 @@ class Prototype;
 
 class EntryPoint
 {
+	const char *empty = "_empty";
+
 	public:
 		EntryPoint(const EntryPoint *parent
 			, llvm::BasicBlock *block

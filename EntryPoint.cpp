@@ -93,13 +93,13 @@ const EntryPoint *EntryPoint::byName(const std::string &name) const
 
 EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 {
-	return EntryPoint(m_parent
+	return EntryPoint(this
 		, block
 		, m_function
 		, m_returnValueAddress
 		, m_module
 		, m_context
-		, m_name
+		, empty
 		, m_functions
 		, m_locals
 		, m_types
