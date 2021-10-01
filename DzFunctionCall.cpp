@@ -69,7 +69,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 				auto argumentType = value.type();
 				auto storageType = argumentType->storageType(*context);
 
-				auto alloc = builder.CreateAlloca(storageType);
+				auto alloc = entryPoint.alloc(storageType);
 
 				builder.CreateStore(value, alloc);
 

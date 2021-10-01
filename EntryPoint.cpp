@@ -1,7 +1,10 @@
+#include <llvm/IR/IRBuilder.h>
+
 #include "EntryPoint.h"
 
 EntryPoint::EntryPoint(const EntryPoint *parent
 	, llvm::BasicBlock *block
+	, llvm::BasicBlock *alloc
 	, llvm::Function *function
 	, llvm::Value *returnValueAddress
 	, std::unique_ptr<llvm::Module> *module
@@ -14,6 +17,7 @@ EntryPoint::EntryPoint(const EntryPoint *parent
 	)
 	: m_parent(parent)
 	, m_block(block)
+	, m_alloc(alloc)
 	, m_function(function)
 	, m_returnValueAddress(returnValueAddress)
 	, m_module(module)
@@ -39,6 +43,13 @@ llvm::Function *EntryPoint::function() const
 llvm::Value *EntryPoint::returnValueAddress() const
 {
 	return m_returnValueAddress;
+}
+
+llvm::Value *EntryPoint::alloc(llvm::Type *type) const
+{
+	llvm::IRBuilder<> builder(m_alloc, m_alloc->begin());
+
+	return builder.CreateAlloca(type);
 }
 
 std::unique_ptr<llvm::Module> &EntryPoint::module() const
@@ -95,6 +106,7 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 {
 	return EntryPoint(this
 		, block
+		, m_alloc
 		, m_function
 		, m_returnValueAddress
 		, m_module
@@ -107,10 +119,28 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		);
 }
 
+EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
+{
+	return EntryPoint(m_parent
+		, m_block
+		, alloc
+		, m_function
+		, m_returnValueAddress
+		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, m_types
+		, m_values
+		);
+}
+
 EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 {
 	return EntryPoint(m_parent
 		, m_block
+		, m_alloc
 		, function
 		, m_returnValueAddress
 		, m_module
@@ -127,6 +157,7 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, TypedValue> &local
 {
 	return EntryPoint(m_parent
 		, m_block
+		, m_alloc
 		, m_function
 		, m_returnValueAddress
 		, m_module
@@ -143,6 +174,7 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 {
 	return EntryPoint(this
 		, m_block
+		, m_alloc
 		, m_function
 		, m_returnValueAddress
 		, m_module
@@ -159,6 +191,7 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 {
 	return EntryPoint(m_parent
 		, m_block
+		, m_alloc
 		, m_function
 		, address
 		, m_module
@@ -175,6 +208,7 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 {
 	return EntryPoint(m_parent
 		, m_block
+		, m_alloc
 		, m_function
 		, m_returnValueAddress
 		, m_module

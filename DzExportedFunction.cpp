@@ -53,11 +53,16 @@ std::vector<DzResult> DzExportedFunction::build(const EntryPoint &entryPoint, St
 
 	auto functionType = llvm::FunctionType::get(storageType, argumentTypes, false);
 	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, m_name, module.get());
+
+	auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
 	auto block = llvm::BasicBlock::Create(*context);
+
+	linkBlocks(alloc, block);
 
 	auto ep = entryPoint
 		.withFunction(function)
-		.withBlock(block);
+		.withBlock(block)
+		.withAlloc(alloc);
 
 	auto result = m_block->build(ep, values);
 

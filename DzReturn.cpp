@@ -25,7 +25,6 @@ llvm::Constant *getInitializer(llvm::Type *type)
 
 std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
 	auto name = entryPoint.name();
@@ -35,30 +34,20 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	block->setName(name);
 	block->insertInto(function);
 
-	std::ostringstream stream;
-	stream << block->getName();
-	stream << "_ret";
-
-	auto globalName = stream.str();
 	auto value = values.pop();
 
 	auto type = value.type();
 	auto storageType = type->storageType(*context);
 
-	auto global = module->getOrInsertGlobal(globalName, storageType, [&]
-	{
-		auto initializer = getInitializer(storageType);
-
-		return new llvm::GlobalVariable(*module, storageType, false, llvm::GlobalValue::InternalLinkage, initializer, globalName);
-	});
+	auto alloc = entryPoint.alloc(storageType);
 
 	llvm::IRBuilder<> builder(block);
 
-	builder.CreateStore(value, global);
+	builder.CreateStore(value, alloc);
 
-	auto load = builder.CreateLoad(storageType, global);
+	auto load = builder.CreateLoad(storageType, alloc);
 
-	values.push(TypedValue(type, load));
+	values.push({ type, load });
 
 	return m_consumer->build(entryPoint, values);
 }

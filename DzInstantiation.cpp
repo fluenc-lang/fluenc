@@ -73,23 +73,9 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	auto structType = llvm::StructType::create(*context, types, prototype->tag());
 
-//	auto addressSpace = dataLayout.getAllocaAddrSpace();
 	auto align = dataLayout.getABITypeAlign(structType);
 
-//	auto alloc = new llvm::AllocaInst(structType, addressSpace, nullptr, align, "instance", block);
-
-	std::ostringstream stream;
-	stream << structType->getName();
-	stream << "_instance";
-
-	auto globalName = stream.str();
-
-	auto global = module->getOrInsertGlobal(globalName, structType, [&]
-	{
-		auto initializer = llvm::ConstantAggregateZero::get(structType);
-
-		return new llvm::GlobalVariable(*module, structType, false, llvm::GlobalValue::InternalLinkage, initializer, globalName);
-	});
+	auto alloc = entryPoint.alloc(structType);
 
 	std::vector<UserTypeField> fields;
 
@@ -101,7 +87,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 			llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), embryo.index)
 		};
 
-		auto gep = llvm::GetElementPtrInst::CreateInBounds(global, indexes, embryo.field.name(), block);
+		auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, embryo.field.name(), block);
 
 		auto valueType = embryo.value.type();
 		auto valueStorageType = valueType->storageType(*context);
@@ -115,7 +101,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 		return { embryo.field.name(), valueType };
 	});
 
-	auto load = new llvm::LoadInst(structType, global, "by_value", false, align, block);
+	auto load = new llvm::LoadInst(structType, alloc, "by_value", false, align, block);
 
 	auto type = new UserType(prototype, structType, fields);
 
