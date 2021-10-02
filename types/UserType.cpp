@@ -20,5 +20,5 @@ std::vector<UserTypeField> UserType::fields() const
 
 llvm::Type *UserType::storageType(llvm::LLVMContext &) const
 {
-	return m_type;
+	return m_type->getPointerTo();
 }

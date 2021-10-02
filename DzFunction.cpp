@@ -76,7 +76,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 
 	auto dataLayout = module->getDataLayout();
 
-	std::map<std::string, TypedValue> locals;
+	auto locals = entryPoint.locals();
 
 	for (const auto &argument : m_arguments)
 	{
@@ -85,9 +85,14 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 		auto addressOfArgument = values.pop();
 
 		auto argumentType = addressOfArgument.type();
+		auto storageType = argumentType->storageType(*context);
+
+		auto align = dataLayout.getABITypeAlign(storageType);
 
 		if (auto userType = dynamic_cast<UserType *>(argumentType))
 		{
+			auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
+
 			auto i = 0;
 
 			for (auto &field : userType->fields())
@@ -95,7 +100,6 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 				auto intType = llvm::Type::getInt32Ty(*context);
 
 				auto fieldType = field.type();
-//				auto fieldStorageType = fieldType->storageType(*context);
 
 				llvm::Value *indexes[] =
 				{
@@ -108,11 +112,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 				ss << ".";
 				ss << field.name();
 
-//				auto align = dataLayout.getABITypeAlign(fieldStorageType);
-
-				auto gep = llvm::GetElementPtrInst::CreateInBounds(addressOfArgument, indexes, field.name(), block);
-
-//				auto load = new llvm::LoadInst(fieldStorageType, gep, name, false, align, block);
+				auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
 
 				auto localName = ss.str();
 
@@ -123,11 +123,6 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 		}
 		else
 		{
-//			auto storageType = argumentType->storageType(*context);
-//			auto align = dataLayout.getABITypeAlign(storageType);
-
-//			auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
-
 			locals[name] = TypedValue(argumentType, addressOfArgument);
 		}
 	}

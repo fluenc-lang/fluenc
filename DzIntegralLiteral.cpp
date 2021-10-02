@@ -36,7 +36,7 @@ llvm::ConstantInt *DzIntegralLiteral::getValue(llvm::Type *storageType) const
 
 	if (hex != std::string::npos)
 	{
-		return llvm::ConstantInt::get((llvm::IntegerType *)storageType, m_value.substr(hex + 1), 16);
+		return llvm::ConstantInt::get((llvm::IntegerType *)storageType, m_value.substr(hex + 2), 16);
 	}
 
 	return llvm::ConstantInt::get((llvm::IntegerType *)storageType, m_value, 10);

@@ -84,18 +84,18 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 		auto addressOfArgument = values.pop();
 
+		auto align = dataLayout.getABITypeAlign(storageType);
+
+		auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
+
 		if (dynamic_cast<Prototype *>(type))
 		{
-			auto cast = new llvm::BitCastInst(addressOfArgument, llvm::Type::getInt8PtrTy(*context), "cast", block);
+			auto cast = new llvm::BitCastInst(load, llvm::Type::getInt8PtrTy(*context), "cast", block);
 
 			argumentValues.push_back(cast);
 		}
 		else
 		{
-			auto align = dataLayout.getABITypeAlign(storageType);
-
-			auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
-
 			argumentValues.push_back(load);
 		}
 	}

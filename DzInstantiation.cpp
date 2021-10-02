@@ -101,11 +101,11 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 		return { embryo.field.name(), valueType };
 	});
 
-	auto load = new llvm::LoadInst(structType, alloc, "by_value", false, align, block);
+//	auto load = new llvm::LoadInst(structType, alloc, "by_value", false, align, block);
 
 	auto type = new UserType(prototype, structType, fields);
 
-	values.push({ type, load });
+	values.push({ type, alloc });
 
 	return m_consumer->build(entryPoint, values);
 }
