@@ -17,6 +17,7 @@ class DzTypeName
 
 		static DzTypeName *int32();
 		static DzTypeName *int64();
+		static DzTypeName *uint32();
 		static DzTypeName *boolean();
 		static DzTypeName *string();
 

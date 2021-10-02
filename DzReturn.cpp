@@ -13,16 +13,6 @@ DzReturn::DzReturn(DzValue *consumer)
 {
 }
 
-llvm::Constant *getInitializer(llvm::Type *type)
-{
-	if (type->isStructTy())
-	{
-		return llvm::ConstantAggregateZero::get(type);
-	}
-
-	return llvm::ConstantInt::get(type, 0);
-}
-
 std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();

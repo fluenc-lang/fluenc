@@ -1,3 +1,5 @@
+#include <llvm/IR/Constant.h>
+
 #include "TypedValue.h"
 
 TypedValue::TypedValue()
@@ -15,6 +17,11 @@ TypedValue::TypedValue(Type *type, llvm::Value *value)
 Type *TypedValue::type() const
 {
 	return m_type;
+}
+
+llvm::Constant *TypedValue::constant() const
+{
+	return static_cast<llvm::Constant *>(m_value);
 }
 
 TypedValue::operator llvm::Value *() const

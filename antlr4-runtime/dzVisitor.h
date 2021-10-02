@@ -23,6 +23,8 @@ public:
 
     virtual antlrcpp::Any visitStructure(dzParser::StructureContext *context) = 0;
 
+    virtual antlrcpp::Any visitGlobal(dzParser::GlobalContext *context) = 0;
+
     virtual antlrcpp::Any visitAssignment(dzParser::AssignmentContext *context) = 0;
 
     virtual antlrcpp::Any visitField(dzParser::FieldContext *context) = 0;
@@ -36,6 +38,8 @@ public:
     virtual antlrcpp::Any visitBoolLiteral(dzParser::BoolLiteralContext *context) = 0;
 
     virtual antlrcpp::Any visitStringLiteral(dzParser::StringLiteralContext *context) = 0;
+
+    virtual antlrcpp::Any visitUint32Literal(dzParser::Uint32LiteralContext *context) = 0;
 
     virtual antlrcpp::Any visitCall(dzParser::CallContext *context) = 0;
 

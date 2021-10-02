@@ -14,6 +14,8 @@ SOURCES += \
 	DzExportedFunctionTerminator.cpp \
 	DzFunction.cpp \
 	DzFunctionCall.cpp \
+	DzGlobal.cpp \
+	DzGlobalTerminator.cpp \
 	DzImportedFunction.cpp \
 	DzInstantiation.cpp \
 	DzIntegralLiteral.cpp \
@@ -44,6 +46,7 @@ SOURCES += \
 	types/Prototype.cpp \
 	types/PrototypeField.cpp \
 	types/StringType.cpp \
+	types/Uint32Type.cpp \
 	types/UserType.cpp \
 	types/UserTypeField.cpp \
 	types/VoidType.cpp
@@ -61,6 +64,8 @@ HEADERS += \
 	DzExportedFunctionTerminator.h \
 	DzFunction.h \
 	DzFunctionCall.h \
+	DzGlobal.h \
+	DzGlobalTerminator.h \
 	DzImportedFunction.h \
 	DzInstantiation.h \
 	DzIntegralLiteral.h \
@@ -94,6 +99,7 @@ HEADERS += \
 	types/PrototypeField.h \
 	types/StringType.h \
 	Type.h \
+	types/Uint32Type.h \
 	types/UserType.h \
 	types/UserTypeField.h \
 	types/VoidType.h \

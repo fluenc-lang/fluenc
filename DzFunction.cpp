@@ -95,7 +95,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 				auto intType = llvm::Type::getInt32Ty(*context);
 
 				auto fieldType = field.type();
-				auto fieldStorageType = fieldType->storageType(*context);
+//				auto fieldStorageType = fieldType->storageType(*context);
 
 				llvm::Value *indexes[] =
 				{
@@ -108,25 +108,27 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 				ss << ".";
 				ss << field.name();
 
-				auto align = dataLayout.getABITypeAlign(fieldStorageType);
+//				auto align = dataLayout.getABITypeAlign(fieldStorageType);
 
 				auto gep = llvm::GetElementPtrInst::CreateInBounds(addressOfArgument, indexes, field.name(), block);
 
-				auto load = new llvm::LoadInst(fieldStorageType, gep, name, false, align, block);
+//				auto load = new llvm::LoadInst(fieldStorageType, gep, name, false, align, block);
 
 				auto localName = ss.str();
 
-				locals[localName] = TypedValue(fieldType, load);
+				locals[localName] = TypedValue(fieldType, gep);
 			}
+
+			locals[name] = addressOfArgument;
 		}
 		else
 		{
-			auto storageType = argumentType->storageType(*context);
-			auto align = dataLayout.getABITypeAlign(storageType);
+//			auto storageType = argumentType->storageType(*context);
+//			auto align = dataLayout.getABITypeAlign(storageType);
 
-			auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
+//			auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
 
-			locals[name] = TypedValue(argumentType, load);
+			locals[name] = TypedValue(argumentType, addressOfArgument);
 		}
 	}
 

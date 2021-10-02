@@ -1,5 +1,6 @@
 #include <numeric>
 
+#include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
 
 #include "VisitorV4.h"
@@ -21,6 +22,8 @@
 #include "DzImportedFunction.h"
 #include "DzStruct.h"
 #include "DzInstantiation.h"
+#include "DzGlobal.h"
+#include "DzGlobalTerminator.h"
 
 #include "types/Prototype.h"
 
@@ -63,25 +66,39 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		types.insert({ result->tag(), result });
 	}
 
+	Stack values;
+
+	EntryPoint entryPoint(nullptr
+		, nullptr
+		, nullptr
+		, nullptr
+		, nullptr
+		, &module
+		, &llvmContext
+		, "term"
+		, functions
+		, locals
+		, types
+		, values
+		);
+
+	for (auto global : context->global())
+	{
+		auto result = visit(global)
+			.as<DzGlobal *>();
+
+		for (auto &[_, globalValues] : result->build(entryPoint, values))
+		{
+			locals.insert({ result->name(), *globalValues.begin() });
+		}
+	}
+
 	for (auto root : roots)
 	{
-		Stack values;
+		auto ep = entryPoint
+			.withLocals(locals);
 
-		EntryPoint entryPoint(nullptr
-			, nullptr
-			, nullptr
-			, nullptr
-			, nullptr
-			, &module
-			, &llvmContext
-			, "term"
-			, functions
-			, locals
-			, types
-			, values
-			);
-
-		root->build(entryPoint, values);
+		root->build(ep, values);
 	}
 
 	module->print(llvm::errs(), nullptr);
@@ -299,6 +316,16 @@ antlrcpp::Any VisitorV4::visitStringLiteral(dzParser::StringLiteralContext *cont
 	return static_cast<DzValue *>(constant);
 }
 
+antlrcpp::Any VisitorV4::visitUint32Literal(dzParser::Uint32LiteralContext *context)
+{
+	auto constant = new DzIntegralLiteral(m_alpha
+		, DzTypeName::uint32()
+		, context->INT()->getText()
+		);
+
+	return static_cast<DzValue *>(constant);
+}
+
 antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 {
 	auto name = context->ID()->getText();
@@ -372,4 +399,19 @@ antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
 		.as<DzValue *>();
 
 	return condition;
+}
+
+antlrcpp::Any VisitorV4::visitGlobal(dzParser::GlobalContext *context)
+{
+	auto name = context->ID()->getText();
+
+	auto terminator = new DzGlobalTerminator(name);
+
+	VisitorV4 visitor(terminator, nullptr);
+
+	auto literal = visitor
+		.visit(context->literal())
+		.as<DzValue *>();
+
+	return new DzGlobal(literal, name);
 }

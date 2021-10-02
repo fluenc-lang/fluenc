@@ -4,6 +4,7 @@
 
 #include "types/Int32Type.h"
 #include "types/Int64Type.h"
+#include "types/Uint32Type.h"
 #include "types/BooleanType.h"
 #include "types/StringType.h"
 #include "types/VoidType.h"
@@ -29,6 +30,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 	if (m_name == "long")
 	{
 		return Int64Type::instance();
+	}
+
+	if (m_name == "uint")
+	{
+		return Uint32Type::instance();
 	}
 
 	if (m_name == "bool")
@@ -68,6 +74,13 @@ DzTypeName *DzTypeName::int32()
 DzTypeName *DzTypeName::int64()
 {
 	static DzTypeName typeName("long");
+
+	return &typeName;
+}
+
+DzTypeName *DzTypeName::uint32()
+{
+	static DzTypeName typeName("uint");
 
 	return &typeName;
 }

@@ -1,5 +1,7 @@
 #include <llvm/IR/Constants.h>
 
+#include <regex>
+
 #include "DzIntegralLiteral.h"
 #include "DzTypeName.h"
 #include "EntryPoint.h"
@@ -20,10 +22,22 @@ std::vector<DzResult> DzIntegralLiteral::build(const EntryPoint &entryPoint, Sta
 	auto storageType = type->storageType(*context);
 
 	auto value = TypedValue(type
-		,  llvm::ConstantInt::get((llvm::IntegerType *)storageType, m_value, 10)
+		, getValue(storageType)
 		);
 
 	values.push(value);
 
 	return m_consumer->build(entryPoint, values);
+}
+
+llvm::ConstantInt *DzIntegralLiteral::getValue(llvm::Type *storageType) const
+{
+	auto hex = m_value.find("0x");
+
+	if (hex != std::string::npos)
+	{
+		return llvm::ConstantInt::get((llvm::IntegerType *)storageType, m_value.substr(hex + 1), 16);
+	}
+
+	return llvm::ConstantInt::get((llvm::IntegerType *)storageType, m_value, 10);
 }

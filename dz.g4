@@ -1,11 +1,15 @@
 grammar dz;
 
 program 
-	: (function | structure)*
+	: (function | structure | global)*
 	;
 
 structure
 	: 'struct' ID '{' field (',' field)* '}'
+	;
+
+global
+	: 'global' ID ':' literal
 	;
 
 assignment
@@ -25,6 +29,7 @@ literal
 	| INT'L' #int64Literal
 	| BOOL #boolLiteral
 	| STRING #stringLiteral
+	| INT'u' #uint32Literal
 	;
 	
 expression
@@ -40,10 +45,6 @@ ret
 	: 'return' value=expression? ('->' chained=expression)?
 	;
 
-//conditional
-//	: 'if' '(' expression ')' block
-//	;
-
 block
 	: '{' expression* ret '}'
 	;
@@ -58,6 +59,7 @@ typeName
 	
 INT
 	: '-'?[0-9]+
+	| '0x'[0-9A-F]+
 	;
 
 BOOL

@@ -15,6 +15,8 @@ class TypedValue
 
 		Type *type() const;
 
+		llvm::Constant *constant() const;
+
 		operator llvm::Value *() const;
 
 	private:

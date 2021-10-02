@@ -30,7 +30,7 @@ class Tests : public QObject
 	public:
 		Tests()
 		{
-			scenario24();
+			scenario27();
 		}
 
 	private:
@@ -669,6 +669,43 @@ class Tests : public QObject
 			QCOMPARE(result, 2);
 		}
 
+		void scenario26()
+		{
+			auto result = exec(R"(
+				export int main()
+				{
+					return 0xFF;
+				}
+			)");
+
+			QCOMPARE(result, -1);
+		}
+
+		void scenario27()
+		{
+			auto result = exec(R"(
+				global Constant1: 12;
+				global Constant2: 22u;
+
+				function f(int v)
+				{
+					return 3;
+				}
+
+				function f(uint v)
+				{
+					return 2;
+				}
+
+				export int main()
+				{
+					return f(Constant1) * f(Constant2);
+				}
+			)");
+
+			QCOMPARE(result, 6);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -695,6 +732,8 @@ class Tests : public QObject
 		W_SLOT(scenario23)
 		W_SLOT(scenario24)
 		W_SLOT(scenario25)
+		W_SLOT(scenario26)
+		W_SLOT(scenario27)
 
 	private:
 		ModuleInfo *compile(std::string source)

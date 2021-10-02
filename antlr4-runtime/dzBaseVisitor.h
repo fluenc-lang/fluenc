@@ -23,6 +23,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitGlobal(dzParser::GlobalContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitAssignment(dzParser::AssignmentContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -48,6 +52,10 @@ public:
   }
 
   virtual antlrcpp::Any visitStringLiteral(dzParser::StringLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitUint32Literal(dzParser::Uint32LiteralContext *ctx) override {
     return visitChildren(ctx);
   }
 

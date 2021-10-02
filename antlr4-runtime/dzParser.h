@@ -13,14 +13,14 @@ class  dzParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, INT = 14, 
-    BOOL = 15, OP = 16, STRING = 17, WS = 18, ID = 19
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
+    T__14 = 15, INT = 16, BOOL = 17, OP = 18, STRING = 19, WS = 20, ID = 21
   };
 
   enum {
-    RuleProgram = 0, RuleStructure = 1, RuleAssignment = 2, RuleField = 3, 
-    RuleFunction = 4, RuleLiteral = 5, RuleExpression = 6, RuleRet = 7, 
-    RuleBlock = 8, RuleArgument = 9, RuleTypeName = 10
+    RuleProgram = 0, RuleStructure = 1, RuleGlobal = 2, RuleAssignment = 3, 
+    RuleField = 4, RuleFunction = 5, RuleLiteral = 6, RuleExpression = 7, 
+    RuleRet = 8, RuleBlock = 9, RuleArgument = 10, RuleTypeName = 11
   };
 
   explicit dzParser(antlr4::TokenStream *input);
@@ -35,6 +35,7 @@ public:
 
   class ProgramContext;
   class StructureContext;
+  class GlobalContext;
   class AssignmentContext;
   class FieldContext;
   class FunctionContext;
@@ -53,6 +54,8 @@ public:
     FunctionContext* function(size_t i);
     std::vector<StructureContext *> structure();
     StructureContext* structure(size_t i);
+    std::vector<GlobalContext *> global();
+    GlobalContext* global(size_t i);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -75,6 +78,20 @@ public:
   };
 
   StructureContext* structure();
+
+  class  GlobalContext : public antlr4::ParserRuleContext {
+  public:
+    GlobalContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ID();
+    LiteralContext *literal();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  GlobalContext* global();
 
   class  AssignmentContext : public antlr4::ParserRuleContext {
   public:
@@ -142,6 +159,15 @@ public:
     StringLiteralContext(LiteralContext *ctx);
 
     antlr4::tree::TerminalNode *STRING();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  Uint32LiteralContext : public LiteralContext {
+  public:
+    Uint32LiteralContext(LiteralContext *ctx);
+
+    antlr4::tree::TerminalNode *INT();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

@@ -51,9 +51,11 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitInt64Literal(dzParser::Int64LiteralContext *context) override;
 		antlrcpp::Any visitBoolLiteral(dzParser::BoolLiteralContext *context) override;
 		antlrcpp::Any visitStringLiteral(dzParser::StringLiteralContext *context) override;
+		antlrcpp::Any visitUint32Literal(dzParser::Uint32LiteralContext *context) override;
 		antlrcpp::Any visitStructure(dzParser::StructureContext *context) override;
 		antlrcpp::Any visitInstantiation(dzParser::InstantiationContext *context) override;
 		antlrcpp::Any visitConditional(dzParser::ConditionalContext *context) override;
+		antlrcpp::Any visitGlobal(dzParser::GlobalContext *context) override;
 
 	private:
 		DzValue *m_alpha;
