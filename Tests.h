@@ -796,6 +796,20 @@ class Tests : public QObject
 			QCOMPARE(result, -10);
 		}
 
+		void scenario31()
+		{
+			auto result = exec(R"(
+				// This is a comment
+				export int main()
+				{
+					// This is also a comment
+					return 1; // And this
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -827,6 +841,7 @@ class Tests : public QObject
 		W_SLOT(scenario28)
 		W_SLOT(scenario29)
 		W_SLOT(scenario30)
+		W_SLOT(scenario31)
 
 	private:
 		ModuleInfo *compile(std::string source)

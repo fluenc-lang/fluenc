@@ -1,7 +1,7 @@
 grammar dz;
 
 program 
-	: (function | structure | global)*
+	: (COMMENT | function | structure | global)*
 	;
 
 structure
@@ -31,12 +31,16 @@ literal
 	| STRING #stringLiteral
 	| INT'u' #uint32Literal
 	;
+
+with
+	: 'with' '{' field (',' field)* '}'
+	;
 	
 expression
 	: ID '(' (expression (',' expression)*)? ')'		#call
 	| literal											#constant
 	| left=expression op=OP right=expression			#binary
-	| ID ('.' ID)*										#member
+	| ID ('.' ID)* with?								#member
 	| typeName '{' assignment? (',' assignment)* '}'	#instantiation
 	| 'if' '(' expression ')' block						#conditional
 	;
@@ -78,6 +82,10 @@ OP
 	| '-'
 	| '<='
 	| '>='
+	;
+
+COMMENT
+	: '//' ~[\r\n]* -> skip
 	;
 
 STRING

@@ -14,13 +14,14 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
-    T__14 = 15, INT = 16, BOOL = 17, OP = 18, STRING = 19, WS = 20, ID = 21
+    T__14 = 15, T__15 = 16, INT = 17, BOOL = 18, OP = 19, COMMENT = 20, 
+    STRING = 21, WS = 22, ID = 23
   };
 
   enum {
     RuleProgram = 0, RuleStructure = 1, RuleGlobal = 2, RuleAssignment = 3, 
-    RuleField = 4, RuleFunction = 5, RuleLiteral = 6, RuleExpression = 7, 
-    RuleRet = 8, RuleBlock = 9, RuleArgument = 10, RuleTypeName = 11
+    RuleField = 4, RuleFunction = 5, RuleLiteral = 6, RuleWith = 7, RuleExpression = 8, 
+    RuleRet = 9, RuleBlock = 10, RuleArgument = 11, RuleTypeName = 12
   };
 
   explicit dzParser(antlr4::TokenStream *input);
@@ -40,6 +41,7 @@ public:
   class FieldContext;
   class FunctionContext;
   class LiteralContext;
+  class WithContext;
   class ExpressionContext;
   class RetContext;
   class BlockContext;
@@ -50,6 +52,8 @@ public:
   public:
     ProgramContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    std::vector<antlr4::tree::TerminalNode *> COMMENT();
+    antlr4::tree::TerminalNode* COMMENT(size_t i);
     std::vector<FunctionContext *> function();
     FunctionContext* function(size_t i);
     std::vector<StructureContext *> structure();
@@ -201,6 +205,20 @@ public:
 
   LiteralContext* literal();
 
+  class  WithContext : public antlr4::ParserRuleContext {
+  public:
+    WithContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<FieldContext *> field();
+    FieldContext* field(size_t i);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  WithContext* with();
+
   class  ExpressionContext : public antlr4::ParserRuleContext {
   public:
     ExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -264,6 +282,7 @@ public:
 
     std::vector<antlr4::tree::TerminalNode *> ID();
     antlr4::tree::TerminalNode* ID(size_t i);
+    WithContext *with();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
