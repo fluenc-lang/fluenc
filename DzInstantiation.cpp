@@ -15,7 +15,7 @@ DzInstantiation::DzInstantiation(DzValue *consumer
 	)
 	: m_consumer(consumer)
 	, m_type(type)
-	, m_fields(begin(fields), end(fields))
+	, m_fields(fields)
 {
 }
 
@@ -36,13 +36,22 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	auto prototypeFields = prototype->fields();
 
+	std::unordered_map<std::string, TypedValue> valueByName;
+
+	std::transform(begin(m_fields), end(m_fields), std::insert_iterator(valueByName, begin(valueByName)), [&](auto field)
+	{
+		return std::make_pair(field, values.pop());
+	});
+
 	std::vector<FieldEmbryo> fieldEmbryos;
 
 	std::transform(begin(prototypeFields), end(prototypeFields), index_iterator(), std::back_insert_iterator(fieldEmbryos), [&](auto field, auto index) -> FieldEmbryo
 	{
-		if (m_fields.contains(field.name()))
+		auto value = valueByName.find(field.name());
+
+		if (value != valueByName.end())
 		{
-			return { index, field, values.pop() };
+			return { index, field, value->second };
 		}
 
 		auto defaultValue = field.defaultValue();
@@ -71,9 +80,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	auto dataLayout = module->getDataLayout();
 
-	auto structType = llvm::StructType::create(*context, types, prototype->tag());
-
-	auto align = dataLayout.getABITypeAlign(structType);
+	auto structType = llvm::StructType::get(*context, types);
 
 	auto alloc = entryPoint.alloc(structType);
 
@@ -100,8 +107,6 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 		return { embryo.field.name(), valueType };
 	});
-
-//	auto load = new llvm::LoadInst(structType, alloc, "by_value", false, align, block);
 
 	auto type = new UserType(prototype, structType, fields);
 

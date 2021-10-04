@@ -370,7 +370,7 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 		, fields
 		);
 
-	auto value = std::accumulate(rbegin(assignments), rend(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
+	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
 	{
 		VisitorV4 visitor(consumer, nullptr);
 

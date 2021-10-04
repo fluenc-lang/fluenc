@@ -672,7 +672,7 @@ class Tests : public QObject
 				}
 			)");
 
-			QCOMPARE(result, -1);
+			QCOMPARE(result, 255);
 		}
 
 		void scenario27()
@@ -732,6 +732,70 @@ class Tests : public QObject
 			QCOMPARE(result, 32);
 		}
 
+		void scenario29()
+		{
+			auto result = exec(R"(
+				struct MyStruct
+				{
+					x: 0,
+					y: 0
+				};
+
+				function createStruct()
+				{
+					return MyStruct
+					{
+						x: 10,
+						y: 20
+					};
+				}
+
+				function doStuff(MyStruct s)
+				{
+					return s.x - s.y;
+				}
+
+				export int main()
+				{
+					return doStuff(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, -10);
+		}
+
+		void scenario30()
+		{
+			auto result = exec(R"(
+				struct MyStruct
+				{
+					x: 0,
+					y: 0
+				};
+
+				function createStruct()
+				{
+					return MyStruct
+					{
+						y: 20,
+						x: 10
+					};
+				}
+
+				function doStuff(MyStruct s)
+				{
+					return s.x - s.y;
+				}
+
+				export int main()
+				{
+					return doStuff(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, -10);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -761,6 +825,8 @@ class Tests : public QObject
 		W_SLOT(scenario26)
 		W_SLOT(scenario27)
 		W_SLOT(scenario28)
+		W_SLOT(scenario29)
+		W_SLOT(scenario30)
 
 	private:
 		ModuleInfo *compile(std::string source)

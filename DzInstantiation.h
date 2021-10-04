@@ -22,7 +22,7 @@ class DzInstantiation : public DzValue
 		DzValue *m_consumer;
 		DzTypeName *m_type;
 
-		std::unordered_set<std::string> m_fields;
+		std::vector<std::string> m_fields;
 };
 
 #endif // DZINSTANTIATION_H
