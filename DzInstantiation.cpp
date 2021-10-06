@@ -5,16 +5,17 @@
 #include "DzInstantiation.h"
 #include "DzTypeName.h"
 #include "IndexIterator.h"
+#include "IPrototypeProvider.h"
 
 #include "types/Prototype.h"
 #include "types/UserType.h"
 
 DzInstantiation::DzInstantiation(DzValue *consumer
-	, DzTypeName *type
+	, IPrototypeProvider *prototypeProvider
 	, const std::vector<std::string> &fields
 	)
 	: m_consumer(consumer)
-	, m_type(type)
+	, m_prototypeProvider(prototypeProvider)
 	, m_fields(fields)
 {
 }
@@ -32,16 +33,16 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
-	auto prototype = (Prototype *)m_type->resolve(entryPoint);
-
-	auto prototypeFields = prototype->fields();
-
 	std::unordered_map<std::string, TypedValue> valueByName;
 
 	std::transform(begin(m_fields), end(m_fields), std::insert_iterator(valueByName, begin(valueByName)), [&](auto field)
 	{
 		return std::make_pair(field, values.pop());
 	});
+
+	auto prototype = m_prototypeProvider->provide(entryPoint, values);
+
+	auto prototypeFields = prototype->fields();
 
 	std::vector<FieldEmbryo> fieldEmbryos;
 
@@ -80,6 +81,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	auto dataLayout = module->getDataLayout();
 
+	auto intType = llvm::Type::getInt32Ty(*context);
 	auto structType = llvm::StructType::get(*context, types);
 
 	auto alloc = entryPoint.alloc(structType);
@@ -90,8 +92,8 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 	{
 		llvm::Value *indexes[] =
 		{
-			llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), 0),
-			llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), embryo.index)
+			llvm::ConstantInt::get(intType, 0),
+			llvm::ConstantInt::get(intType, embryo.index)
 		};
 
 		auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, embryo.field.name(), block);
@@ -105,7 +107,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 		UNUSED(store);
 
-		return { embryo.field.name(), valueType };
+		return { embryo.index, embryo.field.name(), valueType };
 	});
 
 	auto type = new UserType(prototype, structType, fields);

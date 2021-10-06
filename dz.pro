@@ -5,6 +5,7 @@ CONFIG += DEBUG
 SOURCES += \
 	AllIterator.cpp \
 	CompilerException.cpp \
+	DefaultPrototypeProvider.cpp \
 	DzArgument.cpp \
 	DzAssignment.cpp \
 	DzBinary.cpp \
@@ -12,6 +13,7 @@ SOURCES += \
 	DzConditional.cpp \
 	DzExportedFunction.cpp \
 	DzExportedFunctionTerminator.cpp \
+	DzFieldAccess.cpp \
 	DzFunction.cpp \
 	DzFunctionCall.cpp \
 	DzGlobal.cpp \
@@ -35,6 +37,7 @@ SOURCES += \
 	Utility.cpp \
 	VisitorV1.cpp \
 	VisitorV4.cpp \
+	WithPrototypeProvider.cpp \
 	main.cpp \
 	antlr4-runtime/dzBaseVisitor.cpp \
 	antlr4-runtime/dzLexer.cpp \
@@ -54,6 +57,7 @@ SOURCES += \
 HEADERS += \
 	AllIterator.h \
 	CompilerException.h \
+	DefaultPrototypeProvider.h \
 	DzArgument.h \
 	DzAssignment.h \
 	DzBinary.h \
@@ -62,6 +66,7 @@ HEADERS += \
 	DzConditional.h \
 	DzExportedFunction.h \
 	DzExportedFunctionTerminator.h \
+	DzFieldAccess.h \
 	DzFunction.h \
 	DzFunctionCall.h \
 	DzGlobal.h \
@@ -78,6 +83,7 @@ HEADERS += \
 	DzValue.h \
 	EntryPoint.h \
 	FunctionAttribute.h \
+	IPrototypeProvider.h \
 	IndexIterator.h \
 	KaleidoscopeJIT.h \
 	Stack.h \
@@ -87,6 +93,7 @@ HEADERS += \
 	UnknownTypeException.h \
 	Utility.h \
 	VisitorV4.h \
+	WithPrototypeProvider.h \
 	antlr4-runtime/dzBaseVisitor.h \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \

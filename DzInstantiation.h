@@ -3,16 +3,20 @@
 
 #include <unordered_set>
 
+#include <llvm/IR/Instructions.h>
+
 #include "DzValue.h"
+#include "DzTypeName.h"
 
 class DzTypeName;
 class DzAssignment;
+class IPrototypeProvider;
 
 class DzInstantiation : public DzValue
 {
 	public:
 		DzInstantiation(DzValue *consumer
-			, DzTypeName *type
+			, IPrototypeProvider *prototypeProvider
 			, const std::vector<std::string> &fields
 			);
 
@@ -20,7 +24,7 @@ class DzInstantiation : public DzValue
 
 	private:
 		DzValue *m_consumer;
-		DzTypeName *m_type;
+		IPrototypeProvider *m_prototypeProvider;
 
 		std::vector<std::string> m_fields;
 };

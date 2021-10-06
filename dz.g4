@@ -33,7 +33,7 @@ literal
 	;
 
 with
-	: 'with' '{' field (',' field)* '}'
+	: 'with' '{' assignment (',' assignment)* '}'
 	;
 	
 expression

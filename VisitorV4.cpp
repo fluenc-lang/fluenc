@@ -24,6 +24,9 @@
 #include "DzInstantiation.h"
 #include "DzGlobal.h"
 #include "DzGlobalTerminator.h"
+#include "IndexIterator.h"
+#include "DefaultPrototypeProvider.h"
+#include "WithPrototypeProvider.h"
 
 #include "types/Prototype.h"
 
@@ -261,6 +264,34 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 	return static_cast<DzValue *>(value);
 }
 
+antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)
+{
+	auto assignments = context->assignment();
+
+	std::vector<std::string> fields;
+
+	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](dzParser::AssignmentContext *assignment)
+	{
+		return assignment->field()->ID()->getText();
+	});
+
+	auto instantiation = new DzInstantiation(m_alpha
+		, WithPrototypeProvider::instance()
+		, fields
+		);
+
+	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
+	{
+		VisitorV4 visitor(consumer, nullptr);
+
+		return visitor
+			.visit(assignment->expression())
+			.as<DzValue *>();
+	});
+
+	return static_cast<DzValue *>(value);
+}
+
 antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 {
 	auto access = context->ID();
@@ -272,6 +303,15 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 
 		return ss.str();
 	});
+
+	auto with = context->with();
+
+	if (with)
+	{
+		auto member = new DzMemberAccess(visit(with), path);
+
+		return static_cast<DzValue *>(member);
+	}
 
 	auto member = new DzMemberAccess(m_alpha, path);
 
@@ -365,8 +405,12 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 		return assignment->field()->ID()->getText();
 	});
 
+	auto typeName = visit(context->typeName())
+		.as<DzTypeName *>();
+
+	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
 	auto instantiation = new DzInstantiation(m_alpha
-		, visit(context->typeName())
+		, prototypeProvider
 		, fields
 		);
 
