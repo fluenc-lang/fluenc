@@ -1,0 +1,163 @@
+import int puts(string str);
+
+import int SDL_Init(uint flags);
+import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
+import int SDL_RenderClear(long renderer);
+import int SDL_RenderFillRect(long renderer, SDL_Rect rect);
+import int SDL_PollKeyEvent(SDL_KeyboardEvent key);
+
+import long SDL_CreateRenderer(long window, int index, int flags);
+import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
+
+import void SDL_RenderPresent(long renderer);
+import void SDL_PumpEvents();
+
+import void printnum(int num);
+
+global SDL_INIT_VIDEO: 0x00000020u;
+global SDL_WINDOWPOS_UNDEFINED: 0x1FFF0000u;
+global SDL_KEYDOWN: 0x300u;
+global SDL_KEYUP: 0x301u;
+global SDLK_a: 0x61u;
+global SDLK_d: 0x64u;
+global SDLK_s: 0x73u;
+global SDLK_w: 0x77u;
+
+struct SDL_Rect
+{
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+};
+
+struct SDL_KeyboardEvent
+{
+    type: 0,
+    timestamp: 0,
+    windowID: 0,
+    padding: 0,
+    scancode: 0,
+    sym: 0,
+    padding: 0L
+};
+
+struct Player
+{
+    x: 0,
+    y: 0
+};
+
+function createKeyboardEvent()
+{
+    return SDL_KeyboardEvent {};
+}
+
+function createPlayer()
+{
+    return Player {};
+}
+
+function processKey(SDL_KeyboardEvent key)
+{
+    SDL_PumpEvents();
+
+    if (SDL_PollKeyEvent(key) == 1)
+    {
+        return key;
+    }
+
+    return nothing;
+}
+
+function updatePlayerPosition(Player player, SDL_KeyboardEvent key)
+{
+    if (key.sym == SDLK_a)
+    {
+        return player with
+        {
+            x: player.x - 1
+        };
+    }
+
+    if (key.sym == SDLK_d)
+    {
+        return player with
+        {
+            x: player.x + 1
+        };
+    }
+
+    if (key.sym == SDLK_w)
+    {
+        return player with
+        {
+            y: player.y - 1
+        };
+    }
+
+    if (key.sym == SDLK_s)
+    {
+        return player with
+        {
+            y: player.y + 1
+        };
+    }
+
+    return player;
+}
+
+function updatePlayerPosition(Player player, without key)
+{
+    return player;
+}
+
+function processEvents(Player player)
+{
+    return updatePlayerPosition(player
+        , processKey(
+            createKeyboardEvent()
+            )
+        );
+}
+
+function rectFromPlayer(Player player)
+{
+    return SDL_Rect
+    {
+        x: player.x,
+        y: player.y,
+        width: 32,
+        height: 32
+    };
+}
+
+function mainLoop(long renderer, Player player)
+{
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    SDL_RenderClear(renderer);
+
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+    SDL_RenderFillRect(renderer
+        , rectFromPlayer(player)
+        );
+
+    SDL_RenderPresent(renderer);
+
+    return mainLoop(renderer
+        , processEvents(player)
+        );
+}
+
+export int main()
+{
+    SDL_Init(SDL_INIT_VIDEO);
+
+    return mainLoop(
+        SDL_CreateRenderer(
+            SDL_CreateWindow("test", 0, 0, 800, 600, 0), 0, 0)
+            , createPlayer()
+        );
+}
