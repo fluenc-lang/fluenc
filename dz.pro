@@ -52,7 +52,9 @@ SOURCES += \
 	types/Uint32Type.cpp \
 	types/UserType.cpp \
 	types/UserTypeField.cpp \
-	types/VoidType.cpp
+	types/VoidType.cpp \
+	types/WithPrototype.cpp \
+	types/WithoutType.cpp
 
 HEADERS += \
 	AllIterator.h \
@@ -100,6 +102,7 @@ HEADERS += \
 	antlr4-runtime/dzVisitor.h \
 	types/BooleanType.h \
 	types/BuiltinType.h \
+	types/IPrototype.h \
 	types/Int32Type.h \
 	types/Int64Type.h \
 	types/Prototype.h \
@@ -110,6 +113,8 @@ HEADERS += \
 	types/UserType.h \
 	types/UserTypeField.h \
 	types/VoidType.h \
+	types/WithPrototype.h \
+	types/WithoutType.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

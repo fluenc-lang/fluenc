@@ -368,7 +368,7 @@ antlrcpp::Any VisitorV4::visitUint32Literal(dzParser::Uint32LiteralContext *cont
 
 antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 {
-	auto name = context->ID()->getText();
+	auto name = context->name->getText();
 	auto inputFields = context->field();
 
 	std::vector<PrototypeField> fields;
@@ -391,7 +391,16 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 		return { name, nullptr };
 	});
 
-	return new Prototype(name, fields);
+	std::vector<DzTypeName *> parentTypes;
+
+	auto parentTypeNames = context->typeName();
+
+	std::transform(begin(parentTypeNames), end(parentTypeNames), std::back_insert_iterator(parentTypes), [this](dzParser::TypeNameContext *typeName) -> DzTypeName *
+	{
+		return visit(typeName);
+	});
+
+	return new Prototype(name, fields, parentTypes);
 }
 
 antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *context)
@@ -458,4 +467,16 @@ antlrcpp::Any VisitorV4::visitGlobal(dzParser::GlobalContext *context)
 		.as<DzValue *>();
 
 	return new DzGlobal(literal, name);
+}
+
+antlrcpp::Any VisitorV4::visitNothing(dzParser::NothingContext *context)
+{
+	UNUSED(context);
+
+	auto constant = new DzIntegralLiteral(m_alpha
+		, DzTypeName::without()
+		, "0"
+		);
+
+	return static_cast<DzValue *>(constant);
 }

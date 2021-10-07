@@ -42,7 +42,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	auto prototype = m_prototypeProvider->provide(entryPoint, values);
 
-	auto prototypeFields = prototype->fields();
+	auto prototypeFields = prototype->fields(entryPoint);
 
 	std::vector<FieldEmbryo> fieldEmbryos;
 

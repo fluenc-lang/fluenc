@@ -4,12 +4,12 @@
 #include "Type.h"
 #include "UserTypeField.h"
 
-class Prototype;
+class IPrototype;
 
 class UserType : public Type
 {
 	public:
-		UserType(Prototype *prototype, llvm::Type *type, const std::vector<UserTypeField> &fields);
+		UserType(IPrototype *prototype, llvm::Type *type, const std::vector<UserTypeField> &fields);
 
 		std::string tag() const override;
 		std::vector<UserTypeField> fields() const;
@@ -17,7 +17,7 @@ class UserType : public Type
 		llvm::Type *storageType(llvm::LLVMContext &) const override;
 
 	private:
-		Prototype *m_prototype;
+		IPrototype *m_prototype;
 
 		llvm::Type *m_type;
 

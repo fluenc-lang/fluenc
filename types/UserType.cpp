@@ -1,7 +1,7 @@
 #include "UserType.h"
 #include "Prototype.h"
 
-UserType::UserType(Prototype *prototype, llvm::Type *type, const std::vector<UserTypeField> &fields)
+UserType::UserType(IPrototype *prototype, llvm::Type *type, const std::vector<UserTypeField> &fields)
 	: m_prototype(prototype)
 	, m_type(type)
 	, m_fields(fields)

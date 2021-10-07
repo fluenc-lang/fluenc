@@ -5,7 +5,7 @@ program
 	;
 
 structure
-	: 'struct' ID '{' field (',' field)* '}'
+	: 'struct' name=ID (':' typeName (',' typeName)*)? '{' field (',' field)* '}'
 	;
 
 global
@@ -30,6 +30,7 @@ literal
 	| BOOL #boolLiteral
 	| STRING #stringLiteral
 	| INT'u' #uint32Literal
+	| 'nothing' #nothing
 	;
 
 with

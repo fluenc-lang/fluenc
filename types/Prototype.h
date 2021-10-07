@@ -1,22 +1,28 @@
 #ifndef PROTOTYPE_H
 #define PROTOTYPE_H
 
-#include "Type.h"
-#include "PrototypeField.h"
+#include "IPrototype.h"
 
-class Prototype : public Type
+class DzTypeName;
+
+class Prototype : public IPrototype
 {
 	public:
-		Prototype(const std::string &tag, const std::vector<PrototypeField> &fields);
+		Prototype(const std::string &tag
+			, const std::vector<PrototypeField> &fields
+			, const std::vector<DzTypeName *> &parentTypes
+			);
 
 		std::string tag() const override;
-		std::vector<PrototypeField> fields() const;
+		std::vector<PrototypeField> fields(const EntryPoint &entryPoint) const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
 	private:
 		std::string m_tag;
+
 		std::vector<PrototypeField> m_fields;
+		std::vector<DzTypeName *> m_parentTypes;
 };
 
 #endif // PROTOTYPE_H

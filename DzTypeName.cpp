@@ -8,6 +8,7 @@
 #include "types/BooleanType.h"
 #include "types/StringType.h"
 #include "types/VoidType.h"
+#include "types/WithoutType.h"
 #include "types/Prototype.h"
 
 DzTypeName::DzTypeName(const std::string &name)
@@ -50,6 +51,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 	if (m_name == "void")
 	{
 		return VoidType::instance();
+	}
+
+	if (m_name == "without")
+	{
+		return WithoutType::instance();
 	}
 
 	auto types = entryPoint.types();
@@ -95,6 +101,13 @@ DzTypeName *DzTypeName::boolean()
 DzTypeName *DzTypeName::string()
 {
 	static DzTypeName typeName("string");
+
+	return &typeName;
+}
+
+DzTypeName *DzTypeName::without()
+{
+	static DzTypeName typeName("without");
 
 	return &typeName;
 }

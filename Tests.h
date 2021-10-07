@@ -895,6 +895,64 @@ class Tests : public QObject
 			QCOMPARE(result, 31);
 		}
 
+		void scenario34()
+		{
+			auto result = exec(R"(
+				function foo()
+				{
+					return nothing;
+				}
+
+				function bar(without v)
+				{
+					return 20;
+				}
+
+				export int main()
+				{
+					return bar(foo());
+				}
+			)");
+
+			QCOMPARE(result, 20);
+		}
+
+		void scenario35()
+		{
+			auto result = exec(R"(
+				struct Bar
+				{
+					x: 0
+				};
+
+				struct Foo : Bar
+				{
+					y: 0
+				};
+
+				function foo()
+				{
+					return Foo
+					{
+						x: 1,
+						y: 2
+					};
+				}
+
+				function add(Foo f)
+				{
+					return f.x - f.y;
+				}
+
+				export int main()
+				{
+					return add(foo());
+				}
+			)");
+
+			QCOMPARE(result, -1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -929,6 +987,8 @@ class Tests : public QObject
 		W_SLOT(scenario31)
 		W_SLOT(scenario32)
 		W_SLOT(scenario33)
+		W_SLOT(scenario34)
+		W_SLOT(scenario35)
 
 	private:
 		ModuleInfo *compile(std::string source)

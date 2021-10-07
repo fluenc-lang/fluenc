@@ -20,6 +20,7 @@ class DzTypeName
 		static DzTypeName *uint32();
 		static DzTypeName *boolean();
 		static DzTypeName *string();
+		static DzTypeName *without();
 
 	private:
 		std::string m_name;
