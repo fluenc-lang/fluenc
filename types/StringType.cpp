@@ -1,4 +1,5 @@
 #include "StringType.h"
+#include "Utility.h"
 
 std::string StringType::tag() const
 {

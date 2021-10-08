@@ -18,6 +18,8 @@ class Prototype : public IPrototype
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
+		bool is(const Type *type, const EntryPoint &entryPoint) const override;
+
 	private:
 		std::string m_tag;
 

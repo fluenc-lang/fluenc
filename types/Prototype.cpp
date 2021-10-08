@@ -35,3 +35,23 @@ llvm::Type *Prototype::storageType(llvm::LLVMContext &context) const
 {
 	return llvm::Type::getInt8PtrTy(context);
 }
+
+bool Prototype::is(const Type *type, const EntryPoint &entryPoint) const
+{
+	if (type->tag() == m_tag)
+	{
+		return true;
+	}
+
+	for (auto parentType : m_parentTypes)
+	{
+		auto prototype = parentType->resolve(entryPoint);
+
+		if (prototype->is(type, entryPoint))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}

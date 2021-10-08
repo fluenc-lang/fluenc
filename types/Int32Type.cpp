@@ -1,4 +1,5 @@
 #include "Int32Type.h"
+#include "Utility.h"
 
 std::string Int32Type::tag() const
 {

@@ -53,7 +53,7 @@ bool DzImportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, cons
 		auto argumentType = argument->type(entryPoint);
 		auto valueType = value.type();
 
-		return argumentType->tag() == valueType->tag();
+		return valueType->is(argumentType, entryPoint);
 	});
 
 	return result;

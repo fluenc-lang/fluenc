@@ -1,4 +1,5 @@
 #include "BooleanType.h"
+#include "Utility.h"
 
 std::string BooleanType::tag() const
 {

@@ -953,6 +953,47 @@ class Tests : public QObject
 			QCOMPARE(result, -1);
 		}
 
+		void scenario36()
+		{
+			auto result = exec(R"(
+				struct Bar
+				{
+					x: 0
+				};
+
+				struct Foo : Bar
+				{
+					y: 0
+				};
+
+				function foo()
+				{
+					return Foo
+					{
+						x: 1,
+						y: 2
+					};
+				}
+
+				function getY(Foo f)
+				{
+					return f.y;
+				}
+
+				function add(Bar b)
+				{
+					return b.x - getY(b);
+				}
+
+				export int main()
+				{
+					return add(foo());
+				}
+			)");
+
+			QCOMPARE(result, -1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -989,6 +1030,7 @@ class Tests : public QObject
 		W_SLOT(scenario33)
 		W_SLOT(scenario34)
 		W_SLOT(scenario35)
+		W_SLOT(scenario36)
 
 	private:
 		ModuleInfo *compile(std::string source)

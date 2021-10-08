@@ -1,6 +1,7 @@
 #include <llvm/IR/Type.h>
 
 #include "WithoutType.h"
+#include "Utility.h"
 
 std::string WithoutType::tag() const
 {

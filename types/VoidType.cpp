@@ -1,4 +1,5 @@
 #include "VoidType.h"
+#include "Utility.h"
 
 std::string VoidType::tag() const
 {

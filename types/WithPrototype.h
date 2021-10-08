@@ -14,6 +14,8 @@ class WithPrototype : public IPrototype
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
+		bool is(const Type *type, const EntryPoint &entryPoint) const override;
+
 	private:
 		TypedValue m_value;
 };

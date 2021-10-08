@@ -22,3 +22,8 @@ llvm::Type *UserType::storageType(llvm::LLVMContext &) const
 {
 	return m_type->getPointerTo();
 }
+
+bool UserType::is(const Type *type, const EntryPoint &entryPoint) const
+{
+	return m_prototype->is(type, entryPoint);
+}
