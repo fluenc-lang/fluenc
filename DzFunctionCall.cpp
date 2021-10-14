@@ -31,16 +31,16 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 	if (tailCallTarget)
 	{
+		llvm::IRBuilder<> builder(block);
+
 		auto tailCallValues = tailCallTarget->values();
 
 		for (auto i = 0u; i < m_numberOfArguments; i++)
 		{
-			llvm::IRBuilder<> builder(block);
-
 			builder.CreateStore(values.pop(), tailCallValues.pop());
 		}
 
-		linkBlocks(block, tailCallTarget->block());
+		linkBlocks(block, tailCallTarget->entry());
 
 		return std::vector<DzResult>();
 	}
@@ -73,7 +73,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 				builder.CreateStore(value, alloc);
 
-				values.push(TypedValue(argumentType, alloc));
+				values.push({ argumentType, alloc });
 			}
 
 			auto functionBlock = llvm::BasicBlock::Create(*context);

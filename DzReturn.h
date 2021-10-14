@@ -6,12 +6,13 @@
 class DzReturn : public DzValue
 {
 	public:
-		DzReturn(DzValue *consumer);
+		DzReturn(DzValue *consumer, DzValue *chained);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		DzValue *m_consumer;
+		DzValue *m_chained;
 };
 
 #endif // DZRETURN_H

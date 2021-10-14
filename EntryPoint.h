@@ -18,6 +18,7 @@ class EntryPoint
 		EntryPoint(const EntryPoint *parent
 			, llvm::BasicBlock *block
 			, llvm::BasicBlock *alloc
+			, llvm::BasicBlock *entry
 			, llvm::Function *function
 			, llvm::Value *returnValueAddress
 			, std::unique_ptr<llvm::Module> *module
@@ -33,6 +34,8 @@ class EntryPoint
 		EntryPoint(const EntryPoint &) = default;
 
 		llvm::BasicBlock *block() const;
+		llvm::BasicBlock *entry() const;
+
 		llvm::Function *function() const;
 		llvm::Value *returnValueAddress() const;
 
@@ -53,6 +56,7 @@ class EntryPoint
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
+		EntryPoint withEntry(llvm::BasicBlock *entry) const;
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, TypedValue> &locals) const;
 		EntryPoint withName(const std::string &name) const;
@@ -64,6 +68,7 @@ class EntryPoint
 
 		llvm::BasicBlock *m_block;
 		llvm::BasicBlock *m_alloc;
+		llvm::BasicBlock *m_entry;
 
 		llvm::Function *m_function;
 		llvm::Value *m_returnValueAddress;

@@ -7,9 +7,11 @@
 #include "DzReturn.h"
 #include "EntryPoint.h"
 #include "Type.h"
+#include "DzExportedFunctionTerminator.h"
 
-DzReturn::DzReturn(DzValue *consumer)
+DzReturn::DzReturn(DzValue *consumer, DzValue *chained)
 	: m_consumer(consumer)
+	, m_chained(chained)
 {
 }
 
@@ -39,5 +41,8 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	values.push({ type, load });
 
-	return m_consumer->build(entryPoint, values);
+	auto ep = entryPoint
+		.withReturnValueAddress(alloc);
+
+	return m_consumer->build(ep, values);
 }

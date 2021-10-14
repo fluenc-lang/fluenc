@@ -76,6 +76,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, nullptr
 		, nullptr
 		, nullptr
+		, nullptr
 		, &module
 		, &llvmContext
 		, "term"
@@ -129,6 +130,11 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 		{
 			return FunctionAttribute::Export;
 		}
+
+		if (attribute == "recursive")
+		{
+			return FunctionAttribute::Recursive;
+		}
 	}
 
 	return FunctionAttribute::None;
@@ -176,7 +182,8 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 	VisitorV4 visitor(terminator, nullptr);
 
-	auto function = new DzFunction(name
+	auto function = new DzFunction(attribute
+		, name
 		, arguments
 		, visitor.visit(block)
 		);
@@ -198,7 +205,7 @@ antlrcpp::Any VisitorV4::visitArgument(dzParser::ArgumentContext *context)
 
 antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 {
-	auto ret = new DzReturn(m_alpha);
+	auto ret = new DzReturn(m_alpha, nullptr);
 
 	VisitorV4 visitor(ret, nullptr);
 
@@ -479,4 +486,9 @@ antlrcpp::Any VisitorV4::visitNothing(dzParser::NothingContext *context)
 		);
 
 	return static_cast<DzValue *>(constant);
+}
+
+antlrcpp::Any VisitorV4::visitGroup(dzParser::GroupContext *context)
+{
+	return visit(context->expression());
 }

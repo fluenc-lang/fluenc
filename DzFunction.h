@@ -8,8 +8,9 @@ class DzArgument;
 class DzFunction : public DzCallable
 {
 	public:
-		DzFunction(const std::string &name
-			, std::vector<DzArgument *> arguments
+		DzFunction(FunctionAttribute attribute
+			, const std::string &name
+			, const std::vector<DzArgument *> &arguments
 			, DzValue *block
 			);
 
@@ -22,6 +23,8 @@ class DzFunction : public DzCallable
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		FunctionAttribute m_attribute;
+
 		std::string m_name;
 		std::vector<DzArgument *> m_arguments;
 

@@ -79,6 +79,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitArray(dzParser::ArrayContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitBinary(dzParser::BinaryContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -88,6 +92,10 @@ public:
   }
 
   virtual antlrcpp::Any visitInstantiation(dzParser::InstantiationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitGroup(dzParser::GroupContext *ctx) override {
     return visitChildren(ctx);
   }
 

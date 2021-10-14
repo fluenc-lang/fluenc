@@ -15,11 +15,13 @@
 
 #include "types/UserType.h"
 
-DzFunction::DzFunction(const std::string &name
-	, std::vector<DzArgument *> arguments
+DzFunction::DzFunction(FunctionAttribute attribute
+	, const std::string &name
+	, const std::vector<DzArgument *> &arguments
 	, DzValue *block
 	)
-	: m_name(name)
+	: m_attribute(attribute)
+	, m_name(name)
 	, m_arguments(arguments)
 	, m_block(block)
 {
@@ -32,7 +34,7 @@ std::string DzFunction::name() const
 
 FunctionAttribute DzFunction::attribute() const
 {
-	return FunctionAttribute::None;
+	return m_attribute;
 }
 
 bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values, size_t numberOfArguments) const
@@ -129,6 +131,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 
 	auto ep = pep
 		.withName(m_name)
+		.withEntry(block)
 		.withLocals(locals);
 
 	return m_block->build(ep, values);

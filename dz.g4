@@ -44,6 +44,8 @@ expression
 	| ID ('.' ID)* with?								#member
 	| typeName '{' assignment? (',' assignment)* '}'	#instantiation
 	| 'if' '(' expression ')' block						#conditional
+	| '[' expression? (',' expression)* ']'				#array
+	| '(' expression ')'								#group
 	;
 
 ret
