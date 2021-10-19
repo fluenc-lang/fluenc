@@ -27,6 +27,7 @@
 #include "IndexIterator.h"
 #include "DefaultPrototypeProvider.h"
 #include "WithPrototypeProvider.h"
+#include "StackSegment.h"
 
 #include "types/Prototype.h"
 
@@ -252,8 +253,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 {
 	auto expression = context->expression();
 
-	auto call = new DzFunctionCall(m_alpha
-		, context->ID()->getText()
+	auto call = new DzFunctionCall(context->ID()->getText()
 		, expression.size()
 		);
 
@@ -268,7 +268,9 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 		return result;
 	});
 
-	return static_cast<DzValue *>(value);
+	auto segment = new StackSegment(value, m_alpha);
+
+	return static_cast<DzValue *>(segment);
 }
 
 antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)

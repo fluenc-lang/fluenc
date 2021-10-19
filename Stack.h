@@ -13,6 +13,8 @@ class Stack
 		Stack() = default;
 		Stack(const Stack &other) = default;
 
+		size_t size() const;
+
 		std::vector<TypedValue, std::allocator<TypedValue>>::const_iterator begin() const;
 		std::vector<TypedValue, std::allocator<TypedValue>>::const_iterator end() const;
 

@@ -8,7 +8,7 @@ class IPrototype;
 class IPrototypeProvider
 {
 	public:
-		virtual IPrototype *provide(const EntryPoint &entryPoint, Stack values) = 0;
+		virtual IPrototype *provide(const EntryPoint &entryPoint, Stack &values) = 0;
 };
 
 #endif // IPROTOTYPEPROVIDER_H

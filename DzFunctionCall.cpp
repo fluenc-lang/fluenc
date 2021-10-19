@@ -9,9 +9,8 @@
 #include "EntryPoint.h"
 #include "Type.h"
 
-DzFunctionCall::DzFunctionCall(DzValue *consumer, const std::string name, size_t numberOfArguments)
-	: m_consumer(consumer)
-	, m_name(name)
+DzFunctionCall::DzFunctionCall(const std::string name, size_t numberOfArguments)
+	: m_name(name)
 	, m_numberOfArguments(numberOfArguments)
 {
 }
@@ -24,6 +23,8 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
 
+	auto numberOfArguments = values.size();
+
 	block->insertInto(function);
 
 	auto tailCallTarget = entryPoint
@@ -35,7 +36,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 		auto tailCallValues = tailCallTarget->values();
 
-		for (auto i = 0u; i < m_numberOfArguments; i++)
+		for (auto i = 0u; i < numberOfArguments; i++)
 		{
 			builder.CreateStore(values.pop(), tailCallValues.pop());
 		}
@@ -49,11 +50,11 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 	{
 		auto function = i->second;
 
-		if (function->hasMatchingSignature(entryPoint, values, m_numberOfArguments))
+		if (function->hasMatchingSignature(entryPoint, values))
 		{
 			std::vector<TypedValue> argumentValues;
 
-			for (auto i = 0u; i < m_numberOfArguments; i++)
+			for (auto i = 0u; i < numberOfArguments; i++)
 			{
 				auto value = values.pop();
 
@@ -85,21 +86,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 			if (function->attribute() == FunctionAttribute::Import)
 			{
-				std::vector<DzResult> result;
-
-				auto functionResults = function->build(functionEntryPoint, values);
-
-				for (const auto &[_, returnValue] : functionResults)
-				{
-					auto consumerResults = m_consumer->build(functionEntryPoint, returnValue);
-
-					for (const auto &consumerResult : consumerResults)
-					{
-						result.push_back(consumerResult);
-					}
-				}
-
-				return result;
+				return function->build(functionEntryPoint, values);
 			}
 
 			std::vector<DzResult> result;
@@ -115,12 +102,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 				auto consumerEntryPoint = functionEntryPoint
 					.withBlock(consumerBlock);
 
-				auto consumerResults = m_consumer->build(consumerEntryPoint, returnValue);
-
-				for (const auto &consumerResult : consumerResults)
-				{
-					result.push_back(consumerResult);
-				}
+				result.push_back({ consumerEntryPoint, returnValue });
 			}
 
 			return result;

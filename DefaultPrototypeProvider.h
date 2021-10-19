@@ -10,7 +10,7 @@ class DefaultPrototypeProvider : public IPrototypeProvider
 	public:
 		DefaultPrototypeProvider(DzTypeName *type);
 
-		IPrototype *provide(const EntryPoint &entryPoint, Stack values) override;
+		IPrototype *provide(const EntryPoint &entryPoint, Stack &values) override;
 
 	private:
 		DzTypeName *m_type;

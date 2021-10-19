@@ -31,6 +31,7 @@ SOURCES += \
 	IndexIterator.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
+	StackSegment.cpp \
 	TypedValue.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
@@ -89,6 +90,7 @@ HEADERS += \
 	IndexIterator.h \
 	KaleidoscopeJIT.h \
 	Stack.h \
+	StackSegment.h \
 	Tests.h \
 	TypedValue.h \
 	UndeclaredIdentifierException.h \

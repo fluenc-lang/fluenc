@@ -37,13 +37,9 @@ FunctionAttribute DzFunction::attribute() const
 	return m_attribute;
 }
 
-bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values, size_t numberOfArguments) const
+bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values) const
 {
-	// Sanity check.
-	// TODO: Introduce slicing of stack, to only expose a sane amount of values.
-	// Then this parameter (and check) can be removed.
-
-	if (m_arguments.size() != numberOfArguments)
+	if (m_arguments.size() != values.size())
 	{
 		return false;
 	}

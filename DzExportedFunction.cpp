@@ -32,11 +32,10 @@ FunctionAttribute DzExportedFunction::attribute() const
 	return FunctionAttribute::Export;
 }
 
-bool DzExportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values, size_t numberOfArguments) const
+bool DzExportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values) const
 {
 	UNUSED(entryPoint);
 	UNUSED(values);
-	UNUSED(numberOfArguments);
 
 	return true;
 }

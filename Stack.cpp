@@ -1,5 +1,10 @@
 #include "Stack.h"
 
+size_t Stack::size() const
+{
+	return m_values.size();
+}
+
 std::vector<TypedValue, std::allocator<TypedValue>>::const_iterator Stack::begin() const
 {
 	return m_values.begin();

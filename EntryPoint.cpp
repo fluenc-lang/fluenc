@@ -111,7 +111,9 @@ const EntryPoint *EntryPoint::byName(const std::string &name) const
 
 EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 {
-	return EntryPoint(this
+	auto parent = new EntryPoint(*this);
+
+	return EntryPoint(parent
 		, block
 		, m_alloc
 		, m_entry
@@ -147,7 +149,9 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 
 EntryPoint EntryPoint::withEntry(llvm::BasicBlock *entry) const
 {
-	return EntryPoint(this
+	auto parent = new EntryPoint(*this);
+
+	return EntryPoint(parent
 		, m_block
 		, m_alloc
 		, entry
@@ -201,7 +205,9 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, TypedValue> &local
 
 EntryPoint EntryPoint::withName(const std::string &name) const
 {
-	return EntryPoint(this
+	auto parent = new EntryPoint(*this);
+
+	return EntryPoint(parent
 		, m_block
 		, m_alloc
 		, m_entry

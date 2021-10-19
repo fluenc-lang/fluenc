@@ -1,6 +1,7 @@
 # Binary
 dz
 a.out
+examples/sdl_basic/hello_world
 
 # Qt
 *.pro.user

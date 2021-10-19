@@ -6,7 +6,7 @@ DefaultPrototypeProvider::DefaultPrototypeProvider(DzTypeName *type)
 {
 }
 
-IPrototype *DefaultPrototypeProvider::provide(const EntryPoint &entryPoint, Stack values)
+IPrototype *DefaultPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &values)
 {
 	UNUSED(values);
 
