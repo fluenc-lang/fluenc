@@ -46,7 +46,9 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 		for (auto i = 0u; i < numberOfArguments; i++)
 		{
-			builder.CreateStore(values.pop(), tailCallValues.pop());
+			auto load = builder.CreateLoad(values.pop());
+
+			builder.CreateStore(load, tailCallValues.pop());
 		}
 
 		linkBlocks(block, tailCallTarget->entry());
@@ -60,31 +62,6 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 		if (function->hasMatchingSignature(entryPoint, values))
 		{
-			std::vector<TypedValue> argumentValues;
-
-			for (auto i = 0u; i < numberOfArguments; i++)
-			{
-				auto value = values.pop();
-
-				argumentValues.push_back(value);
-			}
-
-			for (auto i = rbegin(argumentValues); i != rend(argumentValues); i++)
-			{
-				llvm::IRBuilder<> builder(block);
-
-				auto value = *i;
-
-				auto argumentType = value.type();
-				auto storageType = argumentType->storageType(*context);
-
-				auto alloc = entryPoint.alloc(storageType);
-
-				builder.CreateStore(value, alloc);
-
-				values.push({ argumentType, alloc });
-			}
-
 			auto functionBlock = llvm::BasicBlock::Create(*context);
 
 			linkBlocks(block, functionBlock);

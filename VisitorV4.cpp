@@ -2,6 +2,7 @@
 
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/IR/IRBuilder.h>
 
 #include "VisitorV4.h"
 #include "EntryPoint.h"
@@ -267,17 +268,6 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 			.visit(parameter)
 			.as<DzValue *>();
 	});
-
-//	auto value = std::accumulate(begin(expression), end(expression), static_cast<DzValue *>(call), [](DzValue *consumer, dzParser::ExpressionContext *parameter)
-//	{
-//		VisitorV4 visitor(consumer, nullptr);
-
-//		auto result = visitor
-//			.visit(parameter)
-//			.as<DzValue *>();
-
-//		return result;
-//	});
 
 	auto segment = new StackSegment(values, call, m_alpha);
 
