@@ -10,6 +10,14 @@ DzStringLiteral::DzStringLiteral(DzValue *consumer, const std::string &value)
 {
 }
 
+int DzStringLiteral::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzStringLiteral::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();

@@ -6,12 +6,16 @@
 class StackSegment : public DzValue
 {
 	public:
-		StackSegment(DzValue *subject, DzValue *consumer);
+		StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue *consumer);
+
+		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		DzValue *m_subject;
+		std::vector<DzValue *> m_values;
+
+		DzValue *m_call;
 		DzValue *m_consumer;
 };
 

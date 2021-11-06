@@ -8,6 +8,14 @@ DzGlobalTerminator::DzGlobalTerminator(const std::string &name)
 {
 }
 
+int DzGlobalTerminator::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzGlobalTerminator::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();

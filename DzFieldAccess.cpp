@@ -10,6 +10,14 @@ DzFieldAccess::DzFieldAccess(llvm::Value *instance, const UserTypeField &field)
 {
 }
 
+int DzFieldAccess::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack values) const
 {
 	UNUSED(values);

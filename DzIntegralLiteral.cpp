@@ -14,6 +14,14 @@ DzIntegralLiteral::DzIntegralLiteral(DzValue *consumer, DzTypeName *type, const 
 {
 }
 
+int DzIntegralLiteral::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzIntegralLiteral::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();

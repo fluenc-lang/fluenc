@@ -62,6 +62,14 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 	return result;
 }
 
+int DzFunction::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();

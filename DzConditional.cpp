@@ -11,6 +11,14 @@ DzConditional::DzConditional(DzValue *ifFalse, DzValue *ifTrue)
 {
 }
 
+int DzConditional::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();

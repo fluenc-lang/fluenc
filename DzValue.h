@@ -16,6 +16,8 @@ struct DzResult
 class DzValue
 {
 	public:
+		virtual int compare(DzValue *other, const EntryPoint &entryPoint) const = 0;
+
 		virtual std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const = 0;
 };
 

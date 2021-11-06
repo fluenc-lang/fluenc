@@ -257,18 +257,29 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 		, expression.size()
 		);
 
-	auto value = std::accumulate(begin(expression), end(expression), static_cast<DzValue *>(call), [](DzValue *consumer, dzParser::ExpressionContext *parameter)
-	{
-		VisitorV4 visitor(consumer, nullptr);
+	std::vector<DzValue *> values;
 
-		auto result = visitor
+	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [](dzParser::ExpressionContext *parameter)
+	{
+		VisitorV4 visitor(DzTerminator::instance(), nullptr);
+
+		return visitor
 			.visit(parameter)
 			.as<DzValue *>();
-
-		return result;
 	});
 
-	auto segment = new StackSegment(value, m_alpha);
+//	auto value = std::accumulate(begin(expression), end(expression), static_cast<DzValue *>(call), [](DzValue *consumer, dzParser::ExpressionContext *parameter)
+//	{
+//		VisitorV4 visitor(consumer, nullptr);
+
+//		auto result = visitor
+//			.visit(parameter)
+//			.as<DzValue *>();
+
+//		return result;
+//	});
+
+	auto segment = new StackSegment(values, call, m_alpha);
 
 	return static_cast<DzValue *>(segment);
 }

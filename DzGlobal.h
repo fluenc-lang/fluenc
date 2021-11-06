@@ -9,6 +9,8 @@ class DzGlobal : public DzValue
 	public:
 		DzGlobal(DzValue *value, const std::string &name);
 
+		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
+
 		std::string name() const;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;

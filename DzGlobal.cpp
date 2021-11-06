@@ -9,6 +9,14 @@ DzGlobal::DzGlobal(DzValue *value, const std::string &name)
 {
 }
 
+int DzGlobal::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::string DzGlobal::name() const
 {
 	return m_name;

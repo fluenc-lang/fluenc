@@ -40,6 +40,14 @@ bool DzExportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, cons
 	return true;
 }
 
+int DzExportedFunction::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzExportedFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();

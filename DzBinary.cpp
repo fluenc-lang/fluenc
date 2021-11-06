@@ -11,6 +11,14 @@ DzBinary::DzBinary(DzValue *consumer, const std::string &op)
 {
 }
 
+int DzBinary::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzBinary::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto left = values.pop();

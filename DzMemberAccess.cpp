@@ -11,6 +11,14 @@ DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 {
 }
 
+int DzMemberAccess::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();

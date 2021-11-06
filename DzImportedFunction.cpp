@@ -20,6 +20,14 @@ DzImportedFunction::DzImportedFunction(const std::string &name
 {
 }
 
+int DzImportedFunction::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::string DzImportedFunction::name() const
 {
 	return m_name;

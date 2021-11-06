@@ -11,6 +11,14 @@ DzTerminator::DzTerminator(const std::string &name)
 {
 }
 
+int DzTerminator::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzTerminator::build(const EntryPoint &entryPoint, Stack values) const
 {
 	return {{ entryPoint, values }};

@@ -15,6 +15,14 @@ DzFunctionCall::DzFunctionCall(const std::string name, size_t numberOfArguments)
 {
 }
 
+int DzFunctionCall::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();

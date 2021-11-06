@@ -20,6 +20,14 @@ DzInstantiation::DzInstantiation(DzValue *consumer
 {
 }
 
+int DzInstantiation::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack values) const
 {
 	struct FieldEmbryo

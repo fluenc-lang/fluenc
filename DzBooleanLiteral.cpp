@@ -10,6 +10,14 @@ DzBooleanLiteral::DzBooleanLiteral(DzValue *consumer, const std::string &value)
 {
 }
 
+int DzBooleanLiteral::compare(DzValue *other, const EntryPoint &entryPoint) const
+{
+	UNUSED(other);
+	UNUSED(entryPoint);
+
+	return -1;
+}
+
 TypedValue DzBooleanLiteral::resolveValue(const EntryPoint &entryPoint) const
 {
 	auto &context = entryPoint.context();
