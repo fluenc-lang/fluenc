@@ -89,6 +89,7 @@ HEADERS += \
 	FunctionAttribute.h \
 	IPrototypeProvider.h \
 	IndexIterator.h \
+	IndexedValue.h \
 	KaleidoscopeJIT.h \
 	Stack.h \
 	StackSegment.h \

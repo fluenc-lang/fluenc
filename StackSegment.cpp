@@ -4,6 +4,8 @@
 
 #include "StackSegment.h"
 #include "Type.h"
+#include "IndexIterator.h"
+#include "IndexedValue.h"
 
 StackSegment::StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue *consumer)
 	: m_values(values)
@@ -30,25 +32,40 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 	std::vector<DzResult> result;
 	std::vector<DzResult> input = {{ entryPoint, Stack() }};
 
-	auto orderedValues = m_values;
+	std::vector<IndexedValue> orderedValues;
+
+	std::transform(begin(m_values), end(m_values), index_iterator(), std::back_insert_iterator(orderedValues), [](auto value, auto index) -> IndexedValue
+	{
+		return { index, value };
+	});
 
 	std::sort(begin(orderedValues), end(orderedValues), [=](auto first, auto second)
 	{
-		return first->compare(second, entryPoint);
+		return first.value->compare(second.value, entryPoint);
 	});
 
-	auto subjectResults = std::accumulate(begin(orderedValues), end(orderedValues), input, [=](auto accumulator, auto value)
+	auto subjectResults = std::accumulate(begin(orderedValues), end(orderedValues), input, [=](auto accumulator, auto argument)
 	{
-		std::vector<DzResult> results;
+		std::multimap<int, DzResult> results;
 
 		for (auto &[accumulatorEntryPoint, accumulatorValues] : accumulator)
 		{
-			auto result = value->build(accumulatorEntryPoint, accumulatorValues);
+			auto result = argument.value->build(accumulatorEntryPoint, accumulatorValues);
 
-			results.insert(end(results), begin(result), end(result));
+			for (auto &r : result)
+			{
+				results.insert({ argument.index, r });
+			}
 		}
 
-		return results;
+		std::vector<DzResult> orderedResults;
+
+		std::transform(begin(results), end(results), std::back_insert_iterator(orderedResults), [](auto pair)
+		{
+			return pair.second;
+		});
+
+		return orderedResults;
 	});
 
 	for (auto &[subjectEntryPoint, subjectValues] : subjectResults)
