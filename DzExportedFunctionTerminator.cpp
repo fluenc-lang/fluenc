@@ -22,7 +22,7 @@ std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entr
 
 	linkBlocks(previous, block);
 
-	auto returnValue = values.pop();
+	auto returnValue = values.require<TypedValue>();
 
 	llvm::IRBuilder<> builder(block);
 	builder.CreateRet(*returnValue);

@@ -55,7 +55,8 @@ SOURCES += \
 	types/UserTypeField.cpp \
 	types/VoidType.cpp \
 	types/WithPrototype.cpp \
-	types/WithoutType.cpp
+	types/WithoutType.cpp \
+	values/ArgumentValue.cpp
 
 HEADERS += \
 	AllIterator.h \
@@ -117,6 +118,8 @@ HEADERS += \
 	types/VoidType.h \
 	types/WithPrototype.h \
 	types/WithoutType.h \
+	values/ArgumentValue.h \
+	values/BaseValue.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

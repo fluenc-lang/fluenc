@@ -46,9 +46,9 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 		for (auto i = 0u; i < numberOfArguments; i++)
 		{
-			auto load = builder.CreateLoad(*values.pop());
+			auto load = builder.CreateLoad(*values.require<TypedValue>());
 
-			builder.CreateStore(load, *tailCallValues.pop());
+			builder.CreateStore(load, *tailCallValues.require<TypedValue>());
 		}
 
 		linkBlocks(block, tailCallTarget->entry());

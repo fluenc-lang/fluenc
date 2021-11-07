@@ -5,27 +5,27 @@ size_t Stack::size() const
 	return m_values.size();
 }
 
-std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_iterator Stack::begin() const
+std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator Stack::begin() const
 {
 	return m_values.begin();
 }
 
-std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_iterator Stack::end() const
+std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator Stack::end() const
 {
 	return m_values.end();
 }
 
-std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_reverse_iterator Stack::rbegin() const
+std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator Stack::rbegin() const
 {
 	return m_values.rbegin();
 }
 
-std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_reverse_iterator Stack::rend() const
+std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator Stack::rend() const
 {
 	return m_values.rend();
 }
 
-const TypedValue *Stack::pop()
+const BaseValue *Stack::pop()
 {
 	auto value = m_values.back();
 
@@ -34,7 +34,7 @@ const TypedValue *Stack::pop()
 	return value;
 }
 
-void Stack::push(const TypedValue *value)
+void Stack::push(const BaseValue *value)
 {
 	m_values.push_back(value);
 }

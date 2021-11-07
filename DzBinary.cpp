@@ -21,8 +21,8 @@ int DzBinary::compare(DzValue *other, const EntryPoint &entryPoint) const
 
 std::vector<DzResult> DzBinary::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto left = values.pop();
-	auto right = values.pop();
+	auto left = values.require<TypedValue>();
+	auto right = values.require<TypedValue>();
 
 	auto value = resolveOp(entryPoint, left, right);
 

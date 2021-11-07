@@ -34,7 +34,7 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	block->setName(name);
 	block->insertInto(function);
 
-	auto value = values.pop();
+	auto value = values.require<TypedValue>();
 
 	auto type = value->type();
 	auto storageType = type->storageType(*context);

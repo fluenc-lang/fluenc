@@ -88,7 +88,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 	{
 		auto name = argument->name();
 
-		auto addressOfArgument = values.pop();
+		auto addressOfArgument = values.require<TypedValue>();
 
 		auto argumentType = addressOfArgument->type();
 		auto storageType = argumentType->storageType(*context);

@@ -95,7 +95,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 		for (auto &[_, globalValues] : result->build(entryPoint, values))
 		{
-			locals.insert({ result->name(), *globalValues.begin() });
+			locals.insert({ result->name(), static_cast<const TypedValue *>(*globalValues.begin()) });
 		}
 	}
 

@@ -5,9 +5,11 @@
 #include <llvm/IR/Value.h>
 #include <llvm/IR/DerivedTypes.h>
 
+#include "values/BaseValue.h"
+
 class Type;
 
-class TypedValue
+class TypedValue : public BaseValue
 {
 	public:
 		TypedValue();

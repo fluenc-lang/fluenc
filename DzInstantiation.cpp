@@ -45,7 +45,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::transform(begin(m_fields), end(m_fields), std::insert_iterator(valueByName, begin(valueByName)), [&](auto field)
 	{
-		return std::make_pair(field, values.pop());
+		return std::make_pair(field, values.require<TypedValue>());
 	});
 
 	auto prototype = m_prototypeProvider->provide(entryPoint, values);
@@ -72,7 +72,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 		for (auto &[_, defaultValues] : defaultValue->build(entryPoint, Stack()))
 		{
-			return { index, field, *defaultValues.begin() };
+			return { index, field, static_cast<const TypedValue *>(*defaultValues.begin()) };
 		}
 
 		throw new std::exception();

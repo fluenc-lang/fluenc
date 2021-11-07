@@ -59,18 +59,21 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 
 		for (auto &value : subjectValues)
 		{
-			auto argumentType = value->type();
-			auto storageType = argumentType->storageType(*context);
+			if (auto typedValue = dynamic_cast<const TypedValue *>(value))
+			{
+				auto argumentType = value->type();
+				auto storageType = argumentType->storageType(*context);
 
-			auto alloc = entryPoint.alloc(storageType);
+				auto alloc = entryPoint.alloc(storageType);
 
-			auto align = dataLayout.getABITypeAlign(storageType);
+				auto align = dataLayout.getABITypeAlign(storageType);
 
-			auto store = new llvm::StoreInst(*value, alloc, false, align, block);
+				auto store = new llvm::StoreInst(*typedValue, alloc, false, align, block);
 
-			UNUSED(store);
+				UNUSED(store);
 
-			pointersToValues.push(new TypedValue { argumentType, alloc });
+				pointersToValues.push(new TypedValue { argumentType, alloc });
+			}
 		}
 
 		auto callResults = m_call->build(subjectEntryPoint, pointersToValues);

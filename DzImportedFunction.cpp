@@ -86,7 +86,7 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 		argumentTypes.push_back(storageType);
 
-		auto addressOfArgument = values.pop();
+		auto addressOfArgument = values.require<TypedValue>();
 
 		auto align = dataLayout.getABITypeAlign(storageType);
 

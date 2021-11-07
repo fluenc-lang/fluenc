@@ -21,7 +21,7 @@ std::vector<DzResult> DzGlobalTerminator::build(const EntryPoint &entryPoint, St
 	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
 
-	auto value = values.pop();
+	auto value = values.require<TypedValue>();
 	auto valueType = value->type();
 
 	auto storageType = valueType->storageType(*context);

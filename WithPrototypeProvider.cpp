@@ -15,7 +15,7 @@ IPrototype *WithPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &
 {
 	UNUSED(entryPoint);
 
-	auto addressOfValue = values.pop();
+	auto addressOfValue = values.require<TypedValue>();
 
 	return new WithPrototype(*addressOfValue);
 }
