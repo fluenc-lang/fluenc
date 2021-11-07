@@ -45,7 +45,7 @@ std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack v
 
 	auto load = new llvm::LoadInst(storageType, gep, m_field.name(), false, align, block);
 
-	values.push({ fieldType, load });
+	values.push(new TypedValue { fieldType, load });
 
 	return {{ entryPoint, values }};
 }

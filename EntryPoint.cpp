@@ -12,7 +12,7 @@ EntryPoint::EntryPoint(const EntryPoint *parent
 	, std::unique_ptr<llvm::LLVMContext> *context
 	, const std::string &name
 	, const std::multimap<std::string, DzCallable *> &functions
-	, const std::map<std::string, TypedValue> &locals
+	, const std::map<std::string, const TypedValue *> &locals
 	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
 	)
@@ -79,7 +79,7 @@ std::multimap<std::string, DzCallable *> EntryPoint::functions() const
 	return m_functions;
 }
 
-std::map<std::string, TypedValue> EntryPoint::locals() const
+std::map<std::string, const TypedValue *> EntryPoint::locals() const
 {
 	return m_locals;
 }
@@ -185,7 +185,7 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		);
 }
 
-EntryPoint EntryPoint::withLocals(const std::map<std::string, TypedValue> &locals) const
+EntryPoint EntryPoint::withLocals(const std::map<std::string, const TypedValue *> &locals) const
 {
 	return EntryPoint(m_parent
 		, m_block

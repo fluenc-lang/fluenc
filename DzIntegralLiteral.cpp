@@ -29,7 +29,7 @@ std::vector<DzResult> DzIntegralLiteral::build(const EntryPoint &entryPoint, Sta
 	auto type = m_type->resolve(entryPoint);
 	auto storageType = type->storageType(*context);
 
-	auto value = TypedValue(type
+	auto value = new TypedValue(type
 		, getValue(storageType)
 		);
 

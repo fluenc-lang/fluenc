@@ -13,7 +13,7 @@ class DzBooleanLiteral : public DzValue
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		TypedValue resolveValue(const EntryPoint &entryPoint) const;
+		const TypedValue *resolveValue(const EntryPoint &entryPoint) const;
 
 		DzValue *m_consumer;
 

@@ -30,7 +30,7 @@ std::vector<DzResult> DzStringLiteral::build(const EntryPoint &entryPoint, Stack
 
 	auto address = builder.CreateGlobalStringPtr(string, "string", 0, module.get());
 
-	values.push({ StringType::instance(), address });
+	values.push(new TypedValue { StringType::instance(), address });
 
 	return m_consumer->build(entryPoint, values);
 }

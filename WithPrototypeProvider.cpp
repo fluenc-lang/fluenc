@@ -17,5 +17,5 @@ IPrototype *WithPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &
 
 	auto addressOfValue = values.pop();
 
-	return new WithPrototype(addressOfValue);
+	return new WithPrototype(*addressOfValue);
 }

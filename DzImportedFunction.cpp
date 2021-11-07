@@ -55,7 +55,7 @@ bool DzImportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, cons
 		}
 
 		auto argumentType = argument->type(entryPoint);
-		auto valueType = value.type();
+		auto valueType = value->type();
 
 		return valueType->is(argumentType, entryPoint);
 	});
@@ -90,7 +90,7 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 		auto align = dataLayout.getABITypeAlign(storageType);
 
-		auto load = new llvm::LoadInst(storageType, addressOfArgument, name, false, align, block);
+		auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
 
 		if (dynamic_cast<Prototype *>(type))
 		{
@@ -114,7 +114,7 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 	if (returnType != VoidType::instance())
 	{
-		values.push({ returnType, call });
+		values.push(new TypedValue { returnType, call });
 	}
 
 	return {{ entryPoint, values }};

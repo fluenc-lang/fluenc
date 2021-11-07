@@ -25,7 +25,7 @@ std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entr
 	auto returnValue = values.pop();
 
 	llvm::IRBuilder<> builder(block);
-	builder.CreateRet(returnValue);
+	builder.CreateRet(*returnValue);
 
 	return {{ entryPoint, values }};
 }

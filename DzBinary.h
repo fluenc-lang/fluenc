@@ -13,7 +13,7 @@ class DzBinary : public DzValue
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		TypedValue resolveOp(const EntryPoint &entryPoint, const TypedValue &left, const TypedValue &right) const;
+		const TypedValue *resolveOp(const EntryPoint &entryPoint, const TypedValue *left, const TypedValue *right) const;
 
 		DzValue * m_consumer;
 

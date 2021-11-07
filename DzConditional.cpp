@@ -33,7 +33,7 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 
 	llvm::IRBuilder<> builder(block);
 
-	builder.CreateCondBr(values.pop(), ifTrue, ifFalse);
+	builder.CreateCondBr(*values.pop(), ifTrue, ifFalse);
 
 	auto epIfFalse = entryPoint
 		.withName("ifFalse")

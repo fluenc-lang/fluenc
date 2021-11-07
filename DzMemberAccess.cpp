@@ -34,15 +34,15 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		throw new std::exception();
 	}
 
-	auto valueType = iterator->second.type();
+	auto valueType = iterator->second->type();
 	auto storageType = valueType->storageType(*context);
 
 	auto dataLayout = module->getDataLayout();
 	auto align = dataLayout.getABITypeAlign(storageType);
 
-	auto load = new llvm::LoadInst(storageType, iterator->second, m_name, false, align, block);
+	auto load = new llvm::LoadInst(storageType, *iterator->second, m_name, false, align, block);
 
-	values.push({ valueType, load });
+	values.push(new TypedValue { valueType, load });
 
 	return m_consumer->build(entryPoint, values);
 }

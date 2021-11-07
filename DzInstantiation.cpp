@@ -34,14 +34,14 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 	{
 		int index;
 
-		PrototypeField field;
-		TypedValue value;
+		const PrototypeField field;
+		const TypedValue *value;
 	};
 
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
-	std::unordered_map<std::string, TypedValue> valueByName;
+	std::unordered_map<std::string, const TypedValue *> valueByName;
 
 	std::transform(begin(m_fields), end(m_fields), std::insert_iterator(valueByName, begin(valueByName)), [&](auto field)
 	{
@@ -82,7 +82,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(types), [&](auto embryo)
 	{
-		return embryo.value.type()->storageType(*context);
+		return embryo.value->type()->storageType(*context);
 	});
 
 	auto block = entryPoint.block();
@@ -106,12 +106,12 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 		auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, embryo.field.name(), block);
 
-		auto valueType = embryo.value.type();
+		auto valueType = embryo.value->type();
 		auto valueStorageType = valueType->storageType(*context);
 
 		auto valueAlign = dataLayout.getABITypeAlign(valueStorageType);
 
-		auto store = new llvm::StoreInst(embryo.value, gep, false, valueAlign, block);
+		auto store = new llvm::StoreInst(*embryo.value, gep, false, valueAlign, block);
 
 		UNUSED(store);
 
@@ -120,7 +120,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	auto type = new UserType(prototype, structType, fields);
 
-	values.push({ type, alloc });
+	values.push(new TypedValue { type, alloc });
 
 	return m_consumer->build(entryPoint, values);
 }

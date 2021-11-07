@@ -15,18 +15,18 @@ class Stack
 
 		size_t size() const;
 
-		std::vector<TypedValue, std::allocator<TypedValue>>::const_iterator begin() const;
-		std::vector<TypedValue, std::allocator<TypedValue>>::const_iterator end() const;
+		std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_iterator begin() const;
+		std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_iterator end() const;
 
-		std::vector<TypedValue, std::allocator<TypedValue>>::const_reverse_iterator rbegin() const;
-		std::vector<TypedValue, std::allocator<TypedValue>>::const_reverse_iterator rend() const;
+		std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_reverse_iterator rbegin() const;
+		std::vector<const TypedValue *, std::allocator<const TypedValue *>>::const_reverse_iterator rend() const;
 
-		TypedValue pop();
+		const TypedValue *pop();
 
-		void push(const TypedValue &value);
+		void push(const TypedValue *value);
 
 	private:
-		std::vector<TypedValue> m_values;
+		std::vector<const TypedValue *> m_values;
 };
 
 #endif // STACK_H

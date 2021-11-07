@@ -45,7 +45,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	std::vector<DzCallable *> roots;
 	std::multimap<std::string, DzCallable *> functions;
-	std::map<std::string, TypedValue> locals;
+	std::map<std::string, const TypedValue *> locals;
 	std::map<std::string, Prototype *> types;
 
 	for (auto function : context->function())

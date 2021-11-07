@@ -36,18 +36,18 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	auto value = values.pop();
 
-	auto type = value.type();
+	auto type = value->type();
 	auto storageType = type->storageType(*context);
 
 	auto alloc = entryPoint.alloc(storageType);
 
 	llvm::IRBuilder<> builder(block);
 
-	builder.CreateStore(value, alloc);
+	builder.CreateStore(*value, alloc);
 
 	auto load = builder.CreateLoad(storageType, alloc);
 
-	values.push({ type, load });
+	values.push(new TypedValue { type, load });
 
 	auto ep = entryPoint
 		.withReturnValueAddress(alloc);

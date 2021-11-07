@@ -18,7 +18,7 @@ int DzBooleanLiteral::compare(DzValue *other, const EntryPoint &entryPoint) cons
 	return -1;
 }
 
-TypedValue DzBooleanLiteral::resolveValue(const EntryPoint &entryPoint) const
+const TypedValue *DzBooleanLiteral::resolveValue(const EntryPoint &entryPoint) const
 {
 	auto &context = entryPoint.context();
 
@@ -26,12 +26,12 @@ TypedValue DzBooleanLiteral::resolveValue(const EntryPoint &entryPoint) const
 
 	if (m_value == "true")
 	{
-		return { type, llvm::ConstantInt::get(type->storageType(*context), 1) };
+		return new TypedValue { type, llvm::ConstantInt::get(type->storageType(*context), 1) };
 	}
 
 	if (m_value == "false")
 	{
-		return { type, llvm::ConstantInt::get(type->storageType(*context), 0) };
+		return new TypedValue { type, llvm::ConstantInt::get(type->storageType(*context), 0) };
 	}
 
 	throw new std::exception(); // TODO
