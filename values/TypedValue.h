@@ -12,17 +12,16 @@ class Type;
 class TypedValue : public BaseValue
 {
 	public:
-		TypedValue();
-		TypedValue(Type *type, llvm::Value *value);
+		TypedValue(const Type *type, llvm::Value *value);
 
-		Type *type() const;
+		const Type *type() const;
 
 		llvm::Constant *constant() const;
 
 		operator llvm::Value *() const;
 
 	private:
-		Type *m_type;
+		const Type *m_type;
 
 		llvm::Value *m_value;
 };

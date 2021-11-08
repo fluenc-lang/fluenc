@@ -1,14 +1,13 @@
 #ifndef DZARGUMENT_H
 #define DZARGUMENT_H
 
-#include "TypedValue.h"
-
 #include <string>
 
 #include <llvm/IR/Type.h>
 
 class DzTypeName;
 class EntryPoint;
+class Type;
 
 class DzArgument
 {

@@ -46,10 +46,15 @@ expression
 	| 'if' '(' expression ')' block						#conditional
 	| '[' expression? (',' expression)* ']'				#array
 	| '(' expression ')'								#group
+	| '...' expression									#expansion
+	;
+
+continuation
+	: '(' (expression (',' expression)*)? ')'
 	;
 
 ret
-	: 'return' value=expression? ('->' chained=expression)?
+	: 'return' value=expression? ('->' chained=continuation)?
 	;
 
 block
@@ -61,7 +66,7 @@ argument
 	;
 
 typeName
-	: ID '...'?
+	: (ID '...'?)
 	;
 	
 INT
@@ -104,7 +109,7 @@ ID
 	;
 
 fragment CHAR
-	: [a-zA-Z_]
+	: [a-zA-Z]
 	;
 
 fragment DIGIT

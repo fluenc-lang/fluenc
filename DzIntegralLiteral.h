@@ -12,8 +12,6 @@ class DzIntegralLiteral : public DzValue
 	public:
 		DzIntegralLiteral(DzValue *consumer, DzTypeName *type, const std::string &value);
 
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
-
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:

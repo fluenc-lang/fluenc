@@ -3,19 +3,12 @@
 #include "DzBooleanLiteral.h"
 
 #include "types/BooleanType.h"
+#include "values/TypedValue.h"
 
 DzBooleanLiteral::DzBooleanLiteral(DzValue *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
 {
-}
-
-int DzBooleanLiteral::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 const TypedValue *DzBooleanLiteral::resolveValue(const EntryPoint &entryPoint) const

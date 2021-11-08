@@ -59,6 +59,8 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitGlobal(dzParser::GlobalContext *context) override;
 		antlrcpp::Any visitNothing(dzParser::NothingContext *context) override;
 		antlrcpp::Any visitGroup(dzParser::GroupContext *context) override;
+		antlrcpp::Any visitExpansion(dzParser::ExpansionContext *context) override;
+		antlrcpp::Any visitContinuation(dzParser::ContinuationContext *context) override;
 
 	private:
 		DzValue *m_alpha;

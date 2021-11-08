@@ -5,7 +5,10 @@
 #include "StackSegment.h"
 #include "Type.h"
 #include "IndexIterator.h"
-#include "IndexedValue.h"
+#include "Indexed.h"
+
+#include "values/IndexedValue.h"
+#include "values/TypedValue.h"
 
 StackSegment::StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue *consumer)
 	: m_values(values)
@@ -14,12 +17,9 @@ StackSegment::StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue
 {
 }
 
-int StackSegment::compare(DzValue *other, const EntryPoint &entryPoint) const
+bool StackSegment::compare(const DzValue *other, const EntryPoint &entryPoint) const
 {
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
+	return m_call->compare(other, entryPoint);
 }
 
 std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack values) const
@@ -32,9 +32,9 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 	std::vector<DzResult> result;
 	std::vector<DzResult> input = {{ entryPoint, Stack() }};
 
-	std::vector<IndexedValue> orderedValues;
+	std::vector<Indexed<DzValue *>> orderedValues;
 
-	std::transform(begin(m_values), end(m_values), index_iterator(), std::back_insert_iterator(orderedValues), [](auto value, auto index) -> IndexedValue
+	std::transform(begin(m_values), end(m_values), index_iterator(), std::back_insert_iterator(orderedValues), [](auto value, auto index) -> Indexed<DzValue *>
 	{
 		return { index, value };
 	});
@@ -44,53 +44,66 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 		return first.value->compare(second.value, entryPoint);
 	});
 
-	auto subjectResults = std::accumulate(begin(orderedValues), end(orderedValues), input, [=](auto accumulator, auto argument)
+	auto subjectResults = std::accumulate(begin(orderedValues), end(orderedValues), input, [&](auto accumulator, auto argument)
 	{
-		std::multimap<int, DzResult> results;
+		std::vector<DzResult> results;
 
 		for (auto &[accumulatorEntryPoint, accumulatorValues] : accumulator)
 		{
-			auto result = argument.value->build(accumulatorEntryPoint, accumulatorValues);
+			auto result = argument.value->build(accumulatorEntryPoint, Stack());
 
-			for (auto &r : result)
+			for (auto &[resultEntryPoint, resultValues] : result)
 			{
-				results.insert({ argument.index, r });
+				auto scopedReturnValues = accumulatorValues;
+
+				auto block = resultEntryPoint.block();
+
+				for (auto resultValue : resultValues)
+				{
+					if (auto typedValue = dynamic_cast<const TypedValue *>(resultValue))
+					{
+						auto argumentType = resultValue->type();
+						auto storageType = argumentType->storageType(*context);
+
+						auto alloc = entryPoint.alloc(storageType);
+
+						auto align = dataLayout.getABITypeAlign(storageType);
+
+						auto store = new llvm::StoreInst(*typedValue, alloc, false, align, block);
+
+						UNUSED(store);
+
+						scopedReturnValues.push(new IndexedValue{ argument.index, new TypedValue { argumentType, alloc } });
+					}
+					else
+					{
+						scopedReturnValues.push(new IndexedValue { argument.index, resultValue });
+					}
+				}
+
+				results.push_back({ resultEntryPoint, scopedReturnValues });
 			}
 		}
 
-		std::vector<DzResult> orderedResults;
-
-		std::transform(begin(results), end(results), std::back_insert_iterator(orderedResults), [](auto pair)
-		{
-			return pair.second;
-		});
-
-		return orderedResults;
+		return results;
 	});
 
 	for (auto &[subjectEntryPoint, subjectValues] : subjectResults)
 	{
-		auto block = subjectEntryPoint.block();
-
-		Stack pointersToValues;
+		std::multimap<int, const BaseValue *, std::greater<int>> indexedValues;
 
 		for (auto &value : subjectValues)
 		{
-			if (auto typedValue = dynamic_cast<const TypedValue *>(value))
-			{
-				auto argumentType = value->type();
-				auto storageType = argumentType->storageType(*context);
+			auto indexed = static_cast<const IndexedValue *>(value);
 
-				auto alloc = entryPoint.alloc(storageType);
+			indexedValues.insert({ indexed->index(), indexed->subject() });
+		}
 
-				auto align = dataLayout.getABITypeAlign(storageType);
+		Stack pointersToValues;
 
-				auto store = new llvm::StoreInst(*typedValue, alloc, false, align, block);
-
-				UNUSED(store);
-
-				pointersToValues.push(new TypedValue { argumentType, alloc });
-			}
+		for (auto [_, value] : indexedValues)
+		{
+			pointersToValues.push(value);
 		}
 
 		auto callResults = m_call->build(subjectEntryPoint, pointersToValues);

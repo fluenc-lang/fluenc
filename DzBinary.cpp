@@ -4,19 +4,12 @@
 #include "EntryPoint.h"
 
 #include "types/BooleanType.h"
+#include "values/TypedValue.h"
 
 DzBinary::DzBinary(DzValue *consumer, const std::string &op)
 	: m_consumer(consumer)
 	, m_op(op)
 {
-}
-
-int DzBinary::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzBinary::build(const EntryPoint &entryPoint, Stack values) const

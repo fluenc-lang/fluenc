@@ -61,6 +61,10 @@ public:
 
     virtual antlrcpp::Any visitGroup(dzParser::GroupContext *context) = 0;
 
+    virtual antlrcpp::Any visitExpansion(dzParser::ExpansionContext *context) = 0;
+
+    virtual antlrcpp::Any visitContinuation(dzParser::ContinuationContext *context) = 0;
+
     virtual antlrcpp::Any visitRet(dzParser::RetContext *context) = 0;
 
     virtual antlrcpp::Any visitBlock(dzParser::BlockContext *context) = 0;

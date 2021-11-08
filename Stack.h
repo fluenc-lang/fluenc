@@ -5,7 +5,7 @@
 
 #include <stack>
 
-#include "TypedValue.h"
+class BaseValue;
 
 class Stack
 {

@@ -10,6 +10,8 @@
 #include "types/UserType.h"
 #include "types/Prototype.h"
 
+#include "values/TypedValue.h"
+
 DzImportedFunction::DzImportedFunction(const std::string &name
 	, const std::vector<DzArgument *> &arguments
 	, DzTypeName *returnType
@@ -18,14 +20,6 @@ DzImportedFunction::DzImportedFunction(const std::string &name
 	, m_arguments(arguments)
 	, m_returnType(returnType)
 {
-}
-
-int DzImportedFunction::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::string DzImportedFunction::name() const

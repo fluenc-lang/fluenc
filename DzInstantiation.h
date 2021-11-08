@@ -20,8 +20,6 @@ class DzInstantiation : public DzValue
 			, const std::vector<std::string> &fields
 			);
 
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
-
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:

@@ -4,18 +4,12 @@
 #include "DzFieldAccess.h"
 #include "Type.h"
 
+#include "values/TypedValue.h"
+
 DzFieldAccess::DzFieldAccess(llvm::Value *instance, const UserTypeField &field)
 	: m_instance(instance)
 	, m_field(field)
 {
-}
-
-int DzFieldAccess::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack values) const

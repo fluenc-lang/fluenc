@@ -3,19 +3,12 @@
 #include "DzStringLiteral.h"
 
 #include "types/StringType.h"
+#include "values/TypedValue.h"
 
 DzStringLiteral::DzStringLiteral(DzValue *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
 {
-}
-
-int DzStringLiteral::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzStringLiteral::build(const EntryPoint &entryPoint, Stack values) const

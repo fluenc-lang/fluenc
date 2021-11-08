@@ -15,6 +15,9 @@
 
 #include "types/UserType.h"
 
+#include "values/DependentValue.h"
+#include "values/TypedValue.h"
+
 DzFunction::DzFunction(FunctionAttribute attribute
 	, const std::string &name
 	, const std::vector<DzArgument *> &arguments
@@ -62,14 +65,6 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 	return result;
 }
 
-int DzFunction::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
-}
-
 std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();
@@ -88,48 +83,55 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 	{
 		auto name = argument->name();
 
-		auto addressOfArgument = values.require<TypedValue>();
+		auto value = values.pop();
 
-		auto argumentType = addressOfArgument->type();
-		auto storageType = argumentType->storageType(*context);
-
-		auto align = dataLayout.getABITypeAlign(storageType);
-
-		if (auto userType = dynamic_cast<UserType *>(argumentType))
+		if (auto addressOfArgument = dynamic_cast<const TypedValue *>(value))
 		{
-			auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
+			auto argumentType = addressOfArgument->type();
+			auto storageType = argumentType->storageType(*context);
 
-			auto i = 0;
+			auto align = dataLayout.getABITypeAlign(storageType);
 
-			for (auto &field : userType->fields())
+			if (auto userType = dynamic_cast<const UserType *>(argumentType))
 			{
-				auto intType = llvm::Type::getInt32Ty(*context);
+				auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
 
-				auto fieldType = field.type();
+				auto i = 0;
 
-				llvm::Value *indexes[] =
+				for (auto &field : userType->fields())
 				{
-					llvm::ConstantInt::get(intType, 0),
-					llvm::ConstantInt::get(intType, i++)
-				};
+					auto intType = llvm::Type::getInt32Ty(*context);
 
-				std::stringstream ss;
-				ss << name;
-				ss << ".";
-				ss << field.name();
+					auto fieldType = field.type();
 
-				auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
+					llvm::Value *indexes[] =
+					{
+						llvm::ConstantInt::get(intType, 0),
+						llvm::ConstantInt::get(intType, i++)
+					};
 
-				auto localName = ss.str();
+					std::stringstream ss;
+					ss << name;
+					ss << ".";
+					ss << field.name();
 
-				locals[localName] = new TypedValue(fieldType, gep);
+					auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
+
+					auto localName = ss.str();
+
+					locals[localName] = new TypedValue(fieldType, gep);
+				}
+
+				locals[name] = addressOfArgument;
 			}
-
-			locals[name] = addressOfArgument;
+			else
+			{
+				locals[name] = new TypedValue(argumentType, *addressOfArgument);
+			}
 		}
-		else
+		else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
 		{
-			locals[name] = new TypedValue(argumentType, *addressOfArgument);
+			locals[name] = dependentValue;
 		}
 	}
 

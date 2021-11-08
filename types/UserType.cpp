@@ -8,6 +8,11 @@ UserType::UserType(IPrototype *prototype, llvm::Type *type, const std::vector<Us
 {
 }
 
+TypeKind UserType::kind() const
+{
+	return TypeKind::UserType;
+}
+
 std::string UserType::tag() const
 {
 	return m_prototype->tag();
@@ -21,6 +26,11 @@ std::vector<UserTypeField> UserType::fields() const
 llvm::Type *UserType::storageType(llvm::LLVMContext &) const
 {
 	return m_type->getPointerTo();
+}
+
+Type *UserType::iteratorType() const
+{
+	return m_prototype->iteratorType();
 }
 
 bool UserType::is(const Type *type, const EntryPoint &entryPoint) const

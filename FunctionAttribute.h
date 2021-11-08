@@ -6,7 +6,8 @@ enum class FunctionAttribute
 	None = 0,
 	Import,
 	Export,
-	Recursive
+	Recursive,
+	Iterator,
 };
 
 #endif // FUNCTIONATTRIBUTE_H

@@ -21,7 +21,8 @@ public:
   enum {
     RuleProgram = 0, RuleStructure = 1, RuleGlobal = 2, RuleAssignment = 3, 
     RuleField = 4, RuleFunction = 5, RuleLiteral = 6, RuleWith = 7, RuleExpression = 8, 
-    RuleRet = 9, RuleBlock = 10, RuleArgument = 11, RuleTypeName = 12
+    RuleContinuation = 9, RuleRet = 10, RuleBlock = 11, RuleArgument = 12, 
+    RuleTypeName = 13
   };
 
   explicit dzParser(antlr4::TokenStream *input);
@@ -43,6 +44,7 @@ public:
   class LiteralContext;
   class WithContext;
   class ExpressionContext;
+  class ContinuationContext;
   class RetContext;
   class BlockContext;
   class ArgumentContext;
@@ -328,16 +330,39 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  ExpansionContext : public ExpressionContext {
+  public:
+    ExpansionContext(ExpressionContext *ctx);
+
+    ExpressionContext *expression();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   ExpressionContext* expression();
   ExpressionContext* expression(int precedence);
-  class  RetContext : public antlr4::ParserRuleContext {
+  class  ContinuationContext : public antlr4::ParserRuleContext {
   public:
-    dzParser::ExpressionContext *value = nullptr;
-    dzParser::ExpressionContext *chained = nullptr;
-    RetContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    ContinuationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ContinuationContext* continuation();
+
+  class  RetContext : public antlr4::ParserRuleContext {
+  public:
+    dzParser::ExpressionContext *value = nullptr;
+    dzParser::ContinuationContext *chained = nullptr;
+    RetContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    ExpressionContext *expression();
+    ContinuationContext *continuation();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;

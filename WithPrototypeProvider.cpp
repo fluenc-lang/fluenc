@@ -4,6 +4,8 @@
 #include "types/UserType.h"
 #include "types/WithPrototype.h"
 
+#include "values/TypedValue.h"
+
 WithPrototypeProvider *WithPrototypeProvider::instance()
 {
 	static WithPrototypeProvider instance;
@@ -17,5 +19,5 @@ IPrototype *WithPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &
 
 	auto addressOfValue = values.require<TypedValue>();
 
-	return new WithPrototype(*addressOfValue);
+	return new WithPrototype(addressOfValue);
 }

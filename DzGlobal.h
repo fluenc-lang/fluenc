@@ -2,14 +2,11 @@
 #define DZGLOBAL_H
 
 #include "DzValue.h"
-#include "TypedValue.h"
 
 class DzGlobal : public DzValue
 {
 	public:
 		DzGlobal(DzValue *value, const std::string &name);
-
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
 
 		std::string name() const;
 

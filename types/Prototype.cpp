@@ -36,6 +36,11 @@ llvm::Type *Prototype::storageType(llvm::LLVMContext &context) const
 	return llvm::Type::getInt8PtrTy(context);
 }
 
+Type *Prototype::iteratorType() const
+{
+	return nullptr;
+}
+
 bool Prototype::is(const Type *type, const EntryPoint &entryPoint) const
 {
 	if (type->tag() == m_tag)

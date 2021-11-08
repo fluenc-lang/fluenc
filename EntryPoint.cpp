@@ -2,7 +2,8 @@
 
 #include "EntryPoint.h"
 
-EntryPoint::EntryPoint(const EntryPoint *parent
+EntryPoint::EntryPoint(int depth
+	, const EntryPoint *parent
 	, llvm::BasicBlock *block
 	, llvm::BasicBlock *alloc
 	, llvm::BasicBlock *entry
@@ -12,11 +13,12 @@ EntryPoint::EntryPoint(const EntryPoint *parent
 	, std::unique_ptr<llvm::LLVMContext> *context
 	, const std::string &name
 	, const std::multimap<std::string, DzCallable *> &functions
-	, const std::map<std::string, const TypedValue *> &locals
+	, const std::map<std::string, const BaseValue *> &locals
 	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
 	)
-	: m_parent(parent)
+	: m_depth(depth)
+	, m_parent(parent)
 	, m_block(block)
 	, m_alloc(alloc)
 	, m_entry(entry)
@@ -30,6 +32,11 @@ EntryPoint::EntryPoint(const EntryPoint *parent
 	, m_types(types)
 	, m_values(values)
 {
+}
+
+int EntryPoint::depth() const
+{
+	return m_depth;
 }
 
 llvm::BasicBlock *EntryPoint::block() const
@@ -79,7 +86,7 @@ std::multimap<std::string, DzCallable *> EntryPoint::functions() const
 	return m_functions;
 }
 
-std::map<std::string, const TypedValue *> EntryPoint::locals() const
+std::map<std::string, const BaseValue *> EntryPoint::locals() const
 {
 	return m_locals;
 }
@@ -111,9 +118,8 @@ const EntryPoint *EntryPoint::byName(const std::string &name) const
 
 EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 {
-	auto parent = new EntryPoint(*this);
-
-	return EntryPoint(parent
+	return EntryPoint(m_depth + 1
+		, new EntryPoint(*this)
 		, block
 		, m_alloc
 		, m_entry
@@ -131,7 +137,8 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 
 EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 {
-	return EntryPoint(m_parent
+	return EntryPoint(m_depth + 1
+		, m_parent
 		, m_block
 		, alloc
 		, m_entry
@@ -149,9 +156,8 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 
 EntryPoint EntryPoint::withEntry(llvm::BasicBlock *entry) const
 {
-	auto parent = new EntryPoint(*this);
-
-	return EntryPoint(parent
+	return EntryPoint(m_depth + 1
+		, new EntryPoint(*this)
 		, m_block
 		, m_alloc
 		, entry
@@ -169,7 +175,8 @@ EntryPoint EntryPoint::withEntry(llvm::BasicBlock *entry) const
 
 EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 {
-	return EntryPoint(m_parent
+	return EntryPoint(m_depth + 1
+		, m_parent
 		, m_block
 		, m_alloc
 		, m_entry
@@ -185,9 +192,10 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		);
 }
 
-EntryPoint EntryPoint::withLocals(const std::map<std::string, const TypedValue *> &locals) const
+EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *> &locals) const
 {
-	return EntryPoint(m_parent
+	return EntryPoint(m_depth + 1
+		, m_parent
 		, m_block
 		, m_alloc
 		, m_entry
@@ -205,9 +213,8 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const TypedValue *
 
 EntryPoint EntryPoint::withName(const std::string &name) const
 {
-	auto parent = new EntryPoint(*this);
-
-	return EntryPoint(parent
+	return EntryPoint(m_depth + 1
+		, new EntryPoint(*this)
 		, m_block
 		, m_alloc
 		, m_entry
@@ -225,7 +232,8 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 
 EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 {
-	return EntryPoint(m_parent
+	return EntryPoint(m_depth + 1
+		, m_parent
 		, m_block
 		, m_alloc
 		, m_entry
@@ -243,7 +251,8 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 
 EntryPoint EntryPoint::withValues(const Stack &values) const
 {
-	return EntryPoint(m_parent
+	return EntryPoint(m_depth + 1
+		, m_parent
 		, m_block
 		, m_alloc
 		, m_entry
@@ -256,5 +265,24 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 		, m_locals
 		, m_types
 		, values
+		);
+}
+
+EntryPoint EntryPoint::withDepth(int depth) const
+{
+	return EntryPoint(depth
+		, m_parent
+		, m_block
+		, m_alloc
+		, m_entry
+		, m_function
+		, m_returnValueAddress
+		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, m_types
+		, m_values
 		);
 }

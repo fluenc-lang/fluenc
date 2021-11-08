@@ -1,6 +1,5 @@
 #include "DzTypeName.h"
 #include "EntryPoint.h"
-#include "TypedValue.h"
 
 #include "types/Int32Type.h"
 #include "types/Int64Type.h"
@@ -56,6 +55,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 	if (m_name == "without")
 	{
 		return WithoutType::instance();
+	}
+
+	if (m_name == "int...")
+	{
+		return IteratorType<Int32Type>::instance();
 	}
 
 	auto types = entryPoint.types();

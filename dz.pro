@@ -11,6 +11,8 @@ SOURCES += \
 	DzBinary.cpp \
 	DzBooleanLiteral.cpp \
 	DzConditional.cpp \
+	DzContinuation.cpp \
+	DzExpansion.cpp \
 	DzExportedFunction.cpp \
 	DzExportedFunctionTerminator.cpp \
 	DzFieldAccess.cpp \
@@ -24,15 +26,14 @@ SOURCES += \
 	DzMemberAccess.cpp \
 	DzReturn.cpp \
 	DzStringLiteral.cpp \
-	DzStruct.cpp \
 	DzTerminator.cpp \
 	DzTypeName.cpp \
+	DzValue.cpp \
 	EntryPoint.cpp \
 	IndexIterator.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
 	StackSegment.cpp \
-	TypedValue.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
 	Utility.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
 	antlr4-runtime/dzParser.cpp \
 	antlr4-runtime/dzVisitor.cpp \
 	types/BooleanType.cpp \
+	types/IPrototype.cpp \
 	types/Int32Type.cpp \
 	types/Int64Type.cpp \
 	types/Prototype.cpp \
@@ -56,18 +58,23 @@ SOURCES += \
 	types/VoidType.cpp \
 	types/WithPrototype.cpp \
 	types/WithoutType.cpp \
-	values/ArgumentValue.cpp
+	values/TypedValue.cpp \
+	values/DependentValue.cpp \
+	values/IndexedValue.cpp
 
 HEADERS += \
 	AllIterator.h \
 	CompilerException.h \
 	DefaultPrototypeProvider.h \
+	values/DependentValue.h \
 	DzArgument.h \
 	DzAssignment.h \
 	DzBinary.h \
 	DzBooleanLiteral.h \
 	DzCallable.h \
 	DzConditional.h \
+	DzContinuation.h \
+	DzExpansion.h \
 	DzExportedFunction.h \
 	DzExportedFunctionTerminator.h \
 	DzFieldAccess.h \
@@ -81,7 +88,6 @@ HEADERS += \
 	DzMemberAccess.h \
 	DzReturn.h \
 	DzStringLiteral.h \
-	DzStruct.h \
 	DzTerminator.h \
 	DzTypeName.h \
 	DzValue.h \
@@ -89,12 +95,11 @@ HEADERS += \
 	FunctionAttribute.h \
 	IPrototypeProvider.h \
 	IndexIterator.h \
-	IndexedValue.h \
+	Indexed.h \
 	KaleidoscopeJIT.h \
 	Stack.h \
 	StackSegment.h \
 	Tests.h \
-	TypedValue.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \
 	Utility.h \
@@ -109,6 +114,7 @@ HEADERS += \
 	types/IPrototype.h \
 	types/Int32Type.h \
 	types/Int64Type.h \
+	types/IteratorType.h \
 	types/Prototype.h \
 	types/PrototypeField.h \
 	types/StringType.h \
@@ -119,8 +125,9 @@ HEADERS += \
 	types/VoidType.h \
 	types/WithPrototype.h \
 	types/WithoutType.h \
-	values/ArgumentValue.h \
 	values/BaseValue.h \
+	values/IndexedValue.h \
+	values/TypedValue.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

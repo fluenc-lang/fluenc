@@ -14,8 +14,6 @@ class DzImportedFunction : public DzCallable
 			, DzTypeName *returnType
 			);
 
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
-
 		std::string name() const override;
 
 		FunctionAttribute attribute() const override;

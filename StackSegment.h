@@ -8,7 +8,7 @@ class StackSegment : public DzValue
 	public:
 		StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue *consumer);
 
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
+		bool compare(const DzValue *other, const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 

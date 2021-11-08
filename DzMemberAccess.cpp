@@ -1,22 +1,16 @@
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+
 #include "DzMemberAccess.h"
 #include "EntryPoint.h"
 #include "Type.h"
 
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Instructions.h>
+#include "values/TypedValue.h"
 
 DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 	: m_consumer(consumer)
 	, m_name(name)
 {
-}
-
-int DzMemberAccess::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
@@ -34,15 +28,23 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		throw new std::exception();
 	}
 
-	auto valueType = iterator->second->type();
-	auto storageType = valueType->storageType(*context);
+	if (auto computedValue = dynamic_cast<const TypedValue *>(iterator->second))
+	{
+		auto valueType = computedValue->type();
 
-	auto dataLayout = module->getDataLayout();
-	auto align = dataLayout.getABITypeAlign(storageType);
+		auto storageType = valueType->storageType(*context);
 
-	auto load = new llvm::LoadInst(storageType, *iterator->second, m_name, false, align, block);
+		auto dataLayout = module->getDataLayout();
+		auto align = dataLayout.getABITypeAlign(storageType);
 
-	values.push(new TypedValue { valueType, load });
+		auto load = new llvm::LoadInst(storageType, *computedValue, m_name, false, align, block);
+
+		values.push(new TypedValue { valueType, load });
+	}
+	else
+	{
+		values.push(iterator->second);
+	}
 
 	return m_consumer->build(entryPoint, values);
 }

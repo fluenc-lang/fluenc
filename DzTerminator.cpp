@@ -6,17 +6,10 @@
 #include "DzTerminator.h"
 #include "EntryPoint.h"
 
-DzTerminator::DzTerminator(const std::string &name)
+DzTerminator::DzTerminator(const std::string &name, FunctionAttribute attribute)
 	: m_name(name)
+	, m_attribute(attribute)
 {
-}
-
-int DzTerminator::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzTerminator::build(const EntryPoint &entryPoint, Stack values) const
@@ -24,9 +17,14 @@ std::vector<DzResult> DzTerminator::build(const EntryPoint &entryPoint, Stack va
 	return {{ entryPoint, values }};
 }
 
+FunctionAttribute DzTerminator::attribute() const
+{
+	return m_attribute;
+}
+
 DzTerminator *DzTerminator::instance()
 {
-	static DzTerminator instance("pajs");
+	static DzTerminator instance("pajs", FunctionAttribute::None);
 
 	return &instance;
 }

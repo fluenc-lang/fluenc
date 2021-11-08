@@ -3,12 +3,12 @@
 
 #include "DzValue.h"
 
+class TypedValue;
+
 class DzBooleanLiteral : public DzValue
 {
 	public:
 		DzBooleanLiteral(DzValue *consumer, const std::string &value);
-
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 

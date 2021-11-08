@@ -2,7 +2,6 @@
 
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
-#include <llvm/IR/IRBuilder.h>
 
 #include "VisitorV4.h"
 #include "EntryPoint.h"
@@ -21,7 +20,6 @@
 #include "DzBooleanLiteral.h"
 #include "DzStringLiteral.h"
 #include "DzImportedFunction.h"
-#include "DzStruct.h"
 #include "DzInstantiation.h"
 #include "DzGlobal.h"
 #include "DzGlobalTerminator.h"
@@ -29,8 +27,12 @@
 #include "DefaultPrototypeProvider.h"
 #include "WithPrototypeProvider.h"
 #include "StackSegment.h"
+#include "DzContinuation.h"
+#include "DzExpansion.h"
 
 #include "types/Prototype.h"
+
+#include "values/TypedValue.h"
 
 VisitorV4::VisitorV4(DzValue *alpha, DzValue *beta)
 	: m_alpha(alpha)
@@ -45,7 +47,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	std::vector<DzCallable *> roots;
 	std::multimap<std::string, DzCallable *> functions;
-	std::map<std::string, const TypedValue *> locals;
+	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, Prototype *> types;
 
 	for (auto function : context->function())
@@ -73,7 +75,8 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	Stack values;
 
-	EntryPoint entryPoint(nullptr
+	EntryPoint entryPoint(0
+		, nullptr
 		, nullptr
 		, nullptr
 		, nullptr
@@ -95,7 +98,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 		for (auto &[_, globalValues] : result->build(entryPoint, values))
 		{
-			locals.insert({ result->name(), static_cast<const TypedValue *>(*globalValues.begin()) });
+			locals.insert({ result->name(), globalValues.require<TypedValue>() });
 		}
 	}
 
@@ -136,6 +139,11 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 		if (attribute == "recursive")
 		{
 			return FunctionAttribute::Recursive;
+		}
+
+		if (attribute == "iterator")
+		{
+			return FunctionAttribute::Iterator;
 		}
 	}
 
@@ -180,7 +188,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 		return static_cast<DzCallable *>(entryPoint);
 	}
 
-	auto terminator = new DzTerminator(name);
+	auto terminator = new DzTerminator(name, attribute);
 
 	VisitorV4 visitor(terminator, nullptr);
 
@@ -195,7 +203,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 antlrcpp::Any VisitorV4::visitTypeName(dzParser::TypeNameContext *context)
 {
-	return new DzTypeName(context->ID()->getText());
+	return new DzTypeName(context->getText());
 }
 
 antlrcpp::Any VisitorV4::visitArgument(dzParser::ArgumentContext *context)
@@ -207,6 +215,18 @@ antlrcpp::Any VisitorV4::visitArgument(dzParser::ArgumentContext *context)
 
 antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 {
+	if (context->chained)
+	{
+		auto continuation = visit(context->chained);
+
+		auto ret = new DzReturn(m_alpha, continuation);
+
+		VisitorV4 visitor(ret, nullptr);
+
+		return visitor
+			.visit(context->value);
+	}
+
 	auto ret = new DzReturn(m_alpha, nullptr);
 
 	VisitorV4 visitor(ret, nullptr);
@@ -254,9 +274,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 {
 	auto expression = context->expression();
 
-	auto call = new DzFunctionCall(context->ID()->getText()
-		, expression.size()
-		);
+	auto call = new DzFunctionCall(context->ID()->getText());
 
 	std::vector<DzValue *> values;
 
@@ -494,4 +512,35 @@ antlrcpp::Any VisitorV4::visitNothing(dzParser::NothingContext *context)
 antlrcpp::Any VisitorV4::visitGroup(dzParser::GroupContext *context)
 {
 	return visit(context->expression());
+}
+
+antlrcpp::Any VisitorV4::visitExpansion(dzParser::ExpansionContext *context)
+{
+	auto expansion = new DzExpansion(m_alpha);
+
+	VisitorV4 visitor(expansion, nullptr);
+
+	return visitor
+		.visit(context->expression())
+		.as<DzValue *>();
+}
+
+antlrcpp::Any VisitorV4::visitContinuation(dzParser::ContinuationContext *context)
+{
+	auto continuation = new DzContinuation();
+
+	auto expressions = context->expression();
+
+	auto value = std::accumulate(begin(expressions), end(expressions), static_cast<DzValue *>(continuation), [](DzValue *consumer, dzParser::ExpressionContext *parameter)
+	{
+		VisitorV4 visitor(consumer, nullptr);
+
+		auto result = visitor
+			.visit(parameter)
+			.as<DzValue *>();
+
+		return result;
+	});
+
+	return value;
 }

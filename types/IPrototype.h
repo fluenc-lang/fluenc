@@ -9,6 +9,8 @@ class EntryPoint;
 class IPrototype : public Type
 {
 	public:
+		TypeKind kind() const override;
+
 		virtual std::vector<PrototypeField> fields(const EntryPoint &entryPoint) const = 0;
 };
 

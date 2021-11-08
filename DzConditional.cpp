@@ -5,18 +5,12 @@
 #include "DzConditional.h"
 #include "EntryPoint.h"
 
+#include "values/TypedValue.h"
+
 DzConditional::DzConditional(DzValue *ifFalse, DzValue *ifTrue)
 	: m_ifTrue(ifTrue)
 	, m_ifFalse(ifFalse)
 {
-}
-
-int DzConditional::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack values) const

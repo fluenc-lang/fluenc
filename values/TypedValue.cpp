@@ -2,19 +2,13 @@
 
 #include "TypedValue.h"
 
-TypedValue::TypedValue()
-	: m_type(nullptr)
-	, m_value(nullptr)
-{
-}
-
-TypedValue::TypedValue(Type *type, llvm::Value *value)
+TypedValue::TypedValue(const Type *type, llvm::Value *value)
 	: m_type(type)
 	, m_value(value)
 {
 }
 
-Type *TypedValue::type() const
+const Type *TypedValue::type() const
 {
 	return m_type;
 }

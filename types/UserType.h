@@ -11,10 +11,14 @@ class UserType : public Type
 	public:
 		UserType(IPrototype *prototype, llvm::Type *type, const std::vector<UserTypeField> &fields);
 
+		TypeKind kind() const override;
+
 		std::string tag() const override;
 		std::vector<UserTypeField> fields() const;
 
 		llvm::Type *storageType(llvm::LLVMContext &) const override;
+
+		Type *iteratorType() const override;
 
 		bool is(const Type *type, const EntryPoint &entryPoint) const override;
 

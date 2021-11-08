@@ -8,19 +8,15 @@
 #include "EntryPoint.h"
 #include "Type.h"
 #include "DzExportedFunctionTerminator.h"
+#include "DzTerminator.h"
+
+#include "values/TypedValue.h"
+#include "values/DependentValue.h"
 
 DzReturn::DzReturn(DzValue *consumer, DzValue *chained)
 	: m_consumer(consumer)
 	, m_chained(chained)
 {
-}
-
-int DzReturn::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values) const
@@ -45,12 +41,14 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	builder.CreateStore(*value, alloc);
 
+	if (m_chained)
+	{
+		values.push(new DependentValue { type->iteratorType(), new EntryPoint(entryPoint), m_chained });
+	}
+
 	auto load = builder.CreateLoad(storageType, alloc);
 
 	values.push(new TypedValue { type, load });
 
-	auto ep = entryPoint
-		.withReturnValueAddress(alloc);
-
-	return m_consumer->build(ep, values);
+	return m_consumer->build(entryPoint, values);
 }

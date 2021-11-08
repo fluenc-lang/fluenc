@@ -99,6 +99,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitExpansion(dzParser::ExpansionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitContinuation(dzParser::ContinuationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitRet(dzParser::RetContext *ctx) override {
     return visitChildren(ctx);
   }

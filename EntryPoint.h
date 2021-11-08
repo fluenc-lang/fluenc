@@ -15,7 +15,8 @@ class EntryPoint
 	const char *empty = "_empty";
 
 	public:
-		EntryPoint(const EntryPoint *parent
+		EntryPoint(int depth
+			, const EntryPoint *parent
 			, llvm::BasicBlock *block
 			, llvm::BasicBlock *alloc
 			, llvm::BasicBlock *entry
@@ -25,13 +26,15 @@ class EntryPoint
 			, std::unique_ptr<llvm::LLVMContext> *context
 			, const std::string &name
 			, const std::multimap<std::string, DzCallable *> &functions
-			, const std::map<std::string, const TypedValue *> &locals
+			, const std::map<std::string, const BaseValue *> &locals
 			, const std::map<std::string, Prototype *> &types
 			, const Stack &values
 			);
 
 		EntryPoint() = default;
 		EntryPoint(const EntryPoint &) = default;
+
+		int depth() const;
 
 		llvm::BasicBlock *block() const;
 		llvm::BasicBlock *entry() const;
@@ -47,7 +50,7 @@ class EntryPoint
 		std::string name() const;
 
 		std::multimap<std::string, DzCallable *> functions() const;
-		std::map<std::string, const TypedValue *> locals() const;
+		std::map<std::string, const BaseValue *> locals() const;
 		std::map<std::string, Prototype *> types() const;
 
 		Stack values() const;
@@ -58,12 +61,15 @@ class EntryPoint
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
 		EntryPoint withEntry(llvm::BasicBlock *entry) const;
 		EntryPoint withFunction(llvm::Function *function) const;
-		EntryPoint withLocals(const std::map<std::string, const TypedValue *> &locals) const;
+		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
 		EntryPoint withName(const std::string &name) const;
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
 		EntryPoint withValues(const Stack &values) const;
+		EntryPoint withDepth(int depth) const;
 
 	private:
+		int m_depth;
+
 		const EntryPoint *m_parent;
 
 		llvm::BasicBlock *m_block;
@@ -79,7 +85,7 @@ class EntryPoint
 		std::string m_name;
 
 		std::multimap<std::string, DzCallable *> m_functions;
-		std::map<std::string, const TypedValue *> m_locals;
+		std::map<std::string, const BaseValue *> m_locals;
 		std::map<std::string, Prototype *> m_types;
 
 		Stack m_values;

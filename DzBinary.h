@@ -3,12 +3,12 @@
 
 #include "DzValue.h"
 
+class TypedValue;
+
 class DzBinary : public DzValue
 {
 	public:
 		DzBinary(DzValue *consumer, const std::string &op);
-
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 

@@ -7,19 +7,13 @@
 #include "EntryPoint.h"
 #include "Type.h"
 
+#include "values/TypedValue.h"
+
 DzIntegralLiteral::DzIntegralLiteral(DzValue *consumer, DzTypeName *type, const std::string &value)
 	: m_consumer(consumer)
 	, m_type(type)
 	, m_value(value)
 {
-}
-
-int DzIntegralLiteral::compare(DzValue *other, const EntryPoint &entryPoint) const
-{
-	UNUSED(other);
-	UNUSED(entryPoint);
-
-	return -1;
 }
 
 std::vector<DzResult> DzIntegralLiteral::build(const EntryPoint &entryPoint, Stack values) const

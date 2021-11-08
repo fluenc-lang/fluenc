@@ -6,16 +6,14 @@
 class DzFunctionCall : public DzValue
 {
 	public:
-		DzFunctionCall(const std::string name, size_t numberOfArguments);
+		DzFunctionCall(const std::string name);
 
-		int compare(DzValue *other, const EntryPoint &entryPoint) const override;
+		bool compare(const DzValue *other, const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		std::string m_name;
-
-		size_t m_numberOfArguments;
 };
 
 #endif // DZFUNCTIONCALL_H
