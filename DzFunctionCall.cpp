@@ -19,20 +19,21 @@ DzFunctionCall::DzFunctionCall(const std::string name)
 {
 }
 
-bool DzFunctionCall::compare(const DzValue *other, const EntryPoint &entryPoint) const
+int DzFunctionCall::order(const EntryPoint &entryPoint) const
 {
-	UNUSED(other);
-
 	auto functions = entryPoint.functions();
 
 	auto iterator = functions.find(m_name);
 
 	if (iterator != functions.end())
 	{
-		return iterator->second->attribute() != FunctionAttribute::Iterator;
+		if (iterator->second->attribute() == FunctionAttribute::Iterator)
+		{
+			return 1;
+		}
 	}
 
-	return true;
+	return -1;
 }
 
 std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const

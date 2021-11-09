@@ -16,7 +16,7 @@ struct DzResult
 class DzValue
 {
 	public:
-		virtual bool compare(const DzValue *other, const EntryPoint &entryPoint) const;
+		virtual int order(const EntryPoint &entryPoint) const;
 
 		virtual std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const = 0;
 };

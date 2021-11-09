@@ -17,9 +17,9 @@ StackSegment::StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue
 {
 }
 
-bool StackSegment::compare(const DzValue *other, const EntryPoint &entryPoint) const
+int StackSegment::order(const EntryPoint &entryPoint) const
 {
-	return m_call->compare(other, entryPoint);
+	return m_call->order(entryPoint);
 }
 
 std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack values) const
@@ -41,7 +41,7 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 
 	std::sort(begin(orderedValues), end(orderedValues), [=](auto first, auto second)
 	{
-		return first.value->compare(second.value, entryPoint);
+		return first.value->order(entryPoint) < second.value->order(entryPoint);
 	});
 
 	auto subjectResults = std::accumulate(begin(orderedValues), end(orderedValues), input, [&](auto accumulator, auto argument)

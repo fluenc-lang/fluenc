@@ -1026,6 +1026,28 @@ class Tests : public QObject
 			QCOMPARE(result, 15);
 		}
 
+		void scenario38()
+		{
+			auto result = exec(R"(
+				function sum(int value, int number)
+				{
+					return value + number;
+				}
+
+				function sum(int value, int number, int ...numbers)
+				{
+					return sum(value + number, ...numbers);
+				}
+
+				export int main()
+				{
+					return sum(0, [1, 2, 3]);
+				}
+			)");
+
+			QCOMPARE(result, 6);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1064,6 +1086,7 @@ class Tests : public QObject
 		W_SLOT(scenario35)
 		W_SLOT(scenario36)
 		W_SLOT(scenario37)
+		W_SLOT(scenario38)
 
 	private:
 		ModuleInfo *compile(std::string source)

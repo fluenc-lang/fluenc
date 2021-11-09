@@ -7,6 +7,9 @@ SOURCES += \
 	CompilerException.cpp \
 	DefaultPrototypeProvider.cpp \
 	DzArgument.cpp \
+	DzArrayContinuation.cpp \
+	DzArrayElement.cpp \
+	DzArrayInit.cpp \
 	DzAssignment.cpp \
 	DzBinary.cpp \
 	DzBooleanLiteral.cpp \
@@ -66,6 +69,9 @@ HEADERS += \
 	AllIterator.h \
 	CompilerException.h \
 	DefaultPrototypeProvider.h \
+	DzArrayContinuation.h \
+	DzArrayElement.h \
+	DzArrayInit.h \
 	values/DependentValue.h \
 	DzArgument.h \
 	DzAssignment.h \

@@ -29,6 +29,9 @@
 #include "StackSegment.h"
 #include "DzContinuation.h"
 #include "DzExpansion.h"
+#include "Indexed.h"
+#include "DzArrayElement.h"
+#include "DzArrayInit.h"
 
 #include "types/Prototype.h"
 
@@ -543,4 +546,31 @@ antlrcpp::Any VisitorV4::visitContinuation(dzParser::ContinuationContext *contex
 	});
 
 	return value;
+}
+
+antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
+{
+	auto expressions = context->expression();
+
+	std::vector<Indexed<dzParser::ExpressionContext *>> indexed;
+
+	std::transform(rbegin(expressions), rend(expressions), index_iterator(1u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<dzParser::ExpressionContext *>
+	{
+		return { expressions.size() - y, x };
+	});
+
+	auto firstElement = std::accumulate(begin(indexed), end(indexed), (DzValue *)nullptr, [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
+	{
+		auto element = new DzArrayElement(expression.index, m_alpha, next);
+
+		VisitorV4 visitor(element, nullptr);
+
+		return visitor
+			.visit(expression.value)
+			.as<DzValue *>();
+	});
+
+	auto init = new DzArrayInit(firstElement);
+
+	return static_cast<DzValue *>(init);
 }

@@ -1,19 +1,19 @@
-#ifndef DZFUNCTIONCALL_H
-#define DZFUNCTIONCALL_H
+#ifndef DZARRAYINIT_H
+#define DZARRAYINIT_H
 
 #include "DzValue.h"
 
-class DzFunctionCall : public DzValue
+class DzArrayInit : public DzValue
 {
 	public:
-		DzFunctionCall(const std::string name);
+		DzArrayInit(DzValue *consumer);
 
 		int order(const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		std::string m_name;
+		DzValue *m_consumer;
 };
 
-#endif // DZFUNCTIONCALL_H
+#endif // DZARRAYINIT_H
