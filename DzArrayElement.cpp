@@ -5,6 +5,8 @@
 #include "DzArrayElement.h"
 #include "DzArrayContinuation.h"
 
+#include "types/IteratorType.h"
+
 #include "values/TypedValue.h"
 #include "values/DependentValue.h"
 
@@ -38,8 +40,6 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 		auto indexType = index->type();
 		auto storageType = indexType->storageType(*context);
 
-		auto valueType = value->type();
-
 		auto ifTrue = llvm::BasicBlock::Create(*context);
 		auto ifFalse = llvm::BasicBlock::Create(*context);
 
@@ -55,14 +55,14 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 		builder.CreateCondBr(comparison , ifTrue, ifFalse);
 
 		auto epIfFalse = entryPoint
-				.withBlock(ifFalse);
+			.withBlock(ifFalse);
 
 		auto epIfTrue = entryPoint
-				.withBlock(ifTrue);
+			.withBlock(ifTrue);
 
 		valuesIfFalse.push(index);
 
-		valuesIfTrue.push(new DependentValue { valueType->iteratorType(), new EntryPoint(entryPoint), new DzArrayContinuation(*index) });
+		valuesIfTrue.push(new DependentValue { IteratorType::instance(), new EntryPoint(entryPoint), new DzArrayContinuation(*index) });
 		valuesIfTrue.push(value);
 
 		auto resultsIfTrue = m_consumer->build(epIfTrue, valuesIfTrue);

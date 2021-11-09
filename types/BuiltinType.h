@@ -23,7 +23,8 @@ class BuiltinType : public Type
 
 		Type *iteratorType() const override
 		{
-			return IteratorType<T>::instance();
+			return nullptr;
+//			return IteratorType<T>::instance();
 		}
 
 		bool is(const Type *type, const EntryPoint &entryPoint) const override

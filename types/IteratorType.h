@@ -12,13 +12,13 @@ class IIteratorType : public Type
 		virtual Type *elementType() const = 0;
 };
 
-template<typename T>
-class IteratorType : public IIteratorType
+//template<typename T>
+class IteratorType : public Type
 {
 	public:
 		static Type *instance()
 		{
-			static IteratorType<T> instance;
+			static IteratorType instance;
 
 			return &instance;
 		}
@@ -30,13 +30,7 @@ class IteratorType : public IIteratorType
 
 		std::string tag() const override
 		{
-			auto subject = T::instance();
-
-			std::stringstream ss;
-			ss << subject->tag();
-			ss << "...";
-
-			return ss.str();
+			return "...";
 		}
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override
@@ -49,10 +43,10 @@ class IteratorType : public IIteratorType
 			return nullptr;
 		}
 
-		Type *elementType() const override
-		{
-			return T::instance();
-		}
+//		Type *elementType() const override
+//		{
+//			return T::instance();
+//		}
 
 		bool is(const Type *type, const EntryPoint &entryPoint) const override
 		{

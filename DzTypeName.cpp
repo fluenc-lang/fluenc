@@ -57,9 +57,9 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint)
 		return WithoutType::instance();
 	}
 
-	if (m_name == "int...")
+	if (m_name == "...")
 	{
-		return IteratorType<Int32Type>::instance();
+		return IteratorType::instance();
 	}
 
 	auto types = entryPoint.types();

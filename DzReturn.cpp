@@ -10,6 +10,8 @@
 #include "DzExportedFunctionTerminator.h"
 #include "DzTerminator.h"
 
+#include "types/IteratorType.h"
+
 #include "values/TypedValue.h"
 #include "values/DependentValue.h"
 
@@ -43,7 +45,7 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	if (m_chained)
 	{
-		values.push(new DependentValue { type->iteratorType(), new EntryPoint(entryPoint), m_chained });
+		values.push(new DependentValue { IteratorType::instance(), new EntryPoint(entryPoint), m_chained });
 	}
 
 	auto load = builder.CreateLoad(storageType, alloc);

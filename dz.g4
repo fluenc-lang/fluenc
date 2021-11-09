@@ -66,7 +66,7 @@ argument
 	;
 
 typeName
-	: (ID '...'?)
+	: (ID | '...')
 	;
 	
 INT

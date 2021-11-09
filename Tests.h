@@ -1012,7 +1012,7 @@ class Tests : public QObject
 					return value + number;
 				}
 
-				function sum(int value, int number, int... numbers)
+				function sum(int value, int number, ...numbers)
 				{
 					return sum(value + number, ...numbers);
 				}
@@ -1034,7 +1034,7 @@ class Tests : public QObject
 					return value + number;
 				}
 
-				function sum(int value, int number, int ...numbers)
+				function sum(int value, int number, ...numbers)
 				{
 					return sum(value + number, ...numbers);
 				}
@@ -1046,6 +1046,57 @@ class Tests : public QObject
 			)");
 
 			QCOMPARE(result, 6);
+		}
+
+		void scenario39()
+		{
+			auto result = exec(R"(
+				struct Struct1
+				{
+					x
+				};
+
+				struct Struct2
+				{
+					y
+				};
+
+				function sum(int value, Struct1 s)
+				{
+					return value + s.x;
+				}
+
+				function sum(int value, Struct1 s, ...ss)
+				{
+					return sum(value + s.x, ...ss);
+				}
+
+				function sum(int value, Struct2 s)
+				{
+					return value + s.y;
+				}
+
+				function sum(int value, Struct2 s, ...ss)
+				{
+					return sum(value + s.y, ...ss);
+				}
+
+				export int main()
+				{
+					return sum(0, [
+						Struct1
+						{
+							x: 1
+						},
+						Struct2
+						{
+							y: 2
+						}
+					]);
+				}
+			)");
+
+			QCOMPARE(result, 3);
 		}
 
 		W_SLOT(scenario1)
@@ -1087,6 +1138,7 @@ class Tests : public QObject
 		W_SLOT(scenario36)
 		W_SLOT(scenario37)
 		W_SLOT(scenario38)
+		W_SLOT(scenario39)
 
 	private:
 		ModuleInfo *compile(std::string source)
