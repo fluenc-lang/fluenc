@@ -32,25 +32,37 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	block->setName(name);
 	block->insertInto(function);
 
-	auto value = values.require<TypedValue>();
-
-	auto type = value->type();
-	auto storageType = type->storageType(*context);
-
-	auto alloc = entryPoint.alloc(storageType);
-
 	llvm::IRBuilder<> builder(block);
 
-	builder.CreateStore(*value, alloc);
+	Stack localValues;
 
 	if (m_chained)
 	{
-		values.push(new DependentValue { IteratorType::instance(), new EntryPoint(entryPoint), m_chained });
+		localValues.push(new DependentValue { IteratorType::instance(), new EntryPoint(entryPoint), m_chained });
 	}
 
-	auto load = builder.CreateLoad(storageType, alloc);
+	for (auto i = values.begin(); i < values.end(); i++)
+	{
+		auto value = *i;
 
-	values.push(new TypedValue { type, load });
+		if (auto typedValue = dynamic_cast<const TypedValue *>(value))
+		{
+			auto type = value->type();
+			auto storageType = type->storageType(*context);
 
-	return m_consumer->build(entryPoint, values);
+			auto alloc = entryPoint.alloc(storageType);
+
+			builder.CreateStore(*typedValue, alloc);
+
+			auto load = builder.CreateLoad(storageType, alloc);
+
+			localValues.push(new TypedValue { type, load });
+		}
+		else
+		{
+			localValues.push(value);
+		}
+	}
+
+	return m_consumer->build(entryPoint, localValues);
 }
