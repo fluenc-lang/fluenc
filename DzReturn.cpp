@@ -13,7 +13,7 @@
 #include "types/IteratorType.h"
 
 #include "values/TypedValue.h"
-#include "values/DependentValue.h"
+#include "values/ExpandableValue.h"
 
 DzReturn::DzReturn(DzValue *consumer, DzValue *chained)
 	: m_consumer(consumer)
@@ -36,7 +36,7 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	if (m_chained)
 	{
-		localValues.push(new DependentValue { IteratorType::instance(), new EntryPoint(entryPoint), m_chained });
+		localValues.push(new ExpandableValue { new EntryPoint(entryPoint), m_chained });
 	}
 
 	for (auto i = values.begin(); i < values.end(); i++)

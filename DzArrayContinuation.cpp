@@ -36,5 +36,5 @@ std::vector<DzResult> DzArrayContinuation::build(const EntryPoint &entryPoint, S
 
 	UNUSED(store);
 
-	return std::vector<DzResult>();
+	return {{ entryPoint, Stack() }};
 }

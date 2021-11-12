@@ -15,7 +15,7 @@
 
 #include "types/UserType.h"
 
-#include "values/DependentValue.h"
+#include "values/ExpandableValue.h"
 #include "values/TypedValue.h"
 
 DzFunction::DzFunction(FunctionAttribute attribute
@@ -129,7 +129,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 				locals[name] = new TypedValue(argumentType, *addressOfArgument);
 			}
 		}
-		else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
+		else if (auto dependentValue = dynamic_cast<const ExpandableValue *>(value))
 		{
 			locals[name] = dependentValue;
 		}

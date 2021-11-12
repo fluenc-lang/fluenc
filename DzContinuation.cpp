@@ -1,9 +1,13 @@
+#include <numeric>
+
 #include <llvm/IR/Instructions.h>
 
 #include "DzContinuation.h"
 #include "Type.h"
+#include "IndexIterator.h"
 
 #include "values/TypedValue.h"
+#include "values/DependentValue.h"
 
 std::vector<DzResult> DzContinuation::build(const EntryPoint &entryPoint, Stack values) const
 {
@@ -17,20 +21,34 @@ std::vector<DzResult> DzContinuation::build(const EntryPoint &entryPoint, Stack 
 	auto numberOfArguments = values.size();
 	auto tailCallValues = entryPoint.values();
 
-	for (auto i = 0ul; i < numberOfArguments; i++)
+	auto tailCallTarget = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), &entryPoint, [&](const EntryPoint *target, size_t)
 	{
-		auto value = values.require<TypedValue>();
-		auto storage = tailCallValues.require<TypedValue>();
+		auto value = values.pop();
+		auto storage = tailCallValues.pop();
 
-		auto valueType = storage->type();
-		auto valueStorageType = valueType->storageType(*context);
+		if (auto computedValue = dynamic_cast<const TypedValue *>(value))
+		{
+			auto valueType = storage->type();
+			auto valueStorageType = valueType->storageType(*context);
 
-		auto valueAlign = dataLayout.getABITypeAlign(valueStorageType);
+			auto valueAlign = dataLayout.getABITypeAlign(valueStorageType);
 
-		auto store = new llvm::StoreInst(*value, *storage, false, valueAlign, block);
+			auto store = new llvm::StoreInst(*computedValue, *static_cast<const TypedValue *>(storage), false, valueAlign, block);
 
-		UNUSED(store);
-	}
+			UNUSED(store);
+		}
+		else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
+		{
+			auto provider = dependentValue->provider();
 
-	return std::vector<DzResult>();
+			if (provider->depth() < target->depth())
+			{
+				return provider;
+			}
+		}
+
+		return target;
+	});
+
+	return {{ *tailCallTarget, Stack() }};
 }

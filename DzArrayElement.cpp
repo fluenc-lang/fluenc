@@ -8,7 +8,7 @@
 #include "types/IteratorType.h"
 
 #include "values/TypedValue.h"
-#include "values/DependentValue.h"
+#include "values/ExpandableValue.h"
 
 DzArrayElement::DzArrayElement(size_t index, DzValue *consumer, DzValue *next)
 	: m_index(index)
@@ -62,7 +62,7 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 
 		valuesIfFalse.push(index);
 
-		valuesIfTrue.push(new DependentValue { IteratorType::instance(), new EntryPoint(entryPoint), new DzArrayContinuation(*index) });
+		valuesIfTrue.push(new ExpandableValue { new EntryPoint(entryPoint), new DzArrayContinuation(*index) });
 		valuesIfTrue.push(value);
 
 		auto resultsIfTrue = m_consumer->build(epIfTrue, valuesIfTrue);

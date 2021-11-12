@@ -62,8 +62,9 @@ SOURCES += \
 	types/VoidType.cpp \
 	types/WithPrototype.cpp \
 	types/WithoutType.cpp \
-	values/TypedValue.cpp \
 	values/DependentValue.cpp \
+	values/ExpandableValue.cpp \
+	values/TypedValue.cpp \
 	values/IndexedValue.cpp
 
 HEADERS += \
@@ -74,7 +75,6 @@ HEADERS += \
 	DzArrayContinuation.h \
 	DzArrayElement.h \
 	DzArrayInit.h \
-	values/DependentValue.h \
 	DzArgument.h \
 	DzAssignment.h \
 	DzBinary.h \
@@ -134,6 +134,8 @@ HEADERS += \
 	types/WithPrototype.h \
 	types/WithoutType.h \
 	values/BaseValue.h \
+	values/DependentValue.h \
+	values/ExpandableValue.h \
 	values/IndexedValue.h \
 	values/TypedValue.h \
 	wobjectdefs.h \

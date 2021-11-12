@@ -1,5 +1,6 @@
 #include "DzExpansion.h"
 
+#include "values/ExpandableValue.h"
 #include "values/DependentValue.h"
 
 DzExpansion::DzExpansion(DzValue *consumer)
@@ -11,15 +12,22 @@ std::vector<DzResult> DzExpansion::build(const EntryPoint &entryPoint, Stack val
 {
 	auto block = entryPoint.block();
 
-	auto iterator = values.require<DependentValue>();
+	auto iterator = values.require<ExpandableValue>();
 
 	auto continuation = iterator->chain();
 	auto provider = iterator->provider();
 	auto continuationEntryPoint = provider->withBlock(block);
 
-	continuation->build(continuationEntryPoint, Stack());
+	auto result = continuation->build(continuationEntryPoint, Stack());
 
-	values.push(iterator);
+	for (auto &[targetEntryPoint, _] : result)
+	{
+		auto value = new DependentValue { new EntryPoint(targetEntryPoint) };
 
-	return m_consumer->build(entryPoint, values);
+		values.push(value);
+
+		return m_consumer->build(entryPoint, values);
+	}
+
+	throw new std::exception();
 }

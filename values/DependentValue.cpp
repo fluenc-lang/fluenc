@@ -1,23 +1,16 @@
 #include "DependentValue.h"
 
-DependentValue::DependentValue(const Type *type, const EntryPoint *provider, const DzValue *chain)
-	: m_type(type)
-	, m_provider(provider)
-	, m_chain(chain)
+DependentValue::DependentValue(const EntryPoint *provider)
+	: m_provider(provider)
 {
 }
 
 const Type *DependentValue::type() const
 {
-	return m_type;
+	throw std::exception();
 }
 
 const EntryPoint *DependentValue::provider() const
 {
 	return m_provider;
-}
-
-const DzValue *DependentValue::chain() const
-{
-	return m_chain;
 }
