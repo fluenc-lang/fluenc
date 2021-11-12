@@ -42,18 +42,16 @@ struct SDL_KeyboardEvent
     padding: 0L
 };
 
-struct Player
-{
-    x: 0,
-    y: 0
-};
+global Normal: 0;
+global MouseOver: 1;
 
 struct Item
 {
     x: 0,
     y: 0,
     width: 0,
-    height: 0
+    height: 0,
+    state: 0
 };
 
 struct Button : Item
@@ -68,19 +66,75 @@ struct State
 
 function application(State state)
 {
-    return Button
+    return [
+        Button
+        {
+            x: 10 + state.counter,
+            y: 10,
+            width: 70,
+            height: 20,
+            text: "Click me!"
+        },
+        Button
+        {
+            x: 10 + state.counter,
+            y: 40,
+            width: 70,
+            height: 20,
+            text: "Click me!"
+        }
+    ];
+}
+
+function boundingRect(Item item)
+{
+    return SDL_Rect
     {
-        x: 10 + state.counter,
-        y: 10,
-        width: 100,
-        height: 20,
-        text: "Click me!"
+        x: item.x,
+        y: item.y,
+        width: item.width,
+        height: item.height
     };
 }
 
-function draw(Button button)
+function clear(long renderer, State state)
 {
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
 
+    return state;
+}
+
+function present(long renderer, State state)
+{
+    SDL_RenderPresent(renderer);
+
+    return state;
+}
+
+function drawButton(long renderer, Button button)
+{
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+    SDL_RenderFillRect(renderer
+        , boundingRect(button)
+        );
+
+    return nothing;
+}
+
+function draw(long renderer, State state, Button button)
+{
+    drawButton(renderer, button);
+
+    return state;
+}
+
+function draw(long renderer, State state, Button button, ...controls)
+{
+    drawButton(renderer, button);
+
+    return draw(renderer, state, ...controls);
 }
 
 function initState()
@@ -90,7 +144,14 @@ function initState()
 
 function mainLoop(long renderer, State state)
 {
-    return mainLoop(renderer, state);
+    return mainLoop(renderer
+        , present(renderer
+            , draw(renderer
+                , clear(renderer, state)
+                , application(state)
+                )
+            )
+        );
 }
 
 export int main()

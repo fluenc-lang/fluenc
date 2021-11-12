@@ -1,13 +1,13 @@
 #include "UserTypeField.h"
 
-UserTypeField::UserTypeField(int index, const std::string &name, const Type *type)
+UserTypeField::UserTypeField(size_t index, const std::string &name, const Type *type)
 	: m_index(index)
 	, m_name(name)
 	, m_type(type)
 {
 }
 
-int UserTypeField::index() const
+size_t UserTypeField::index() const
 {
 	return m_index;
 }

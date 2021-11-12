@@ -25,11 +25,9 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 {
 	auto &context = entryPoint.context();
 
-	auto name = entryPoint.name();
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
 
-	block->setName(name);
 	block->insertInto(function);
 
 	llvm::IRBuilder<> builder(block);

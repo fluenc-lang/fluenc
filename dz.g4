@@ -109,7 +109,7 @@ ID
 	;
 
 fragment CHAR
-	: [a-zA-Z]
+	: [a-zA-Z_]
 	;
 
 fragment DIGIT

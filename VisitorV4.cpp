@@ -32,6 +32,7 @@
 #include "Indexed.h"
 #include "DzArrayElement.h"
 #include "DzArrayInit.h"
+#include "BlockStackFrame.h"
 
 #include "types/Prototype.h"
 
@@ -244,7 +245,9 @@ antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
 
 	auto result = std::accumulate(rbegin(expressions), rend(expressions), visit(context->ret()), [this](DzValue *consumer, dzParser::ExpressionContext *expression)
 	{
-		VisitorV4 visitor(consumer, m_alpha);
+		auto stackFrame = new BlockStackFrame(consumer);
+
+		VisitorV4 visitor(stackFrame, m_alpha);
 
 		return visitor
 			.visit(expression)

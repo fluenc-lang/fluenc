@@ -27,6 +27,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
+	public:
+		Tests()
+		{
+			scenario41();
+		}
+
 	private:
 		void scenario1()
 		{
@@ -1126,6 +1132,35 @@ class Tests : public QObject
 			QCOMPARE(result, 6);
 		}
 
+		void scenario41()
+		{
+			auto result = exec(R"(
+				function foo()
+				{
+					return 1;
+				}
+
+				function generator()
+				{
+					foo();
+
+					return 32;
+				}
+
+				function func(int value)
+				{
+					return value;
+				}
+
+				export int main()
+				{
+					return func(generator());
+				}
+			)");
+
+			QCOMPARE(result, 32);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1167,6 +1202,7 @@ class Tests : public QObject
 		W_SLOT(scenario38)
 		W_SLOT(scenario39)
 		W_SLOT(scenario40)
+		W_SLOT(scenario41)
 
 	private:
 		ModuleInfo *compile(std::string source)

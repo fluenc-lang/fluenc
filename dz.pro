@@ -4,6 +4,7 @@ CONFIG += DEBUG
 
 SOURCES += \
 	AllIterator.cpp \
+	BlockStackFrame.cpp \
 	CompilerException.cpp \
 	DefaultPrototypeProvider.cpp \
 	DzArgument.cpp \
@@ -67,6 +68,7 @@ SOURCES += \
 
 HEADERS += \
 	AllIterator.h \
+	BlockStackFrame.h \
 	CompilerException.h \
 	DefaultPrototypeProvider.h \
 	DzArrayContinuation.h \

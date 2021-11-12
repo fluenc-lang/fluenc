@@ -8,16 +8,16 @@ class Type;
 class UserTypeField
 {
 	public:
-		UserTypeField(int index, const std::string &name, const Type *type);
+		UserTypeField(size_t index, const std::string &name, const Type *type);
 
-		int index() const;
+		size_t index() const;
 
 		std::string name() const;
 
 		const Type *type() const;
 
 	private:
-		int m_index;
+		size_t m_index;
 
 		std::string m_name;
 
