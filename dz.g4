@@ -17,7 +17,7 @@ assignment
 	;
 
 field
-	: ID (':' literal)?
+	: ID (':' expression)?
 	;
 	
 function 

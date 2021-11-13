@@ -2,27 +2,29 @@
 
 #include <stdio.h>
 
-int SDL_PollKeyEvent(SDL_KeyboardEvent *key)
+struct Event
+{
+    SDL_KeyboardEvent *key;
+    SDL_MouseMotionEvent *motion;
+};
+
+void SDL_WaitEventEx(struct Event *events)
 {
     SDL_Event event;
 
-    if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED))
-    {
-        memcpy(key, &event.key, sizeof(SDL_KeyboardEvent));
+    SDL_WaitEvent(&event);
 
-        return 1;
-    }
-
-    return 0;
+    memcpy(events->key, &event.key, sizeof(SDL_KeyboardEvent));
+    memcpy(events->motion, &event.motion, sizeof(SDL_MouseMotionEvent));
 }
 
-int SDL_PollMouseEvent(SDL_MouseEvent *mouse)
+int SDL_PollMouseMotionEvent(SDL_MouseMotionEvent *motion)
 {
     SDL_Event event;
 
-    if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED))
+    if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION))
     {
-        memcpy(key, &event.key, sizeof(SDL_KeyboardEvent));
+        memcpy(motion, &event.motion, sizeof(SDL_MouseMotionEvent));
 
         return 1;
     }

@@ -411,12 +411,12 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 	{
 		auto name = field->ID()->getText();
 
-		if (field->literal())
+		if (field->expression())
 		{
 			VisitorV4 visitor(DzTerminator::instance(), nullptr);
 
 			auto defaultValue = visitor
-				.visit(field->literal())
+				.visit(field->expression())
 				.as<DzValue *>();
 
 			return { name, defaultValue };

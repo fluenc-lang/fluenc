@@ -5,12 +5,14 @@ import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
 import int SDL_RenderClear(long renderer);
 import int SDL_RenderFillRect(long renderer, SDL_Rect rect);
 import int SDL_PollKeyEvent(SDL_KeyboardEvent key);
+import int SDL_PollMouseMotionEvent(SDL_MouseMotionEvent motion);
 
 import long SDL_CreateRenderer(long window, int index, int flags);
 import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
 
 import void SDL_RenderPresent(long renderer);
 import void SDL_PumpEvents();
+import void SDL_WaitEventEx(EventState events);
 
 import void printnum(int num);
 
@@ -42,6 +44,19 @@ struct SDL_KeyboardEvent
     padding: 0L
 };
 
+struct SDL_MouseMotionEvent
+{
+    type : 0,
+    timestamp : 0,
+    windowID: 0,
+    which: 0,
+    state: 0,
+    x: 0,
+    y: 0,
+    xrel: 0,
+    yrel: 0
+};
+
 global Normal: 0;
 global MouseOver: 1;
 
@@ -59,10 +74,103 @@ struct Button : Item
     text
 };
 
+struct Color
+{
+    r: 0,
+    g: 0,
+    b: 0
+}
+
+struct Rectangle : Item
+{
+    color: Color {}
+};
+
 struct State
 {
     counter: 0
 };
+
+struct ControlTemplate
+{
+    normal,
+    mouseOver
+};
+
+function createMouseMotionEvent()
+{
+    return SDL_MouseMotionEvent {};
+}
+
+function processMouseMotion(SDL_MouseMotionEvent motion)
+{
+    SDL_PumpEvents();
+
+    if (SDL_PollMouseMotionEvent(motion) == 1)
+    {
+        return motion;
+    }
+
+    return nothing;
+}
+
+struct EventState
+{
+    key,
+    motion
+};
+
+struct ApplicationState
+{
+    events,
+    user
+};
+
+function createEventState()
+{
+    return EventState
+    {
+        key: SDL_KeyboardEvent {},
+        motion: SDL_MouseMotionEvent {}
+    };
+}
+
+function processEvents(EventState eventState)
+{
+    SDL_WaitEventEx(eventState);
+
+    return eventState;
+}
+
+function createApplicationState(State state)
+{
+    return ApplicationState
+    {
+        events: processEvents(createEventState()),
+        user: state
+    };
+}
+
+function buttonTemplate(Button button)
+{
+    return ControlTemplate
+    {
+        normal: Rectangle
+        {
+            color: Color
+            {
+                r: 255
+            }
+        },
+        mouseOver: Rectangle
+        {
+            color: Color
+            {
+                b: 255
+            }
+        }
+    };
+}
 
 function application(State state)
 {
@@ -79,6 +187,22 @@ function application(State state)
         {
             x: 10 + state.counter,
             y: 40,
+            width: 70,
+            height: 20,
+            text: "Click me!"
+        },
+        Button
+        {
+            x: 10 + state.counter,
+            y: 70,
+            width: 70,
+            height: 20,
+            text: "Click me!"
+        },
+        Button
+        {
+            x: 10 + state.counter,
+            y: 100,
             width: 70,
             height: 20,
             text: "Click me!"
@@ -112,29 +236,106 @@ function present(long renderer, State state)
     return state;
 }
 
+function setRenderDrawColor(long renderer, Color color)
+{
+    return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+}
+
+function draw(long renderer, Rectangle rectangle)
+{
+    setRenderDrawColor(renderer, rectangle.color);
+
+    SDL_RenderFillRect(renderer, boundingRect(rectangle));
+
+    return rectangle;
+}
+
+function selectTemplate(ControlTemplate template, Item item)
+{
+    if (item.state == MouseOver)
+    {
+        return template.mouseOver;
+    }
+
+    return template.normal;
+}
+
 function drawButton(long renderer, Button button)
 {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    draw(buttonTemplate(button));
 
-    SDL_RenderFillRect(renderer
-        , boundingRect(button)
-        );
+    return button;
+}
 
-    return nothing;
+function containsMouse(Item item, SDL_MouseMotionEvent motion)
+{
+    if (motion.x < item.x)
+    {
+        return false;
+    }
+
+    if (motion.x > (item.x + item.width))
+    {
+        return false;
+    }
+
+    if (motion.y < item.y)
+    {
+        return false;
+    }
+
+    if (motion.y > (item.y + item.height))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+function updateButton(EventState events, Button button)
+{
+    if (containsMouse(button, events.motion))
+    {
+        return button with
+        {
+            state: MouseOver
+        };
+    }
+
+    return button with
+    {
+        state: Normal
+    };
+}
+
+function update(ApplicationState state, Button button)
+{
+    return updateButton(state.events, button);
+}
+
+function update(ApplicationState state, Button button, ...controls)
+{
+    return updateButton(state.events, button) -> (state, ...controls);
 }
 
 function draw(long renderer, State state, Button button)
 {
-    drawButton(renderer, button);
-
-    return state;
+    return drawButton(renderer, button);
 }
 
 function draw(long renderer, State state, Button button, ...controls)
 {
-    drawButton(renderer, button);
+    return drawButton(renderer, button) -> (renderer, state, ...controls);
+}
 
-    return draw(renderer, state, ...controls);
+function run(State state, Item item)
+{
+    return state;
+}
+
+function run(State state, Item item, ...items)
+{
+    return run(state, ...items);
 }
 
 function initState()
@@ -146,9 +347,13 @@ function mainLoop(long renderer, State state)
 {
     return mainLoop(renderer
         , present(renderer
-            , draw(renderer
-                , clear(renderer, state)
-                , application(state)
+            , run(state
+                , draw(renderer
+                    , clear(renderer, state)
+                    , update(createApplicationState(state)
+                        , application(state)
+                        )
+                    )
                 )
             )
         );

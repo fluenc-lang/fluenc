@@ -53,6 +53,11 @@ function createKeyboardEvent()
     return SDL_KeyboardEvent {};
 }
 
+function createMouseMotionEvent()
+{
+    return SDL_MouseMotionEvent {};
+}
+
 function createPlayer()
 {
     return Player {};
