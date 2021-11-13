@@ -94,32 +94,39 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 
 			if (auto userType = dynamic_cast<const UserType *>(argumentType))
 			{
+				auto intType = llvm::Type::getInt32Ty(*context);
+
 				auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
 
 				auto i = 0;
 
 				for (auto &field : userType->fields())
 				{
-					auto intType = llvm::Type::getInt32Ty(*context);
-
-					auto fieldType = field.type();
-
-					llvm::Value *indexes[] =
-					{
-						llvm::ConstantInt::get(intType, 0),
-						llvm::ConstantInt::get(intType, i++)
-					};
-
 					std::stringstream ss;
 					ss << name;
 					ss << ".";
 					ss << field.name();
 
-					auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
-
 					auto localName = ss.str();
 
-					locals[localName] = new TypedValue(fieldType, gep);
+					auto fieldType = field.type();
+
+					if (fieldType)
+					{
+						llvm::Value *indexes[] =
+						{
+							llvm::ConstantInt::get(intType, 0),
+							llvm::ConstantInt::get(intType, i++)
+						};
+
+						auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
+
+						locals[localName] = new TypedValue(fieldType, gep);
+					}
+					else
+					{
+						locals[localName] = nullptr;
+					}
 				}
 
 				locals[name] = addressOfArgument;

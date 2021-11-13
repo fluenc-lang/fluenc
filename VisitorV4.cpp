@@ -573,7 +573,12 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 			.as<DzValue *>();
 	});
 
-	auto init = new DzArrayInit(firstElement);
+	if (firstElement)
+	{
+		auto init = new DzArrayInit(firstElement);
 
-	return static_cast<DzValue *>(init);
+		return static_cast<DzValue *>(init);
+	}
+
+	return m_alpha;
 }

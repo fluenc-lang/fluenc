@@ -66,7 +66,8 @@ struct Item
     y: 0,
     width: 0,
     height: 0,
-    state: 0
+    state: 0,
+    children: []
 };
 
 struct Button : Item
@@ -151,19 +152,34 @@ function createApplicationState(State state)
     };
 }
 
+function rgb(int r, int g, int b)
+{
+    return Color
+    {
+        r: r,
+        g: g,
+        b: b
+    };
+}
+
 function buttonTemplate(Button button)
 {
     return ControlTemplate
     {
         normal: Rectangle
         {
-            color: Color
-            {
-                r: 255
-            }
+            x: button.x,
+            y: button.y,
+            width: button.width,
+            height: button.height + 2,
+            color: rgb(41, 128, 185)
         },
         mouseOver: Rectangle
         {
+            x: button.x,
+            y: button.y,
+            width: button.width,
+            height: button.height,
             color: Color
             {
                 b: 255
@@ -241,7 +257,7 @@ function setRenderDrawColor(long renderer, Color color)
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
 
-function draw(long renderer, Rectangle rectangle)
+function draw_s(long renderer, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
@@ -262,7 +278,7 @@ function selectTemplate(ControlTemplate template, Item item)
 
 function drawButton(long renderer, Button button)
 {
-    draw(buttonTemplate(button));
+    draw_s(renderer, selectTemplate(buttonTemplate(button), button));
 
     return button;
 }

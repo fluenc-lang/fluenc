@@ -27,6 +27,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
+	public:
+		Tests()
+		{
+			scenario45();
+		}
+
 	private:
 		void scenario1()
 		{
@@ -1224,6 +1230,55 @@ class Tests : public QObject
 			QCOMPARE(result, 100);
 		}
 
+		void scenario44()
+		{
+			auto result = exec(R"(
+				function foo()
+				{
+					return 23;
+				}
+
+				export int main()
+				{
+					return foo([]);
+				}
+			)");
+
+			QCOMPARE(result, 23);
+		}
+
+		void scenario45()
+		{
+			auto result = exec(R"(
+				struct Foo
+				{
+					array: []
+				};
+
+				function createFoo()
+				{
+					return Foo {};
+				}
+
+				function foo(Foo f)
+				{
+					return bar(f.array);
+				}
+
+				function bar()
+				{
+					return 23;
+				}
+
+				export int main()
+				{
+					return foo(createFoo());
+				}
+			)");
+
+			QCOMPARE(result, 23);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1268,6 +1323,8 @@ class Tests : public QObject
 		W_SLOT(scenario41)
 		W_SLOT(scenario42)
 		W_SLOT(scenario43)
+		W_SLOT(scenario44)
+		W_SLOT(scenario45)
 
 	private:
 		ModuleInfo *compile(std::string source)

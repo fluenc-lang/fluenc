@@ -41,7 +41,7 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 
 		values.push(new TypedValue { valueType, load });
 	}
-	else
+	else if(iterator->second)
 	{
 		values.push(iterator->second);
 	}

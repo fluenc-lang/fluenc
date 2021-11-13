@@ -29,17 +29,17 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 		size_t index;
 
 		const PrototypeField field;
-		const TypedValue *value;
+		const BaseValue *value;
 	};
 
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
-	std::unordered_map<std::string, const TypedValue *> valueByName;
+	std::unordered_map<std::string, const BaseValue *> valueByName;
 
 	std::transform(begin(m_fields), end(m_fields), std::insert_iterator(valueByName, begin(valueByName)), [&](auto field)
 	{
-		return std::make_pair(field, values.require<TypedValue>());
+		return std::make_pair(field, values.pop());
 	});
 
 	auto prototype = m_prototypeProvider->provide(entryPoint, values);
@@ -66,7 +66,12 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 		for (auto &[_, defaultValues] : defaultValue->build(entryPoint, Stack()))
 		{
-			return { index, field, static_cast<const TypedValue *>(*defaultValues.begin()) };
+			if (defaultValues.size() > 0)
+			{
+				return { index, field, *defaultValues.begin() };
+			}
+
+			return { index, field, nullptr };
 		}
 
 		throw new std::exception();
@@ -74,9 +79,14 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::vector<llvm::Type *> types;
 
-	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(types), [&](auto embryo)
+	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(types), [&](auto embryo) -> llvm::Type *
 	{
-		return embryo.value->type()->storageType(*context);
+		if (embryo.value)
+		{
+			return embryo.value->type()->storageType(*context);
+		}
+
+		return llvm::Type::getInt8PtrTy(*context);
 	});
 
 	auto block = entryPoint.block();
@@ -92,24 +102,31 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::transform(begin(fieldEmbryos), end(fieldEmbryos), std::back_insert_iterator(fields), [&](auto embryo) -> UserTypeField
 	{
-		llvm::Value *indexes[] =
+		if (auto typedValue = dynamic_cast<const TypedValue *>(embryo.value))
 		{
-			llvm::ConstantInt::get(intType, 0),
-			llvm::ConstantInt::get(intType, embryo.index)
-		};
+			llvm::Value *indexes[] =
+			{
+				llvm::ConstantInt::get(intType, 0),
+				llvm::ConstantInt::get(intType, embryo.index)
+			};
 
-		auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, embryo.field.name(), block);
+			auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, embryo.field.name(), block);
 
-		auto valueType = embryo.value->type();
-		auto valueStorageType = valueType->storageType(*context);
+			auto valueType = embryo.value->type();
+			auto valueStorageType = valueType->storageType(*context);
 
-		auto valueAlign = dataLayout.getABITypeAlign(valueStorageType);
+			auto valueAlign = dataLayout.getABITypeAlign(valueStorageType);
 
-		auto store = new llvm::StoreInst(*embryo.value, gep, false, valueAlign, block);
+			auto store = new llvm::StoreInst(*typedValue, gep, false, valueAlign, block);
 
-		UNUSED(store);
+			UNUSED(store);
 
-		return { embryo.index, embryo.field.name(), valueType };
+			return { embryo.index, embryo.field.name(), valueType };
+		}
+		else
+		{
+			return { embryo.index, embryo.field.name(), nullptr };
+		}
 	});
 
 	auto type = new UserType(prototype, structType, fields);
