@@ -24,22 +24,26 @@ std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack v
 	auto intType = llvm::Type::getInt32Ty(*context);
 
 	auto fieldType = m_field.type();
-	auto storageType = fieldType->storageType(*context);
 
-	llvm::Value *indexes[] =
+	if (fieldType)
 	{
-		llvm::ConstantInt::get(intType, 0),
-		llvm::ConstantInt::get(intType, m_field.index())
-	};
+		auto storageType = fieldType->storageType(*context);
 
-	auto gep = llvm::GetElementPtrInst::CreateInBounds(m_instance, indexes, m_field.name(), block);
+		llvm::Value *indexes[] =
+		{
+			llvm::ConstantInt::get(intType, 0),
+			llvm::ConstantInt::get(intType, m_field.index())
+		};
 
-	auto dataLayout = module->getDataLayout();
-	auto align = dataLayout.getABITypeAlign(storageType);
+		auto gep = llvm::GetElementPtrInst::CreateInBounds(m_instance, indexes, m_field.name(), block);
 
-	auto load = new llvm::LoadInst(storageType, gep, m_field.name(), false, align, block);
+		auto dataLayout = module->getDataLayout();
+		auto align = dataLayout.getABITypeAlign(storageType);
 
-	values.push(new TypedValue { fieldType, load });
+		auto load = new llvm::LoadInst(storageType, gep, m_field.name(), false, align, block);
+
+		values.push(new TypedValue { fieldType, load });
+	}
 
 	return {{ entryPoint, values }};
 }

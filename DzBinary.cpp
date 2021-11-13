@@ -80,5 +80,15 @@ const TypedValue *DzBinary::resolveOp(const EntryPoint &entryPoint, const TypedV
 		return new TypedValue { BooleanType::instance(), builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_NE, *left, *right) };
 	}
 
+	if (m_op == "&&")
+	{
+		return new TypedValue { BooleanType::instance(), builder.CreateAnd(*left, *right) };
+	}
+
+	if (m_op == "||")
+	{
+		return new TypedValue { BooleanType::instance(), builder.CreateOr(*left, *right) };
+	}
+
 	throw new std::exception();
 }

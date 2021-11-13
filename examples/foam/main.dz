@@ -172,7 +172,17 @@ function buttonTemplate(Button button)
             y: button.y,
             width: button.width,
             height: button.height + 2,
-            color: rgb(41, 128, 185)
+            color: rgb(41, 128, 185),
+            children: [
+                Rectangle
+                {
+                    x: button.x,
+                    y: button.y,
+                    width: button.width,
+                    height: button.height,
+                    color: rgb(29, 153, 243)
+                }
+            ]
         },
         mouseOver: Rectangle
         {
@@ -257,13 +267,27 @@ function setRenderDrawColor(long renderer, Color color)
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
 
-function draw_s(long renderer, Rectangle rectangle)
+function draw_q(long renderer, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
     SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
     return rectangle;
+}
+
+function draw_q(long renderer)
+{
+    return nothing;
+}
+
+function draw_s(long renderer, Rectangle rectangle)
+{
+    setRenderDrawColor(renderer, rectangle.color);
+
+    SDL_RenderFillRect(renderer, boundingRect(rectangle));
+
+    return draw_q(renderer, rectangle.children);
 }
 
 function selectTemplate(ControlTemplate template, Item item)
