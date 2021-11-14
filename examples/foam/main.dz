@@ -309,27 +309,10 @@ function drawButton(long renderer, Button button)
 
 function containsMouse(Item item, SDL_MouseMotionEvent motion)
 {
-    if (motion.x < item.x)
-    {
-        return false;
-    }
-
-    if (motion.x > (item.x + item.width))
-    {
-        return false;
-    }
-
-    if (motion.y < item.y)
-    {
-        return false;
-    }
-
-    if (motion.y > (item.y + item.height))
-    {
-        return false;
-    }
-
-    return true;
+    return (motion.x > item.x)
+        && (motion.x < (item.x + item.width))
+        && (motion.y > item.y)
+        && (motion.y < (item.y + item.height));
 }
 
 function updateButton(EventState events, Button button)

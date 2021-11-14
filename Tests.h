@@ -1295,6 +1295,73 @@ class Tests : public QObject
 			QCOMPARE(result, 1);
 		}
 
+		void scenario47()
+		{
+			auto result = exec(R"(
+				struct Item
+				{
+					value: 0,
+					children: []
+				};
+
+				function createStructure()
+				{
+					return [
+						Item
+						{
+							value: 1,
+							children: [
+								Item
+								{
+									value: 2
+								},
+								Item
+								{
+									value: 3
+								}
+							]
+						},
+						Item
+						{
+							value: 4,
+							children: [
+								Item
+								{
+									value: 5
+								}
+							]
+						},
+						Item
+						{
+							value: 6
+						}
+					];
+				}
+
+				function foo(int accumulator)
+				{
+					return accumulator;
+				}
+
+				function foo(int accumulator, Item item)
+				{
+					return foo(accumulator + item.value, item.children);
+				}
+
+				function foo(int accumulator, Item item, ...values)
+				{
+					return foo(foo(accumulator + item.value, item.children), ...values);
+				}
+
+				export int main()
+				{
+					return foo(0, createStructure());
+				}
+			)");
+
+			QCOMPARE(result, 1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1342,6 +1409,7 @@ class Tests : public QObject
 		W_SLOT(scenario44)
 		W_SLOT(scenario45)
 		W_SLOT(scenario46)
+//		W_SLOT(scenario47)
 
 	private:
 		ModuleInfo *compile(std::string source)
