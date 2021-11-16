@@ -3,14 +3,14 @@
 
 #include "DzCallable.h"
 
-class DzArgument;
+class DzBaseArgument;
 class DzTypeName;
 
 class DzImportedFunction : public DzCallable
 {
 	public:
 		DzImportedFunction(const std::string &name
-			, const std::vector<DzArgument *> &arguments
+			, const std::vector<DzBaseArgument *> &arguments
 			, DzTypeName *returnType
 			);
 
@@ -24,7 +24,7 @@ class DzImportedFunction : public DzCallable
 
 	private:
 		std::string m_name;
-		std::vector<DzArgument *> m_arguments;
+		std::vector<DzBaseArgument *> m_arguments;
 
 		DzTypeName *m_returnType;
 };

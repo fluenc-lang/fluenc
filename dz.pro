@@ -64,6 +64,7 @@ SOURCES += \
 	types/WithoutType.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/TupleValue.cpp \
 	values/TypedValue.cpp \
 	values/IndexedValue.cpp
 
@@ -137,6 +138,7 @@ HEADERS += \
 	values/DependentValue.h \
 	values/ExpandableValue.h \
 	values/IndexedValue.h \
+	values/TupleValue.h \
 	values/TypedValue.h \
 	wobjectdefs.h \
 	wobjectimpl.h

@@ -9,6 +9,7 @@
 
 #include "values/IndexedValue.h"
 #include "values/TypedValue.h"
+#include "values/TupleValue.h"
 
 StackSegment::StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue *consumer)
 	: m_values(values)
@@ -74,6 +75,35 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 						UNUSED(store);
 
 						scopedReturnValues.push(new IndexedValue{ argument.index, new TypedValue { argumentType, alloc } });
+					}
+					else if (auto tupleValue = dynamic_cast<const TupleValue *>(resultValue)) // bleh
+					{
+						std::vector<const BaseValue *> v;
+
+						for (auto k : tupleValue->values())
+						{
+							if (auto tb = dynamic_cast<const TypedValue *>(k))
+							{
+								auto argumentType = tb->type();
+								auto storageType = argumentType->storageType(*context);
+
+								auto alloc = entryPoint.alloc(storageType);
+
+								auto align = dataLayout.getABITypeAlign(storageType);
+
+								auto store = new llvm::StoreInst(*tb, alloc, false, align, block);
+
+								UNUSED(store);
+
+								v.push_back(new TypedValue { argumentType, alloc });
+							}
+							else
+							{
+								v.push_back(k);
+							}
+						}
+
+						scopedReturnValues.push(new IndexedValue { argument.index, new TupleValue { v } });
 					}
 					else
 					{

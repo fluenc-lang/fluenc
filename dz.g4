@@ -62,7 +62,8 @@ block
 	;
 
 argument
-	: typeName ID
+	: typeName ID #standardArgument
+	| '(' argument (',' argument)* ')' #tupleArgument
 	;
 
 typeName

@@ -389,13 +389,34 @@ public:
   class  ArgumentContext : public antlr4::ParserRuleContext {
   public:
     ArgumentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    ArgumentContext() = default;
+    void copyFrom(ArgumentContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
     virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  StandardArgumentContext : public ArgumentContext {
+  public:
+    StandardArgumentContext(ArgumentContext *ctx);
+
     TypeNameContext *typeName();
     antlr4::tree::TerminalNode *ID();
 
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  TupleArgumentContext : public ArgumentContext {
+  public:
+    TupleArgumentContext(ArgumentContext *ctx);
+
+    std::vector<ArgumentContext *> argument();
+    ArgumentContext* argument(size_t i);
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
   };
 
   ArgumentContext* argument();
