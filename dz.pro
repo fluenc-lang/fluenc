@@ -78,6 +78,7 @@ HEADERS += \
 	DzArrayInit.h \
 	DzArgument.h \
 	DzAssignment.h \
+	DzBaseArgument.h \
 	DzBinary.h \
 	DzBooleanLiteral.h \
 	DzCallable.h \

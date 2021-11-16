@@ -1,9 +1,10 @@
 #include "ExpandableValue.h"
+#include "EntryPoint.h"
 
 #include "types/IteratorType.h"
 
-ExpandableValue::ExpandableValue(const EntryPoint *provider, const DzValue *chain)
-	: m_provider(provider)
+ExpandableValue::ExpandableValue(const EntryPoint &provider, const DzValue *chain)
+	: m_provider(new EntryPoint(provider))
 	, m_chain(chain)
 {
 }

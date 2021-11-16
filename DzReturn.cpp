@@ -22,8 +22,10 @@ DzReturn::DzReturn(DzValue *consumer, DzValue *chained)
 {
 }
 
-const BaseValue *v(const BaseValue *value, const EntryPoint &entryPoint)
+const BaseValue *fetchValue(Stack &values, const EntryPoint &entryPoint)
 {
+	auto value = values.pop();
+
 	if (auto typedValue = dynamic_cast<const TypedValue *>(value))
 	{
 		auto &context = entryPoint.context();
@@ -56,45 +58,19 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	llvm::IRBuilder<> builder(block);
 
-	auto value = values.pop();
-
-	auto k = v(value, entryPoint);
+	auto value = fetchValue(values, entryPoint);
 
 	if (m_chained)
 	{
-		auto continuation = new ExpandableValue { new EntryPoint(entryPoint), m_chained };
-
-		auto tuple = new TupleValue({ continuation, k });
+		auto continuation = new ExpandableValue(entryPoint, m_chained);
+		auto tuple = new TupleValue({ continuation, value });
 
 		values.push(tuple);
 	}
 	else
 	{
-		values.push(k);
+		values.push(value);
 	}
-
-//	for (auto i = values.begin(); i < values.end(); i++)
-//	{
-//		auto value = *i;
-
-//		if (auto typedValue = dynamic_cast<const TypedValue *>(value))
-//		{
-//			auto type = value->type();
-//			auto storageType = type->storageType(*context);
-
-//			auto alloc = entryPoint.alloc(storageType);
-
-//			builder.CreateStore(*typedValue, alloc);
-
-//			auto load = builder.CreateLoad(storageType, alloc);
-
-//			localValues.push(new TypedValue { type, load });
-//		}
-//		else
-//		{
-//			localValues.push(value);
-//		}
-//	}
 
 	return m_consumer->build(entryPoint, values);
 }

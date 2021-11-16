@@ -63,11 +63,9 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 
 		valuesIfFalse.push(index);
 
-		auto continuation = new ExpandableValue
-		{
-			new EntryPoint(entryPoint),
-			new DzArrayContinuation(*index)
-		};
+		auto continuation = new ExpandableValue(entryPoint
+			, new DzArrayContinuation(*index)
+			);
 
 		auto tuple = new TupleValue({ continuation, value });
 

@@ -5,17 +5,13 @@
 
 #include <llvm/IR/Type.h>
 
+#include "DzBaseArgument.h"
+
 #include "values/TupleValue.h"
 
 class DzTypeName;
 class EntryPoint;
 class Type;
-
-class DzBaseArgument
-{
-	public:
-		virtual Type *type(const EntryPoint &entryPoint) const = 0;
-};
 
 class DzArgument : public DzBaseArgument
 {
