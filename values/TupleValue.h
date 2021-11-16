@@ -6,6 +6,7 @@
 
 #include "BaseValue.h"
 #include "Utility.h"
+#include "Stack.h"
 
 #include "types/TupleType.h"
 
@@ -26,7 +27,7 @@ class TupleValue : public BaseValue
 			return TupleType::get(types);
 		}
 
-		std::vector<const BaseValue *> values() const
+		Stack values() const
 		{
 			return m_values;
 		}

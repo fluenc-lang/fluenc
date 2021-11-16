@@ -11,6 +11,7 @@ class Stack
 {
 	public:
 		Stack() = default;
+		Stack(const std::vector<const BaseValue *> &values);
 		Stack(const Stack &other) = default;
 
 		size_t size() const;

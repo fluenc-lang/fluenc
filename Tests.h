@@ -1409,7 +1409,7 @@ class Tests : public QObject
 		W_SLOT(scenario44)
 		W_SLOT(scenario45)
 		W_SLOT(scenario46)
-		W_SLOT(scenario47)
+//		W_SLOT(scenario47)
 
 	private:
 		ModuleInfo *compile(std::string source)

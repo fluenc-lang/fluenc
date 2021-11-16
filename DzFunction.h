@@ -32,7 +32,7 @@ class DzFunction : public DzCallable
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		std::vector<Argument> handleStandardArgument(DzArgument *argument, const EntryPoint &entryPoint, Stack &values) const;
+		std::vector<Argument> handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, Stack &values) const;
 
 		FunctionAttribute m_attribute;
 

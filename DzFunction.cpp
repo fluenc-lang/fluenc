@@ -80,31 +80,9 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 
 	for (const auto &argument : m_arguments)
 	{
-		if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
+		for (auto &[name, value] : handleArgument(argument, entryPoint, values))
 		{
-			for (auto &[name, value] : handleStandardArgument(standardArgument, entryPoint, values))
-			{
-				locals[name] = value;
-			}
-		}
-		else if (auto tupleArgument = dynamic_cast<DzTupleArgument *>(argument))
-		{
-			auto k = (TupleValue *)values.pop();
-
-			Stack s;
-
-			for (auto &v : k->values())
-			{
-				s.push(v);
-			}
-
-			for (auto standardArgument : tupleArgument->arguments())
-			{
-				for (auto &[name, value] : handleStandardArgument(static_cast<DzArgument *>(standardArgument), entryPoint, s))
-				{
-					locals[name] = value;
-				}
-			}
+			locals[name] = value;
 		}
 	}
 
@@ -116,70 +94,95 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 	return m_block->build(ep, values);
 }
 
-std::vector<DzFunction::Argument> DzFunction::handleStandardArgument(DzArgument *argument, const EntryPoint &entryPoint, Stack &values) const
+std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, Stack &values) const
 {
-	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
-
-	auto name = argument->name();
-
-	auto value = values.pop();
-
-	std::vector<Argument> result =
+	if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
 	{
-		{ name, value }
-	};
+		auto &module = entryPoint.module();
+		auto &context = entryPoint.context();
 
-	if (auto addressOfArgument = dynamic_cast<const TypedValue *>(value))
-	{
-		auto argumentType = addressOfArgument->type();
+		auto name = standardArgument->name();
 
-		if (auto userType = dynamic_cast<const UserType *>(argumentType))
+		auto value = values.pop();
+
+		std::vector<Argument> result
 		{
-			auto block = entryPoint.block();
+			{ name, value }
+		};
 
-			auto dataLayout = module->getDataLayout();
+		if (auto addressOfArgument = dynamic_cast<const TypedValue *>(value))
+		{
+			auto argumentType = addressOfArgument->type();
 
-			auto storageType = argumentType->storageType(*context);
-
-			auto align = dataLayout.getABITypeAlign(storageType);
-
-			auto intType = llvm::Type::getInt32Ty(*context);
-
-			auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
-
-			auto fields = userType->fields();
-
-			std::transform(begin(fields), end(fields), index_iterator(), std::back_insert_iterator(result), [=](auto field, auto index) -> Argument
+			if (auto userType = dynamic_cast<const UserType *>(argumentType))
 			{
-				std::stringstream ss;
-				ss << name;
-				ss << ".";
-				ss << field.name();
+				auto block = entryPoint.block();
 
-				auto localName = ss.str();
+				auto dataLayout = module->getDataLayout();
 
-				auto fieldType = field.type();
+				auto storageType = argumentType->storageType(*context);
 
-				if (fieldType)
+				auto align = dataLayout.getABITypeAlign(storageType);
+
+				auto intType = llvm::Type::getInt32Ty(*context);
+
+				auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
+
+				auto fields = userType->fields();
+
+				std::transform(begin(fields), end(fields), index_iterator(), std::back_insert_iterator(result), [=](auto field, auto index) -> Argument
 				{
-					llvm::Value *indexes[] =
+					std::stringstream ss;
+					ss << name;
+					ss << ".";
+					ss << field.name();
+
+					auto localName = ss.str();
+
+					auto fieldType = field.type();
+
+					if (fieldType)
 					{
-						llvm::ConstantInt::get(intType, 0),
-						llvm::ConstantInt::get(intType, index)
-					};
+						llvm::Value *indexes[] =
+						{
+							llvm::ConstantInt::get(intType, 0),
+							llvm::ConstantInt::get(intType, index)
+						};
 
-					auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
+						auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
 
-					return { localName, new TypedValue(fieldType, gep) };
-				}
-				else
-				{
-					return { localName, nullptr };
-				}
-			});
+						return { localName, new TypedValue(fieldType, gep) };
+					}
+					else
+					{
+						return { localName, nullptr };
+					}
+				});
+			}
 		}
+
+		return result;
 	}
 
-	return result;
+	if (auto tupleArgument = dynamic_cast<DzTupleArgument *>(argument))
+	{
+		auto tupleValue = values.require<TupleValue>();
+
+		auto tupleValues = tupleValue->values();
+		auto arguments = tupleArgument->arguments();
+
+		std::vector<Argument> results;
+
+		for (auto argument : arguments)
+		{
+			for (auto &result : handleArgument(argument, entryPoint, tupleValues))
+			{
+				results.push_back(result);
+			}
+		}
+
+		return results;
+	}
+
+	throw new std::exception();
 }
