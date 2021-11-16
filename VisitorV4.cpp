@@ -33,6 +33,7 @@
 #include "DzArrayElement.h"
 #include "DzArrayInit.h"
 #include "BlockStackFrame.h"
+#include "DzTupleArgument.h"
 
 #include "types/Prototype.h"
 

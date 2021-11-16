@@ -23,11 +23,6 @@ class IteratorType : public Type
 			return &instance;
 		}
 
-		TypeKind kind() const override
-		{
-			return TypeKind::Iterator;
-		}
-
 		std::string tag() const override
 		{
 			return "...";

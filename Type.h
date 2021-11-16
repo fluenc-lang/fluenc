@@ -7,19 +7,9 @@
 
 class EntryPoint;
 
-enum class TypeKind
-{
-	Builtin,
-	Prototype,
-	UserType,
-	Iterator,
-};
-
 class Type
 {
 	public:
-		virtual TypeKind kind() const = 0;
-
 		virtual std::string tag() const = 0;
 
 		virtual llvm::Type *storageType(llvm::LLVMContext &context) const = 0;

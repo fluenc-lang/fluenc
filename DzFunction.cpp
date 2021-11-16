@@ -13,6 +13,7 @@
 #include "AllIterator.h"
 #include "Type.h"
 #include "IndexIterator.h"
+#include "DzTupleArgument.h"
 
 #include "types/UserType.h"
 

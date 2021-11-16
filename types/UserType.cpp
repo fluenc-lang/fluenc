@@ -8,11 +8,6 @@ UserType::UserType(IPrototype *prototype, llvm::Type *type, const std::vector<Us
 {
 }
 
-TypeKind UserType::kind() const
-{
-	return TypeKind::UserType;
-}
-
 std::string UserType::tag() const
 {
 	return m_prototype->tag();

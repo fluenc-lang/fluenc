@@ -11,8 +11,6 @@ class UserType : public Type
 	public:
 		UserType(IPrototype *prototype, llvm::Type *type, const std::vector<UserTypeField> &fields);
 
-		TypeKind kind() const override;
-
 		std::string tag() const override;
 		std::vector<UserTypeField> fields() const;
 
