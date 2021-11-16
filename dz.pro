@@ -31,6 +31,7 @@ SOURCES += \
 	DzReturn.cpp \
 	DzStringLiteral.cpp \
 	DzTerminator.cpp \
+	DzTupleArgument.cpp \
 	DzTypeName.cpp \
 	DzValue.cpp \
 	EntryPoint.cpp \
@@ -50,12 +51,12 @@ SOURCES += \
 	antlr4-runtime/dzParser.cpp \
 	antlr4-runtime/dzVisitor.cpp \
 	types/BooleanType.cpp \
-	types/IPrototype.cpp \
 	types/Int32Type.cpp \
 	types/Int64Type.cpp \
 	types/Prototype.cpp \
 	types/PrototypeField.cpp \
 	types/StringType.cpp \
+	types/TupleType.cpp \
 	types/Uint32Type.cpp \
 	types/UserType.cpp \
 	types/UserTypeField.cpp \
@@ -64,6 +65,7 @@ SOURCES += \
 	types/WithoutType.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/TupleValue.cpp \
 	values/TypedValue.cpp \
 	values/IndexedValue.cpp
 
@@ -77,6 +79,7 @@ HEADERS += \
 	DzArrayInit.h \
 	DzArgument.h \
 	DzAssignment.h \
+	DzBaseArgument.h \
 	DzBinary.h \
 	DzBooleanLiteral.h \
 	DzCallable.h \
@@ -97,6 +100,7 @@ HEADERS += \
 	DzReturn.h \
 	DzStringLiteral.h \
 	DzTerminator.h \
+	DzTupleArgument.h \
 	DzTypeName.h \
 	DzValue.h \
 	EntryPoint.h \
@@ -127,6 +131,7 @@ HEADERS += \
 	types/PrototypeField.h \
 	types/StringType.h \
 	Type.h \
+	types/TupleType.h \
 	types/Uint32Type.h \
 	types/UserType.h \
 	types/UserTypeField.h \
@@ -137,6 +142,7 @@ HEADERS += \
 	values/DependentValue.h \
 	values/ExpandableValue.h \
 	values/IndexedValue.h \
+	values/TupleValue.h \
 	values/TypedValue.h \
 	wobjectdefs.h \
 	wobjectimpl.h

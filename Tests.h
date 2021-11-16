@@ -27,6 +27,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
+	public:
+		Tests()
+		{
+			scenario37();
+		}
+
 	private:
 		void scenario1()
 		{
@@ -1012,7 +1018,7 @@ class Tests : public QObject
 					return value + number;
 				}
 
-				function sum(int value, int number, ...numbers)
+				function sum(int value, (int number, ...numbers))
 				{
 					return sum(value + number, ...numbers);
 				}
@@ -1034,7 +1040,7 @@ class Tests : public QObject
 					return value + number;
 				}
 
-				function sum(int value, int number, ...numbers)
+				function sum(int value, (int number, ...numbers))
 				{
 					return sum(value + number, ...numbers);
 				}
@@ -1066,7 +1072,7 @@ class Tests : public QObject
 					return value + s.x;
 				}
 
-				function sum(int value, Struct1 s, ...ss)
+				function sum(int value, (Struct1 s, ...ss))
 				{
 					return sum(value + s.x, ...ss);
 				}
@@ -1076,7 +1082,7 @@ class Tests : public QObject
 					return value + s.y;
 				}
 
-				function sum(int value, Struct2 s, ...ss)
+				function sum(int value, (Struct2 s, ...ss))
 				{
 					return sum(value + s.y, ...ss);
 				}
@@ -1112,7 +1118,7 @@ class Tests : public QObject
 					return value + number;
 				}
 
-				function sum(int value, int number, ...numbers)
+				function sum(int value, (int number, ...numbers))
 				{
 					return sum(value + number, ...numbers);
 				}
@@ -1163,9 +1169,9 @@ class Tests : public QObject
 					return value + 2;
 				}
 
-				function add(int value, ...values)
+				function add((int value, ...values))
 				{
-					return value + 2 -> (value, ...values);
+					return value + 2 -> (...values);
 				}
 
 				function sum(int product, int value)
@@ -1173,7 +1179,7 @@ class Tests : public QObject
 					return product + value;
 				}
 
-				function sum(int product, int value, ...values)
+				function sum(int product, (int value, ...values))
 				{
 					return sum(product + value, ...values);
 				}
@@ -1348,7 +1354,7 @@ class Tests : public QObject
 					return foo(accumulator + item.value, item.children);
 				}
 
-				function foo(int accumulator, Item item, ...values)
+				function foo(int accumulator, (Item item, ...values))
 				{
 					return foo(foo(accumulator + item.value, item.children), ...values);
 				}

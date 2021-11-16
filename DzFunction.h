@@ -4,13 +4,22 @@
 #include "DzCallable.h"
 
 class DzArgument;
+class DzBaseArgument;
+class BaseValue;
 
 class DzFunction : public DzCallable
 {
+	struct Argument
+	{
+		std::string name;
+
+		const BaseValue *value;
+	};
+
 	public:
 		DzFunction(FunctionAttribute attribute
 			, const std::string &name
-			, const std::vector<DzArgument *> &arguments
+			, const std::vector<DzBaseArgument *> &arguments
 			, DzValue *block
 			);
 
@@ -23,10 +32,12 @@ class DzFunction : public DzCallable
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		std::vector<Argument> handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, Stack &values) const;
+
 		FunctionAttribute m_attribute;
 
 		std::string m_name;
-		std::vector<DzArgument *> m_arguments;
+		std::vector<DzBaseArgument *> m_arguments;
 
 		DzValue *m_block;
 };

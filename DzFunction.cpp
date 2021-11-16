@@ -12,15 +12,19 @@
 #include "EntryPoint.h"
 #include "AllIterator.h"
 #include "Type.h"
+#include "IndexIterator.h"
+#include "DzTupleArgument.h"
 
 #include "types/UserType.h"
 
 #include "values/ExpandableValue.h"
 #include "values/TypedValue.h"
+#include "values/TupleValue.h"
+#include "values/BaseValue.h"
 
 DzFunction::DzFunction(FunctionAttribute attribute
 	, const std::string &name
-	, const std::vector<DzArgument *> &arguments
+	, const std::vector<DzBaseArgument *> &arguments
 	, DzValue *block
 	)
 	: m_attribute(attribute)
@@ -49,7 +53,7 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 
 	auto result = true;
 
-	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), all_true(result), [=](DzArgument *argument, auto value)
+	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), all_true(result), [=](DzBaseArgument *argument, auto value)
 	{
 		if (!value)
 		{
@@ -67,40 +71,66 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 
 std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
+	auto block = entryPoint.block();
 
 	auto pep = entryPoint
 		.withValues(values);
-
-	auto block = entryPoint.block();
-
-	auto dataLayout = module->getDataLayout();
 
 	auto locals = entryPoint.locals();
 
 	for (const auto &argument : m_arguments)
 	{
-		auto name = argument->name();
+		for (auto &[name, value] : handleArgument(argument, entryPoint, values))
+		{
+			locals[name] = value;
+		}
+	}
+
+	auto ep = pep
+		.withName(m_name)
+		.withEntry(block)
+		.withLocals(locals);
+
+	return m_block->build(ep, values);
+}
+
+std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, Stack &values) const
+{
+	if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
+	{
+		auto &module = entryPoint.module();
+		auto &context = entryPoint.context();
+
+		auto name = standardArgument->name();
 
 		auto value = values.pop();
+
+		std::vector<Argument> result
+		{
+			{ name, value }
+		};
 
 		if (auto addressOfArgument = dynamic_cast<const TypedValue *>(value))
 		{
 			auto argumentType = addressOfArgument->type();
-			auto storageType = argumentType->storageType(*context);
-
-			auto align = dataLayout.getABITypeAlign(storageType);
 
 			if (auto userType = dynamic_cast<const UserType *>(argumentType))
 			{
+				auto block = entryPoint.block();
+
+				auto dataLayout = module->getDataLayout();
+
+				auto storageType = argumentType->storageType(*context);
+
+				auto align = dataLayout.getABITypeAlign(storageType);
+
 				auto intType = llvm::Type::getInt32Ty(*context);
 
 				auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
 
-				auto i = 0;
+				auto fields = userType->fields();
 
-				for (auto &field : userType->fields())
+				std::transform(begin(fields), end(fields), index_iterator(), std::back_insert_iterator(result), [=](auto field, auto index) -> Argument
 				{
 					std::stringstream ss;
 					ss << name;
@@ -116,36 +146,43 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 						llvm::Value *indexes[] =
 						{
 							llvm::ConstantInt::get(intType, 0),
-							llvm::ConstantInt::get(intType, i++)
+							llvm::ConstantInt::get(intType, index)
 						};
 
 						auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
 
-						locals[localName] = new TypedValue(fieldType, gep);
+						return { localName, new TypedValue(fieldType, gep) };
 					}
 					else
 					{
-						locals[localName] = nullptr;
+						return { localName, nullptr };
 					}
-				}
+				});
+			}
+		}
 
-				locals[name] = addressOfArgument;
-			}
-			else
-			{
-				locals[name] = new TypedValue(argumentType, *addressOfArgument);
-			}
-		}
-		else if (auto dependentValue = dynamic_cast<const ExpandableValue *>(value))
-		{
-			locals[name] = dependentValue;
-		}
+		return result;
 	}
 
-	auto ep = pep
-		.withName(m_name)
-		.withEntry(block)
-		.withLocals(locals);
+	if (auto tupleArgument = dynamic_cast<DzTupleArgument *>(argument))
+	{
+		auto tupleValue = values.require<TupleValue>();
 
-	return m_block->build(ep, values);
+		auto tupleValues = tupleValue->values();
+		auto arguments = tupleArgument->arguments();
+
+		std::vector<Argument> results;
+
+		for (auto argument : arguments)
+		{
+			for (auto &result : handleArgument(argument, entryPoint, tupleValues))
+			{
+				results.push_back(result);
+			}
+		}
+
+		return results;
+	}
+
+	throw new std::exception();
 }

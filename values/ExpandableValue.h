@@ -14,7 +14,7 @@ class DzValue;
 class ExpandableValue : public BaseValue
 {
 	public:
-		ExpandableValue(const EntryPoint *provider, const DzValue *chain);
+		ExpandableValue(const EntryPoint &provider, const DzValue *chain);
 
 		const Type *type() const override;
 

@@ -33,6 +33,7 @@
 #include "DzArrayElement.h"
 #include "DzArrayInit.h"
 #include "BlockStackFrame.h"
+#include "DzTupleArgument.h"
 
 #include "types/Prototype.h"
 
@@ -156,7 +157,7 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 
 antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 {
-	std::vector<DzArgument *> arguments;
+	std::vector<DzBaseArgument *> arguments;
 
 	for (auto argument : context->argument())
 	{
@@ -210,11 +211,29 @@ antlrcpp::Any VisitorV4::visitTypeName(dzParser::TypeNameContext *context)
 	return new DzTypeName(context->getText());
 }
 
-antlrcpp::Any VisitorV4::visitArgument(dzParser::ArgumentContext *context)
+antlrcpp::Any VisitorV4::visitStandardArgument(dzParser::StandardArgumentContext *context)
 {
-	return new DzArgument(context->ID()->getText()
+	auto argument = new DzArgument(context->ID()->getText()
 		, visit(context->typeName())
 		);
+
+	return static_cast<DzBaseArgument *>(argument);
+}
+
+antlrcpp::Any VisitorV4::visitTupleArgument(dzParser::TupleArgumentContext *context)
+{
+	auto arguments = context->argument();
+
+	std::vector<DzBaseArgument *> tupleArguments;
+
+	std::transform(begin(arguments), end(arguments), std::back_insert_iterator(tupleArguments), [this](dzParser::ArgumentContext *argument) -> DzBaseArgument *
+	{
+		return visit(argument);
+	});
+
+	auto argument = new DzTupleArgument(tupleArguments);
+
+	return static_cast<DzBaseArgument *>(argument);
 }
 
 antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)

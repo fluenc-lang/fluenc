@@ -115,7 +115,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitArgument(dzParser::ArgumentContext *ctx) override {
+  virtual antlrcpp::Any visitStandardArgument(dzParser::StandardArgumentContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitTupleArgument(dzParser::TupleArgumentContext *ctx) override {
     return visitChildren(ctx);
   }
 

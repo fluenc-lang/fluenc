@@ -16,15 +16,9 @@ class BuiltinType : public Type
 			return &instance;
 		}
 
-		TypeKind kind() const override
-		{
-			return TypeKind::Builtin;
-		}
-
 		Type *iteratorType() const override
 		{
 			return nullptr;
-//			return IteratorType<T>::instance();
 		}
 
 		bool is(const Type *type, const EntryPoint &entryPoint) const override

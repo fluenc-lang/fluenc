@@ -13,7 +13,7 @@
 #include "values/TypedValue.h"
 
 DzImportedFunction::DzImportedFunction(const std::string &name
-	, const std::vector<DzArgument *> &arguments
+	, const std::vector<DzBaseArgument *> &arguments
 	, DzTypeName *returnType
 	)
 	: m_name(name)
@@ -73,28 +73,35 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 	for (const auto &argument : m_arguments)
 	{
-		auto name = argument->name();
-		auto type = argument->type(entryPoint);
-
-		auto storageType = type->storageType(*context);
-
-		argumentTypes.push_back(storageType);
-
-		auto addressOfArgument = values.require<TypedValue>();
-
-		auto align = dataLayout.getABITypeAlign(storageType);
-
-		auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
-
-		if (dynamic_cast<Prototype *>(type))
+		if (auto standardArgument  = dynamic_cast<DzArgument *>(argument))
 		{
-			auto cast = new llvm::BitCastInst(load, llvm::Type::getInt8PtrTy(*context), "cast", block);
+			auto name = standardArgument->name();
+			auto type = standardArgument->type(entryPoint);
 
-			argumentValues.push_back(cast);
+			auto storageType = type->storageType(*context);
+
+			argumentTypes.push_back(storageType);
+
+			auto addressOfArgument = values.require<TypedValue>();
+
+			auto align = dataLayout.getABITypeAlign(storageType);
+
+			auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
+
+			if (dynamic_cast<Prototype *>(type))
+			{
+				auto cast = new llvm::BitCastInst(load, llvm::Type::getInt8PtrTy(*context), "cast", block);
+
+				argumentValues.push_back(cast);
+			}
+			else
+			{
+				argumentValues.push_back(load);
+			}
 		}
 		else
 		{
-			argumentValues.push_back(load);
+			throw new std::exception();
 		}
 	}
 

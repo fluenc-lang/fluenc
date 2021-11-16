@@ -14,6 +14,7 @@
 
 #include "values/TypedValue.h"
 #include "values/ExpandableValue.h"
+#include "values/TupleValue.h"
 
 DzReturn::DzReturn(DzValue *consumer, DzValue *chained)
 	: m_consumer(consumer)
@@ -21,10 +22,35 @@ DzReturn::DzReturn(DzValue *consumer, DzValue *chained)
 {
 }
 
+const BaseValue *fetchValue(Stack &values, const EntryPoint &entryPoint)
+{
+	auto value = values.pop();
+
+	if (auto typedValue = dynamic_cast<const TypedValue *>(value))
+	{
+		auto &context = entryPoint.context();
+
+		auto block = entryPoint.block();
+
+		llvm::IRBuilder<> builder(block);
+
+		auto type = value->type();
+		auto storageType = type->storageType(*context);
+
+		auto alloc = entryPoint.alloc(storageType);
+
+		builder.CreateStore(*typedValue, alloc);
+
+		auto load = builder.CreateLoad(storageType, alloc);
+
+		return new TypedValue { type, load };
+	}
+
+	return value;
+}
+
 std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
-
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
 
@@ -32,35 +58,19 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	llvm::IRBuilder<> builder(block);
 
-	Stack localValues;
+	auto value = fetchValue(values, entryPoint);
 
 	if (m_chained)
 	{
-		localValues.push(new ExpandableValue { new EntryPoint(entryPoint), m_chained });
-	}
+		auto continuation = new ExpandableValue(entryPoint, m_chained);
+		auto tuple = new TupleValue({ continuation, value });
 
-	for (auto i = values.begin(); i < values.end(); i++)
+		values.push(tuple);
+	}
+	else
 	{
-		auto value = *i;
-
-		if (auto typedValue = dynamic_cast<const TypedValue *>(value))
-		{
-			auto type = value->type();
-			auto storageType = type->storageType(*context);
-
-			auto alloc = entryPoint.alloc(storageType);
-
-			builder.CreateStore(*typedValue, alloc);
-
-			auto load = builder.CreateLoad(storageType, alloc);
-
-			localValues.push(new TypedValue { type, load });
-		}
-		else
-		{
-			localValues.push(value);
-		}
+		values.push(value);
 	}
 
-	return m_consumer->build(entryPoint, localValues);
+	return m_consumer->build(entryPoint, values);
 }

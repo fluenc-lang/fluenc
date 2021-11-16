@@ -1,5 +1,10 @@
 #include "Stack.h"
 
+Stack::Stack(const std::vector<const BaseValue *> &values)
+	: m_values(values)
+{
+}
+
 size_t Stack::size() const
 {
 	return m_values.size();
