@@ -23,13 +23,50 @@ int StackSegment::order(const EntryPoint &entryPoint) const
 	return m_call->order(entryPoint);
 }
 
-std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack values) const
+const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint)
 {
 	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
 
 	auto dataLayout = module->getDataLayout();
 
+	auto block = entryPoint.block();
+
+	if (auto typedValue = dynamic_cast<const TypedValue *>(value))
+	{
+		auto argumentType = typedValue->type();
+		auto storageType = argumentType->storageType(*context);
+
+		auto alloc = entryPoint.alloc(storageType);
+
+		auto align = dataLayout.getABITypeAlign(storageType);
+
+		auto store = new llvm::StoreInst(*typedValue, alloc, false, align, block);
+
+		UNUSED(store);
+
+		return new TypedValue { argumentType, alloc };
+	}
+
+	if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
+	{
+		auto tupleValues = tupleValue->values();
+
+		std::vector<const BaseValue *> values;
+
+		std::transform(tupleValues.begin(), tupleValues.end(), std::back_insert_iterator(values), [&](auto value)
+		{
+			return fetchValue(value, entryPoint);
+		});
+
+		return new TupleValue { values };
+	}
+
+	return value;
+}
+
+std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack values) const
+{
 	std::vector<DzResult> result;
 	std::vector<DzResult> input = {{ entryPoint, Stack() }};
 
@@ -57,58 +94,11 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 			{
 				auto scopedReturnValues = accumulatorValues;
 
-				auto block = resultEntryPoint.block();
-
 				for (auto resultValue : resultValues)
 				{
-					if (auto typedValue = dynamic_cast<const TypedValue *>(resultValue))
-					{
-						auto argumentType = resultValue->type();
-						auto storageType = argumentType->storageType(*context);
+					auto returnValue = new IndexedValue{ argument.index, fetchValue(resultValue, resultEntryPoint) };
 
-						auto alloc = entryPoint.alloc(storageType);
-
-						auto align = dataLayout.getABITypeAlign(storageType);
-
-						auto store = new llvm::StoreInst(*typedValue, alloc, false, align, block);
-
-						UNUSED(store);
-
-						scopedReturnValues.push(new IndexedValue{ argument.index, new TypedValue { argumentType, alloc } });
-					}
-					else if (auto tupleValue = dynamic_cast<const TupleValue *>(resultValue)) // bleh
-					{
-						std::vector<const BaseValue *> v;
-
-						for (auto k : tupleValue->values())
-						{
-							if (auto tb = dynamic_cast<const TypedValue *>(k))
-							{
-								auto argumentType = tb->type();
-								auto storageType = argumentType->storageType(*context);
-
-								auto alloc = entryPoint.alloc(storageType);
-
-								auto align = dataLayout.getABITypeAlign(storageType);
-
-								auto store = new llvm::StoreInst(*tb, alloc, false, align, block);
-
-								UNUSED(store);
-
-								v.push_back(new TypedValue { argumentType, alloc });
-							}
-							else
-							{
-								v.push_back(k);
-							}
-						}
-
-						scopedReturnValues.push(new IndexedValue { argument.index, new TupleValue { v } });
-					}
-					else
-					{
-						scopedReturnValues.push(new IndexedValue { argument.index, resultValue });
-					}
+					scopedReturnValues.push(returnValue);
 				}
 
 				results.push_back({ resultEntryPoint, scopedReturnValues });
