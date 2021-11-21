@@ -23,9 +23,14 @@ std::string TupleType::tag() const
 
 llvm::Type *TupleType::storageType(llvm::LLVMContext &context) const
 {
-	UNUSED(context);
+	std::vector<llvm::Type *> types;
 
-	return nullptr;
+	std::transform(begin(m_types), end(m_types), std::back_insert_iterator(types), [&](auto type)
+	{
+		return type->storageType(context);
+	});
+
+	return llvm::StructType::get(context, types);
 }
 
 Type *TupleType::iteratorType() const

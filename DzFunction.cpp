@@ -21,6 +21,8 @@
 #include "values/TypedValue.h"
 #include "values/TupleValue.h"
 #include "values/BaseValue.h"
+#include "values/UserTypeValue.h"
+#include "values/NamedValue.h"
 
 DzFunction::DzFunction(FunctionAttribute attribute
 	, const std::string &name
@@ -98,8 +100,8 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 {
 	if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
 	{
-		auto &module = entryPoint.module();
-		auto &context = entryPoint.context();
+//		auto &module = entryPoint.module();
+//		auto &context = entryPoint.context();
 
 		auto name = standardArgument->name();
 
@@ -110,55 +112,21 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 			{ name, value }
 		};
 
-		if (auto addressOfArgument = dynamic_cast<const TypedValue *>(value))
+		if (auto userValue = dynamic_cast<const UserTypeValue * >(value))
 		{
-			auto argumentType = addressOfArgument->type();
+			auto fields = userValue->fields();
 
-			if (auto userType = dynamic_cast<const UserType *>(argumentType))
+			std::transform(begin(fields), end(fields), std::back_insert_iterator(result), [=](auto field) -> Argument
 			{
-				auto block = entryPoint.block();
+				std::stringstream ss;
+				ss << name;
+				ss << ".";
+				ss << field->name();
 
-				auto dataLayout = module->getDataLayout();
+				auto localName = ss.str();
 
-				auto storageType = argumentType->storageType(*context);
-
-				auto align = dataLayout.getABITypeAlign(storageType);
-
-				auto intType = llvm::Type::getInt32Ty(*context);
-
-				auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
-
-				auto fields = userType->fields();
-
-				std::transform(begin(fields), end(fields), index_iterator(), std::back_insert_iterator(result), [=](auto field, auto index) -> Argument
-				{
-					std::stringstream ss;
-					ss << name;
-					ss << ".";
-					ss << field.name();
-
-					auto localName = ss.str();
-
-					auto fieldType = field.type();
-
-					if (fieldType)
-					{
-						llvm::Value *indexes[] =
-						{
-							llvm::ConstantInt::get(intType, 0),
-							llvm::ConstantInt::get(intType, index)
-						};
-
-						auto gep = llvm::GetElementPtrInst::CreateInBounds(load, indexes, field.name(), block);
-
-						return { localName, new TypedValue(fieldType, gep) };
-					}
-					else
-					{
-						return { localName, nullptr };
-					}
-				});
-			}
+				return { localName, new Blast { field->subject(), field->entryPoint() } };
+			});
 		}
 
 		return result;

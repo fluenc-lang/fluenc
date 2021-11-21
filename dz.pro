@@ -65,9 +65,11 @@ SOURCES += \
 	types/WithoutType.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/NamedValue.cpp \
 	values/TupleValue.cpp \
 	values/TypedValue.cpp \
-	values/IndexedValue.cpp
+	values/IndexedValue.cpp \
+	values/UserTypeValue.cpp
 
 HEADERS += \
 	AllIterator.h \
@@ -142,8 +144,10 @@ HEADERS += \
 	values/DependentValue.h \
 	values/ExpandableValue.h \
 	values/IndexedValue.h \
+	values/NamedValue.h \
 	values/TupleValue.h \
 	values/TypedValue.h \
+	values/UserTypeValue.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

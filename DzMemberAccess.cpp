@@ -41,6 +41,28 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 
 		values.push(new TypedValue { valueType, load });
 	}
+	else if (auto blast = dynamic_cast<const Blast *>(iterator->second))
+	{
+		std::vector<DzResult> res;
+
+		auto ep = blast->entryPoint()
+			->withBlock(block);
+
+		auto k = blast->subject()->build(ep, values);
+
+		for (auto &[epp, v] : k)
+		{
+			auto eep = entryPoint
+				.withBlock(epp.block());
+
+			for (auto &r : m_consumer->build(eep, v))
+			{
+				res.push_back(r);
+			}
+		}
+
+		return res;
+	}
 	else if (iterator->second)
 	{
 		values.push(iterator->second);
