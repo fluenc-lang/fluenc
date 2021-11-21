@@ -1,7 +1,7 @@
 #include "NamedValue.h"
 #include "EntryPoint.h"
 
-NamedValue::NamedValue(const std::string &name, const EntryPoint &entryPoint, DzValue *subject)
+NamedValue::NamedValue(const std::string &name, const EntryPoint &entryPoint, const DzValue *subject)
 	: m_name(name)
 	, m_entryPoint(new EntryPoint(entryPoint))
 	, m_subject(subject)
@@ -18,7 +18,12 @@ const EntryPoint *NamedValue::entryPoint() const
 	return m_entryPoint;
 }
 
-DzValue *NamedValue::subject() const
+const DzValue *NamedValue::subject() const
 {
 	return m_subject;
+}
+
+const Type *NamedValue::type() const
+{
+	throw new std::exception();
 }

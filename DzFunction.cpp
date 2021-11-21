@@ -100,9 +100,6 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 {
 	if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
 	{
-//		auto &module = entryPoint.module();
-//		auto &context = entryPoint.context();
-
 		auto name = standardArgument->name();
 
 		auto value = values.pop();
@@ -125,7 +122,7 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 
 				auto localName = ss.str();
 
-				return { localName, new Blast { field->subject(), field->entryPoint() } };
+				return { localName, field };
 			});
 		}
 

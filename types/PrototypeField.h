@@ -8,16 +8,16 @@ class DzValue;
 class PrototypeField
 {
 	public:
-		PrototypeField(const std::string &name, DzValue *defaultValue);
+		PrototypeField(const std::string &name, const DzValue *defaultValue);
 
 		std::string name() const;
 
-		DzValue *defaultValue() const;
+		const DzValue *defaultValue() const;
 
 	private:
 		std::string m_name;
 
-		DzValue *m_defaultValue;
+		const DzValue *m_defaultValue;
 };
 
 #endif // PROTOTYPEFIELD_H

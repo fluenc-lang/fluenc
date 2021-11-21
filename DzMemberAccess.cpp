@@ -6,6 +6,7 @@
 #include "Type.h"
 
 #include "values/TypedValue.h"
+#include "values/NamedValue.h"
 
 DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 	: m_consumer(consumer)
@@ -41,7 +42,7 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 
 		values.push(new TypedValue { valueType, load });
 	}
-	else if (auto blast = dynamic_cast<const Blast *>(iterator->second))
+	else if (auto blast = dynamic_cast<const NamedValue *>(iterator->second))
 	{
 		std::vector<DzResult> res;
 

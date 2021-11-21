@@ -5,21 +5,23 @@
 
 class DzValue;
 
-class NamedValue
+class NamedValue : public BaseValue
 {
 	public:
-		NamedValue(const std::string &name, const EntryPoint &entryPoint, DzValue *subject);
+		NamedValue(const std::string &name, const EntryPoint &entryPoint, const DzValue *subject);
 
 		std::string name() const;
 
 		const EntryPoint *entryPoint() const;
-		DzValue *subject() const;
+		const DzValue *subject() const;
+
+		const Type *type() const override;
 
 	private:
 		std::string m_name;
 
 		const EntryPoint *m_entryPoint;
-		DzValue *m_subject;
+		const DzValue *m_subject;
 };
 
 #endif // NAMEDVALUE_H
