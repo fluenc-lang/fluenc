@@ -14,7 +14,7 @@ class Prototype : public IPrototype
 			);
 
 		std::string tag() const override;
-		std::vector<PrototypeField> fields(const EntryPoint &entryPoint) const override;
+		std::vector<const NamedValue *> fields(const EntryPoint &entryPoint) const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 

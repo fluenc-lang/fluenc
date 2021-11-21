@@ -34,21 +34,19 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::transform(begin(prototypeFields), end(prototypeFields), std::back_insert_iterator(namedValues), [&](auto field) -> const NamedValue *
 	{
-		auto value = m_fields.find(field.name());
+		auto value = m_fields.find(field->name());
 
 		if (value != m_fields.end())
 		{
-			return new NamedValue { field.name(), entryPoint, value->second };
+			return new NamedValue { field->name(), entryPoint, value->second };
 		}
 
-		auto defaultValue = field.defaultValue();
-
-		if (!defaultValue)
+		if (!field->hasValue())
 		{
 			throw new std::exception();
 		}
 
-		return new NamedValue { field.name(), entryPoint, defaultValue };
+		return field;
 	});
 
 	auto userTypeValue = new UserTypeValue(prototype, namedValues);

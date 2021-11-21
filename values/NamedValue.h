@@ -1,9 +1,10 @@
 #ifndef NAMEDVALUE_H
 #define NAMEDVALUE_H
 
-#include "BaseValue.h"
+#include <llvm/IR/BasicBlock.h>
 
-class DzValue;
+#include "BaseValue.h"
+#include "DzValue.h"
 
 class NamedValue : public BaseValue
 {
@@ -11,11 +12,11 @@ class NamedValue : public BaseValue
 		NamedValue(const std::string &name, const EntryPoint &entryPoint, const DzValue *subject);
 
 		std::string name() const;
-
-		const EntryPoint *entryPoint() const;
-		const DzValue *subject() const;
+		std::vector<DzResult> build(llvm::BasicBlock *block, const Stack &values) const;
 
 		const Type *type() const override;
+
+		bool hasValue() const;
 
 	private:
 		std::string m_name;

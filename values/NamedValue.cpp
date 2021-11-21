@@ -13,17 +13,19 @@ std::string NamedValue::name() const
 	return m_name;
 }
 
-const EntryPoint *NamedValue::entryPoint() const
+std::vector<DzResult> NamedValue::build(llvm::BasicBlock *block, const Stack &values) const
 {
-	return m_entryPoint;
-}
+	auto entryPoint = m_entryPoint->withBlock(block);
 
-const DzValue *NamedValue::subject() const
-{
-	return m_subject;
+	return m_subject->build(entryPoint, values);
 }
 
 const Type *NamedValue::type() const
 {
 	throw new std::exception();
+}
+
+bool NamedValue::hasValue() const
+{
+	return m_subject;
 }

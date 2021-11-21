@@ -29,40 +29,35 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		throw new std::exception();
 	}
 
-	if (auto computedValue = dynamic_cast<const TypedValue *>(iterator->second))
+	if (auto value = dynamic_cast<const TypedValue *>(iterator->second))
 	{
-		auto valueType = computedValue->type();
+		auto valueType = value->type();
 
 		auto storageType = valueType->storageType(*context);
 
 		auto dataLayout = module->getDataLayout();
 		auto align = dataLayout.getABITypeAlign(storageType);
 
-		auto load = new llvm::LoadInst(storageType, *computedValue, m_name, false, align, block);
+		auto load = new llvm::LoadInst(storageType, *value, m_name, false, align, block);
 
 		values.push(new TypedValue { valueType, load });
 	}
-	else if (auto blast = dynamic_cast<const NamedValue *>(iterator->second))
+	else if (auto value = dynamic_cast<const NamedValue *>(iterator->second))
 	{
-		std::vector<DzResult> res;
+		std::vector<DzResult> results;
 
-		auto ep = blast->entryPoint()
-			->withBlock(block);
-
-		auto k = blast->subject()->build(ep, values);
-
-		for (auto &[epp, v] : k)
+		for (auto &[forwardedEntryPoint, forwardedValues] : value->build(block, values))
 		{
-			auto eep = entryPoint
-				.withBlock(epp.block());
+			auto consumerEntryPoint = entryPoint
+				.withBlock(forwardedEntryPoint.block());
 
-			for (auto &r : m_consumer->build(eep, v))
+			for (auto &result : m_consumer->build(consumerEntryPoint, forwardedValues))
 			{
-				res.push_back(r);
+				results.push_back(result);
 			}
 		}
 
-		return res;
+		return results;
 	}
 	else if (iterator->second)
 	{
