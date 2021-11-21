@@ -120,9 +120,7 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 				ss << ".";
 				ss << field->name();
 
-				auto localName = ss.str();
-
-				return { localName, field };
+				return { ss.str(), field };
 			});
 		}
 

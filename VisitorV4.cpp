@@ -340,17 +340,6 @@ antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)
 		);
 
 	return static_cast<DzValue *>(instantiation);
-
-//	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
-//	{
-//		VisitorV4 visitor(consumer, nullptr);
-
-//		return visitor
-//			.visit(assignment->expression())
-//			.as<DzValue *>();
-//	});
-
-//	return static_cast<DzValue *>(value);
 }
 
 antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
@@ -491,17 +480,6 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 		);
 
 	return static_cast<DzValue *>(instantiation);
-
-//	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
-//	{
-//		VisitorV4 visitor(consumer, nullptr);
-
-//		return visitor
-//			.visit(assignment->expression())
-//			.as<DzValue *>();
-//	});
-
-//	return static_cast<DzValue *>(value);
 }
 
 antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
