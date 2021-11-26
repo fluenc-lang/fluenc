@@ -3,7 +3,7 @@
 
 #include "DzValue.h"
 
-#include "values/NamedValue.h"
+class NamedValue;
 
 class DzFieldAccess : public DzValue
 {

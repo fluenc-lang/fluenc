@@ -36,6 +36,7 @@ SOURCES += \
 	DzValue.cpp \
 	EntryPoint.cpp \
 	IndexIterator.cpp \
+	InteropHelper.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
 	StackSegment.cpp \
@@ -110,6 +111,7 @@ HEADERS += \
 	IPrototypeProvider.h \
 	IndexIterator.h \
 	Indexed.h \
+	InteropHelper.h \
 	KaleidoscopeJIT.h \
 	Stack.h \
 	StackSegment.h \
@@ -118,6 +120,7 @@ HEADERS += \
 	UnknownTypeException.h \
 	Utility.h \
 	VisitorV4.h \
+	VoidIterator.h \
 	WithPrototypeProvider.h \
 	antlr4-runtime/dzBaseVisitor.h \
 	antlr4-runtime/dzLexer.h \
