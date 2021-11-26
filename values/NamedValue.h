@@ -6,10 +6,16 @@
 #include "BaseValue.h"
 #include "DzValue.h"
 
+class DzTypeName;
+
 class NamedValue : public BaseValue
 {
 	public:
-		NamedValue(const std::string &name, const EntryPoint &entryPoint, const DzValue *subject);
+		NamedValue(const std::string &name
+			, const EntryPoint &entryPoint
+			, const DzValue *subject
+			, const DzTypeName *type
+			);
 
 		std::string name() const;
 		std::vector<DzResult> build(llvm::BasicBlock *block, const Stack &values) const;
@@ -23,6 +29,7 @@ class NamedValue : public BaseValue
 
 		const EntryPoint *m_entryPoint;
 		const DzValue *m_subject;
+		const DzTypeName *m_type;
 };
 
 #endif // NAMEDVALUE_H

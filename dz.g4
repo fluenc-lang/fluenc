@@ -17,7 +17,7 @@ assignment
 	;
 
 field
-	: ID (':' expression)?
+	: typeName? ID (':' expression)?
 	;
 	
 function 

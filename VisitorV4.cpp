@@ -423,9 +423,17 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 
 	std::vector<PrototypeField> fields;
 
-	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [](dzParser::FieldContext *field) -> PrototypeField
+	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [this](dzParser::FieldContext *field) -> PrototypeField
 	{
 		auto name = field->ID()->getText();
+
+		DzTypeName *type = nullptr;
+
+		if (field->typeName())
+		{
+			type = visit(field->typeName())
+				.as<DzTypeName *>();
+		}
 
 		if (field->expression())
 		{
@@ -435,10 +443,10 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 				.visit(field->expression())
 				.as<DzValue *>();
 
-			return { name, defaultValue };
+			return { name, defaultValue, type };
 		}
 
-		return { name, nullptr };
+		return { name, nullptr, type };
 	});
 
 	std::vector<DzTypeName *> parentTypes;

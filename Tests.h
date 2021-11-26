@@ -23,6 +23,14 @@
 #include <QObject>
 #include <QTest>
 
+extern "C"
+{
+	void *foo(void *p)
+	{
+		return p;
+	}
+}
+
 class Tests : public QObject
 {
 	W_OBJECT(Tests)
@@ -1377,54 +1385,85 @@ class Tests : public QObject
 			QCOMPARE(result, 21);
 		}
 
-		W_SLOT(scenario1)
-		W_SLOT(scenario2)
-		W_SLOT(scenario3)
-		W_SLOT(scenario4)
-		W_SLOT(scenario5)
-		W_SLOT(scenario6)
-		W_SLOT(scenario7)
-		W_SLOT(scenario8)
-		W_SLOT(scenario9)
-		W_SLOT(scenario10)
-		W_SLOT(scenario11)
-		W_SLOT(scenario12)
-		W_SLOT(scenario13)
-		W_SLOT(scenario14)
-		W_SLOT(scenario15)
-		W_SLOT(fibonacci)
-		W_SLOT(scenario16)
-		W_SLOT(scenario17)
-		W_SLOT(scenario18)
-		W_SLOT(scenario19)
-		W_SLOT(scenario20)
-		W_SLOT(scenario21)
-		W_SLOT(scenario22)
-		W_SLOT(scenario23)
-		W_SLOT(scenario24)
-		W_SLOT(scenario25)
-		W_SLOT(scenario26)
-		W_SLOT(scenario27)
-		W_SLOT(scenario28)
-		W_SLOT(scenario29)
-		W_SLOT(scenario30)
-		W_SLOT(scenario31)
-		W_SLOT(scenario32)
-		W_SLOT(scenario33)
-		W_SLOT(scenario34)
-		W_SLOT(scenario35)
-		W_SLOT(scenario36)
-		W_SLOT(scenario37)
-		W_SLOT(scenario38)
-		W_SLOT(scenario39)
-		W_SLOT(scenario40)
-		W_SLOT(scenario41)
-		W_SLOT(scenario42)
-		W_SLOT(scenario43)
-		W_SLOT(scenario44)
-		W_SLOT(scenario45)
-		W_SLOT(scenario46)
-		W_SLOT(scenario47)
+		void scenario48()
+		{
+			auto result = exec(R"(
+				import MyStruct foo(MyStruct s);
+
+				struct MyStruct
+				{
+					int x,
+					int y
+				};
+
+				function createStruct()
+				{
+					return MyStruct { x: 1, y: 2 };
+				}
+
+				function bar(MyStruct s)
+				{
+					return s.x + s.y;
+				}
+
+				export int main()
+				{
+					return bar(foo(createStruct()));
+				}
+			)");
+
+			QCOMPARE(result, 3);
+		}
+
+//		W_SLOT(scenario1)
+//		W_SLOT(scenario2)
+//		W_SLOT(scenario3)
+//		W_SLOT(scenario4)
+//		W_SLOT(scenario5)
+//		W_SLOT(scenario6)
+//		W_SLOT(scenario7)
+//		W_SLOT(scenario8)
+//		W_SLOT(scenario9)
+//		W_SLOT(scenario10)
+//		W_SLOT(scenario11)
+//		W_SLOT(scenario12)
+//		W_SLOT(scenario13)
+//		W_SLOT(scenario14)
+//		W_SLOT(scenario15)
+//		W_SLOT(fibonacci)
+//		W_SLOT(scenario16)
+//		W_SLOT(scenario17)
+//		W_SLOT(scenario18)
+//		W_SLOT(scenario19)
+//		W_SLOT(scenario20)
+//		W_SLOT(scenario21)
+//		W_SLOT(scenario22)
+//		W_SLOT(scenario23)
+//		W_SLOT(scenario24)
+//		W_SLOT(scenario25)
+//		W_SLOT(scenario26)
+//		W_SLOT(scenario27)
+//		W_SLOT(scenario28)
+//		W_SLOT(scenario29)
+//		W_SLOT(scenario30)
+//		W_SLOT(scenario31)
+//		W_SLOT(scenario32)
+//		W_SLOT(scenario33)
+//		W_SLOT(scenario34)
+//		W_SLOT(scenario35)
+//		W_SLOT(scenario36)
+//		W_SLOT(scenario37)
+//		W_SLOT(scenario38)
+//		W_SLOT(scenario39)
+//		W_SLOT(scenario40)
+//		W_SLOT(scenario41)
+//		W_SLOT(scenario42)
+//		W_SLOT(scenario43)
+//		W_SLOT(scenario44)
+//		W_SLOT(scenario45)
+//		W_SLOT(scenario46)
+//		W_SLOT(scenario47)
+		W_SLOT(scenario48)
 
 	private:
 		ModuleInfo *compile(std::string source)

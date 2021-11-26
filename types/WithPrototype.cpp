@@ -27,11 +27,6 @@ llvm::Type *WithPrototype::storageType(llvm::LLVMContext &context) const
 	return m_value->type()->storageType(context);
 }
 
-Type *WithPrototype::iteratorType() const
-{
-	return nullptr;
-}
-
 bool WithPrototype::is(const Type *type, const EntryPoint &entryPoint) const
 {
 	return m_value->type()->is(type, entryPoint);

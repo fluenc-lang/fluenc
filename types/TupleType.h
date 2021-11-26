@@ -14,8 +14,6 @@ class TupleType : public Type
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
-		Type *iteratorType() const override;
-
 		bool is(const Type *type, const EntryPoint &entryPoint) const override;
 
 		static TupleType *get(const std::vector<const Type *> types);

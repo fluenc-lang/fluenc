@@ -23,11 +23,6 @@ llvm::Type *UserType::storageType(llvm::LLVMContext &) const
 	return m_type->getPointerTo();
 }
 
-Type *UserType::iteratorType() const
-{
-	return m_prototype->iteratorType();
-}
-
 bool UserType::is(const Type *type, const EntryPoint &entryPoint) const
 {
 	return m_prototype->is(type, entryPoint);

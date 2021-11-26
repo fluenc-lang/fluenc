@@ -3,6 +3,7 @@
 
 #include "TupleType.h"
 #include "Utility.h"
+#include "AllIterator.h"
 
 TupleType::TupleType(const std::vector<const Type *> types)
 	: m_types(types)
@@ -33,16 +34,26 @@ llvm::Type *TupleType::storageType(llvm::LLVMContext &context) const
 	return llvm::StructType::get(context, types);
 }
 
-Type *TupleType::iteratorType() const
-{
-	return nullptr;
-}
-
 bool TupleType::is(const Type *type, const EntryPoint &entryPoint) const
 {
-	UNUSED(entryPoint);
+	if (auto tuple = dynamic_cast<const TupleType *>(type))
+	{
+		if (m_types.size() != tuple->m_types.size())
+		{
+			return false;
+		}
 
-	return tag() == type->tag();
+		auto result = true;
+
+		std::transform(begin(m_types), end(m_types), begin(tuple->m_types), all_true(result), [&](auto left, auto right)
+		{
+			return left->is(right, entryPoint);
+		});
+
+		return result;
+	}
+
+	return false;
 }
 
 TupleType *TupleType::get(const std::vector<const Type *> types)

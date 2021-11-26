@@ -13,7 +13,7 @@ class DzTypeName
 
 		std::string name() const;
 
-		Type *resolve(const EntryPoint &entryPoint);
+		Type *resolve(const EntryPoint &entryPoint) const;
 
 		static DzTypeName *int32();
 		static DzTypeName *int64();

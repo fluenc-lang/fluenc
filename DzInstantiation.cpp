@@ -38,7 +38,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 		if (value != m_fields.end())
 		{
-			return new NamedValue { field->name(), entryPoint, value->second };
+			return new NamedValue { field->name(), entryPoint, value->second, nullptr };
 		}
 
 		if (!field->hasValue())

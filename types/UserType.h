@@ -16,8 +16,6 @@ class UserType : public Type
 
 		llvm::Type *storageType(llvm::LLVMContext &) const override;
 
-		Type *iteratorType() const override;
-
 		bool is(const Type *type, const EntryPoint &entryPoint) const override;
 
 	private:
