@@ -28,7 +28,7 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 
 	auto dataLayout = module->getDataLayout();
 
-	auto value = values.require<TypedValue>();
+	auto value = values.pop();
 	auto index = values.require<TypedValue>();
 
 	if (m_next)

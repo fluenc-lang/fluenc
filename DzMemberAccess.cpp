@@ -6,6 +6,7 @@
 #include "Type.h"
 
 #include "values/TypedValue.h"
+#include "values/NamedValue.h"
 
 DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 	: m_consumer(consumer)
@@ -28,18 +29,35 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		throw new std::exception();
 	}
 
-	if (auto computedValue = dynamic_cast<const TypedValue *>(iterator->second))
+	if (auto value = dynamic_cast<const TypedValue *>(iterator->second))
 	{
-		auto valueType = computedValue->type();
+		auto valueType = value->type();
 
 		auto storageType = valueType->storageType(*context);
 
 		auto dataLayout = module->getDataLayout();
 		auto align = dataLayout.getABITypeAlign(storageType);
 
-		auto load = new llvm::LoadInst(storageType, *computedValue, m_name, false, align, block);
+		auto load = new llvm::LoadInst(storageType, *value, m_name, false, align, block);
 
 		values.push(new TypedValue { valueType, load });
+	}
+	else if (auto value = dynamic_cast<const NamedValue *>(iterator->second))
+	{
+		std::vector<DzResult> results;
+
+		for (auto &[forwardedEntryPoint, forwardedValues] : value->build(block, values))
+		{
+			auto consumerEntryPoint = entryPoint
+				.withBlock(forwardedEntryPoint.block());
+
+			for (auto &result : m_consumer->build(consumerEntryPoint, forwardedValues))
+			{
+				results.push_back(result);
+			}
+		}
+
+		return results;
 	}
 	else if (iterator->second)
 	{

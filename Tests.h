@@ -27,12 +27,6 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
-	public:
-		Tests()
-		{
-			scenario37();
-		}
-
 	private:
 		void scenario1()
 		{
@@ -1344,28 +1338,43 @@ class Tests : public QObject
 					];
 				}
 
-				function foo(int accumulator)
+				function foo2(int accumulator)
 				{
 					return accumulator;
 				}
 
-				function foo(int accumulator, Item item)
+				function foo2(int accumulator, Item item)
 				{
-					return foo(accumulator + item.value, item.children);
+					return accumulator + item.value;
 				}
 
-				function foo(int accumulator, (Item item, ...values))
+				function foo2(int accumulator, (Item item, ...values))
 				{
-					return foo(foo(accumulator + item.value, item.children), ...values);
+					return foo2(accumulator + item.value, ...values);
+				}
+
+				function foo1(int accumulator)
+				{
+					return accumulator;
+				}
+
+				function foo1(int accumulator, Item item)
+				{
+					return foo2(accumulator + item.value, item.children);
+				}
+
+				function foo1(int accumulator, (Item item, ...values))
+				{
+					return foo1(foo2(accumulator + item.value, item.children), ...values);
 				}
 
 				export int main()
 				{
-					return foo(0, createStructure());
+					return foo1(0, createStructure());
 				}
 			)");
 
-			QCOMPARE(result, 1);
+			QCOMPARE(result, 21);
 		}
 
 		W_SLOT(scenario1)
@@ -1415,7 +1424,7 @@ class Tests : public QObject
 		W_SLOT(scenario44)
 		W_SLOT(scenario45)
 		W_SLOT(scenario46)
-//		W_SLOT(scenario47)
+		W_SLOT(scenario47)
 
 	private:
 		ModuleInfo *compile(std::string source)

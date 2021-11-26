@@ -16,11 +16,6 @@ class BuiltinType : public Type
 			return &instance;
 		}
 
-		Type *iteratorType() const override
-		{
-			return nullptr;
-		}
-
 		bool is(const Type *type, const EntryPoint &entryPoint) const override
 		{
 			UNUSED(entryPoint);

@@ -16,9 +16,14 @@ std::string Prototype::tag() const
 	return m_tag;
 }
 
-std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint) const
+std::vector<const NamedValue *> Prototype::fields(const EntryPoint &entryPoint) const
 {
-	std::vector<PrototypeField> fields(m_fields);
+	std::vector<const NamedValue *> fields;
+
+	std::transform(begin(m_fields), end(m_fields), std::back_insert_iterator(fields), [&](auto field)
+	{
+		return new NamedValue { field.name(), entryPoint, field.defaultValue(), field.type() };
+	});
 
 	for (auto type : m_parentTypes)
 	{
@@ -34,11 +39,6 @@ std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint) cons
 llvm::Type *Prototype::storageType(llvm::LLVMContext &context) const
 {
 	return llvm::Type::getInt8PtrTy(context);
-}
-
-Type *Prototype::iteratorType() const
-{
-	return nullptr;
 }
 
 bool Prototype::is(const Type *type, const EntryPoint &entryPoint) const

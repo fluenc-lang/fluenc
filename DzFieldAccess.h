@@ -3,19 +3,21 @@
 
 #include "DzValue.h"
 
-#include "types/UserTypeField.h"
+class NamedValue;
 
 class DzFieldAccess : public DzValue
 {
 	public:
-		DzFieldAccess(llvm::Value *instance, const UserTypeField &field);
+		DzFieldAccess(llvm::Value *instance, const NamedValue *field, size_t index);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		llvm::Value *m_instance;
 
-		UserTypeField m_field;
+		const NamedValue *m_field;
+
+		size_t m_index;
 };
 
 #endif // DZFIELDACCESS_H

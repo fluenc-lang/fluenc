@@ -3,12 +3,14 @@
 
 #include "DzFieldAccess.h"
 #include "Type.h"
+#include "InteropHelper.h"
 
-#include "values/TypedValue.h"
+#include "values/NamedValue.h"
 
-DzFieldAccess::DzFieldAccess(llvm::Value *instance, const UserTypeField &field)
+DzFieldAccess::DzFieldAccess(llvm::Value *instance, const NamedValue *field, size_t index)
 	: m_instance(instance)
 	, m_field(field)
+	, m_index(index)
 {
 }
 
@@ -23,7 +25,7 @@ std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack v
 
 	auto intType = llvm::Type::getInt32Ty(*context);
 
-	auto fieldType = m_field.type();
+	auto fieldType = m_field->type();
 
 	if (fieldType)
 	{
@@ -32,17 +34,19 @@ std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack v
 		llvm::Value *indexes[] =
 		{
 			llvm::ConstantInt::get(intType, 0),
-			llvm::ConstantInt::get(intType, m_field.index())
+			llvm::ConstantInt::get(intType, m_index)
 		};
 
-		auto gep = llvm::GetElementPtrInst::CreateInBounds(m_instance, indexes, m_field.name(), block);
+		auto gep = llvm::GetElementPtrInst::CreateInBounds(m_instance, indexes, m_field->name(), block);
 
 		auto dataLayout = module->getDataLayout();
 		auto align = dataLayout.getABITypeAlign(storageType);
 
-		auto load = new llvm::LoadInst(storageType, gep, m_field.name(), false, align, block);
+		auto load = new llvm::LoadInst(storageType, gep, m_field->name(), false, align, block);
 
-		values.push(new TypedValue { fieldType, load });
+		auto value = InteropHelper::createReadProxy(load, fieldType, entryPoint);
+
+		values.push(value);
 	}
 
 	return {{ entryPoint, values }};

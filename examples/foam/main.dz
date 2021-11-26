@@ -12,7 +12,8 @@ import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags
 
 import void SDL_RenderPresent(long renderer);
 import void SDL_PumpEvents();
-import void SDL_WaitEventEx(EventState events);
+
+import EventState SDL_WaitEventEx(EventState events);
 
 import void printnum(int num);
 
@@ -27,34 +28,34 @@ global SDLK_w: 0x77u;
 
 struct SDL_Rect
 {
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0
+    int x: 0,
+    int y: 0,
+    int width: 0,
+    int height: 0
 };
 
 struct SDL_KeyboardEvent
 {
-    type: 0,
-    timestamp: 0,
-    windowID: 0,
-    padding: 0,
-    scancode: 0,
-    sym: 0,
-    padding: 0L
+    int type: 0,
+    int timestamp: 0,
+    int windowID: 0,
+    int padding: 0,
+    int scancode: 0,
+    int sym: 0,
+    long padding: 0L
 };
 
 struct SDL_MouseMotionEvent
 {
-    type : 0,
-    timestamp : 0,
-    windowID: 0,
-    which: 0,
-    state: 0,
-    x: 0,
-    y: 0,
-    xrel: 0,
-    yrel: 0
+    int type : 0,
+    int timestamp : 0,
+    int windowID: 0,
+    int which: 0,
+    int state: 0,
+    int x: 0,
+    int y: 0,
+    int xrel: 0,
+    int yrel: 0
 };
 
 global Normal: 0;
@@ -98,27 +99,10 @@ struct ControlTemplate
     mouseOver
 };
 
-function createMouseMotionEvent()
-{
-    return SDL_MouseMotionEvent {};
-}
-
-function processMouseMotion(SDL_MouseMotionEvent motion)
-{
-    SDL_PumpEvents();
-
-    if (SDL_PollMouseMotionEvent(motion) == 1)
-    {
-        return motion;
-    }
-
-    return nothing;
-}
-
 struct EventState
 {
-    key,
-    motion
+    SDL_KeyboardEvent key,
+    SDL_MouseMotionEvent motion
 };
 
 struct ApplicationState
@@ -136,18 +120,11 @@ function createEventState()
     };
 }
 
-function processEvents(EventState eventState)
-{
-    SDL_WaitEventEx(eventState);
-
-    return eventState;
-}
-
 function createApplicationState(State state)
 {
     return ApplicationState
     {
-        events: processEvents(createEventState()),
+        events: SDL_WaitEventEx(createEventState()),
         user: state
     };
 }
@@ -336,7 +313,7 @@ function update(ApplicationState state, Button button)
     return updateButton(state.events, button);
 }
 
-function update(ApplicationState state, Button button, ...controls)
+function update(ApplicationState state, (Button button, ...controls))
 {
     return updateButton(state.events, button) -> (state, ...controls);
 }
@@ -346,7 +323,7 @@ function draw(long renderer, State state, Button button)
     return drawButton(renderer, button);
 }
 
-function draw(long renderer, State state, Button button, ...controls)
+function draw(long renderer, State state, (Button button, ...controls))
 {
     return drawButton(renderer, button) -> (renderer, state, ...controls);
 }
@@ -356,7 +333,7 @@ function run(State state, Item item)
     return state;
 }
 
-function run(State state, Item item, ...items)
+function run(State state, (Item item, ...items))
 {
     return run(state, ...items);
 }

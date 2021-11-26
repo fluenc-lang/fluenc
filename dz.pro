@@ -36,6 +36,7 @@ SOURCES += \
 	DzValue.cpp \
 	EntryPoint.cpp \
 	IndexIterator.cpp \
+	InteropHelper.cpp \
 	KaleidoscopeJIT.cpp \
 	Stack.cpp \
 	StackSegment.cpp \
@@ -58,16 +59,17 @@ SOURCES += \
 	types/StringType.cpp \
 	types/TupleType.cpp \
 	types/Uint32Type.cpp \
-	types/UserType.cpp \
 	types/UserTypeField.cpp \
 	types/VoidType.cpp \
 	types/WithPrototype.cpp \
 	types/WithoutType.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/NamedValue.cpp \
 	values/TupleValue.cpp \
 	values/TypedValue.cpp \
-	values/IndexedValue.cpp
+	values/IndexedValue.cpp \
+	values/UserTypeValue.cpp
 
 HEADERS += \
 	AllIterator.h \
@@ -108,6 +110,7 @@ HEADERS += \
 	IPrototypeProvider.h \
 	IndexIterator.h \
 	Indexed.h \
+	InteropHelper.h \
 	KaleidoscopeJIT.h \
 	Stack.h \
 	StackSegment.h \
@@ -116,6 +119,7 @@ HEADERS += \
 	UnknownTypeException.h \
 	Utility.h \
 	VisitorV4.h \
+	VoidIterator.h \
 	WithPrototypeProvider.h \
 	antlr4-runtime/dzBaseVisitor.h \
 	antlr4-runtime/dzLexer.h \
@@ -133,7 +137,6 @@ HEADERS += \
 	Type.h \
 	types/TupleType.h \
 	types/Uint32Type.h \
-	types/UserType.h \
 	types/UserTypeField.h \
 	types/VoidType.h \
 	types/WithPrototype.h \
@@ -142,8 +145,10 @@ HEADERS += \
 	values/DependentValue.h \
 	values/ExpandableValue.h \
 	values/IndexedValue.h \
+	values/NamedValue.h \
 	values/TupleValue.h \
 	values/TypedValue.h \
+	values/UserTypeValue.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

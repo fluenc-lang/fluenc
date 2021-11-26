@@ -5,12 +5,16 @@
 #include "DzArgument.h"
 #include "AllIterator.h"
 #include "Type.h"
+#include "IndexIterator.h"
+#include "DzFieldAccess.h"
+#include "InteropHelper.h"
 
 #include "types/VoidType.h"
 #include "types/UserType.h"
 #include "types/Prototype.h"
 
 #include "values/TypedValue.h"
+#include "values/UserTypeValue.h"
 
 DzImportedFunction::DzImportedFunction(const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
@@ -82,21 +86,21 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 			argumentTypes.push_back(storageType);
 
-			auto addressOfArgument = values.require<TypedValue>();
+			auto value = values.pop();
 
-			auto align = dataLayout.getABITypeAlign(storageType);
-
-			auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
-
-			if (dynamic_cast<Prototype *>(type))
+			if (auto addressOfArgument = dynamic_cast<const TypedValue *>(value))
 			{
-				auto cast = new llvm::BitCastInst(load, llvm::Type::getInt8PtrTy(*context), "cast", block);
+				auto align = dataLayout.getABITypeAlign(storageType);
+
+				auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
+
+				argumentValues.push_back(load);
+			}
+			else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
+			{
+				auto cast = InteropHelper::createWriteProxy(userTypeValue, entryPoint);
 
 				argumentValues.push_back(cast);
-			}
-			else
-			{
-				argumentValues.push_back(load);
 			}
 		}
 		else
@@ -115,7 +119,9 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 	if (returnType != VoidType::instance())
 	{
-		values.push(new TypedValue { returnType, call });
+		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint);
+
+		values.push(returnValue);
 	}
 
 	return {{ entryPoint, values }};
