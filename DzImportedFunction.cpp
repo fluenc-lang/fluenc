@@ -10,7 +10,6 @@
 #include "InteropHelper.h"
 
 #include "types/VoidType.h"
-#include "types/UserType.h"
 #include "types/Prototype.h"
 
 #include "values/TypedValue.h"

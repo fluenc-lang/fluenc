@@ -15,8 +15,6 @@
 #include "IndexIterator.h"
 #include "DzTupleArgument.h"
 
-#include "types/UserType.h"
-
 #include "values/ExpandableValue.h"
 #include "values/TypedValue.h"
 #include "values/TupleValue.h"

@@ -253,7 +253,7 @@ function draw_q(long renderer, Rectangle rectangle)
     return rectangle;
 }
 
-function draw_q(long renderer)
+function draw(long renderer)
 {
     return nothing;
 }

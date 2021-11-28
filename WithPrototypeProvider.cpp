@@ -1,7 +1,6 @@
 #include "WithPrototypeProvider.h"
 #include "DzFieldAccess.h"
 
-#include "types/UserType.h"
 #include "types/WithPrototype.h"
 
 #include "values/TypedValue.h"

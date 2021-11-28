@@ -1,7 +1,5 @@
 #include "UserTypeValue.h"
 
-#include "types/UserType.h"
-
 UserTypeValue::UserTypeValue(const Type *type, const std::vector<const NamedValue *> &values)
 	: m_type(type)
 	, m_values(values)

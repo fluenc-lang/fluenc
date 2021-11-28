@@ -1,5 +1,4 @@
 #include "WithPrototype.h"
-#include "UserType.h"
 #include "DzFieldAccess.h"
 
 #include "values/TypedValue.h"

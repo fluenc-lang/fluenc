@@ -8,7 +8,6 @@
 #include "IPrototypeProvider.h"
 
 #include "types/Prototype.h"
-#include "types/UserType.h"
 
 #include "values/TypedValue.h"
 #include "values/NamedValue.h"

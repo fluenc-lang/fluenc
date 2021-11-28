@@ -299,7 +299,9 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 {
 	auto expression = context->expression();
 
-	auto call = new DzFunctionCall(context->ID()->getText());
+	auto isTailCallEligible = dynamic_cast<DzReturn *>(m_alpha);
+
+	auto call = new DzFunctionCall(context->ID()->getText(), isTailCallEligible);
 
 	std::vector<DzValue *> values;
 

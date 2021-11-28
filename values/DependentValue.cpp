@@ -1,5 +1,7 @@
 #include "DependentValue.h"
 
+#include "types/IteratorType.h"
+
 DependentValue::DependentValue(const EntryPoint *provider)
 	: m_provider(provider)
 {
@@ -7,7 +9,7 @@ DependentValue::DependentValue(const EntryPoint *provider)
 
 const Type *DependentValue::type() const
 {
-	throw std::exception();
+	return IteratorType::instance();
 }
 
 const EntryPoint *DependentValue::provider() const

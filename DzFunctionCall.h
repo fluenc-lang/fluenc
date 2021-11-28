@@ -6,7 +6,7 @@
 class DzFunctionCall : public DzValue
 {
 	public:
-		DzFunctionCall(const std::string name);
+		DzFunctionCall(const std::string name, bool isTailCallEligible);
 
 		int order(const EntryPoint &entryPoint) const override;
 
@@ -14,6 +14,8 @@ class DzFunctionCall : public DzValue
 
 	private:
 		std::string m_name;
+
+		bool m_isTailCallEligible;
 };
 
 #endif // DZFUNCTIONCALL_H
