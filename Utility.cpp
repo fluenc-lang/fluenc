@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include <llvm/IR/IRBuilder.h>
 
 #include "Utility.h"
@@ -13,4 +15,15 @@ void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target)
 {
 	llvm::IRBuilder<> builder(source);
 	builder.CreateBr(target);
+}
+
+std::string nextTag()
+{
+	static int i;
+
+	std::stringstream ss;
+	ss << "tag";
+	ss << i++;
+
+	return ss.str();
 }

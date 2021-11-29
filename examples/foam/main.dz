@@ -244,27 +244,18 @@ function setRenderDrawColor(long renderer, Color color)
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
 
-function draw_q(long renderer, Rectangle rectangle)
-{
-    setRenderDrawColor(renderer, rectangle.color);
-
-    SDL_RenderFillRect(renderer, boundingRect(rectangle));
-
-    return rectangle;
-}
-
 function draw(long renderer)
 {
     return nothing;
 }
 
-function draw_s(long renderer, Rectangle rectangle)
+function draw(long renderer, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
     SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
-    return draw_q(renderer, rectangle.children);
+    return draw(renderer, rectangle.children);
 }
 
 function selectTemplate(ControlTemplate template, Item item)
@@ -279,7 +270,7 @@ function selectTemplate(ControlTemplate template, Item item)
 
 function drawButton(long renderer, Button button)
 {
-    draw_s(renderer, selectTemplate(buttonTemplate(button), button));
+    draw(renderer, selectTemplate(buttonTemplate(button), button));
 
     return button;
 }

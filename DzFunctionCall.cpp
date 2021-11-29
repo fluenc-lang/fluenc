@@ -14,9 +14,8 @@
 #include "values/DependentValue.h"
 #include "values/TypedValue.h"
 
-DzFunctionCall::DzFunctionCall(const std::string name, bool isTailCallEligible)
+DzFunctionCall::DzFunctionCall(const std::string name)
 	: m_name(name)
-	, m_isTailCallEligible(isTailCallEligible)
 {
 }
 
@@ -49,42 +48,45 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 	block->insertInto(function);
 
-	if (m_isTailCallEligible)
+	auto tailCallCandidate = entryPoint
+		.byName(m_name);
+
+	if (tailCallCandidate)
 	{
-		auto tailCallCandidate = entryPoint
-			.byName(m_name);
+		llvm::IRBuilder<> builder(block);
 
-		if (tailCallCandidate)
+		auto targetValues = tailCallCandidate->values();
+		auto inputValues = values;
+
+		auto tailCallTarget = std::accumulate(index_iterator(0ul), index_iterator(numberOfArguments), tailCallCandidate, [&](const EntryPoint *target, size_t)
 		{
-			llvm::IRBuilder<> builder(block);
+			auto value = inputValues.pop();
+			auto storage = targetValues.pop();
 
-			auto tailCallValues = tailCallCandidate->values();
-
-			auto tailCallTarget = std::accumulate(index_iterator(0ul), index_iterator(numberOfArguments), tailCallCandidate, [&](const EntryPoint *target, size_t)
+			if (auto computedValue = dynamic_cast<const TypedValue *>(value))
 			{
-				auto value = values.pop();
-				auto storage = tailCallValues.pop();
+				auto load = builder.CreateLoad(*computedValue);
 
-				if (auto computedValue = dynamic_cast<const TypedValue *>(value))
+				builder.CreateStore(load, *static_cast<const TypedValue *>(storage));
+			}
+			else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
+			{
+				auto provider = dependentValue->provider();
+
+				if (provider->depth() < target->depth())
 				{
-					auto load = builder.CreateLoad(*computedValue);
-
-					builder.CreateStore(load, *static_cast<const TypedValue *>(storage));
+					return provider;
 				}
-				else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
-				{
-					auto provider = dependentValue->provider();
+			}
 
-					if (provider->depth() < target->depth())
-					{
-						return provider;
-					}
-				}
+			return target;
+		});
 
-				return target;
-			});
+		auto entry = tailCallTarget->entry();
 
-			linkBlocks(block, tailCallTarget->entry());
+		if (entry->tag() == entryPoint.tag())
+		{
+			linkBlocks(block, entry->block());
 
 			return std::vector<DzResult>();
 		}
@@ -120,6 +122,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 				auto consumerEntryPoint = functionEntryPoint
 					.withDepth(lastEntryPoint.depth())
+					.pushTag(lastEntryPoint.tag())
 					.withBlock(consumerBlock);
 
 				result.push_back({ consumerEntryPoint, returnValue });

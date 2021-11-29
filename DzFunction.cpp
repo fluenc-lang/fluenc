@@ -71,8 +71,6 @@ bool DzFunction::hasMatchingSignature(const EntryPoint &entryPoint, const Stack 
 
 std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto block = entryPoint.block();
-
 	auto pep = entryPoint
 		.withValues(values);
 
@@ -88,7 +86,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 
 	auto ep = pep
 		.withName(m_name)
-		.withEntry(block)
+		.markEntry()
 		.withLocals(locals);
 
 	return m_block->build(ep, values);

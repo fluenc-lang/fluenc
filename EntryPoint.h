@@ -17,14 +17,15 @@ class EntryPoint
 	public:
 		EntryPoint(int depth
 			, const EntryPoint *parent
+			, const EntryPoint *entry
 			, llvm::BasicBlock *block
 			, llvm::BasicBlock *alloc
-			, llvm::BasicBlock *entry
 			, llvm::Function *function
 			, llvm::Value *returnValueAddress
 			, std::unique_ptr<llvm::Module> *module
 			, std::unique_ptr<llvm::LLVMContext> *context
 			, const std::string &name
+			, const std::stack<std::string> &tag
 			, const std::multimap<std::string, DzCallable *> &functions
 			, const std::map<std::string, const BaseValue *> &locals
 			, const std::map<std::string, Prototype *> &types
@@ -37,7 +38,6 @@ class EntryPoint
 		int depth() const;
 
 		llvm::BasicBlock *block() const;
-		llvm::BasicBlock *entry() const;
 
 		llvm::Function *function() const;
 		llvm::Value *returnValueAddress() const;
@@ -48,6 +48,7 @@ class EntryPoint
 		std::unique_ptr<llvm::LLVMContext> &context() const;
 
 		std::string name() const;
+		std::string tag() const;
 
 		std::multimap<std::string, DzCallable *> functions() const;
 		std::map<std::string, const BaseValue *> locals() const;
@@ -56,13 +57,16 @@ class EntryPoint
 		Stack values() const;
 
 		const EntryPoint *byName(const std::string &name) const;
+		const EntryPoint *entry() const;
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
-		EntryPoint withEntry(llvm::BasicBlock *entry) const;
+		EntryPoint markEntry() const;
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
 		EntryPoint withName(const std::string &name) const;
+		EntryPoint pushTag(const std::string &tag) const;
+		EntryPoint popTag() const;
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
 		EntryPoint withValues(const Stack &values) const;
 		EntryPoint withDepth(int depth) const;
@@ -71,10 +75,10 @@ class EntryPoint
 		int m_depth;
 
 		const EntryPoint *m_parent;
+		const EntryPoint *m_entry;
 
 		llvm::BasicBlock *m_block;
 		llvm::BasicBlock *m_alloc;
-		llvm::BasicBlock *m_entry;
 
 		llvm::Function *m_function;
 		llvm::Value *m_returnValueAddress;
@@ -84,6 +88,7 @@ class EntryPoint
 
 		std::string m_name;
 
+		std::stack<std::string> m_tags;
 		std::multimap<std::string, DzCallable *> m_functions;
 		std::map<std::string, const BaseValue *> m_locals;
 		std::map<std::string, Prototype *> m_types;

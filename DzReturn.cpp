@@ -66,11 +66,19 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 		auto tuple = new TupleValue({ continuation, value });
 
 		values.push(tuple);
-	}
-	else
-	{
-		values.push(value);
+
+		return m_consumer->build(entryPoint, values);
 	}
 
-	return m_consumer->build(entryPoint, values);
+	values.push(value);
+
+	if (dynamic_cast<const TupleValue *>(value))
+	{
+		return m_consumer->build(entryPoint, values);
+	}
+
+	auto ep = entryPoint
+		.popTag();
+
+	return m_consumer->build(ep, values);
 }

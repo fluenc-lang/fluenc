@@ -50,8 +50,10 @@ std::vector<DzResult> DzArrayInit::build(const EntryPoint &entryPoint, Stack val
 	linkBlocks(block, arrayBlock);
 
 	auto ep = entryPoint
+		.pushTag(nextTag())
 		.withBlock(arrayBlock)
-		.withEntry(arrayBlock);
+		.markEntry()
+		;
 
 	return m_consumer->build(ep, values);
 }

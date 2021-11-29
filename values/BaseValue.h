@@ -9,8 +9,6 @@ class BaseValue
 		virtual ~BaseValue() = default;
 
 		virtual const Type *type() const = 0;
-
-//		virtual std::string tag() const = 0;
 };
 
 #endif // BASEVALUE_H

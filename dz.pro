@@ -16,6 +16,7 @@ SOURCES += \
 	DzBooleanLiteral.cpp \
 	DzConditional.cpp \
 	DzContinuation.cpp \
+	DzEmptyArray.cpp \
 	DzExpansion.cpp \
 	DzExportedFunction.cpp \
 	DzExportedFunctionTerminator.cpp \
@@ -87,6 +88,7 @@ HEADERS += \
 	DzCallable.h \
 	DzConditional.h \
 	DzContinuation.h \
+	DzEmptyArray.h \
 	DzExpansion.h \
 	DzExportedFunction.h \
 	DzExportedFunctionTerminator.h \

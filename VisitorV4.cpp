@@ -34,6 +34,7 @@
 #include "DzArrayInit.h"
 #include "BlockStackFrame.h"
 #include "DzTupleArgument.h"
+#include "DzEmptyArray.h"
 
 #include "types/Prototype.h"
 
@@ -54,6 +55,9 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	std::multimap<std::string, DzCallable *> functions;
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, Prototype *> types;
+	std::stack<std::string> tags;
+
+	tags.push("root");
 
 	for (auto function : context->function())
 	{
@@ -90,6 +94,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, &module
 		, &llvmContext
 		, "term"
+		, tags
 		, functions
 		, locals
 		, types
@@ -299,9 +304,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 {
 	auto expression = context->expression();
 
-	auto isTailCallEligible = dynamic_cast<DzReturn *>(m_alpha);
-
-	auto call = new DzFunctionCall(context->ID()->getText(), isTailCallEligible);
+	auto call = new DzFunctionCall(context->ID()->getText());
 
 	std::vector<DzValue *> values;
 
@@ -603,5 +606,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 		return static_cast<DzValue *>(init);
 	}
 
-	return m_alpha;
+	auto empty = new DzEmptyArray(m_alpha);
+
+	return static_cast<DzValue *>(empty);
 }
