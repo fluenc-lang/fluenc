@@ -3,6 +3,7 @@
 #include "EntryPoint.h"
 
 EntryPoint::EntryPoint(int depth
+	, int iteratorDepth
 	, const EntryPoint *parent
 	, const EntryPoint *entry
 	, llvm::BasicBlock *block
@@ -12,13 +13,13 @@ EntryPoint::EntryPoint(int depth
 	, std::unique_ptr<llvm::Module> *module
 	, std::unique_ptr<llvm::LLVMContext> *context
 	, const std::string &name
-	, const std::stack<std::string> &tag
 	, const std::multimap<std::string, DzCallable *> &functions
 	, const std::map<std::string, const BaseValue *> &locals
 	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
 	)
 	: m_depth(depth)
+	, m_iteratorDepth(iteratorDepth)
 	, m_parent(parent)
 	, m_entry(entry)
 	, m_block(block)
@@ -28,7 +29,6 @@ EntryPoint::EntryPoint(int depth
 	, m_module(module)
 	, m_context(context)
 	, m_name(name)
-	, m_tags(tag)
 	, m_functions(functions)
 	, m_locals(locals)
 	, m_types(types)
@@ -39,6 +39,11 @@ EntryPoint::EntryPoint(int depth
 int EntryPoint::depth() const
 {
 	return m_depth;
+}
+
+int EntryPoint::iteratorDepth() const
+{
+	return m_iteratorDepth;
 }
 
 llvm::BasicBlock *EntryPoint::block() const
@@ -83,11 +88,6 @@ std::string EntryPoint::name() const
 	return m_name;
 }
 
-std::string EntryPoint::tag() const
-{
-	return m_tags.top();
-}
-
 std::multimap<std::string, DzCallable *> EntryPoint::functions() const
 {
 	return m_functions;
@@ -126,6 +126,7 @@ const EntryPoint *EntryPoint::byName(const std::string &name) const
 EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, new EntryPoint(*this)
 		, m_entry
 		, block
@@ -135,7 +136,6 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -146,6 +146,7 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -155,7 +156,6 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -166,6 +166,7 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 EntryPoint EntryPoint::markEntry() const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, new EntryPoint(*this)
 		, new EntryPoint(*this)
 		, m_block
@@ -175,7 +176,6 @@ EntryPoint EntryPoint::markEntry() const
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -186,6 +186,7 @@ EntryPoint EntryPoint::markEntry() const
 EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -195,7 +196,6 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -206,6 +206,7 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *> &locals) const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -215,7 +216,6 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *>
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, locals
 		, m_types
@@ -226,6 +226,7 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *>
 EntryPoint EntryPoint::withName(const std::string &name) const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, new EntryPoint(*this)
 		, m_entry
 		, m_block
@@ -235,7 +236,6 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		, m_module
 		, m_context
 		, name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -243,17 +243,11 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		);
 }
 
-EntryPoint EntryPoint::pushTag(const std::string &tag) const
+EntryPoint EntryPoint::withIteratorDepth(int iteratorDepth) const
 {
-	auto tags = m_tags;
-
-	if (m_tags.top() != tag)
-	{
-		tags.push(tag);
-	}
-
 	return EntryPoint(m_depth + 1
-		, new EntryPoint(*this)
+		, std::max(0, iteratorDepth)
+		, m_parent
 		, m_entry
 		, m_block
 		, m_alloc
@@ -262,34 +256,6 @@ EntryPoint EntryPoint::pushTag(const std::string &tag) const
 		, m_module
 		, m_context
 		, m_name
-		, tags
-		, m_functions
-		, m_locals
-		, m_types
-		, m_values
-		);
-}
-
-EntryPoint EntryPoint::popTag() const
-{
-	auto tags = m_tags;
-
-	if (m_tags.size() > 1)
-	{
-		tags.pop();
-	}
-
-	return EntryPoint(m_depth + 1
-		, new EntryPoint(*this)
-		, m_entry
-		, m_block
-		, m_alloc
-		, m_function
-		, m_returnValueAddress
-		, m_module
-		, m_context
-		, m_name
-		, tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -300,6 +266,7 @@ EntryPoint EntryPoint::popTag() const
 EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -309,7 +276,6 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -320,6 +286,7 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 EntryPoint EntryPoint::withValues(const Stack &values) const
 {
 	return EntryPoint(m_depth + 1
+		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -329,7 +296,6 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types
@@ -340,6 +306,7 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 EntryPoint EntryPoint::withDepth(int depth) const
 {
 	return EntryPoint(depth
+		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -349,7 +316,6 @@ EntryPoint EntryPoint::withDepth(int depth) const
 		, m_module
 		, m_context
 		, m_name
-		, m_tags
 		, m_functions
 		, m_locals
 		, m_types

@@ -84,7 +84,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 		auto entry = tailCallTarget->entry();
 
-		if (entry->tag() == entryPoint.tag())
+		if (entry->iteratorDepth() == entryPoint.iteratorDepth())
 		{
 			linkBlocks(block, entry->block());
 
@@ -122,7 +122,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 				auto consumerEntryPoint = functionEntryPoint
 					.withDepth(lastEntryPoint.depth())
-					.pushTag(lastEntryPoint.tag())
+					.withIteratorDepth(lastEntryPoint.iteratorDepth())
 					.withBlock(consumerBlock);
 
 				result.push_back({ consumerEntryPoint, returnValue });

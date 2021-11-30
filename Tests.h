@@ -27,12 +27,6 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
-	public:
-		Tests()
-		{
-			scenario47();
-		}
-
 	private:
 		void scenario1()
 		{

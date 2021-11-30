@@ -78,7 +78,7 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	}
 
 	auto ep = entryPoint
-		.popTag();
+		.withIteratorDepth(entryPoint.iteratorDepth() - 1);
 
 	return m_consumer->build(ep, values);
 }

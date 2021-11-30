@@ -55,9 +55,6 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	std::multimap<std::string, DzCallable *> functions;
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, Prototype *> types;
-	std::stack<std::string> tags;
-
-	tags.push("root");
 
 	for (auto function : context->function())
 	{
@@ -85,6 +82,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	Stack values;
 
 	EntryPoint entryPoint(0
+		, 0
 		, nullptr
 		, nullptr
 		, nullptr
@@ -94,7 +92,6 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, &module
 		, &llvmContext
 		, "term"
-		, tags
 		, functions
 		, locals
 		, types

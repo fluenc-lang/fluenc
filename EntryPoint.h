@@ -12,10 +12,9 @@ class Prototype;
 
 class EntryPoint
 {
-	const char *empty = "_empty";
-
 	public:
 		EntryPoint(int depth
+			, int iteratorDepth
 			, const EntryPoint *parent
 			, const EntryPoint *entry
 			, llvm::BasicBlock *block
@@ -25,7 +24,6 @@ class EntryPoint
 			, std::unique_ptr<llvm::Module> *module
 			, std::unique_ptr<llvm::LLVMContext> *context
 			, const std::string &name
-			, const std::stack<std::string> &tag
 			, const std::multimap<std::string, DzCallable *> &functions
 			, const std::map<std::string, const BaseValue *> &locals
 			, const std::map<std::string, Prototype *> &types
@@ -36,6 +34,7 @@ class EntryPoint
 		EntryPoint(const EntryPoint &) = default;
 
 		int depth() const;
+		int iteratorDepth() const;
 
 		llvm::BasicBlock *block() const;
 
@@ -65,14 +64,14 @@ class EntryPoint
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
 		EntryPoint withName(const std::string &name) const;
-		EntryPoint pushTag(const std::string &tag) const;
-		EntryPoint popTag() const;
+		EntryPoint withIteratorDepth(int iteratorDepth) const;
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
 		EntryPoint withValues(const Stack &values) const;
 		EntryPoint withDepth(int depth) const;
 
 	private:
 		int m_depth;
+		int m_iteratorDepth;
 
 		const EntryPoint *m_parent;
 		const EntryPoint *m_entry;
@@ -88,7 +87,6 @@ class EntryPoint
 
 		std::string m_name;
 
-		std::stack<std::string> m_tags;
 		std::multimap<std::string, DzCallable *> m_functions;
 		std::map<std::string, const BaseValue *> m_locals;
 		std::map<std::string, Prototype *> m_types;

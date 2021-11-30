@@ -8,7 +8,7 @@ DzEmptyArray::DzEmptyArray(DzValue *consumer)
 std::vector<DzResult> DzEmptyArray::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto ep = entryPoint
-		.pushTag(nextTag());
+		.withIteratorDepth(entryPoint.iteratorDepth() + 1);
 
 	return m_consumer->build(ep, values);
 }
