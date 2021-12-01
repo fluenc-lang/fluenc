@@ -90,5 +90,10 @@ const TypedValue *DzBinary::resolveOp(const EntryPoint &entryPoint, const TypedV
 		return new TypedValue { BooleanType::instance(), builder.CreateOr(*left, *right) };
 	}
 
+	if (m_op == "%")
+	{
+		return new TypedValue { BooleanType::instance(), builder.CreateSRem(*left, *right) };
+	}
+
 	throw new std::exception();
 }
