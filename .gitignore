@@ -11,4 +11,4 @@ moc_*
 *.o
 
 # Build
-Makefile
+/Makefile
