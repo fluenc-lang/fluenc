@@ -13,7 +13,7 @@ function readChar(long file)
 
 function nextNumber(int accumulation, (int char, ...chars))
 {
-    if (char == 10) // New line
+    if (char == '\n') // New line
     {
         return accumulation -> (0, ...chars);
     }
@@ -23,7 +23,7 @@ function nextNumber(int accumulation, (int char, ...chars))
         return accumulation;
     }
 
-    return nextNumber((accumulation * 10) + (char - 48), ...chars);
+    return nextNumber((accumulation * 10) + (char - '0'), ...chars);
 }
 
 function part1(int count, int previous, int number)

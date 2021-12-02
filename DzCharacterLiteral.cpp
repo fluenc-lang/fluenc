@@ -20,12 +20,37 @@ std::vector<DzResult> DzCharacterLiteral::build(const EntryPoint &entryPoint, St
 	auto storageType = type->storageType(*context);
 
 	auto value = new TypedValue(type
-		, llvm::ConstantInt::get((llvm::IntegerType *)storageType
-			, *m_value.begin()
-			)
+		, getValue(storageType)
 		);
 
 	values.push(value);
 
 	return m_consumer->build(entryPoint, values);
+}
+
+llvm::ConstantInt *DzCharacterLiteral::getValue(llvm::Type *storageType) const
+{
+	static std::unordered_map<std::string, std::string> sequences =
+	{
+		{ "\\n", "\n" },
+		{ "\\r", "\r" },
+		{ "\\t", "\t" },
+		{ "\\0", "\0" },
+	};
+
+	// I hate ANTLR... Wish I could do this in the grammar file instead.
+	auto string = m_value.substr(1, m_value.size() - 2);
+
+	auto iterator = sequences.find(string);
+
+	if (iterator != sequences.end())
+	{
+		return llvm::ConstantInt::get((llvm::IntegerType *)storageType
+			, *iterator->second.begin()
+			);
+	}
+
+	return llvm::ConstantInt::get((llvm::IntegerType *)storageType
+		, *string.begin()
+		);
 }

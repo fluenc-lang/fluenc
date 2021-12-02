@@ -1,6 +1,8 @@
 #ifndef DZCHARACTERLITERAL_H
 #define DZCHARACTERLITERAL_H
 
+#include <llvm/IR/Constants.h>
+
 #include "DzValue.h"
 
 class DzCharacterLiteral : public DzValue
@@ -11,6 +13,8 @@ class DzCharacterLiteral : public DzValue
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		llvm::ConstantInt *getValue(llvm::Type *storageType) const;
+
 		DzValue *m_consumer;
 
 		std::string m_value;

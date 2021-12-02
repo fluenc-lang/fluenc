@@ -30,7 +30,7 @@ literal
 	| BOOL #boolLiteral
 	| STRING #stringLiteral
 	| INT'u' #uint32Literal
-	| '\'' value=. '\'' #charLiteral
+	| CHARACTER #charLiteral
 	| 'nothing' #nothing
 	;
 
@@ -103,6 +103,10 @@ COMMENT
 
 STRING
 	: '"' ~('"')+ '"'
+	;
+
+CHARACTER
+	: '\'' ~('\'')+ '\''
 	;
 	
 WS

@@ -11,6 +11,16 @@ function readChar(long file)
     return getc(file) -> (file);
 }
 
+function sum(int product, int value)
+{
+    return product + value;
+}
+
+function sum(int product, (int value, ...values))
+{
+    return sum(product + value, ...values);
+}
+
 // Types
 global None: 0;
 global Forward: 757;
@@ -38,7 +48,7 @@ function instruction(int type, int value)
 
 function nextInstruction(int mode, int type, int value, (int char, ...chars))
 {
-    if (char == 10) // New line
+    if (char == '\n') // New line
     {
         return instruction(type, value) -> (Type, None, 0, ...chars);
     }
@@ -48,7 +58,7 @@ function nextInstruction(int mode, int type, int value, (int char, ...chars))
         return nothing;
     }
 
-    if (char == 32) // Space
+    if (char == ' ') // Space
     {
         return nextInstruction(Value, type, value, ...chars);
     }
@@ -58,7 +68,7 @@ function nextInstruction(int mode, int type, int value, (int char, ...chars))
         return nextInstruction(mode, type + char, value, ...chars);
     }
 
-    return nextInstruction(mode, type, (value * 10) + (char - 48), ...chars);
+    return nextInstruction(mode, type, (value * 10) + (char - '0'), ...chars);
 }
 
 function part1(int x, int y, without instruction)

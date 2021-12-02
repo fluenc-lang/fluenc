@@ -612,7 +612,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)
 {
 	auto value = new DzCharacterLiteral(m_alpha
-		, context->value->getText()
+		, context->CHARACTER()->getText()
 		);
 
 	return static_cast<DzValue *>(value);
