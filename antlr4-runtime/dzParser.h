@@ -14,8 +14,8 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
-    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, INT = 20, 
-    BOOL = 21, OP = 22, COMMENT = 23, STRING = 24, WS = 25, ID = 26
+    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
+    INT = 21, BOOL = 22, OP = 23, COMMENT = 24, STRING = 25, WS = 26, ID = 27
   };
 
   enum {
@@ -186,6 +186,15 @@ public:
   public:
     NothingContext(LiteralContext *ctx);
 
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  CharLiteralContext : public LiteralContext {
+  public:
+    CharLiteralContext(LiteralContext *ctx);
+
+    antlr4::Token *value = nullptr;
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

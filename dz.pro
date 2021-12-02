@@ -14,6 +14,7 @@ SOURCES += \
 	DzAssignment.cpp \
 	DzBinary.cpp \
 	DzBooleanLiteral.cpp \
+	DzCharacterLiteral.cpp \
 	DzConditional.cpp \
 	DzContinuation.cpp \
 	DzEmptyArray.cpp \
@@ -86,6 +87,7 @@ HEADERS += \
 	DzBinary.h \
 	DzBooleanLiteral.h \
 	DzCallable.h \
+	DzCharacterLiteral.h \
 	DzConditional.h \
 	DzContinuation.h \
 	DzEmptyArray.h \

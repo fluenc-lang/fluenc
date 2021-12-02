@@ -30,6 +30,7 @@ literal
 	| BOOL #boolLiteral
 	| STRING #stringLiteral
 	| INT'u' #uint32Literal
+	| '\'' value=. '\'' #charLiteral
 	| 'nothing' #nothing
 	;
 

@@ -35,6 +35,7 @@
 #include "BlockStackFrame.h"
 #include "DzTupleArgument.h"
 #include "DzEmptyArray.h"
+#include "DzCharacterLiteral.h"
 
 #include "types/Prototype.h"
 
@@ -606,4 +607,13 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 	auto empty = new DzEmptyArray(m_alpha);
 
 	return static_cast<DzValue *>(empty);
+}
+
+antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)
+{
+	auto value = new DzCharacterLiteral(m_alpha
+		, context->value->getText()
+		);
+
+	return static_cast<DzValue *>(value);
 }
