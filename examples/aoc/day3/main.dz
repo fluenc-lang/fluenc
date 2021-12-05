@@ -1,0 +1,338 @@
+global O_RDONLY: 0;
+
+import int printNumber(int number);
+import int open(string apathname, int flags);
+import int getc(long stream);
+
+import long fdopen(int fildes, string mode);
+
+function readChar(long file)
+{
+    return getc(file) -> (file);
+}
+
+global Base: 2;
+
+function nextLine(int number, (int char, ...chars))
+{
+    if (char == '\n') // New line
+    {
+        return number -> (0, ...chars);
+    }
+
+    if (char < 0) // EOF
+    {
+        return number;
+    }
+
+    return nextLine((number * Base) + (char - '0'), ...chars);
+}
+
+function invertInt(int value)
+{
+    if (value == 1)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+function invert(Row row)
+{
+    return Row
+    {
+        c1: invertInt(row.c1),
+        c2: invertInt(row.c2),
+        c3: invertInt(row.c3),
+        c4: invertInt(row.c4),
+        c5: invertInt(row.c5),
+        c6: invertInt(row.c6),
+        c7: invertInt(row.c7),
+        c8: invertInt(row.c8),
+        c9: invertInt(row.c9),
+        c10: invertInt(row.c10),
+        c11: invertInt(row.c11),
+        c12: invertInt(row.c12)
+    };
+}
+
+struct Row
+{
+    c1: 0,
+    c2: 0,
+    c3: 0,
+    c4: 0,
+    c5: 0,
+    c6: 0,
+    c7: 0,
+    c8: 0,
+    c9: 0,
+    c10: 0,
+    c11: 0,
+    c12: 0
+};
+
+function add(int count, int value)
+{
+    if ((value % Base) == 1)
+    {
+        return count + 1;
+    }
+
+    return count;
+}
+
+function count(int position, int value, Row row)
+{
+    if (position == 11)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c12: add(row.c12, value) }
+            );
+    }
+
+    if (position == 10)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c11: add(row.c11, value) }
+            );
+    }
+
+    if (position == 9)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c10: add(row.c10, value) }
+            );
+    }
+
+    if (position == 8)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c9: add(row.c9, value) }
+            );
+    }
+
+    if (position == 7)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c8: add(row.c8, value) }
+            );
+    }
+
+    if (position == 6)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c7: add(row.c7, value) }
+            );
+    }
+
+    if (position == 5)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c6: add(row.c6, value) }
+            );
+    }
+
+    if (position == 4)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c5: add(row.c5, value) }
+            );
+    }
+
+    if (position == 3)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c4: add(row.c4, value) }
+            );
+    }
+
+    if (position == 2)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c3: add(row.c3, value) }
+        );
+    }
+
+    if (position == 1)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c2: add(row.c2, value) }
+            );
+    }
+
+    if (position == 0)
+    {
+        return count(position + 1
+            , value / Base
+            , row with { c1: add(row.c1, value) }
+            );
+    }
+
+    return row;
+}
+
+function isMajority(int count, int numberOfRows)
+{
+    if (count > (numberOfRows / 2))
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+function summarize(Row row, int i)
+{
+    return Row
+    {
+        c1: isMajority(row.c1, i),
+        c2: isMajority(row.c2, i),
+        c3: isMajority(row.c3, i),
+        c4: isMajority(row.c4, i),
+        c5: isMajority(row.c5, i),
+        c6: isMajority(row.c6, i),
+        c7: isMajority(row.c7, i),
+        c8: isMajority(row.c8, i),
+        c9: isMajority(row.c9, i),
+        c10: isMajority(row.c10, i),
+        c11: isMajority(row.c11, i),
+        c12: isMajority(row.c12, i)
+    };
+}
+
+function yield(int i, Row row)
+{
+    if (i == 11)
+    {
+        return row.c12 -> (i - 1, row);
+    }
+
+    if (i == 10)
+    {
+        return row.c11 -> (i - 1, row);
+    }
+
+    if (i == 9)
+    {
+        return row.c10 -> (i - 1, row);
+    }
+
+    if (i == 8)
+    {
+        return row.c9 -> (i - 1, row);
+    }
+
+    if (i == 7)
+    {
+        return row.c8 -> (i - 1, row);
+    }
+
+    if (i == 6)
+    {
+        return row.c7 -> (i - 1, row);
+    }
+
+    if (i == 5)
+    {
+        return row.c6 -> (i - 1, row);
+    }
+
+    if (i == 4)
+    {
+        return row.c5 -> (i - 1, row);
+    }
+
+    if (i == 3)
+    {
+        return row.c4 -> (i - 1, row);
+    }
+
+    if (i == 2)
+    {
+        return row.c3 -> (i - 1, row);
+    }
+
+    if (i == 1)
+    {
+        return row.c2 -> (i - 1, row);
+    }
+
+    return row.c1;
+}
+
+function toDecimal(int accumulation, int value)
+{
+    return (accumulation * 2) + value;
+}
+
+function toDecimal(int accumulation, (int value, ...values))
+{
+    return toDecimal((accumulation * 2) + value, ...values);
+}
+
+function process(Row gamma, Row epsilon)
+{
+    return toDecimal(0, yield(11, gamma)) * toDecimal(0, yield(11, epsilon));
+}
+
+function part1(int i, Row row, int number)
+{
+    return process(summarize(row, i), invert(summarize(row, i)));
+}
+
+function part1(int i, Row row, (int number, ...numbers))
+{
+    return part1(i + 1, count(0, number, row), ...numbers);
+}
+
+function part2()
+{
+    return 2;
+}
+
+function bind(int result1, int result2)
+{
+    return [result1, result2];
+}
+
+function run()
+{
+    return bind(
+        part1(0, Row {}
+            , nextLine(0
+                , readChar(fdopen(open("input", O_RDONLY), "r"))
+                )
+            ),
+        part2()
+    );
+}
+
+function printNumbers(int number)
+{
+    return printNumber(number);
+}
+
+function printNumbers((int number, ...numbers))
+{
+    printNumber(number);
+
+    return printNumbers(...numbers);
+}
+
+export int main()
+{
+    return printNumbers(run());
+}
