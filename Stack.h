@@ -37,6 +37,24 @@ class Stack
 			throw new std::exception();
 		}
 
+		template<typename T>
+		const T *request()
+		{
+			if (size() <= 0)
+			{
+				return nullptr;
+			}
+
+			auto value = pop();
+
+			if (auto casted = dynamic_cast<const T *>(value))
+			{
+				return casted;
+			}
+
+			return nullptr;
+		}
+
 		void push(const BaseValue *value);
 
 	private:

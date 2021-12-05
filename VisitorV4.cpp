@@ -36,10 +36,14 @@
 #include "DzTupleArgument.h"
 #include "DzEmptyArray.h"
 #include "DzCharacterLiteral.h"
+#include "LazyEvaluation.h"
+#include "LazySink.h"
 
 #include "types/Prototype.h"
 
 #include "values/TypedValue.h"
+#include "values/ReferenceValue.h"
+#include "values/LazyValue.h"
 
 VisitorV4::VisitorV4(DzValue *alpha, DzValue *beta)
 	: m_alpha(alpha)
@@ -106,7 +110,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 		for (auto &[_, globalValues] : result->build(entryPoint, values))
 		{
-			locals.insert({ result->name(), globalValues.require<TypedValue>() });
+			locals.insert({ result->name(), globalValues.require<ReferenceValue>() });
 		}
 	}
 
@@ -308,7 +312,9 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 
 	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [](dzParser::ExpressionContext *parameter)
 	{
-		VisitorV4 visitor(DzTerminator::instance(), nullptr);
+		auto evaluation = new LazyEvaluation();
+
+		VisitorV4 visitor(evaluation, nullptr);
 
 		return visitor
 			.visit(parameter)
@@ -324,17 +330,11 @@ antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)
 {
 	auto assignments = context->assignment();
 
-	std::unordered_map<std::string, DzValue *> fields;
+	std::vector<std::string> fields;
 
-	std::transform(begin(assignments), end(assignments), std::insert_iterator(fields, std::begin(fields)), [](dzParser::AssignmentContext *assignment)
+	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](dzParser::AssignmentContext *assignment)
 	{
-		VisitorV4 visitor(DzTerminator::instance(), nullptr);
-
-		auto value = visitor
-			.visit(assignment->expression())
-			.as<DzValue *>();
-
-		return std::make_pair(assignment->field()->ID()->getText(), value);
+		return assignment->field()->ID()->getText();
 	});
 
 	auto instantiation = new DzInstantiation(m_alpha
@@ -342,7 +342,16 @@ antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)
 		, fields
 		);
 
-	return static_cast<DzValue *>(instantiation);
+	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
+	{
+		VisitorV4 visitor(consumer, nullptr);
+
+		return visitor
+			.visit(assignment->expression())
+			.as<DzValue *>();
+	});
+
+	return static_cast<DzValue *>(value);
 }
 
 antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
@@ -468,17 +477,11 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 {
 	auto assignments = context->assignment();
 
-	std::unordered_map<std::string, DzValue *> fields;
+	std::vector<std::string> fields;
 
-	std::transform(begin(assignments), end(assignments), std::insert_iterator(fields, begin(fields)), [](dzParser::AssignmentContext *assignment)
+	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](dzParser::AssignmentContext *assignment)
 	{
-		VisitorV4 visitor(DzTerminator::instance(), nullptr);
-
-		auto value = visitor
-			.visit(assignment->expression())
-			.as<DzValue *>();
-
-		return std::make_pair(assignment->field()->ID()->getText(), value);
+		return assignment->field()->ID()->getText();
 	});
 
 	auto typeName = visit(context->typeName())
@@ -490,7 +493,16 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 		, fields
 		);
 
-	return static_cast<DzValue *>(instantiation);
+	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
+	{
+		VisitorV4 visitor(consumer, nullptr);
+
+		return visitor
+			.visit(assignment->expression())
+			.as<DzValue *>();
+	});
+
+	return static_cast<DzValue *>(value);
 }
 
 antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
@@ -588,7 +600,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 
 	auto firstElement = std::accumulate(begin(indexed), end(indexed), (DzValue *)nullptr, [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
 	{
-		auto element = new DzArrayElement(expression.index, m_alpha, next);
+		auto element = new DzArrayElement(expression.index, DzTerminator::instance(), next);
 
 		VisitorV4 visitor(element, nullptr);
 
@@ -600,13 +612,15 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 	if (firstElement)
 	{
 		auto init = new DzArrayInit(firstElement);
+		auto lazySink = new LazySink(m_alpha, init);
 
-		return static_cast<DzValue *>(init);
+		return static_cast<DzValue *>(lazySink);
 	}
 
-	auto empty = new DzEmptyArray(m_alpha);
+	auto empty = new DzEmptyArray(DzTerminator::instance());
+	auto lazySink = new LazySink(m_alpha, empty);
 
-	return static_cast<DzValue *>(empty);
+	return static_cast<DzValue *>(lazySink);
 }
 
 antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)

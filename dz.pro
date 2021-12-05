@@ -40,6 +40,8 @@ SOURCES += \
 	IndexIterator.cpp \
 	InteropHelper.cpp \
 	KaleidoscopeJIT.cpp \
+	LazyEvaluation.cpp \
+	LazySink.cpp \
 	Stack.cpp \
 	StackSegment.cpp \
 	UndeclaredIdentifierException.cpp \
@@ -67,7 +69,9 @@ SOURCES += \
 	types/WithoutType.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/LazyValue.cpp \
 	values/NamedValue.cpp \
+	values/ReferenceValue.cpp \
 	values/TupleValue.cpp \
 	values/TypedValue.cpp \
 	values/IndexedValue.cpp \
@@ -116,6 +120,8 @@ HEADERS += \
 	Indexed.h \
 	InteropHelper.h \
 	KaleidoscopeJIT.h \
+	LazyEvaluation.h \
+	LazySink.h \
 	Stack.h \
 	StackSegment.h \
 	Tests.h \
@@ -149,7 +155,9 @@ HEADERS += \
 	values/DependentValue.h \
 	values/ExpandableValue.h \
 	values/IndexedValue.h \
+	values/LazyValue.h \
 	values/NamedValue.h \
+	values/ReferenceValue.h \
 	values/TupleValue.h \
 	values/TypedValue.h \
 	values/UserTypeValue.h \

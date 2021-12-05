@@ -17,7 +17,7 @@ class DzInstantiation : public DzValue
 	public:
 		DzInstantiation(DzValue *consumer
 			, IPrototypeProvider *prototypeProvider
-			, const std::unordered_map<std::string, DzValue *> &fields
+			, const std::vector<std::string> &fields
 			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
@@ -26,7 +26,7 @@ class DzInstantiation : public DzValue
 		DzValue *m_consumer;
 		IPrototypeProvider *m_prototypeProvider;
 
-		std::unordered_map<std::string, DzValue *> m_fields;
+		std::vector<std::string> m_fields;
 };
 
 #endif // DZINSTANTIATION_H

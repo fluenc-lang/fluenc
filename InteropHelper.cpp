@@ -13,10 +13,12 @@
 #include "values/NamedValue.h"
 #include "values/TypedValue.h"
 #include "values/UserTypeValue.h"
+#include "values/ReferenceValue.h"
 
 const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *type, const EntryPoint &entryPoint)
 {
 	auto &context = entryPoint.context();
+	auto &module = entryPoint.module();
 
 	auto block = entryPoint.block();
 
@@ -33,6 +35,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 			return type->storageType(*context);
 		});
 
+		auto intType = llvm::Type::getInt32Ty(*context);
 		auto structType = llvm::StructType::get(*context, types);
 		auto structPtr = structType->getPointerTo();
 
@@ -42,9 +45,31 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 		std::transform(begin(fields), end(fields), index_iterator(), std::back_insert_iterator(fieldValues), [&](auto field, auto index)
 		{
-			auto fieldAccess = new DzFieldAccess(cast, field, index);
+			auto fieldType = field->type();
 
-			return new NamedValue { field->name(), entryPoint, fieldAccess, nullptr };
+			if (fieldType)
+			{
+				auto storageType = fieldType->storageType(*context);
+
+				llvm::Value *indexes[] =
+				{
+					llvm::ConstantInt::get(intType, 0),
+					llvm::ConstantInt::get(intType, index)
+				};
+
+				auto gep = llvm::GetElementPtrInst::CreateInBounds(cast, indexes, field->name(), block);
+
+				auto dataLayout = module->getDataLayout();
+				auto align = dataLayout.getABITypeAlign(storageType);
+
+				auto load = new llvm::LoadInst(storageType, gep, field->name(), false, align, block);
+
+				auto value = createReadProxy(load, fieldType, entryPoint);
+
+				return new NamedValue { field->name(), value };
+			}
+
+			throw new std::exception();
 		});
 
 		return new UserTypeValue { prototype, fieldValues };
@@ -64,23 +89,20 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 	auto fields = userTypeValue->fields();
 
-	std::vector<const TypedValue *> elementValues;
+	std::vector<const ReferenceValue *> elementValues;
 
-	std::transform(begin(fields), end(fields), std::back_insert_iterator(elementValues), [&](const NamedValue *field) -> const TypedValue *
+	std::transform(begin(fields), end(fields), std::back_insert_iterator(elementValues), [&](const NamedValue *field) -> const ReferenceValue *
 	{
-		auto fieldResults = field->build(block, Stack());
-		auto &[_, fieldValues] = *fieldResults.begin();
+		auto fieldValue = field->value();
 
-		auto fieldValue = fieldValues.pop();
-
-		if (auto typedValue = dynamic_cast<const TypedValue *>(fieldValue))
+		if (auto reference = dynamic_cast<const ReferenceValue *>(fieldValue))
 		{
-			return typedValue;
+			return reference;
 		}
 
 		if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(fieldValue))
 		{
-			return new TypedValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
+			return new ReferenceValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
 		}
 
 		throw new std::exception();

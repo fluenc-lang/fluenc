@@ -1,16 +1,16 @@
+#include <llvm/IR/Instructions.h>
+
 #include "NamedValue.h"
 #include "EntryPoint.h"
 #include "DzTypeName.h"
 
+#include "values/TypedValue.h"
+
 NamedValue::NamedValue(const std::string &name
-	, const EntryPoint &entryPoint
-	, const DzValue *subject
-	, const DzTypeName *type
+	, const BaseValue *value
 	)
 	: m_name(name)
-	, m_entryPoint(new EntryPoint(entryPoint))
-	, m_subject(subject)
-	, m_type(type)
+	, m_value(value)
 {
 }
 
@@ -19,19 +19,17 @@ std::string NamedValue::name() const
 	return m_name;
 }
 
-std::vector<DzResult> NamedValue::build(llvm::BasicBlock *block, const Stack &values) const
+const BaseValue *NamedValue::value() const
 {
-	auto entryPoint = m_entryPoint->withBlock(block);
-
-	return m_subject->build(entryPoint, values);
+	return m_value;
 }
 
 const Type *NamedValue::type() const
 {
-	return m_type->resolve(*m_entryPoint);
+	return m_value->type();
 }
 
 bool NamedValue::hasValue() const
 {
-	return m_subject;
+	return m_value;
 }

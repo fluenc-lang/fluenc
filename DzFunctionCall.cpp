@@ -13,6 +13,7 @@
 
 #include "values/DependentValue.h"
 #include "values/TypedValue.h"
+#include "values/ReferenceValue.h"
 
 DzFunctionCall::DzFunctionCall(const std::string name)
 	: m_name(name)
@@ -63,11 +64,11 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 			auto value = inputValues.pop();
 			auto storage = targetValues.pop();
 
-			if (auto computedValue = dynamic_cast<const TypedValue *>(value))
+			if (auto reference = dynamic_cast<const ReferenceValue *>(value))
 			{
-				auto load = builder.CreateLoad(*computedValue);
+				auto load = builder.CreateLoad(*reference);
 
-				builder.CreateStore(load, *static_cast<const TypedValue *>(storage));
+				builder.CreateStore(load, *static_cast<const ReferenceValue *>(storage));
 			}
 			else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
 			{

@@ -116,7 +116,7 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 				ss << ".";
 				ss << field->name();
 
-				return { ss.str(), field };
+				return { ss.str(), field->value() };
 			});
 		}
 
