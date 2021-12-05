@@ -10,6 +10,7 @@
 #include "values/IndexedValue.h"
 #include "values/TypedValue.h"
 #include "values/TupleValue.h"
+#include "values/ReferenceValue.h"
 
 StackSegment::StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue *consumer)
 	: m_values(values)
@@ -45,7 +46,7 @@ const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint
 
 		UNUSED(store);
 
-		return new TypedValue { argumentType, alloc };
+		return new ReferenceValue { argumentType, alloc };
 	}
 
 	if (auto tupleValue = dynamic_cast<const TupleValue *>(value))

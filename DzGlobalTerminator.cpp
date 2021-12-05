@@ -4,6 +4,7 @@
 #include "Type.h"
 
 #include "values/TypedValue.h"
+#include "values/ReferenceValue.h"
 
 DzGlobalTerminator::DzGlobalTerminator(const std::string &name)
 	: m_name(name)
@@ -25,7 +26,7 @@ std::vector<DzResult> DzGlobalTerminator::build(const EntryPoint &entryPoint, St
 		return new llvm::GlobalVariable(*module, storageType, false, llvm::GlobalValue::InternalLinkage, value->constant(), m_name);
 	});
 
-	values.push(new TypedValue { valueType, global });
+	values.push(new ReferenceValue { valueType, global });
 
 	return {{ entryPoint, values }};
 }

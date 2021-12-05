@@ -14,6 +14,7 @@
 
 #include "values/TypedValue.h"
 #include "values/UserTypeValue.h"
+#include "values/ReferenceValue.h"
 
 DzImportedFunction::DzImportedFunction(const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
@@ -87,7 +88,7 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 			auto value = values.pop();
 
-			if (auto addressOfArgument = dynamic_cast<const TypedValue *>(value))
+			if (auto addressOfArgument = dynamic_cast<const ReferenceValue *>(value))
 			{
 				auto align = dataLayout.getABITypeAlign(storageType);
 

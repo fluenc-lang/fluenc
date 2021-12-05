@@ -22,7 +22,18 @@ std::vector<const NamedValue *> Prototype::fields(const EntryPoint &entryPoint) 
 
 	std::transform(begin(m_fields), end(m_fields), std::back_insert_iterator(fields), [&](auto field)
 	{
-		return new NamedValue { field.name(), entryPoint, field.defaultValue(), field.type() };
+		auto defaultValue = field.defaultValue();
+
+		if (defaultValue)
+		{
+			auto defaultResults = defaultValue->build(entryPoint, Stack());
+
+			auto &[_, defaultValues] = *defaultResults.begin();
+
+			return new NamedValue { field.name(), defaultValues.pop() };
+		}
+
+		return new NamedValue { field.name(), nullptr };
 	});
 
 	for (auto type : m_parentTypes)

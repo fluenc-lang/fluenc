@@ -92,7 +92,7 @@ const TypedValue *DzBinary::resolveOp(const EntryPoint &entryPoint, const TypedV
 
 	if (m_op == "%")
 	{
-		return new TypedValue { BooleanType::instance(), builder.CreateSRem(*left, *right) };
+		return new TypedValue { left->type(), builder.CreateSRem(*left, *right) };
 	}
 
 	throw new std::exception();

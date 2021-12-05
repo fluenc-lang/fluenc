@@ -12,13 +12,12 @@ class NamedValue : public BaseValue
 {
 	public:
 		NamedValue(const std::string &name
-			, const EntryPoint &entryPoint
-			, const DzValue *subject
-			, const DzTypeName *type
+			, const BaseValue *value
 			);
 
 		std::string name() const;
-		std::vector<DzResult> build(llvm::BasicBlock *block, const Stack &values) const;
+
+		const BaseValue *value() const;
 
 		const Type *type() const override;
 
@@ -27,9 +26,7 @@ class NamedValue : public BaseValue
 	private:
 		std::string m_name;
 
-		const EntryPoint *m_entryPoint;
-		const DzValue *m_subject;
-		const DzTypeName *m_type;
+		const BaseValue *m_value;
 };
 
 #endif // NAMEDVALUE_H
