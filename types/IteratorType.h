@@ -34,9 +34,10 @@ class IteratorType : public Type
 
 		bool is(const Type *type, const EntryPoint &entryPoint) const override
 		{
+			UNUSED(type);
 			UNUSED(entryPoint);
 
-			return tag() == type->tag();
+			return true;
 		}
 };
 

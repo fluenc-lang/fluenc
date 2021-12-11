@@ -1,5 +1,8 @@
 #include "DzEmptyArray.h"
 
+#include "values/WithoutValue.h"
+#include "values/TaintedValue.h"
+
 DzEmptyArray::DzEmptyArray(DzValue *consumer)
 	: m_consumer(consumer)
 {
@@ -7,8 +10,9 @@ DzEmptyArray::DzEmptyArray(DzValue *consumer)
 
 std::vector<DzResult> DzEmptyArray::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto ep = entryPoint
-		.withIteratorDepth(entryPoint.iteratorDepth() + 1);
+	auto tainted = new TaintedValue(WithoutValue::instance());
 
-	return m_consumer->build(ep, values);
+	values.push(tainted);
+
+	return m_consumer->build(entryPoint, values);
 }

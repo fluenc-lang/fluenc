@@ -50,7 +50,6 @@ std::vector<DzResult> DzArrayInit::build(const EntryPoint &entryPoint, Stack val
 	linkBlocks(block, arrayBlock);
 
 	auto ep = entryPoint
-		.withIteratorDepth(entryPoint.iteratorDepth() + 1)
 		.withBlock(arrayBlock)
 		.markEntry()
 		;

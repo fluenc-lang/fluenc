@@ -72,10 +72,12 @@ SOURCES += \
 	values/LazyValue.cpp \
 	values/NamedValue.cpp \
 	values/ReferenceValue.cpp \
+	values/TaintedValue.cpp \
 	values/TupleValue.cpp \
 	values/TypedValue.cpp \
 	values/IndexedValue.cpp \
-	values/UserTypeValue.cpp
+	values/UserTypeValue.cpp \
+	values/WithoutValue.cpp
 
 HEADERS += \
 	AllIterator.h \
@@ -158,9 +160,11 @@ HEADERS += \
 	values/LazyValue.h \
 	values/NamedValue.h \
 	values/ReferenceValue.h \
+	values/TaintedValue.h \
 	values/TupleValue.h \
 	values/TypedValue.h \
 	values/UserTypeValue.h \
+	values/WithoutValue.h \
 	wobjectdefs.h \
 	wobjectimpl.h
 

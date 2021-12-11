@@ -10,6 +10,7 @@
 #include "values/TypedValue.h"
 #include "values/ExpandableValue.h"
 #include "values/TupleValue.h"
+#include "values/TaintedValue.h"
 
 DzArrayElement::DzArrayElement(size_t index, DzValue *consumer, DzValue *next)
 	: m_index(index)
@@ -68,8 +69,9 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 			);
 
 		auto tuple = new TupleValue({ continuation, value });
+		auto tainted = new TaintedValue(tuple);
 
-		valuesIfTrue.push(tuple);
+		valuesIfTrue.push(tainted);
 
 		auto resultsIfTrue = m_consumer->build(epIfTrue, valuesIfTrue);
 		auto resultsIfFalse = m_next->build(epIfFalse, valuesIfFalse);
@@ -82,7 +84,9 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 		return result;
 	}
 
-	values.push(value);
+	auto tainted = new TaintedValue(value);
+
+	values.push(tainted);
 
 	return m_consumer->build(entryPoint, values);
 }

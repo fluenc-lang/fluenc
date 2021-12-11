@@ -14,7 +14,6 @@ class EntryPoint
 {
 	public:
 		EntryPoint(int depth
-			, int iteratorDepth
 			, const EntryPoint *parent
 			, const EntryPoint *entry
 			, llvm::BasicBlock *block
@@ -34,7 +33,6 @@ class EntryPoint
 		EntryPoint(const EntryPoint &) = default;
 
 		int depth() const;
-		int iteratorDepth() const;
 
 		llvm::BasicBlock *block() const;
 
@@ -64,14 +62,12 @@ class EntryPoint
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
 		EntryPoint withName(const std::string &name) const;
-		EntryPoint withIteratorDepth(int iteratorDepth) const;
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
 		EntryPoint withValues(const Stack &values) const;
 		EntryPoint withDepth(int depth) const;
 
 	private:
 		int m_depth;
-		int m_iteratorDepth;
 
 		const EntryPoint *m_parent;
 		const EntryPoint *m_entry;

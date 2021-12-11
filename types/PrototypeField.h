@@ -5,6 +5,8 @@
 
 class DzValue;
 class DzTypeName;
+class Type;
+class EntryPoint;
 
 class PrototypeField
 {
@@ -17,7 +19,7 @@ class PrototypeField
 		std::string name() const;
 
 		const DzValue *defaultValue() const;
-		const DzTypeName *type() const;
+		const Type *type(const EntryPoint &entryPoint) const;
 
 	private:
 		std::string m_name;

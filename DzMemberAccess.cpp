@@ -50,7 +50,6 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		for (auto &[forwardedEntryPoint, forwardedValues] : value->build(block, values))
 		{
 			auto consumerEntryPoint = entryPoint
-				.withIteratorDepth(forwardedEntryPoint.iteratorDepth())
 				.withBlock(forwardedEntryPoint.block());
 
 			for (auto &result : m_consumer->build(consumerEntryPoint, forwardedValues))

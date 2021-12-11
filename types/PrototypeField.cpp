@@ -1,4 +1,5 @@
 #include "PrototypeField.h"
+#include "DzTypeName.h"
 
 PrototypeField::PrototypeField(const std::string &name
 	, const DzValue *defaultValue
@@ -20,7 +21,12 @@ const DzValue *PrototypeField::defaultValue() const
 	return m_defaultValue;
 }
 
-const DzTypeName *PrototypeField::type() const
+const Type *PrototypeField::type(const EntryPoint &entryPoint) const
 {
-	return m_type;
+	if (m_type)
+	{
+		return m_type->resolve(entryPoint);
+	}
+
+	return nullptr;
 }

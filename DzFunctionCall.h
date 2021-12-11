@@ -13,6 +13,8 @@ class DzFunctionCall : public DzValue
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		std::vector<DzResult> regularCall(const EntryPoint &entryPoint, Stack values) const;
+
 		std::string m_name;
 };
 

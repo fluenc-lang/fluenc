@@ -58,7 +58,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 			{
 				if (reference->type() != value->type())
 				{
-					return new NamedValue { field->name(), value };
+					return new NamedValue { field->name(), value, field->type() };
 				}
 
 				auto type = reference->type();
@@ -75,7 +75,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 				return field;
 			}
 
-			return new NamedValue { field->name(), value };
+			return new NamedValue { field->name(), value, field->type() };
 		}
 
 		if (!field->hasValue())
@@ -107,7 +107,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 			auto reference = new ReferenceValue { type, alloc };
 
-			return new NamedValue { field->name(), reference };
+			return new NamedValue { field->name(), reference, field->type() };
 		}
 
 		return field;

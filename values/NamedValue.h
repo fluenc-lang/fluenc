@@ -13,6 +13,7 @@ class NamedValue : public BaseValue
 	public:
 		NamedValue(const std::string &name
 			, const BaseValue *value
+			, const Type *type
 			);
 
 		std::string name() const;
@@ -27,6 +28,7 @@ class NamedValue : public BaseValue
 		std::string m_name;
 
 		const BaseValue *m_value;
+		const Type *m_type;
 };
 
 #endif // NAMEDVALUE_H

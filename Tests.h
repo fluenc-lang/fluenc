@@ -1227,7 +1227,7 @@ class Tests : public QObject
 		void scenario44()
 		{
 			auto result = exec(R"(
-				function foo()
+				function foo(without item)
 				{
 					return 23;
 				}
@@ -1259,7 +1259,7 @@ class Tests : public QObject
 					return bar(f.array);
 				}
 
-				function bar()
+				function bar(without item)
 				{
 					return 23;
 				}
@@ -1338,7 +1338,7 @@ class Tests : public QObject
 					];
 				}
 
-				function foo2(int accumulator)
+				function foo2(int accumulator, without item)
 				{
 					return accumulator;
 				}
@@ -1353,7 +1353,7 @@ class Tests : public QObject
 					return foo2(accumulator + item.value, ...values);
 				}
 
-				function foo1(int accumulator)
+				function foo1(int accumulator, without item)
 				{
 					return accumulator;
 				}
@@ -1426,7 +1426,7 @@ class Tests : public QObject
 					];
 				}
 
-				function sumWidth(int sum)
+				function sumWidth(int sum, without item)
 				{
 					return sum;
 				}
@@ -1523,6 +1523,129 @@ class Tests : public QObject
 			QCOMPARE(result, 5);
 		}
 
+		void scenario53()
+		{
+			auto result = exec(R"(
+				struct Row
+				{
+					x: 10,
+					y: 2
+				};
+
+				function foo(Row row)
+				{
+					return row.y;
+				}
+
+				function bar(int y, Row row)
+				{
+					return row.x * y;
+				}
+
+				function boo(Row row)
+				{
+					return bar(foo(row), row);
+				}
+
+				export int main()
+				{
+					return boo(Row {});
+				}
+			)");
+
+			QCOMPARE(result, 20);
+		}
+
+		void scenario54()
+		{
+			auto result = exec(R"(
+				struct Item
+				{
+					width: 0,
+					children: []
+				};
+
+				struct Button : Item
+				{
+					text: "foo"
+				};
+
+				struct Rectangle : Item
+				{
+					color: 0
+				};
+
+				function application()
+				{
+					return [
+						Button
+						{
+							width: 10
+						},
+						Button
+						{
+							width: 20
+						}
+					];
+				}
+
+				function selectTemplate(Button button)
+				{
+					return Rectangle
+					{
+						width: button.width
+					};
+				}
+
+				function drawButton(Button button)
+				{
+					return draw(selectTemplate(button));
+				}
+
+				iterator function draw(without item)
+				{
+					return 0;
+				}
+
+				iterator function draw(Rectangle rectangle)
+				{
+					return rectangle.width;
+				}
+
+				iterator function draw((Rectangle rectangle, ...items))
+				{
+					return rectangle.width -> (...items);
+				}
+
+				iterator function draw(Button button)
+				{
+					return drawButton(button);
+				}
+
+				iterator function draw((Button button, ...items))
+				{
+					return drawButton(button) -> (...items);
+				}
+
+				function sum(int accumulator, int value)
+				{
+					return accumulator + value;
+				}
+
+				function sum(int accumulator, (int value, ...values))
+				{
+					return sum(accumulator + value, ...values);
+				}
+
+				export int main()
+				{
+					return sum(0, draw(application()));
+				}
+			)");
+
+			QCOMPARE(result, 30);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1576,6 +1699,8 @@ class Tests : public QObject
 		W_SLOT(scenario50)
 		W_SLOT(scenario51)
 		W_SLOT(scenario52)
+		W_SLOT(scenario53)
+		W_SLOT(scenario54)
 
 	private:
 		ModuleInfo *compile(std::string source)

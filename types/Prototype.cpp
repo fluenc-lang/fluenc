@@ -30,10 +30,10 @@ std::vector<const NamedValue *> Prototype::fields(const EntryPoint &entryPoint) 
 
 			auto &[_, defaultValues] = *defaultResults.begin();
 
-			return new NamedValue { field.name(), defaultValues.pop() };
+			return new NamedValue { field.name(), defaultValues.pop(), field.type(entryPoint) };
 		}
 
-		return new NamedValue { field.name(), nullptr };
+		return new NamedValue { field.name(), nullptr, field.type(entryPoint) };
 	});
 
 	for (auto type : m_parentTypes)

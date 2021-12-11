@@ -66,7 +66,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 				auto value = createReadProxy(load, fieldType, entryPoint);
 
-				return new NamedValue { field->name(), value };
+				return new NamedValue { field->name(), value, field->type() };
 			}
 
 			throw new std::exception();
@@ -89,20 +89,28 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 	auto fields = userTypeValue->fields();
 
-	std::vector<const ReferenceValue *> elementValues;
+	std::vector<const TypedValue *> elementValues;
 
-	std::transform(begin(fields), end(fields), std::back_insert_iterator(elementValues), [&](const NamedValue *field) -> const ReferenceValue *
+	std::transform(begin(fields), end(fields), std::back_insert_iterator(elementValues), [&](const NamedValue *field) -> const TypedValue *
 	{
 		auto fieldValue = field->value();
 
 		if (auto reference = dynamic_cast<const ReferenceValue *>(fieldValue))
 		{
-			return reference;
+			auto type = reference->type();
+			auto storageType = type->storageType(*context);
+
+			auto align = dataLayout.getABITypeAlign(storageType);
+
+			auto load = new llvm::LoadInst(storageType, *reference, field->name(), false, align, block);
+
+			return new TypedValue { type, load };
+
 		}
 
 		if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(fieldValue))
 		{
-			return new ReferenceValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
+			return new TypedValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
 		}
 
 		throw new std::exception();
@@ -137,7 +145,7 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 		auto align = dataLayout.getABITypeAlign(storageType);
 
-		return new llvm::StoreInst(*field, gep,false, align, block);
+		return new llvm::StoreInst(*field, gep, false, align, block);
 	});
 
 	return new llvm::BitCastInst(alloc, llvm::Type::getInt8PtrTy(*context), "cast", block);

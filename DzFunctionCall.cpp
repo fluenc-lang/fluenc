@@ -10,10 +10,12 @@
 #include "EntryPoint.h"
 #include "Type.h"
 #include "IndexIterator.h"
+#include "AllIterator.h"
 
 #include "values/DependentValue.h"
 #include "values/TypedValue.h"
 #include "values/ReferenceValue.h"
+#include "values/TaintedValue.h"
 
 DzFunctionCall::DzFunctionCall(const std::string name)
 	: m_name(name)
@@ -39,9 +41,6 @@ int DzFunctionCall::order(const EntryPoint &entryPoint) const
 
 std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
-
-	auto functions = entryPoint.functions();
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
 
@@ -52,46 +51,87 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 	auto tailCallCandidate = entryPoint
 		.byName(m_name);
 
-	if (tailCallCandidate)
+	if (!tailCallCandidate)
 	{
-		llvm::IRBuilder<> builder(block);
-
-		auto targetValues = tailCallCandidate->values();
-		auto inputValues = values;
-
-		auto tailCallTarget = std::accumulate(index_iterator(0ul), index_iterator(numberOfArguments), tailCallCandidate, [&](const EntryPoint *target, size_t)
-		{
-			auto value = inputValues.pop();
-			auto storage = targetValues.pop();
-
-			if (auto reference = dynamic_cast<const ReferenceValue *>(value))
-			{
-				auto load = builder.CreateLoad(*reference);
-
-				builder.CreateStore(load, *static_cast<const ReferenceValue *>(storage));
-			}
-			else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
-			{
-				auto provider = dependentValue->provider();
-
-				if (provider->depth() < target->depth())
-				{
-					return provider;
-				}
-			}
-
-			return target;
-		});
-
-		auto entry = tailCallTarget->entry();
-
-		if (entry->iteratorDepth() == entryPoint.iteratorDepth())
-		{
-			linkBlocks(block, entry->block());
-
-			return std::vector<DzResult>();
-		}
+		return regularCall(entryPoint, values);
 	}
+
+	llvm::IRBuilder<> builder(block);
+
+	auto targetValues = tailCallCandidate->values();
+	auto inputValues = values;
+
+	if (targetValues.size() != inputValues.size())
+	{
+		return regularCall(entryPoint, values);
+	}
+
+	auto result = true;
+
+	std::transform(targetValues.begin(), targetValues.end(), inputValues.begin(), all_true(result), [=](auto storage, auto value)
+	{
+		auto storageType = storage->type();
+		auto valueType = value->type();
+
+		return valueType->is(storageType, entryPoint);
+	});
+
+	if (!result)
+	{
+		return regularCall(entryPoint, values);
+	}
+
+	auto tailCallTarget = std::accumulate(index_iterator(0ul), index_iterator(numberOfArguments), tailCallCandidate, [&](const EntryPoint *target, size_t) -> const EntryPoint *
+	{
+		if (!target)
+		{
+			return nullptr;
+		}
+
+		auto value = inputValues.pop();
+		auto storage = targetValues.pop();
+
+		if (auto reference = dynamic_cast<const ReferenceValue *>(value))
+		{
+			auto load = builder.CreateLoad(*reference);
+
+			builder.CreateStore(load, *static_cast<const ReferenceValue *>(storage));
+		}
+		else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
+		{
+			auto provider = dependentValue->provider();
+
+			if (provider->depth() < target->depth())
+			{
+				return provider;
+			}
+		}
+		else if (auto tainted = dynamic_cast<const TaintedValue *>(value))
+		{
+			return nullptr;
+		}
+
+		return target;
+	});
+
+	if (!tailCallTarget)
+	{
+		return regularCall(entryPoint, values);
+	}
+
+	auto entry = tailCallTarget->entry();
+
+	linkBlocks(block, entry->block());
+
+	return std::vector<DzResult>();
+}
+
+std::vector<DzResult> DzFunctionCall::regularCall(const EntryPoint &entryPoint, Stack values) const
+{
+	auto &context = entryPoint.context();
+
+	auto functions = entryPoint.functions();
+	auto block = entryPoint.block();
 
 	for (auto [i, end] = functions.equal_range(m_name); i != end; i++)
 	{
@@ -123,7 +163,6 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 				auto consumerEntryPoint = functionEntryPoint
 					.withDepth(lastEntryPoint.depth())
-					.withIteratorDepth(lastEntryPoint.iteratorDepth())
 					.withBlock(consumerBlock);
 
 				result.push_back({ consumerEntryPoint, returnValue });

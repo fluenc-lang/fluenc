@@ -44,6 +44,7 @@
 #include "values/TypedValue.h"
 #include "values/ReferenceValue.h"
 #include "values/LazyValue.h"
+#include "values/TaintedValue.h"
 
 VisitorV4::VisitorV4(DzValue *alpha, DzValue *beta)
 	: m_alpha(alpha)
@@ -87,7 +88,6 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	Stack values;
 
 	EntryPoint entryPoint(0
-		, 0
 		, nullptr
 		, nullptr
 		, nullptr

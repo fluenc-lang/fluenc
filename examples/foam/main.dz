@@ -261,18 +261,18 @@ function setRenderDrawColor(long renderer, Color color)
     return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
 
-function draw(long renderer)
+function draw_s(long renderer, without item)
 {
     return nothing;
 }
 
-function draw(long renderer, Rectangle rectangle)
+function draw_s(long renderer, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
     SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
-    return draw(renderer, rectangle.children);
+    return draw_s(renderer, rectangle.children);
 }
 
 function selectTemplate(ControlTemplate template, Item item)
@@ -292,7 +292,7 @@ function selectTemplate(ControlTemplate template, Item item)
 
 function drawButton(long renderer, Button button)
 {
-    draw(renderer, selectTemplate(buttonTemplate(button), button));
+    draw_s(renderer, selectTemplate(buttonTemplate(button), button));
 
     return button;
 }
@@ -334,22 +334,22 @@ function updateButton(EventState events, Button button)
     };
 }
 
-function update(ApplicationState state, Button button)
+iterator function update(ApplicationState state, Button button)
 {
     return updateButton(state.events, button);
 }
 
-function update(ApplicationState state, (Button button, ...controls))
+iterator function update(ApplicationState state, (Button button, ...controls))
 {
     return updateButton(state.events, button) -> (state, ...controls);
 }
 
-function draw(long renderer, State state, Button button)
+iterator function draw(long renderer, State state, Button button)
 {
-    return drawButton(renderer, button);
+    return button;
 }
 
-function draw(long renderer, State state, (Button button, ...controls))
+iterator function draw(long renderer, State state, (Button button, ...controls))
 {
     return drawButton(renderer, button) -> (renderer, state, ...controls);
 }

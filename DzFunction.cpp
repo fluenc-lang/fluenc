@@ -21,6 +21,7 @@
 #include "values/BaseValue.h"
 #include "values/UserTypeValue.h"
 #include "values/NamedValue.h"
+#include "values/TaintedValue.h"
 
 DzFunction::DzFunction(FunctionAttribute attribute
 	, const std::string &name
@@ -78,7 +79,7 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 
 	for (const auto &argument : m_arguments)
 	{
-		for (auto &[name, value] : handleArgument(argument, entryPoint, values))
+		for (auto &[name, value] : handleArgument(argument, entryPoint, values.pop()))
 		{
 			locals[name] = value;
 		}
@@ -92,13 +93,16 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 	return m_block->build(ep, values);
 }
 
-std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, Stack &values) const
+std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const
 {
+	if (auto tainted = dynamic_cast<const TaintedValue *>(value))
+	{
+		return handleArgument(argument, entryPoint, tainted->subject());
+	}
+
 	if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
 	{
 		auto name = standardArgument->name();
-
-		auto value = values.pop();
 
 		std::vector<Argument> result
 		{
@@ -125,7 +129,7 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 
 	if (auto tupleArgument = dynamic_cast<DzTupleArgument *>(argument))
 	{
-		auto tupleValue = values.require<TupleValue>();
+		auto tupleValue = static_cast<const TupleValue *>(value);
 
 		auto tupleValues = tupleValue->values();
 		auto arguments = tupleArgument->arguments();
@@ -134,7 +138,7 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 
 		for (auto argument : arguments)
 		{
-			for (auto &result : handleArgument(argument, entryPoint, tupleValues))
+			for (auto &result : handleArgument(argument, entryPoint, tupleValues.pop()))
 			{
 				results.push_back(result);
 			}

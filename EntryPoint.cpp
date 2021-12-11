@@ -3,7 +3,6 @@
 #include "EntryPoint.h"
 
 EntryPoint::EntryPoint(int depth
-	, int iteratorDepth
 	, const EntryPoint *parent
 	, const EntryPoint *entry
 	, llvm::BasicBlock *block
@@ -19,7 +18,6 @@ EntryPoint::EntryPoint(int depth
 	, const Stack &values
 	)
 	: m_depth(depth)
-	, m_iteratorDepth(iteratorDepth)
 	, m_parent(parent)
 	, m_entry(entry)
 	, m_block(block)
@@ -41,11 +39,6 @@ int EntryPoint::depth() const
 	return m_depth;
 }
 
-int EntryPoint::iteratorDepth() const
-{
-	return m_iteratorDepth;
-}
-
 llvm::BasicBlock *EntryPoint::block() const
 {
 	return m_block;
@@ -53,7 +46,12 @@ llvm::BasicBlock *EntryPoint::block() const
 
 const EntryPoint *EntryPoint::entry() const
 {
-	return m_entry;
+	if (m_entry)
+	{
+		return m_entry;
+	}
+
+	return this;
 }
 
 llvm::Function *EntryPoint::function() const
@@ -112,7 +110,7 @@ const EntryPoint *EntryPoint::byName(const std::string &name) const
 {
 	if (m_name == name)
 	{
-		return this;
+		return m_entry;
 	}
 
 	if (m_parent)
@@ -126,7 +124,6 @@ const EntryPoint *EntryPoint::byName(const std::string &name) const
 EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, new EntryPoint(*this)
 		, m_entry
 		, block
@@ -146,7 +143,6 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -166,7 +162,6 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 EntryPoint EntryPoint::markEntry() const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, new EntryPoint(*this)
 		, new EntryPoint(*this)
 		, m_block
@@ -186,7 +181,6 @@ EntryPoint EntryPoint::markEntry() const
 EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -206,7 +200,6 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *> &locals) const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -226,7 +219,6 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *>
 EntryPoint EntryPoint::withName(const std::string &name) const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, new EntryPoint(*this)
 		, m_entry
 		, m_block
@@ -243,30 +235,9 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		);
 }
 
-EntryPoint EntryPoint::withIteratorDepth(int iteratorDepth) const
-{
-	return EntryPoint(m_depth + 1
-		, std::max(0, iteratorDepth)
-		, m_parent
-		, m_entry
-		, m_block
-		, m_alloc
-		, m_function
-		, m_returnValueAddress
-		, m_module
-		, m_context
-		, m_name
-		, m_functions
-		, m_locals
-		, m_types
-		, m_values
-		);
-}
-
 EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -286,7 +257,6 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 EntryPoint EntryPoint::withValues(const Stack &values) const
 {
 	return EntryPoint(m_depth + 1
-		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
@@ -306,7 +276,6 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 EntryPoint EntryPoint::withDepth(int depth) const
 {
 	return EntryPoint(depth
-		, m_iteratorDepth
 		, m_parent
 		, m_entry
 		, m_block
