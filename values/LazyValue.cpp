@@ -2,6 +2,8 @@
 #include "EntryPoint.h"
 #include "DzTypeName.h"
 
+#include "types/IteratorType.h"
+
 LazyValue::LazyValue(const DzValue *subject, const EntryPoint &entryPoint)
 	: m_subject(subject)
 	, m_entryPoint(new EntryPoint(entryPoint))
@@ -17,5 +19,5 @@ std::vector<DzResult> LazyValue::build(llvm::BasicBlock *block, const Stack &val
 
 const Type *LazyValue::type() const
 {
-	return nullptr;
+	return IteratorType::instance();
 }

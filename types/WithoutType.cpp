@@ -3,7 +3,7 @@
 #include "WithoutType.h"
 #include "Utility.h"
 
-std::string WithoutType::tag() const
+std::string WithoutType::name() const
 {
 	return "without";
 }

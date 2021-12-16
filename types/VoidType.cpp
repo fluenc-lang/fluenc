@@ -1,7 +1,7 @@
 #include "VoidType.h"
 #include "Utility.h"
 
-std::string VoidType::tag() const
+std::string VoidType::name() const
 {
 	return "void";
 }

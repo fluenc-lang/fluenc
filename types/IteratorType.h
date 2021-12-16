@@ -22,7 +22,7 @@ class IteratorType : public Type
 			return &instance;
 		}
 
-		std::string tag() const override
+		std::string name() const override
 		{
 			return "...";
 		}

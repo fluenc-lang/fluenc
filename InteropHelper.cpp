@@ -30,7 +30,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 		std::transform(begin(fields), end(fields), std::back_insert_iterator(types), [&](auto field)
 		{
-			auto type = field->type();
+			auto type = field.type();
 
 			return type->storageType(*context);
 		});
@@ -45,7 +45,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 		std::transform(begin(fields), end(fields), index_iterator(), std::back_insert_iterator(fieldValues), [&](auto field, auto index)
 		{
-			auto fieldType = field->type();
+			auto fieldType = field.type();
 
 			if (fieldType)
 			{
@@ -57,16 +57,16 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 					llvm::ConstantInt::get(intType, index)
 				};
 
-				auto gep = llvm::GetElementPtrInst::CreateInBounds(cast, indexes, field->name(), block);
+				auto gep = llvm::GetElementPtrInst::CreateInBounds(cast, indexes, field.name(), block);
 
 				auto dataLayout = module->getDataLayout();
 				auto align = dataLayout.getABITypeAlign(storageType);
 
-				auto load = new llvm::LoadInst(storageType, gep, field->name(), false, align, block);
+				auto load = new llvm::LoadInst(storageType, gep, field.name(), false, align, block);
 
 				auto value = createReadProxy(load, fieldType, entryPoint);
 
-				return new NamedValue { field->name(), value, field->type() };
+				return new NamedValue { field.name(), value };
 			}
 
 			throw new std::exception();

@@ -1,8 +1,9 @@
 #include "Prototype.h"
 #include "DzTypeName.h"
+#include "DzValue.h"
 
 Prototype::Prototype(const std::string &tag
-	, const std::vector<PrototypeField> &fields
+	, const std::vector<PrototypeFieldEmbryo> &fields
 	, const std::vector<DzTypeName *> &parentTypes
 	)
 	: m_tag(tag)
@@ -11,16 +12,16 @@ Prototype::Prototype(const std::string &tag
 {
 }
 
-std::string Prototype::tag() const
+std::string Prototype::name() const
 {
 	return m_tag;
 }
 
-std::vector<const NamedValue *> Prototype::fields(const EntryPoint &entryPoint) const
+std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint) const
 {
-	std::vector<const NamedValue *> fields;
+	std::vector<PrototypeField> fields;
 
-	std::transform(begin(m_fields), end(m_fields), std::back_insert_iterator(fields), [&](auto field)
+	std::transform(begin(m_fields), end(m_fields), std::back_insert_iterator(fields), [&](auto field) -> PrototypeField
 	{
 		auto defaultValue = field.defaultValue();
 
@@ -30,10 +31,10 @@ std::vector<const NamedValue *> Prototype::fields(const EntryPoint &entryPoint) 
 
 			auto &[_, defaultValues] = *defaultResults.begin();
 
-			return new NamedValue { field.name(), defaultValues.pop(), field.type(entryPoint) };
+			return { field.name(), defaultValues.pop(), field.type(entryPoint) };
 		}
 
-		return new NamedValue { field.name(), nullptr, field.type(entryPoint) };
+		return { field.name(), nullptr, field.type(entryPoint) };
 	});
 
 	for (auto type : m_parentTypes)
@@ -54,7 +55,7 @@ llvm::Type *Prototype::storageType(llvm::LLVMContext &context) const
 
 bool Prototype::is(const Type *type, const EntryPoint &entryPoint) const
 {
-	if (type->tag() == m_tag)
+	if (type->name() == m_tag)
 	{
 		return true;
 	}

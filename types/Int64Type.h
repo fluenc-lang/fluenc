@@ -6,7 +6,7 @@
 class Int64Type : public BuiltinType<Int64Type>
 {
 	public:
-		std::string tag() const override;
+		std::string name() const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 };

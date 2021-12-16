@@ -6,13 +6,9 @@
 
 #include "values/TypedValue.h"
 
-NamedValue::NamedValue(const std::string &name
-	, const BaseValue *value
-	, const Type *type
-	)
+NamedValue::NamedValue(const std::string &name, const BaseValue *value)
 	: m_name(name)
 	, m_value(value)
-	, m_type(type)
 {
 }
 
@@ -28,10 +24,5 @@ const BaseValue *NamedValue::value() const
 
 const Type *NamedValue::type() const
 {
-	return m_type;
-}
-
-bool NamedValue::hasValue() const
-{
-	return m_value;
+	return m_value->type();
 }

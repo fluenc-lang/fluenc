@@ -20,7 +20,7 @@ class BuiltinType : public Type
 		{
 			UNUSED(entryPoint);
 
-			return tag() == type->tag();
+			return name() == type->name();
 		}
 };
 

@@ -82,7 +82,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		auto result = visit(structure)
 			.as<Prototype *>();
 
-		types.insert({ result->tag(), result });
+		types.insert({ result->name(), result });
 	}
 
 	Stack values;
@@ -433,9 +433,9 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 	auto name = context->name->getText();
 	auto inputFields = context->field();
 
-	std::vector<PrototypeField> fields;
+	std::vector<PrototypeFieldEmbryo> fields;
 
-	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [this](dzParser::FieldContext *field) -> PrototypeField
+	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [this](dzParser::FieldContext *field) -> PrototypeFieldEmbryo
 	{
 		auto name = field->ID()->getText();
 

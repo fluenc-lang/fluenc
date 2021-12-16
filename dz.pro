@@ -60,9 +60,11 @@ SOURCES += \
 	types/Int64Type.cpp \
 	types/Prototype.cpp \
 	types/PrototypeField.cpp \
+	types/PrototypeFieldEmbryo.cpp \
 	types/StringType.cpp \
 	types/TupleType.cpp \
 	types/Uint32Type.cpp \
+	types/UserType.cpp \
 	types/UserTypeField.cpp \
 	types/VoidType.cpp \
 	types/WithPrototype.cpp \
@@ -145,10 +147,12 @@ HEADERS += \
 	types/IteratorType.h \
 	types/Prototype.h \
 	types/PrototypeField.h \
+	types/PrototypeFieldEmbryo.h \
 	types/StringType.h \
 	Type.h \
 	types/TupleType.h \
 	types/Uint32Type.h \
+	types/UserType.h \
 	types/UserTypeField.h \
 	types/VoidType.h \
 	types/WithPrototype.h \

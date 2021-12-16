@@ -9,16 +9,25 @@ WithPrototype::WithPrototype(const UserTypeValue *value)
 {
 }
 
-std::string WithPrototype::tag() const
+std::string WithPrototype::name() const
 {
-	return m_value->type()->tag();
+	return m_value->type()->name();
 }
 
-std::vector<const NamedValue *> WithPrototype::fields(const EntryPoint &entryPoint) const
+std::vector<PrototypeField> WithPrototype::fields(const EntryPoint &entryPoint) const
 {
 	UNUSED(entryPoint);
 
-	return m_value->fields();
+	auto fields = m_value->fields();
+
+	std::vector<PrototypeField> results;
+
+	std::transform(begin(fields), end(fields), std::back_insert_iterator(results), [](auto field) -> PrototypeField
+	{
+		return { field->name(), field->value(), field->type() };
+	});
+
+	return results;
 }
 
 llvm::Type *WithPrototype::storageType(llvm::LLVMContext &context) const

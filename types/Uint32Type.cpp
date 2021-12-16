@@ -1,7 +1,7 @@
 #include "Uint32Type.h"
 #include "Utility.h"
 
-std::string Uint32Type::tag() const
+std::string Uint32Type::name() const
 {
 	return "uint";
 }

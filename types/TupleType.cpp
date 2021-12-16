@@ -10,14 +10,44 @@ TupleType::TupleType(const std::vector<const Type *> types)
 {
 }
 
-std::string TupleType::tag() const
+std::string TupleType::name() const
 {
 	std::stringstream ss;
 
-	std::transform(begin(m_types), end(m_types), std::ostream_iterator<std::string>(ss), [](auto type)
+	ss << "(";
+
+	for (auto i = begin(m_types); i != end(m_types); i++)
 	{
-		return type->tag();
-	});
+		if (i != begin(m_types))
+		{
+			ss << ", ";
+		}
+
+		ss << (*i)->name();
+	}
+
+	ss << ")";
+
+	return ss.str();
+}
+
+std::string TupleType::fullName() const
+{
+	std::stringstream ss;
+
+	ss << "(";
+
+	for (auto i = begin(m_types); i != end(m_types); i++)
+	{
+		if (i != begin(m_types))
+		{
+			ss << ", ";
+		}
+
+		ss << (*i)->fullName();
+	}
+
+	ss << ")";
 
 	return ss.str();
 }
@@ -56,7 +86,7 @@ bool TupleType::is(const Type *type, const EntryPoint &entryPoint) const
 	return false;
 }
 
-TupleType *TupleType::get(const std::vector<const Type *> types)
+TupleType *TupleType::get(const std::vector<const Type *> &types)
 {
 	static std::unordered_map<size_t, TupleType> cache;
 

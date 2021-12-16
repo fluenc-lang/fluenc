@@ -6,7 +6,7 @@
 class Uint32Type : public BuiltinType<Uint32Type>
 {
 	public:
-		std::string tag() const override;
+		std::string name() const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 };

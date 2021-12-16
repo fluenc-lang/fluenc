@@ -1,7 +1,7 @@
 #include "StringType.h"
 #include "Utility.h"
 
-std::string StringType::tag() const
+std::string StringType::name() const
 {
 	return "string";
 }

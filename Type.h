@@ -10,7 +10,11 @@ class EntryPoint;
 class Type
 {
 	public:
-		virtual std::string tag() const = 0;
+		virtual std::string name() const = 0;
+		virtual std::string fullName() const
+		{
+			return name();
+		}
 
 		virtual llvm::Type *storageType(llvm::LLVMContext &context) const = 0;
 

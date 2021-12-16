@@ -48,17 +48,17 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::transform(begin(prototypeFields), end(prototypeFields), std::back_insert_iterator(namedValues), [&](auto field) -> const NamedValue *
 	{
-		auto valueByName = valuesByName.find(field->name());
+		auto valueByName = valuesByName.find(field.name());
 
 		if (valueByName != valuesByName.end())
 		{
 			auto value = valueByName->second;
 
-			if (auto reference = dynamic_cast<const ReferenceValue *>(field->value()))
+			if (auto reference = dynamic_cast<const ReferenceValue *>(field.defaultValue()))
 			{
 				if (reference->type() != value->type())
 				{
-					return new NamedValue { field->name(), value, field->type() };
+					return new NamedValue { field.name(), value };
 				}
 
 				auto type = reference->type();
@@ -72,18 +72,18 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 				UNUSED(store);
 
-				return field;
+				return new NamedValue { field.name(), field.defaultValue() };
 			}
 
-			return new NamedValue { field->name(), value, field->type() };
+			return new NamedValue { field.name(), value };
 		}
 
-		if (!field->hasValue())
+		if (!field.defaultValue())
 		{
 			throw new std::exception();
 		}
 
-		return field;
+		return new NamedValue { field.name(), field.defaultValue() };
 	});
 
 	std::vector<const NamedValue *> finalValues;
@@ -107,7 +107,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 			auto reference = new ReferenceValue { type, alloc };
 
-			return new NamedValue { field->name(), reference, field->type() };
+			return new NamedValue { field->name(), reference };
 		}
 
 		return field;
