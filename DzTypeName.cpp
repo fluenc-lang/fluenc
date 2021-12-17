@@ -9,6 +9,7 @@
 #include "types/VoidType.h"
 #include "types/WithoutType.h"
 #include "types/Prototype.h"
+#include "types/ByteType.h"
 
 DzTypeName::DzTypeName(const std::string &name)
 	: m_name(name)
@@ -35,6 +36,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 	if (m_name == "uint")
 	{
 		return Uint32Type::instance();
+	}
+
+	if (m_name == "byte")
+	{
+		return ByteType::instance();
 	}
 
 	if (m_name == "bool")
@@ -91,6 +97,13 @@ DzTypeName *DzTypeName::int64()
 DzTypeName *DzTypeName::uint32()
 {
 	static DzTypeName typeName("uint");
+
+	return &typeName;
+}
+
+DzTypeName *DzTypeName::byte()
+{
+	static DzTypeName typeName("byte");
 
 	return &typeName;
 }

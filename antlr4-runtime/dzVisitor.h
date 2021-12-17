@@ -43,6 +43,8 @@ public:
 
     virtual antlrcpp::Any visitCharLiteral(dzParser::CharLiteralContext *context) = 0;
 
+    virtual antlrcpp::Any visitByteLiteral(dzParser::ByteLiteralContext *context) = 0;
+
     virtual antlrcpp::Any visitNothing(dzParser::NothingContext *context) = 0;
 
     virtual antlrcpp::Any visitWith(dzParser::WithContext *context) = 0;

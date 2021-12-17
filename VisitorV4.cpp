@@ -600,7 +600,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 
 	auto firstElement = std::accumulate(begin(indexed), end(indexed), (DzValue *)nullptr, [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
 	{
-		auto element = new DzArrayElement(expression.index, DzTerminator::instance(), next);
+		auto element = new DzArrayElement(expression.index, next);
 
 		VisitorV4 visitor(element, nullptr);
 
@@ -630,4 +630,15 @@ antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)
 		);
 
 	return static_cast<DzValue *>(value);
+}
+
+antlrcpp::Any VisitorV4::visitByteLiteral(dzParser::ByteLiteralContext *context)
+{
+	auto constant = new DzIntegralLiteral(m_alpha
+		, DzTypeName::byte()
+		, context->INT()->getText()
+
+		);
+
+	return static_cast<DzValue *>(constant);
 }

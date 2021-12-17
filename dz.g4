@@ -31,6 +31,7 @@ literal
 	| STRING #stringLiteral
 	| INT'u' #uint32Literal
 	| CHARACTER #charLiteral
+	| INT'u8' #byteLiteral
 	| 'nothing' #nothing
 	;
 

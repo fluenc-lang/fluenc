@@ -6,6 +6,7 @@ struct Event
 {
     SDL_KeyboardEvent *key;
     SDL_MouseMotionEvent *motion;
+    SDL_MouseButtonEvent *button;
 };
 
 struct Event *SDL_WaitEventEx(struct Event *events)
@@ -16,20 +17,9 @@ struct Event *SDL_WaitEventEx(struct Event *events)
 
     memcpy(events->key, &event.key, sizeof(SDL_KeyboardEvent));
     memcpy(events->motion, &event.motion, sizeof(SDL_MouseMotionEvent));
+    memcpy(events->button, &event.button, sizeof(SDL_MouseButtonEvent));
 
     return events;
-}
-
-SDL_MouseMotionEvent *SDL_PollMouseMotionEvent(SDL_MouseMotionEvent *motion)
-{
-    SDL_Event event;
-
-    if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION))
-    {
-        memcpy(motion, &event.motion, sizeof(SDL_MouseMotionEvent));
-    }
-
-    return motion;
 }
 
 void printnum(int num)

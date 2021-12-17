@@ -4,14 +4,11 @@ import int SDL_Init(uint flags);
 import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
 import int SDL_RenderClear(long renderer);
 import int SDL_RenderFillRect(long renderer, SDL_Rect rect);
-import int SDL_PollKeyEvent(SDL_KeyboardEvent key);
-import int SDL_PollMouseMotionEvent(SDL_MouseMotionEvent motion);
 
 import long SDL_CreateRenderer(long window, int index, int flags);
 import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
 
 import void SDL_RenderPresent(long renderer);
-import void SDL_PumpEvents();
 
 import EventState SDL_WaitEventEx(EventState events);
 
@@ -21,6 +18,7 @@ global SDL_INIT_VIDEO: 0x00000020u;
 global SDL_WINDOWPOS_UNDEFINED: 0x1FFF0000u;
 global SDL_KEYDOWN: 0x300u;
 global SDL_KEYUP: 0x301u;
+global SDL_MOUSEBUTTONDOWN: 0x401u;
 global SDLK_a: 0x61u;
 global SDLK_d: 0x64u;
 global SDLK_s: 0x73u;
@@ -47,8 +45,8 @@ struct SDL_KeyboardEvent
 
 struct SDL_MouseMotionEvent
 {
-    int type : 0,
-    int timestamp : 0,
+    int type: 0,
+    int timestamp: 0,
     int windowID: 0,
     int which: 0,
     int state: 0,
@@ -56,6 +54,20 @@ struct SDL_MouseMotionEvent
     int y: 0,
     int xrel: 0,
     int yrel: 0
+};
+
+struct SDL_MouseButtonEvent
+{
+    int type: 0,
+    int timestamp: 0,
+    int windowId: 0,
+    int which: 0,
+    byte button: 0u8,
+    byte state: 0u8,
+    byte clicks: 0u8,
+    byte padding: 0u8,
+    int x: 0,
+    int y: 0
 };
 
 global Normal: 0;
@@ -104,7 +116,8 @@ struct ControlTemplate
 struct EventState
 {
     SDL_KeyboardEvent key,
-    SDL_MouseMotionEvent motion
+    SDL_MouseMotionEvent motion,
+    SDL_MouseButtonEvent button
 };
 
 struct ApplicationState
@@ -118,7 +131,8 @@ function createEventState()
     return EventState
     {
         key: SDL_KeyboardEvent {},
-        motion: SDL_MouseMotionEvent {}
+        motion: SDL_MouseMotionEvent {},
+        button: SDL_MouseButtonEvent {}
     };
 }
 
@@ -195,37 +209,47 @@ function buttonTemplate(Button button)
 function application(State state)
 {
     return [
-        Button
+        Rectangle
         {
-            x: 10 + state.counter,
-            y: 10,
-            width: 70,
-            height: 20,
-            text: "Click me!"
-        },
-        Button
-        {
-            x: 10 + state.counter,
-            y: 40,
-            width: 70,
-            height: 20,
-            text: "Click me!"
-        },
-        Button
-        {
-            x: 10 + state.counter,
-            y: 70,
-            width: 70,
-            height: 20,
-            text: "Click me!"
-        },
-        Button
-        {
-            x: 10 + state.counter,
-            y: 100,
-            width: 70,
-            height: 20,
-            text: "Click me!"
+			x: 10,
+			y: 10,
+			width: 250,
+			height: 150,
+            color: rgb(252, 252, 252),
+            children: [
+                Button
+                {
+                    x: 30 + state.counter,
+                    y: 30,
+                    width: 210,
+                    height: 30,
+                    text: "Click me!"
+                },
+                Button
+                {
+                    x: 30 + state.counter,
+                    y: 70,
+                    width: 210,
+                    height: 30,
+                    text: "Click me!"
+                },
+                Button
+                {
+                    x: 30 + state.counter,
+                    y: 110,
+                    width: 70,
+                    height: 30,
+                    text: "Click me!"
+                },
+                Button
+                {
+                    x: 140 + state.counter,
+                    y: 110,
+                    width: 70,
+                    height: 30,
+                    text: "Click me!"
+                }
+            ]
         }
     ];
 }
@@ -243,7 +267,7 @@ function boundingRect(Item item)
 
 function clear(long renderer, State state)
 {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
     return state;
@@ -276,9 +300,9 @@ function selectTemplate(ControlTemplate template, Item item)
     return template.normal;
 }
 
-function drawButton(long renderer, Button button)
+function drawButton(long renderer, State state, Button button)
 {
-    draw(renderer, selectTemplate(buttonTemplate(button), button));
+    draw(renderer, state, selectTemplate(buttonTemplate(button), button));
 
     return button;
 }
@@ -291,16 +315,18 @@ function containsMouse(Item item, SDL_MouseMotionEvent motion)
         && (motion.y < (item.y + item.height));
 }
 
-function isPressed(SDL_MouseMotionEvent motion)
+function isPressed(SDL_MouseButtonEvent button)
 {
-    return motion.state == 1;
+    return button.type == SDL_MOUSEBUTTONDOWN;
 }
 
 function updateButton(EventState events, Button button)
 {
     if (containsMouse(button, events.motion))
     {
-        if (isPressed(events.motion))
+        puts("containsMouse");
+
+        if (isPressed(events.button))
         {
             return button with
             {
@@ -320,6 +346,13 @@ function updateButton(EventState events, Button button)
     };
 }
 
+function update(ApplicationState state, Rectangle rectangle)
+{
+    run(state.user, update(state, rectangle.children));
+
+    return rectangle;
+}
+
 function update(ApplicationState state, Button button)
 {
     return updateButton(state.events, button);
@@ -330,28 +363,28 @@ function update(ApplicationState state, (Button button, ...controls))
     return updateButton(state.events, button) -> (state, ...controls);
 }
 
-function draw(long renderer, without item)
+function draw(long renderer, State state, without item)
 {
     return nothing;
 }
 
-function draw(long renderer, Rectangle rectangle)
+function draw(long renderer, State state, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
     SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
-    return draw(renderer, rectangle.children);
+    return draw(renderer, state, rectangle.children);
 }
 
 function draw(long renderer, State state, Button button)
 {
-    return button;
+    return drawButton(renderer, state, button);
 }
 
 function draw(long renderer, State state, (Button button, ...controls))
 {
-    return drawButton(renderer, button) -> (renderer, state, ...controls);
+    return drawButton(renderer, state, button) -> (renderer, state, ...controls);
 }
 
 function run(State state, Item item)

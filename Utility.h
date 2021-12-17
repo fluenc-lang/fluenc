@@ -17,4 +17,10 @@ void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target);
 
 std::string nextTag();
 
+template<typename TKey, typename TValue>
+bool compareKey(const std::pair<TKey, TValue> &left, const std::pair<TKey, TValue> &right)
+{
+	return left.first < right.first;
+};
+
 #endif // UTILITY_H

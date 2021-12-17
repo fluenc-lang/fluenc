@@ -12,9 +12,8 @@
 #include "values/TupleValue.h"
 #include "values/TaintedValue.h"
 
-DzArrayElement::DzArrayElement(size_t index, DzValue *consumer, DzValue *next)
+DzArrayElement::DzArrayElement(size_t index, DzValue *next)
 	: m_index(index)
-	, m_consumer(consumer)
 	, m_next(next)
 {
 }
@@ -73,12 +72,10 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 
 		valuesIfTrue.push(tainted);
 
-		auto resultsIfTrue = m_consumer->build(epIfTrue, valuesIfTrue);
 		auto resultsIfFalse = m_next->build(epIfFalse, valuesIfFalse);
 
-		std::vector<DzResult> result;
+		std::vector<DzResult> result = {{ epIfTrue, valuesIfTrue }};
 
-		result.insert(end(result), begin(resultsIfTrue), end(resultsIfTrue));
 		result.insert(end(result), begin(resultsIfFalse), end(resultsIfFalse));
 
 		return result;
@@ -88,5 +85,5 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 
 	values.push(tainted);
 
-	return m_consumer->build(entryPoint, values);
+	return {{ entryPoint, values }};
 }

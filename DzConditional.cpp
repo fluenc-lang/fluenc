@@ -6,6 +6,7 @@
 #include "EntryPoint.h"
 
 #include "values/TypedValue.h"
+#include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
 
 DzConditional::DzConditional(DzValue *ifFalse, DzValue *ifTrue)
@@ -16,6 +17,12 @@ DzConditional::DzConditional(DzValue *ifFalse, DzValue *ifTrue)
 
 std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack values) const
 {
+	struct SingleResult
+	{
+		const EntryPoint entryPoint;
+		const TypedValue *value;
+	};
+
 	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
 
@@ -45,64 +52,79 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 	auto resultsIfTrue = m_ifTrue->build(epIfTrue, values);
 	auto resultsIfFalse = m_ifFalse->build(epIfFalse, values);
 
-	std::vector<DzResult> result;
+	std::vector<DzResult> immediateResults;
 
-	result.insert(end(result), begin(resultsIfTrue), end(resultsIfTrue));
-	result.insert(end(result), begin(resultsIfFalse), end(resultsIfFalse));
+	immediateResults.insert(end(immediateResults), begin(resultsIfTrue), end(resultsIfTrue));
+	immediateResults.insert(end(immediateResults), begin(resultsIfFalse), end(resultsIfFalse));
 
-	if (resultsIfTrue.size() != 1 || resultsIfFalse.size() != 1)
+	std::unordered_multimap<const Type *, SingleResult> groupedResults;
+
+	for (auto &result : immediateResults)
 	{
-		return result;
+		auto [resultEntryPoint, resultValues] = result;
+
+		if (resultValues.size() != 1)
+		{
+			continue;
+		}
+
+		auto value = resultValues.request<TypedValue>();
+
+		if (value)
+		{
+			groupedResults.insert({ value->type(), { resultEntryPoint, value } });
+		}
+		else
+		{
+			return immediateResults;
+		}
 	}
 
-	auto [resultEpIfTrue, valuesIfTrue] = *resultsIfTrue.begin();
-	auto [resultEpIfFalse, valuesIfFalse] = *resultsIfFalse.begin();
+	std::vector<DzResult> mergedResults;
 
-	auto valueIfTrue = valuesIfTrue.request<TypedValue>();
-	auto valueIfFalse = valuesIfFalse.request<TypedValue>();
-
-	if (!valueIfTrue || !valueIfFalse)
+	for(auto it = begin(groupedResults)
+		; it != end(groupedResults)
+		; it = upper_bound(it, end(groupedResults), *it, &compareKey<const Type *, SingleResult>)
+		)
 	{
-		return result;
+		auto [type, _] = *it;
+
+		auto range = groupedResults.equal_range(type);
+
+		auto storageType = type->storageType(*context);
+
+		auto alloc = entryPoint.alloc(storageType);
+
+		auto align = dataLayout.getABITypeAlign(storageType);
+
+		auto mergeBlock = llvm::BasicBlock::Create(*context, "merge", function);
+
+		for (auto i = range.first; i != range.second; i++)
+		{
+			auto [resultEntryPoint, value] = i->second;
+
+			auto resultBlock = resultEntryPoint.block();
+
+			auto store = new llvm::StoreInst(*value, alloc, false, align, resultBlock);
+
+			UNUSED(store);
+
+			linkBlocks(resultBlock, mergeBlock);
+		}
+
+		auto mergeLoad = new llvm::LoadInst(storageType, alloc, "mergeLoad", false, align, mergeBlock);
+
+		auto mergeEntryPoint = entryPoint
+			.withBlock(mergeBlock);
+
+		auto mergeResult = new TypedValue { type, mergeLoad };
+
+		auto mergeValues = values;
+
+		mergeValues.push(mergeResult);
+
+		mergedResults.push_back({ mergeEntryPoint, mergeValues });
 	}
 
-	if (valueIfTrue->type() != valueIfFalse->type())
-	{
-		return result;
-	}
-
-	auto resultBlockIfTrue = resultEpIfTrue.block();
-	auto resultBlockIfFalse = resultEpIfFalse.block();
-
-	resultBlockIfTrue->insertInto(function);
-	resultBlockIfFalse->insertInto(function);
-
-	auto type = valueIfTrue->type();
-	auto storageType = type->storageType(*context);
-
-	auto align = dataLayout.getABITypeAlign(storageType);
-
-	auto alloc = entryPoint.alloc(storageType);
-
-	auto mergeBlock = llvm::BasicBlock::Create(*context, "merge", function);
-
-	auto storeIfTrue = new llvm::StoreInst(*valueIfTrue, alloc, false, align, resultBlockIfTrue);
-	auto storeIfFalse = new llvm::StoreInst(*valueIfFalse, alloc, false, align, resultBlockIfFalse);
-
-	UNUSED(storeIfTrue);
-	UNUSED(storeIfFalse);
-
-	linkBlocks(resultBlockIfTrue, mergeBlock);
-	linkBlocks(resultBlockIfFalse, mergeBlock);
-
-	auto mergeLoad = new llvm::LoadInst(storageType, alloc, "mergeLoad", false, align, mergeBlock);
-
-	auto mergeEntryPoint = entryPoint
-		.withBlock(mergeBlock);
-
-	auto mergeResult = new TypedValue { type, mergeLoad };
-
-	values.push(mergeResult);
-
-	return {{ mergeEntryPoint, values }};
+	return mergedResults;
 }

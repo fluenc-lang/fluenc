@@ -63,6 +63,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitByteLiteral(dzParser::ByteLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitNothing(dzParser::NothingContext *ctx) override {
     return visitChildren(ctx);
   }
