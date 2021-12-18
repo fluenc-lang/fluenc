@@ -68,9 +68,8 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 			);
 
 		auto tuple = new TupleValue({ continuation, value });
-		auto tainted = new TaintedValue(tuple);
 
-		valuesIfTrue.push(tainted);
+		valuesIfTrue.push(tuple);
 
 		auto resultsIfFalse = m_next->build(epIfFalse, valuesIfFalse);
 
@@ -81,9 +80,7 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 		return result;
 	}
 
-	auto tainted = new TaintedValue(value);
-
-	values.push(tainted);
+	values.push(value);
 
 	return {{ entryPoint, values }};
 }

@@ -38,6 +38,7 @@
 #include "DzCharacterLiteral.h"
 #include "LazyEvaluation.h"
 #include "LazySink.h"
+#include "TaintedSink.h"
 
 #include "types/Prototype.h"
 
@@ -612,7 +613,8 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 	if (firstElement)
 	{
 		auto init = new DzArrayInit(firstElement);
-		auto lazySink = new LazySink(m_alpha, init);
+		auto taintedSink = new TaintedSink(init);
+		auto lazySink = new LazySink(m_alpha, taintedSink);
 
 		return static_cast<DzValue *>(lazySink);
 	}

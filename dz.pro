@@ -44,6 +44,7 @@ SOURCES += \
 	LazySink.cpp \
 	Stack.cpp \
 	StackSegment.cpp \
+	TaintedSink.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
 	Utility.cpp \
@@ -129,6 +130,7 @@ HEADERS += \
 	LazySink.h \
 	Stack.h \
 	StackSegment.h \
+	TaintedSink.h \
 	Tests.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \

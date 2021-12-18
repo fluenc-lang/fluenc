@@ -65,8 +65,6 @@ std::vector<DzResult> DzExportedFunction::build(const EntryPoint &entryPoint, St
 
 	auto result = m_block->build(ep, values);
 
-	function->print(llvm::errs(), nullptr);
-
 	verifyFunction(*function, &llvm::errs());
 
 	return result;
