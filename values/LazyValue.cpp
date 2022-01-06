@@ -4,8 +4,9 @@
 
 #include "types/IteratorType.h"
 
-LazyValue::LazyValue(const DzValue *subject, const EntryPoint &entryPoint)
-	: m_subject(subject)
+LazyValue::LazyValue(const IteratorTypeHandle &handle, const DzValue *subject, const EntryPoint &entryPoint)
+	: m_handle(handle)
+	, m_subject(subject)
 	, m_entryPoint(new EntryPoint(entryPoint))
 {
 }
@@ -19,5 +20,5 @@ std::vector<DzResult> LazyValue::build(llvm::BasicBlock *block, const Stack &val
 
 const Type *LazyValue::type() const
 {
-	return IteratorType::instance();
+	return m_handle.type();
 }

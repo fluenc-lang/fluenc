@@ -28,7 +28,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 		std::vector<llvm::Type *> types;
 
-		std::transform(begin(fields), end(fields), std::back_insert_iterator(types), [&](auto field)
+		std::transform(begin(fields), end(fields), std::back_inserter(types), [&](auto field)
 		{
 			auto type = field.type();
 
@@ -43,7 +43,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 		std::vector<const NamedValue *> fieldValues;
 
-		std::transform(begin(fields), end(fields), index_iterator(), std::back_insert_iterator(fieldValues), [&](auto field, auto index)
+		std::transform(begin(fields), end(fields), index_iterator(), std::back_inserter(fieldValues), [&](auto field, auto index)
 		{
 			auto fieldType = field.type();
 
@@ -91,7 +91,7 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 	std::vector<const TypedValue *> elementValues;
 
-	std::transform(begin(fields), end(fields), std::back_insert_iterator(elementValues), [&](const NamedValue *field) -> const TypedValue *
+	std::transform(begin(fields), end(fields), std::back_inserter(elementValues), [&](const NamedValue *field) -> const TypedValue *
 	{
 		auto fieldValue = field->value();
 
@@ -118,7 +118,7 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 	std::vector<llvm::Type *> elementTypes;
 
-	std::transform(begin(elementValues), end(elementValues), std::back_insert_iterator(elementTypes), [&](auto value)
+	std::transform(begin(elementValues), end(elementValues), std::back_inserter(elementTypes), [&](auto value)
 	{
 		auto type = value->type();
 

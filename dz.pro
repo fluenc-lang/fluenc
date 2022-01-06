@@ -1,6 +1,6 @@
 QT += testlib
 
-CONFIG += DEBUG
+CONFIG += DEBUG c++17
 
 SOURCES += \
 	AllIterator.cpp \
@@ -39,7 +39,8 @@ SOURCES += \
 	EntryPoint.cpp \
 	IndexIterator.cpp \
 	InteropHelper.cpp \
-	KaleidoscopeJIT.cpp \
+	IteratorTypeHandle.cpp \
+	Junction.cpp \
 	LazyEvaluation.cpp \
 	LazySink.cpp \
 	Stack.cpp \
@@ -125,6 +126,8 @@ HEADERS += \
 	IndexIterator.h \
 	Indexed.h \
 	InteropHelper.h \
+	IteratorTypeHandle.h \
+	Junction.h \
 	KaleidoscopeJIT.h \
 	LazyEvaluation.h \
 	LazySink.h \
@@ -180,12 +183,12 @@ OTHER_FILES += dz.g4 \
         main.dz \
 	foo.dz
 
-QMAKE_CXXFLAGS += -std=c++20
+#QMAKE_CXXFLAGS += -std=c++20
 
 LIBS += \
     -L/home/znurre/Program/Develop/C++/llvm-project/build/lib/ \
 #    -lLLVM-14git \
-    -lLLVM-12 \
+    -lLLVM-13 \
     -lantlr4-runtime
 
 DEPENDPATH += /usr/include/antlr4-runtime

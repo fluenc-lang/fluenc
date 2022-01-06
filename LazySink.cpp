@@ -2,15 +2,16 @@
 
 #include "values/LazyValue.h"
 
-LazySink::LazySink(const DzValue *consumer, const DzValue *subject)
-	: m_consumer(consumer)
+LazySink::LazySink(const IteratorTypeHandle &handle, const DzValue *consumer, const DzValue *subject)
+	: m_handle(handle)
+	, m_consumer(consumer)
 	, m_subject(subject)
 {
 }
 
 std::vector<DzResult> LazySink::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto lazy = new LazyValue(m_subject, entryPoint);
+	auto lazy = new LazyValue(m_handle, m_subject, entryPoint);
 
 	values.push(lazy);
 

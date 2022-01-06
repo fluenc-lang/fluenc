@@ -1,3 +1,5 @@
+#include <unordered_map>
+
 #include <llvm/IR/Constants.h>
 
 #include "DzCharacterLiteral.h"

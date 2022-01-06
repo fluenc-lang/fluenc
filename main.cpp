@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include <string_view>
+
 #include <llvm/Support/TargetSelect.h>
 
 #include "Tests.h"
@@ -40,8 +42,7 @@ int main(int argc, char **argv)
 		VisitorV4 visitor(nullptr, nullptr);
 
 		auto moduleInfo = visitor
-			.visit(program)
-			.as<ModuleInfo *>();
+			.visit<ModuleInfo *>(program);
 
 		std::string errors;
 

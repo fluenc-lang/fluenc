@@ -5,6 +5,11 @@ TupleValue::TupleValue(const std::vector<const BaseValue *> &values)
 {
 }
 
+size_t TupleValue::size() const
+{
+	return m_values.size();
+}
+
 const Type *TupleValue::type() const
 {
 	std::vector<const Type *> types;

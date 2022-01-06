@@ -1,4 +1,5 @@
 #include <sstream>
+#include <unordered_map>
 
 #include <llvm/IR/IRBuilder.h>
 

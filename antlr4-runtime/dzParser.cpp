@@ -1,5 +1,5 @@
 
-// Generated from dz.g4 by ANTLR 4.9.2
+// Generated from dz.g4 by ANTLR 4.9.3
 
 
 #include "dzVisitor.h"
@@ -207,7 +207,7 @@ dzParser::StructureContext* dzParser::structure() {
     setState(37);
     match(dzParser::T__0);
     setState(38);
-    dynamic_cast<StructureContext *>(_localctx)->name = match(dzParser::ID);
+    antlrcpp::downCast<StructureContext *>(_localctx)->name = match(dzParser::ID);
     setState(48);
     _errHandler->sync(this);
 
@@ -523,7 +523,7 @@ dzParser::FunctionContext* dzParser::function() {
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 7, _ctx)) {
     case 1: {
       setState(78);
-      dynamic_cast<FunctionContext *>(_localctx)->attribute = match(dzParser::ID);
+      antlrcpp::downCast<FunctionContext *>(_localctx)->attribute = match(dzParser::ID);
       break;
     }
 
@@ -533,7 +533,7 @@ dzParser::FunctionContext* dzParser::function() {
     setState(81);
     typeName();
     setState(82);
-    dynamic_cast<FunctionContext *>(_localctx)->name = match(dzParser::ID);
+    antlrcpp::downCast<FunctionContext *>(_localctx)->name = match(dzParser::ID);
     setState(83);
     match(dzParser::T__6);
     setState(92);
@@ -727,7 +727,7 @@ dzParser::LiteralContext* dzParser::literal() {
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 11, _ctx)) {
     case 1: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::Int32LiteralContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::Int32LiteralContext>(_localctx);
       enterOuterAlt(_localctx, 1);
       setState(98);
       match(dzParser::INT);
@@ -735,7 +735,7 @@ dzParser::LiteralContext* dzParser::literal() {
     }
 
     case 2: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::Int64LiteralContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::Int64LiteralContext>(_localctx);
       enterOuterAlt(_localctx, 2);
       setState(99);
       match(dzParser::INT);
@@ -745,7 +745,7 @@ dzParser::LiteralContext* dzParser::literal() {
     }
 
     case 3: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::BoolLiteralContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::BoolLiteralContext>(_localctx);
       enterOuterAlt(_localctx, 3);
       setState(101);
       match(dzParser::BOOL);
@@ -753,7 +753,7 @@ dzParser::LiteralContext* dzParser::literal() {
     }
 
     case 4: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::StringLiteralContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::StringLiteralContext>(_localctx);
       enterOuterAlt(_localctx, 4);
       setState(102);
       match(dzParser::STRING);
@@ -761,7 +761,7 @@ dzParser::LiteralContext* dzParser::literal() {
     }
 
     case 5: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::Uint32LiteralContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::Uint32LiteralContext>(_localctx);
       enterOuterAlt(_localctx, 5);
       setState(103);
       match(dzParser::INT);
@@ -771,7 +771,7 @@ dzParser::LiteralContext* dzParser::literal() {
     }
 
     case 6: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::CharLiteralContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::CharLiteralContext>(_localctx);
       enterOuterAlt(_localctx, 6);
       setState(105);
       match(dzParser::CHARACTER);
@@ -779,7 +779,7 @@ dzParser::LiteralContext* dzParser::literal() {
     }
 
     case 7: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::ByteLiteralContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::ByteLiteralContext>(_localctx);
       enterOuterAlt(_localctx, 7);
       setState(106);
       match(dzParser::INT);
@@ -789,7 +789,7 @@ dzParser::LiteralContext* dzParser::literal() {
     }
 
     case 8: {
-      _localctx = dynamic_cast<LiteralContext *>(_tracker.createInstance<dzParser::NothingContext>(_localctx));
+      _localctx = _tracker.createInstance<dzParser::NothingContext>(_localctx);
       enterOuterAlt(_localctx, 8);
       setState(108);
       match(dzParser::T__11);
@@ -1327,9 +1327,9 @@ dzParser::ExpressionContext* dzParser::expression(int precedence) {
 
         if (!(precpred(_ctx, 7))) throw FailedPredicateException(this, "precpred(_ctx, 7)");
         setState(190);
-        dynamic_cast<BinaryContext *>(_localctx)->op = match(dzParser::OP);
+        antlrcpp::downCast<BinaryContext *>(_localctx)->op = match(dzParser::OP);
         setState(191);
-        dynamic_cast<BinaryContext *>(_localctx)->right = expression(8); 
+        antlrcpp::downCast<BinaryContext *>(_localctx)->right = expression(8); 
       }
       setState(196);
       _errHandler->sync(this);
@@ -1489,7 +1489,7 @@ dzParser::RetContext* dzParser::ret() {
       | (1ULL << dzParser::CHARACTER)
       | (1ULL << dzParser::ID))) != 0)) {
       setState(211);
-      dynamic_cast<RetContext *>(_localctx)->value = expression(0);
+      antlrcpp::downCast<RetContext *>(_localctx)->value = expression(0);
     }
     setState(216);
     _errHandler->sync(this);
@@ -1499,7 +1499,7 @@ dzParser::RetContext* dzParser::ret() {
       setState(214);
       match(dzParser::T__19);
       setState(215);
-      dynamic_cast<RetContext *>(_localctx)->chained = continuation();
+      antlrcpp::downCast<RetContext *>(_localctx)->chained = continuation();
     }
    
   }
@@ -1665,7 +1665,7 @@ dzParser::ArgumentContext* dzParser::argument() {
     switch (_input->LA(1)) {
       case dzParser::T__17:
       case dzParser::ID: {
-        _localctx = dynamic_cast<ArgumentContext *>(_tracker.createInstance<dzParser::StandardArgumentContext>(_localctx));
+        _localctx = _tracker.createInstance<dzParser::StandardArgumentContext>(_localctx);
         enterOuterAlt(_localctx, 1);
         setState(228);
         typeName();
@@ -1675,7 +1675,7 @@ dzParser::ArgumentContext* dzParser::argument() {
       }
 
       case dzParser::T__6: {
-        _localctx = dynamic_cast<ArgumentContext *>(_tracker.createInstance<dzParser::TupleArgumentContext>(_localctx));
+        _localctx = _tracker.createInstance<dzParser::TupleArgumentContext>(_localctx);
         enterOuterAlt(_localctx, 2);
         setState(231);
         match(dzParser::T__6);
@@ -1773,7 +1773,7 @@ dzParser::TypeNameContext* dzParser::typeName() {
 
 bool dzParser::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
-    case 8: return expressionSempred(dynamic_cast<ExpressionContext *>(context), predicateIndex);
+    case 8: return expressionSempred(antlrcpp::downCast<ExpressionContext *>(context), predicateIndex);
 
   default:
     break;

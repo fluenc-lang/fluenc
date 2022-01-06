@@ -1646,6 +1646,73 @@ class Tests : public QObject
 			QCOMPARE(result, 30);
 		}
 
+		void scenario55()
+		{
+			auto result = exec(R"(
+				function sum(int product, int value)
+				{
+					return product + value;
+				}
+
+				function sum(int product, (int value, ...values))
+				{
+					return sum(product + value, ...values);
+				}
+
+				export int main()
+				{
+					return sum(0, [1, 2, 3]);
+				}
+			)");
+
+			QCOMPARE(result, 6);
+		}
+
+		void scenario56()
+		{
+			auto result = exec(R"(
+				struct Struct
+				{
+					x
+				};
+
+				function sum(int product, Struct s)
+				{
+					return product + s.x;
+				}
+
+				function sum(int product, (Struct s, ...structs))
+				{
+					return sum(product + s.x, ...structs);
+				}
+
+				function createStructs()
+				{
+					return [
+						Struct
+						{
+							x: 1
+						},
+						Struct
+						{
+							x: 2
+						},
+						Struct
+						{
+							x: 3
+						}
+					];
+				}
+
+				export int main()
+				{
+					return sum(0, createStructs());
+				}
+			)");
+
+			QCOMPARE(result, 6);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1701,6 +1768,8 @@ class Tests : public QObject
 		W_SLOT(scenario52)
 		W_SLOT(scenario53)
 		W_SLOT(scenario54)
+		W_SLOT(scenario55)
+		W_SLOT(scenario56)
 
 	private:
 		ModuleInfo *compile(std::string source)
@@ -1717,8 +1786,7 @@ class Tests : public QObject
 			VisitorV4 visitor(nullptr, nullptr);
 
 			return visitor
-				.visit(program)
-				.as<ModuleInfo *>();
+				.visit<ModuleInfo *>(program);
 
 		}
 
@@ -1731,17 +1799,23 @@ class Tests : public QObject
 				std::move(moduleInfo->context())
 				);
 
-			auto &jit = *KaleidoscopeJIT::create();
-			auto error = jit->addModule(std::move(threadSafeModule));
+			auto jit = llvm::orc::KaleidoscopeJIT::Create();
+
+			if (!jit)
+			{
+				return -1;
+			}
+
+			auto error = (*jit)->addModule(std::move(threadSafeModule));
 
 			if (error)
 			{
 				return -1;
 			}
 
-			auto &mainSymbol = *jit->lookup("main");
+			auto mainSymbol = (*jit)->lookup("main");
 
-			auto main = (int(*)())mainSymbol.getAddress();
+			auto main = (int(*)())mainSymbol->getAddress();
 
 			return main();
 		}

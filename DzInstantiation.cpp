@@ -1,6 +1,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include <sstream>
+#include <unordered_map>
 
 #include "DzInstantiation.h"
 #include "DzTypeName.h"
@@ -35,7 +36,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::unordered_map<std::string, const BaseValue *> valuesByName;
 
-	std::transform(begin(m_fields), end(m_fields), std::insert_iterator(valuesByName, begin(valuesByName)), [&](auto field)
+	std::transform(begin(m_fields), end(m_fields), std::inserter(valuesByName, begin(valuesByName)), [&](auto field)
 	{
 		return std::make_pair(field, values.pop());
 	});
@@ -46,7 +47,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::vector<const NamedValue *> namedValues;
 
-	std::transform(begin(prototypeFields), end(prototypeFields), std::back_insert_iterator(namedValues), [&](auto field) -> const NamedValue *
+	std::transform(begin(prototypeFields), end(prototypeFields), std::back_inserter(namedValues), [&](auto field) -> const NamedValue *
 	{
 		auto valueByName = valuesByName.find(field.name());
 
@@ -88,7 +89,7 @@ std::vector<DzResult> DzInstantiation::build(const EntryPoint &entryPoint, Stack
 
 	std::vector<const NamedValue *> finalValues;
 
-	std::transform(begin(namedValues), end(namedValues), std::back_insert_iterator(finalValues), [&](auto field) -> const NamedValue *
+	std::transform(begin(namedValues), end(namedValues), std::back_inserter(finalValues), [&](auto field) -> const NamedValue *
 	{
 		auto value = field->value();
 

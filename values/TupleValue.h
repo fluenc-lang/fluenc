@@ -15,6 +15,8 @@ class TupleValue : public BaseValue
 	public:
 		TupleValue(const std::vector<const BaseValue *> &values);
 
+		size_t size() const;
+
 		const Type *type() const override;
 
 		Stack values() const;

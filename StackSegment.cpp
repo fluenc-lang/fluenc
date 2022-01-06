@@ -55,7 +55,7 @@ const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint
 
 		std::vector<const BaseValue *> values;
 
-		std::transform(tupleValues.begin(), tupleValues.end(), std::back_insert_iterator(values), [&](auto value)
+		std::transform(tupleValues.begin(), tupleValues.end(), std::back_inserter(values), [&](auto value)
 		{
 			return fetchValue(value, entryPoint);
 		});
@@ -73,7 +73,7 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 
 	std::vector<Indexed<DzValue *>> orderedValues;
 
-	std::transform(begin(m_values), end(m_values), index_iterator(), std::back_insert_iterator(orderedValues), [](auto value, auto index) -> Indexed<DzValue *>
+	std::transform(begin(m_values), end(m_values), index_iterator(), std::back_inserter(orderedValues), [](auto value, auto index) -> Indexed<DzValue *>
 	{
 		return { index, value };
 	});

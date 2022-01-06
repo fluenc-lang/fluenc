@@ -39,6 +39,8 @@
 #include "LazyEvaluation.h"
 #include "LazySink.h"
 #include "TaintedSink.h"
+#include "Junction.h"
+#include "IteratorTypeHandle.h"
 
 #include "types/Prototype.h"
 
@@ -65,8 +67,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	for (auto function : context->function())
 	{
-		auto result = visit(function)
-			.as<DzCallable *>();
+		auto result = visit<DzCallable *>(function);
 
 		if (result->attribute() == FunctionAttribute::Export)
 		{
@@ -80,8 +81,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	for (auto structure : context->structure())
 	{
-		auto result = visit(structure)
-			.as<Prototype *>();
+		auto result = visit<Prototype *>(structure);
 
 		types.insert({ result->name(), result });
 	}
@@ -106,8 +106,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	for (auto global : context->global())
 	{
-		auto result = visit(global)
-			.as<DzGlobal *>();
+		auto result = visit<DzGlobal *>(global);
 
 		for (auto &[_, globalValues] : result->build(entryPoint, values))
 		{
@@ -169,7 +168,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 	for (auto argument : context->argument())
 	{
-		arguments.push_back(visit(argument));
+		arguments.push_back(visit<DzBaseArgument *>(argument));
 	}
 
 	auto name = context->name->getText();
@@ -181,7 +180,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	{
 		auto import = new DzImportedFunction(name
 			, arguments
-			, visit(context->typeName())
+			, visit<DzTypeName *>(context->typeName())
 			);
 
 		return static_cast<DzCallable *>(import);
@@ -194,8 +193,8 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 		VisitorV4 visitor(terminator, nullptr);
 
 		auto entryPoint = new DzExportedFunction(name
-			, visitor.visit(block)
-			, visitor.visit(context->typeName())
+			, visitor.visit<DzValue *>(block)
+			, visitor.visit<DzTypeName *>(context->typeName())
 			);
 
 		return static_cast<DzCallable *>(entryPoint);
@@ -208,7 +207,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	auto function = new DzFunction(attribute
 		, name
 		, arguments
-		, visitor.visit(block)
+		, visitor.visit<DzValue *>(block)
 		);
 
 	return static_cast<DzCallable *>(function);
@@ -222,7 +221,7 @@ antlrcpp::Any VisitorV4::visitTypeName(dzParser::TypeNameContext *context)
 antlrcpp::Any VisitorV4::visitStandardArgument(dzParser::StandardArgumentContext *context)
 {
 	auto argument = new DzArgument(context->ID()->getText()
-		, visit(context->typeName())
+		, visit<DzTypeName *>(context->typeName())
 		);
 
 	return static_cast<DzBaseArgument *>(argument);
@@ -234,9 +233,9 @@ antlrcpp::Any VisitorV4::visitTupleArgument(dzParser::TupleArgumentContext *cont
 
 	std::vector<DzBaseArgument *> tupleArguments;
 
-	std::transform(begin(arguments), end(arguments), std::back_insert_iterator(tupleArguments), [this](dzParser::ArgumentContext *argument) -> DzBaseArgument *
+	std::transform(begin(arguments), end(arguments), std::back_insert_iterator(tupleArguments), [this](dzParser::ArgumentContext *argument)
 	{
-		return visit(argument);
+		return visit<DzBaseArgument *>(argument);
 	});
 
 	auto argument = new DzTupleArgument(tupleArguments);
@@ -248,14 +247,14 @@ antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 {
 	if (context->chained)
 	{
-		auto continuation = visit(context->chained);
+		auto continuation = visit<DzValue *>(context->chained);
 
 		auto ret = new DzReturn(m_alpha, continuation);
 
 		VisitorV4 visitor(ret, nullptr);
 
 		return visitor
-			.visit(context->value);
+			.visit<DzValue *>(context->value);
 	}
 
 	auto ret = new DzReturn(m_alpha, nullptr);
@@ -263,25 +262,22 @@ antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 	VisitorV4 visitor(ret, nullptr);
 
 	return visitor
-		.visit(context->value);
+		.visit<DzValue *>(context->value);
 }
 
 antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
 {
 	auto expressions = context->expression();
 
-	auto result = std::accumulate(rbegin(expressions), rend(expressions), visit(context->ret()), [this](DzValue *consumer, dzParser::ExpressionContext *expression)
+	return std::accumulate(rbegin(expressions), rend(expressions), visit<DzValue *>(context->ret()), [this](DzValue *consumer, dzParser::ExpressionContext *expression)
 	{
 		auto stackFrame = new BlockStackFrame(consumer);
 
 		VisitorV4 visitor(stackFrame, m_alpha);
 
 		return visitor
-			.visit(expression)
-			.as<DzValue *>();
+			.visit<DzValue *>(expression);
 	});
-
-	return static_cast<DzValue *>(result);
 }
 
 antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
@@ -293,14 +289,14 @@ antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
 	VisitorV4 leftVisitor(binary, nullptr);
 
 	auto left = leftVisitor
-		.visit(context->left)
-		.as<DzValue *>();
+		.visit<DzValue *>(context->left);
 
 	VisitorV4 rightVisitor(left, nullptr);
 
-	auto right = rightVisitor.visit(context->right);
+	auto right = rightVisitor
+		.visit<DzValue *>(context->right);
 
-	return static_cast<DzValue *>(right);
+	return right;
 }
 
 antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
@@ -318,8 +314,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 		VisitorV4 visitor(evaluation, nullptr);
 
 		return visitor
-			.visit(parameter)
-			.as<DzValue *>();
+			.visit<DzValue *>(parameter);
 	});
 
 	auto segment = new StackSegment(values, call, m_alpha);
@@ -343,16 +338,13 @@ antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)
 		, fields
 		);
 
-	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
+	return std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
 	{
 		VisitorV4 visitor(consumer, nullptr);
 
 		return visitor
-			.visit(assignment->expression())
-			.as<DzValue *>();
+			.visit<DzValue *>(assignment->expression());
 	});
-
-	return static_cast<DzValue *>(value);
 }
 
 antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
@@ -371,7 +363,7 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 
 	if (with)
 	{
-		auto member = new DzMemberAccess(visit(with), path);
+		auto member = new DzMemberAccess(visit<DzValue *>(with), path);
 
 		return static_cast<DzValue *>(member);
 	}
@@ -444,8 +436,7 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 
 		if (field->typeName())
 		{
-			type = visit(field->typeName())
-				.as<DzTypeName *>();
+			type = visit<DzTypeName *>(field->typeName());
 		}
 
 		if (field->expression())
@@ -453,8 +444,7 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 			VisitorV4 visitor(DzTerminator::instance(), nullptr);
 
 			auto defaultValue = visitor
-				.visit(field->expression())
-				.as<DzValue *>();
+				.visit<DzValue *>(field->expression());
 
 			return { name, defaultValue, type };
 		}
@@ -468,7 +458,7 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 
 	std::transform(begin(parentTypeNames), end(parentTypeNames), std::back_insert_iterator(parentTypes), [this](dzParser::TypeNameContext *typeName) -> DzTypeName *
 	{
-		return visit(typeName);
+		return visit<DzTypeName *>(typeName);
 	});
 
 	return new Prototype(name, fields, parentTypes);
@@ -485,8 +475,7 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 		return assignment->field()->ID()->getText();
 	});
 
-	auto typeName = visit(context->typeName())
-		.as<DzTypeName *>();
+	auto typeName = visit<DzTypeName *>(context->typeName());
 
 	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
 	auto instantiation = new DzInstantiation(m_alpha
@@ -494,16 +483,13 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 		, fields
 		);
 
-	auto value = std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
+	return std::accumulate(begin(assignments), end(assignments), static_cast<DzValue *>(instantiation), [](auto consumer, dzParser::AssignmentContext *assignment)
 	{
 		VisitorV4 visitor(consumer, nullptr);
 
 		return visitor
-			.visit(assignment->expression())
-			.as<DzValue *>();
+			.visit<DzValue *>(assignment->expression());
 	});
-
-	return static_cast<DzValue *>(value);
 }
 
 antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
@@ -511,16 +497,14 @@ antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
 	VisitorV4 blockVisitor(m_beta, nullptr);
 
 	auto block = blockVisitor
-		.visit(context->block())
-		.as<DzValue *>();
+		.visit<DzValue *>(context->block());
 
 	auto conditional = new DzConditional(m_alpha, block);
 
 	VisitorV4 expressionVisitor(conditional, nullptr);
 
 	auto condition = expressionVisitor
-		.visit(context->expression())
-		.as<DzValue *>();
+		.visit<DzValue *>(context->expression());
 
 	return condition;
 }
@@ -534,8 +518,7 @@ antlrcpp::Any VisitorV4::visitGlobal(dzParser::GlobalContext *context)
 	VisitorV4 visitor(terminator, nullptr);
 
 	auto literal = visitor
-		.visit(context->literal())
-		.as<DzValue *>();
+		.visit<DzValue *>(context->literal());
 
 	return new DzGlobal(literal, name);
 }
@@ -554,7 +537,7 @@ antlrcpp::Any VisitorV4::visitNothing(dzParser::NothingContext *context)
 
 antlrcpp::Any VisitorV4::visitGroup(dzParser::GroupContext *context)
 {
-	return visit(context->expression());
+	return visit<DzValue *>(context->expression());
 }
 
 antlrcpp::Any VisitorV4::visitExpansion(dzParser::ExpansionContext *context)
@@ -564,8 +547,7 @@ antlrcpp::Any VisitorV4::visitExpansion(dzParser::ExpansionContext *context)
 	VisitorV4 visitor(expansion, nullptr);
 
 	return visitor
-		.visit(context->expression())
-		.as<DzValue *>();
+		.visit<DzValue *>(context->expression());
 }
 
 antlrcpp::Any VisitorV4::visitContinuation(dzParser::ContinuationContext *context)
@@ -574,18 +556,15 @@ antlrcpp::Any VisitorV4::visitContinuation(dzParser::ContinuationContext *contex
 
 	auto expressions = context->expression();
 
-	auto value = std::accumulate(begin(expressions), end(expressions), static_cast<DzValue *>(continuation), [](DzValue *consumer, dzParser::ExpressionContext *parameter)
+	return std::accumulate(begin(expressions), end(expressions), static_cast<DzValue *>(continuation), [](DzValue *consumer, dzParser::ExpressionContext *parameter)
 	{
 		VisitorV4 visitor(consumer, nullptr);
 
 		auto result = visitor
-			.visit(parameter)
-			.as<DzValue *>();
+			.visit<DzValue *>(parameter);
 
 		return result;
 	});
-
-	return value;
 }
 
 antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
@@ -606,21 +585,23 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 		VisitorV4 visitor(element, nullptr);
 
 		return visitor
-			.visit(expression.value)
-			.as<DzValue *>();
+			.visit<DzValue *>(expression.value);
 	});
+
+	IteratorTypeHandle handle;
 
 	if (firstElement)
 	{
 		auto init = new DzArrayInit(firstElement);
-		auto taintedSink = new TaintedSink(init);
-		auto lazySink = new LazySink(m_alpha, taintedSink);
+		auto junction = new Junction(init);
+		auto taintedSink = new TaintedSink(junction);
+		auto lazySink = new LazySink(handle, m_alpha, taintedSink);
 
 		return static_cast<DzValue *>(lazySink);
 	}
 
 	auto empty = new DzEmptyArray(DzTerminator::instance());
-	auto lazySink = new LazySink(m_alpha, empty);
+	auto lazySink = new LazySink(handle, m_alpha, empty);
 
 	return static_cast<DzValue *>(lazySink);
 }

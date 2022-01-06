@@ -66,6 +66,14 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitCharLiteral(dzParser::CharLiteralContext *context) override;
 		antlrcpp::Any visitByteLiteral(dzParser::ByteLiteralContext *context) override;
 
+		template<typename T>
+		T visit(antlr4::tree::ParseTree *tree)
+		{
+			auto result = dzBaseVisitor::visit(tree);
+
+			return result.as<T>();
+		}
+
 	private:
 		DzValue *m_alpha;
 		DzValue *m_beta;

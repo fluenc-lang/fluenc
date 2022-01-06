@@ -16,7 +16,7 @@ Type *DzTupleArgument::type(const EntryPoint &entryPoint) const
 {
 	std::vector<const Type *> types;
 
-	std::transform(rbegin(m_arguments), rend(m_arguments), std::back_insert_iterator(types), [&](auto arguments)
+	std::transform(rbegin(m_arguments), rend(m_arguments), std::back_inserter(types), [&](auto arguments)
 	{
 		return arguments->type(entryPoint);
 	});

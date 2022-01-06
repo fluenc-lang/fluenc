@@ -113,7 +113,7 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 		{
 			auto fields = userValue->fields();
 
-			std::transform(begin(fields), end(fields), std::back_insert_iterator(result), [=](auto field) -> Argument
+			std::transform(begin(fields), end(fields), std::back_inserter(result), [=](auto field) -> Argument
 			{
 				std::stringstream ss;
 				ss << name;

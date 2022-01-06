@@ -4,6 +4,7 @@
 #include <llvm/IR/Value.h>
 
 #include <stack>
+#include <vector>
 
 class BaseValue;
 
