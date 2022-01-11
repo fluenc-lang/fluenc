@@ -2,6 +2,7 @@
 
 #include "DzExportedFunctionTerminator.h"
 #include "EntryPoint.h"
+#include "IRBuilderEx.h"
 
 #include "values/TypedValue.h"
 
@@ -16,10 +17,13 @@ std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entr
 
 	linkBlocks(previous, block);
 
+	auto ep = entryPoint
+		.withBlock(block);
+
 	auto returnValue = values.require<TypedValue>();
 
-	llvm::IRBuilder<> builder(block);
-	builder.CreateRet(*returnValue);
+	IRBuilderEx builder(ep);
+	builder.createRet(*returnValue);
 
-	return {{ entryPoint, values }};
+	return {{ ep, values }};
 }

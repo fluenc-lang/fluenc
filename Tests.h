@@ -1713,6 +1713,52 @@ class Tests : public QObject
 			QCOMPARE(result, 6);
 		}
 
+		void scenario57()
+		{
+			auto result = exec(R"(
+				struct Struct
+				{
+					x,
+					children: []
+				};
+
+				function sum(int product, Struct s)
+				{
+					return product + s.x;
+				}
+
+				function sum(int product, (Struct s, ...structs))
+				{
+					return sum(product + s.x, ...structs);
+				}
+
+				function createStructs()
+				{
+					return [
+						Struct
+						{
+							x: 1
+						},
+						Struct
+						{
+							x: 2
+						},
+						Struct
+						{
+							x: 3
+						}
+					];
+				}
+
+				export int main()
+				{
+					return sum(0, createStructs());
+				}
+			)");
+
+			QCOMPARE(result, 6);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1770,6 +1816,7 @@ class Tests : public QObject
 		W_SLOT(scenario54)
 		W_SLOT(scenario55)
 		W_SLOT(scenario56)
+		W_SLOT(scenario57)
 
 	private:
 		ModuleInfo *compile(std::string source)

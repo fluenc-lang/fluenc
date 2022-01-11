@@ -348,7 +348,7 @@ function updateButton(EventState events, Button button)
 
 function update(ApplicationState state, Rectangle rectangle)
 {
-    run(state.user, update(state, rectangle.children));
+    //run(state.user, update(state, rectangle.children));
 
     return rectangle;
 }

@@ -601,9 +601,8 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 	}
 
 	auto empty = new DzEmptyArray(DzTerminator::instance());
-	auto lazySink = new LazySink(handle, m_alpha, empty);
 
-	return static_cast<DzValue *>(lazySink);
+	return static_cast<DzValue *>(empty);
 }
 
 antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)

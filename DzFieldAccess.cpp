@@ -4,6 +4,7 @@
 #include "DzFieldAccess.h"
 #include "Type.h"
 #include "InteropHelper.h"
+#include "IRBuilderEx.h"
 
 #include "values/NamedValue.h"
 
@@ -18,7 +19,6 @@ std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack v
 {
 	UNUSED(values);
 
-	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
 	auto block = entryPoint.block();
@@ -37,12 +37,11 @@ std::vector<DzResult> DzFieldAccess::build(const EntryPoint &entryPoint, Stack v
 			llvm::ConstantInt::get(intType, m_index)
 		};
 
-		auto gep = llvm::GetElementPtrInst::CreateInBounds(m_instance, indexes, m_field->name(), block);
+		auto gep = llvm::GetElementPtrInst::CreateInBounds(storageType, m_instance, indexes, m_field->name(), block);
 
-		auto dataLayout = module->getDataLayout();
-		auto align = dataLayout.getABITypeAlign(storageType);
+		IRBuilderEx builder(entryPoint);
 
-		auto load = new llvm::LoadInst(storageType, gep, m_field->name(), false, align, block);
+		auto load = builder.createLoad(gep, m_field->name());
 
 		auto value = InteropHelper::createReadProxy(load, fieldType, entryPoint);
 

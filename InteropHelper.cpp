@@ -7,6 +7,7 @@
 #include "EntryPoint.h"
 #include "DzFieldAccess.h"
 #include "VoidIterator.h"
+#include "IRBuilderEx.h"
 
 #include "types/IPrototype.h"
 
@@ -21,6 +22,8 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 	auto &module = entryPoint.module();
 
 	auto block = entryPoint.block();
+
+	IRBuilderEx builder(entryPoint);
 
 	if (auto prototype = dynamic_cast<const IPrototype *>(type))
 	{
@@ -39,7 +42,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 		auto structType = llvm::StructType::get(*context, types);
 		auto structPtr = structType->getPointerTo();
 
-		auto cast = new llvm::BitCastInst(value, structPtr, "cast", block);
+		auto cast = builder.createBitCast(value, structPtr, "cast");
 
 		std::vector<const NamedValue *> fieldValues;
 
@@ -62,7 +65,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 				auto dataLayout = module->getDataLayout();
 				auto align = dataLayout.getABITypeAlign(storageType);
 
-				auto load = new llvm::LoadInst(storageType, gep, field.name(), false, align, block);
+				auto load = builder.createLoad(gep, field.name());
 
 				auto value = createReadProxy(load, fieldType, entryPoint);
 
@@ -85,6 +88,8 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 	auto block = entryPoint.block();
 
+	IRBuilderEx builder(entryPoint);
+
 	auto dataLayout = module->getDataLayout();
 
 	auto fields = userTypeValue->fields();
@@ -98,14 +103,10 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 		if (auto reference = dynamic_cast<const ReferenceValue *>(fieldValue))
 		{
 			auto type = reference->type();
-			auto storageType = type->storageType(*context);
 
-			auto align = dataLayout.getABITypeAlign(storageType);
-
-			auto load = new llvm::LoadInst(storageType, *reference, field->name(), false, align, block);
+			auto load = builder.createLoad(*reference, field->name());
 
 			return new TypedValue { type, load };
-
 		}
 
 		if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(fieldValue))
@@ -140,13 +141,8 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 		auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, "gep", block);
 
-		auto type = field->type();
-		auto storageType = type->storageType(*context);
-
-		auto align = dataLayout.getABITypeAlign(storageType);
-
-		return new llvm::StoreInst(*field, gep, false, align, block);
+		return builder.createStore(*field, gep);
 	});
 
-	return new llvm::BitCastInst(alloc, llvm::Type::getInt8PtrTy(*context), "cast", block);
+	return builder.createBitCast(alloc, llvm::Type::getInt8PtrTy(*context), "cast");
 }

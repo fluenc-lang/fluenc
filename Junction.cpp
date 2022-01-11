@@ -2,6 +2,7 @@
 
 #include <llvm/IR/Instructions.h>
 
+#include "IRBuilderEx.h"
 #include "Junction.h"
 #include "Type.h"
 
@@ -16,6 +17,7 @@
 #include "values/NamedValue.h"
 #include "values/ReferenceValue.h"
 #include "values/LazyValue.h"
+#include "values/WithoutValue.h"
 
 Junction::Junction(DzValue *subject)
 	: m_subject(subject)
@@ -79,8 +81,6 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 
 	auto function = entryPoint.function();
 
-	auto junctionBlock = entryPoint.block();
-
 	auto [_, first] = *range.begin();
 
 	if (auto templateValue = dynamic_cast<const TypedValue *>(first))
@@ -90,10 +90,6 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 
 		auto alloc = entryPoint.alloc(storageType);
 
-		auto dataLayout = module->getDataLayout();
-
-		auto align = dataLayout.getABITypeAlign(storageType);
-
 		for (auto &[resultEntryPoint, value] : range)
 		{
 			auto typedValue = static_cast<const TypedValue *>(value);
@@ -102,12 +98,16 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 
 			resultBlock->insertInto(function);
 
-			auto junctionStore = new llvm::StoreInst(*typedValue, alloc, false, align, resultBlock);
+			IRBuilderEx resultBuilder(resultEntryPoint);
+
+			auto junctionStore = resultBuilder.createStore(*typedValue, alloc);
 
 			UNUSED(junctionStore);
 		}
 
-		auto junctionLoad = new llvm::LoadInst(storageType, alloc, "junctionLoad", false, align, junctionBlock);
+		IRBuilderEx junctionBuilder(entryPoint);
+
+		auto junctionLoad = junctionBuilder.createLoad(alloc, "junctionLoad");
 
 		return new TypedValue { type, junctionLoad };
 	}
@@ -120,8 +120,6 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 
 		auto dataLayout = module->getDataLayout();
 
-		auto align = dataLayout.getABITypeAlign(storageType);
-
 		for (auto &[resultEntryPoint, value] : range)
 		{
 			auto referenceValue = static_cast<const ReferenceValue *>(value);
@@ -130,11 +128,11 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 
 			resultBlock->insertInto(function);
 
-			auto load = new llvm::LoadInst(storageType, *referenceValue, "load", false, align, resultBlock);
+			IRBuilderEx resultBuilder(resultEntryPoint);
 
-			auto junctionStore = new llvm::StoreInst(load, alloc, false, align, resultBlock);
+			auto load = resultBuilder.createLoad(*referenceValue, "load");
 
-			UNUSED(junctionStore);
+			resultBuilder.createStore(load, alloc);
 		}
 
 		return new ReferenceValue { type, alloc };
@@ -234,6 +232,10 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 		auto joined = join(values, entryPoint);
 
 		return new NamedValue(templateValue->name(), joined);
+	}
+	else if (auto withoutValue = dynamic_cast<const WithoutValue *>(first))
+	{
+		return withoutValue;
 	}
 
 	throw new std::exception();

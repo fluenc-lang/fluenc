@@ -37,6 +37,7 @@ SOURCES += \
 	DzTypeName.cpp \
 	DzValue.cpp \
 	EntryPoint.cpp \
+	IRBuilderEx.cpp \
 	IndexIterator.cpp \
 	InteropHelper.cpp \
 	IteratorTypeHandle.cpp \
@@ -123,6 +124,7 @@ HEADERS += \
 	EntryPoint.h \
 	FunctionAttribute.h \
 	IPrototypeProvider.h \
+	IRBuilderEx.h \
 	IndexIterator.h \
 	Indexed.h \
 	InteropHelper.h \

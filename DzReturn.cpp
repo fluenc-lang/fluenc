@@ -9,6 +9,7 @@
 #include "Type.h"
 #include "DzExportedFunctionTerminator.h"
 #include "DzTerminator.h"
+#include "IRBuilderEx.h"
 
 #include "types/IteratorType.h"
 
@@ -30,18 +31,16 @@ const BaseValue *fetchValue(Stack &values, const EntryPoint &entryPoint)
 	{
 		auto &context = entryPoint.context();
 
-		auto block = entryPoint.block();
-
-		llvm::IRBuilder<> builder(block);
+		IRBuilderEx builder(entryPoint);
 
 		auto type = value->type();
 		auto storageType = type->storageType(*context);
 
 		auto alloc = entryPoint.alloc(storageType);
 
-		builder.CreateStore(*typedValue, alloc);
+		builder.createStore(*typedValue, alloc);
 
-		auto load = builder.CreateLoad(storageType, alloc);
+		auto load = builder.createLoad(alloc);
 
 		return new TypedValue { type, load };
 	}
@@ -55,8 +54,6 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	auto block = entryPoint.block();
 
 	block->insertInto(function);
-
-	llvm::IRBuilder<> builder(block);
 
 	auto value = fetchValue(values, entryPoint);
 

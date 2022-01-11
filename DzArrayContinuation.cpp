@@ -3,6 +3,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "DzArrayContinuation.h"
+#include "IRBuilderEx.h"
 
 #include "types/Int64Type.h"
 
@@ -15,26 +16,19 @@ std::vector<DzResult> DzArrayContinuation::build(const EntryPoint &entryPoint, S
 {
 	UNUSED(values);
 
-	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
-
-	auto block = entryPoint.block();
-
-	auto dataLayout = module->getDataLayout();
 
 	auto indexType = Int64Type::instance();
 	auto storageType = indexType->storageType(*context);
 
-	auto align = dataLayout.getABITypeAlign(storageType);
-
-	llvm::IRBuilder<> builder(block);
-
-	auto load = new llvm::LoadInst(storageType, m_index, "index", false, align, block);
 	auto indexConstant = llvm::ConstantInt::get(storageType, 1);
-	auto add = builder.CreateAdd(load, indexConstant);
-	auto store = new llvm::StoreInst(add, m_index, false, align, block);
 
-	UNUSED(store);
+	IRBuilderEx builder(entryPoint);
+
+	auto load = builder.createLoad(m_index, "index");
+	auto add = builder.createAdd(load, indexConstant);
+
+	builder.createStore(add, m_index);
 
 	return {{ entryPoint, Stack() }};
 }

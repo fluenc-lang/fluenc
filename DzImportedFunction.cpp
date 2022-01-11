@@ -8,6 +8,7 @@
 #include "IndexIterator.h"
 #include "DzFieldAccess.h"
 #include "InteropHelper.h"
+#include "IRBuilderEx.h"
 
 #include "types/VoidType.h"
 #include "types/Prototype.h"
@@ -66,14 +67,12 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 	auto &module = entryPoint.module();
 	auto &context = entryPoint.context();
 
-	auto block = entryPoint.block();
-
-	auto dataLayout = module->getDataLayout();
-
 	auto returnType = m_returnType->resolve(entryPoint);
 
 	std::vector<llvm::Type *> argumentTypes;
 	std::vector<llvm::Value *> argumentValues;
+
+	IRBuilderEx builder(entryPoint);
 
 	for (const auto &argument : m_arguments)
 	{
@@ -90,9 +89,7 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 			if (auto addressOfArgument = dynamic_cast<const ReferenceValue *>(value))
 			{
-				auto align = dataLayout.getABITypeAlign(storageType);
-
-				auto load = new llvm::LoadInst(storageType, *addressOfArgument, name, false, align, block);
+				auto load = builder.createLoad(*addressOfArgument, name);
 
 				argumentValues.push_back(load);
 			}
@@ -113,9 +110,7 @@ std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, St
 
 	auto function = module->getOrInsertFunction(m_name, functionType);
 
-	llvm::IRBuilder<> builder(block);
-
-	auto call = builder.CreateCall(function, argumentValues);
+	auto call = builder.createCall(function, argumentValues);
 
 	if (returnType != VoidType::instance())
 	{

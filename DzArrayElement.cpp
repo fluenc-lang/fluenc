@@ -4,6 +4,7 @@
 
 #include "DzArrayElement.h"
 #include "DzArrayContinuation.h"
+#include "IRBuilderEx.h"
 
 #include "types/IteratorType.h"
 
@@ -44,16 +45,14 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 		auto ifTrue = llvm::BasicBlock::Create(*context);
 		auto ifFalse = llvm::BasicBlock::Create(*context);
 
-		llvm::IRBuilder<> builder(block);
+		IRBuilderEx builder(entryPoint);
 
-		auto align = dataLayout.getABITypeAlign(storageType);
-
-		auto indexLoad = new llvm::LoadInst(storageType, *index, "index", false, align, block);
+		auto indexLoad = builder.createLoad(*index, "index");
 		auto indexConstant = llvm::ConstantInt::get(storageType, m_index);
 
-		auto comparison =  builder.CreateCmp(llvm::CmpInst::Predicate::ICMP_EQ, indexLoad, indexConstant);
+		auto comparison =  builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, indexLoad, indexConstant);
 
-		builder.CreateCondBr(comparison , ifTrue, ifFalse);
+		builder.createCondBr(comparison , ifTrue, ifFalse);
 
 		auto epIfFalse = entryPoint
 			.withBlock(ifFalse);

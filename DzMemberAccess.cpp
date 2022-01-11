@@ -3,6 +3,7 @@
 
 #include "DzMemberAccess.h"
 #include "EntryPoint.h"
+#include "IRBuilderEx.h"
 #include "Type.h"
 
 #include "values/TypedValue.h"
@@ -17,9 +18,6 @@ DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 
 std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
-
 	auto block = entryPoint.block();
 	auto locals = entryPoint.locals();
 
@@ -34,12 +32,9 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 	{
 		auto valueType = value->type();
 
-		auto storageType = valueType->storageType(*context);
+		IRBuilderEx builder(entryPoint);
 
-		auto dataLayout = module->getDataLayout();
-		auto align = dataLayout.getABITypeAlign(storageType);
-
-		auto load = new llvm::LoadInst(storageType, *value, m_name, false, align, block);
+		auto load = builder.createLoad(*value, m_name);
 
 		values.push(new TypedValue { valueType, load });
 	}

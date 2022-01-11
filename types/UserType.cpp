@@ -46,9 +46,7 @@ std::string UserType::fullName() const
 
 llvm::Type *UserType::storageType(llvm::LLVMContext &context) const
 {
-	UNUSED(context);
-
-	throw new std::exception();
+	return llvm::Type::getInt8PtrTy(context);
 }
 
 bool UserType::is(const Type *type, const EntryPoint &entryPoint) const

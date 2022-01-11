@@ -5,6 +5,7 @@
 
 #include "DzConditional.h"
 #include "EntryPoint.h"
+#include "IRBuilderEx.h"
 
 #include "values/TypedValue.h"
 #include "values/UserTypeValue.h"
@@ -38,9 +39,9 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 	auto ifTrue = llvm::BasicBlock::Create(*context);
 	auto ifFalse = llvm::BasicBlock::Create(*context);
 
-	llvm::IRBuilder<> builder(block);
+	IRBuilderEx builder(entryPoint);
 
-	builder.CreateCondBr(*values.require<TypedValue>(), ifTrue, ifFalse);
+	builder.createCondBr(*values.require<TypedValue>(), ifTrue, ifFalse);
 
 	auto epIfFalse = entryPoint
 		.withName("ifFalse")
@@ -96,8 +97,6 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 
 		auto alloc = entryPoint.alloc(storageType);
 
-		auto align = dataLayout.getABITypeAlign(storageType);
-
 		auto mergeBlock = llvm::BasicBlock::Create(*context, "merge", function);
 
 		for (auto i = range.first; i != range.second; i++)
@@ -106,17 +105,19 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 
 			auto resultBlock = resultEntryPoint.block();
 
-			auto store = new llvm::StoreInst(*value, alloc, false, align, resultBlock);
+			IRBuilderEx resultBuilder(resultEntryPoint);
 
-			UNUSED(store);
+			resultBuilder.createStore(*value, alloc);
 
 			linkBlocks(resultBlock, mergeBlock);
 		}
 
-		auto mergeLoad = new llvm::LoadInst(storageType, alloc, "mergeLoad", false, align, mergeBlock);
-
 		auto mergeEntryPoint = entryPoint
 			.withBlock(mergeBlock);
+
+		IRBuilderEx mergeBuilder(mergeEntryPoint);
+
+		auto mergeLoad = mergeBuilder.createLoad(alloc, "mergeLoad");
 
 		auto mergeResult = new TypedValue { type, mergeLoad };
 

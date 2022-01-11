@@ -11,6 +11,7 @@
 #include "Type.h"
 #include "IndexIterator.h"
 #include "AllIterator.h"
+#include "IRBuilderEx.h"
 
 #include "values/DependentValue.h"
 #include "values/TypedValue.h"
@@ -56,7 +57,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 		return regularCall(entryPoint, values);
 	}
 
-	llvm::IRBuilder<> builder(block);
+	IRBuilderEx builder(entryPoint);
 
 	auto targetValues = tailCallCandidate->values();
 	auto inputValues = values;
@@ -93,9 +94,9 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 
 		if (auto reference = dynamic_cast<const ReferenceValue *>(value))
 		{
-			auto load = builder.CreateLoad(*reference);
+			auto load = builder.createLoad(*reference);
 
-			builder.CreateStore(load, *static_cast<const ReferenceValue *>(storage));
+			builder.createStore(load, *static_cast<const ReferenceValue *>(storage));
 		}
 		else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
 		{
