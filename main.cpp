@@ -3,6 +3,9 @@
 #include <string_view>
 
 #include <llvm/Support/TargetSelect.h>
+#include <llvm/Analysis/CFGPrinter.h>
+#include <llvm/Transforms/Scalar/SimplifyCFG.h>
+#include <llvm/Passes/PassBuilder.h>
 
 #include "Tests.h"
 
@@ -44,33 +47,50 @@ int main(int argc, char **argv)
 		auto moduleInfo = visitor
 			.visit<ModuleInfo *>(program);
 
-		std::string errors;
-
-		auto targetTriple = llvm::sys::getDefaultTargetTriple();
-		auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
-
-		if (!target)
-		{
-			llvm::errs() << errors;
-
-			return 1;
-		}
-
-		auto relocModel = llvm::Optional<llvm::Reloc::Model>();
-		auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
-
-		moduleInfo->module()->setDataLayout(targetMachine->createDataLayout());
-
-		std::error_code EC;
-		llvm::raw_fd_ostream dest(outputFileName.str(), EC, llvm::sys::fs::OF_None);
+		auto &module = moduleInfo->module();
 
 		llvm::legacy::PassManager pm;
 
-		targetMachine->addPassesToEmitFile(pm, dest, nullptr, llvm::CGFT_ObjectFile);
+		if (argc > 2)
+		{
+			if (!strcmp(argv[2], "-dot-cfg"))
+			{
+				auto fp = llvm::createCFGPrinterLegacyPassPass();
 
-		pm.run(*moduleInfo->module());
+				pm.add(fp);
+				pm.run(*module);
+			}
 
-		dest.flush();
+			return 0;
+		}
+		else
+		{
+			std::string errors;
+
+			auto targetTriple = llvm::sys::getDefaultTargetTriple();
+			auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
+
+			if (!target)
+			{
+				llvm::errs() << errors;
+
+				return 1;
+			}
+
+			auto relocModel = llvm::Optional<llvm::Reloc::Model>();
+			auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
+
+			module->setDataLayout(targetMachine->createDataLayout());
+
+			std::error_code EC;
+			llvm::raw_fd_ostream dest(outputFileName.str(), EC, llvm::sys::fs::OF_None);
+
+			targetMachine->addPassesToEmitFile(pm, dest, nullptr, llvm::CGFT_ObjectFile);
+
+			pm.run(*module);
+
+			dest.flush();
+		}
 
 		return 0;
 	}
