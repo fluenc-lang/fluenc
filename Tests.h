@@ -1759,6 +1759,59 @@ class Tests : public QObject
 			QCOMPARE(result, 6);
 		}
 
+		void scenario58()
+		{
+			auto result = exec(R"(
+				struct Child
+				{
+					value
+				};
+
+				struct Struct
+				{
+					child1,
+					child2
+				};
+
+				function createStruct()
+				{
+					return Struct
+					{
+						child1: Child
+						{
+							value: 1
+						},
+						child2: Child
+						{
+							value: 2
+						}
+					};
+				}
+
+				function foo(Struct s)
+				{
+					return loop(s, s.child1, s.child2);
+				}
+
+				function loop(Struct s, Child c1, Child c2)
+				{
+					if (c1.value == 2)
+					{
+						return 41;
+					}
+
+					return loop(s, s.child2, s.child1);
+				}
+
+				export int main()
+				{
+					return foo(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, 41);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1817,6 +1870,7 @@ class Tests : public QObject
 		W_SLOT(scenario55)
 		W_SLOT(scenario56)
 		W_SLOT(scenario57)
+//		W_SLOT(scenario58)
 
 	private:
 		ModuleInfo *compile(std::string source)

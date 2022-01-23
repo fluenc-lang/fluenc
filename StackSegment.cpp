@@ -6,11 +6,14 @@
 #include "Type.h"
 #include "IndexIterator.h"
 #include "Indexed.h"
+#include "IRBuilderEx.h"
 
 #include "values/IndexedValue.h"
 #include "values/TypedValue.h"
 #include "values/TupleValue.h"
 #include "values/ReferenceValue.h"
+#include "values/UserTypeValue.h"
+#include "values/NamedValue.h"
 
 StackSegment::StackSegment(std::vector<DzValue *> values, DzValue *call, DzValue *consumer)
 	: m_values(values)
@@ -31,7 +34,7 @@ const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint
 
 	auto dataLayout = module->getDataLayout();
 
-	auto block = entryPoint.block();
+	IRBuilderEx builder(entryPoint);
 
 	if (auto typedValue = dynamic_cast<const TypedValue *>(value))
 	{
@@ -40,11 +43,21 @@ const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint
 
 		auto alloc = entryPoint.alloc(storageType);
 
-		auto align = dataLayout.getABITypeAlign(storageType);
+		builder.createStore(*typedValue, alloc);
 
-		auto store = new llvm::StoreInst(*typedValue, alloc, false, align, block);
+		return new ReferenceValue { argumentType, alloc };
+	}
 
-		UNUSED(store);
+	if (auto referenceValue = dynamic_cast<const ReferenceValue *>(value))
+	{
+		auto argumentType = referenceValue->type();
+		auto storageType = argumentType->storageType(*context);
+
+		auto load = builder.createLoad(*referenceValue);
+
+		auto alloc = entryPoint.alloc(storageType);
+
+		builder.createStore(load, alloc);
 
 		return new ReferenceValue { argumentType, alloc };
 	}
@@ -61,6 +74,20 @@ const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint
 		});
 
 		return new TupleValue { values };
+	}
+
+	if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
+	{
+		auto fields = userTypeValue->fields();
+
+		std::vector<const NamedValue *> values;
+
+		std::transform(begin(fields), end(fields), std::back_inserter(values), [&](auto field)
+		{
+			return new NamedValue { field->name(), fetchValue(field->value(), entryPoint) };
+		});
+
+		return new UserTypeValue { userTypeValue->type(), values };
 	}
 
 	return value;
