@@ -143,6 +143,7 @@ HEADERS += \
 	VisitorV4.h \
 	VoidIterator.h \
 	WithPrototypeProvider.h \
+	ZipIterator.h \
 	antlr4-runtime/dzBaseVisitor.h \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \

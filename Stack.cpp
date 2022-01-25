@@ -10,22 +10,22 @@ size_t Stack::size() const
 	return m_values.size();
 }
 
-std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator Stack::begin() const
+Stack::const_iterator Stack::begin() const
 {
 	return m_values.begin();
 }
 
-std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator Stack::end() const
+Stack::const_iterator Stack::end() const
 {
 	return m_values.end();
 }
 
-std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator Stack::rbegin() const
+Stack::const_reverse_iterator Stack::rbegin() const
 {
 	return m_values.rbegin();
 }
 
-std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator Stack::rend() const
+Stack::const_reverse_iterator Stack::rend() const
 {
 	return m_values.rend();
 }

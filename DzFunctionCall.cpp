@@ -12,6 +12,7 @@
 #include "IndexIterator.h"
 #include "AllIterator.h"
 #include "IRBuilderEx.h"
+#include "ZipIterator.h"
 
 #include "values/DependentValue.h"
 #include "values/TypedValue.h"
@@ -42,8 +43,7 @@ int DzFunctionCall::order(const EntryPoint &entryPoint) const
 	return -1;
 }
 
-const EntryPoint *forwardValue(IRBuilderEx &builder
-	, const EntryPoint *target
+void transferValue(IRBuilderEx &builder
 	, const BaseValue *value
 	, const BaseValue *storage
 	)
@@ -56,51 +56,25 @@ const EntryPoint *forwardValue(IRBuilderEx &builder
 	}
 	else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 	{
-		auto provider = target;
-
 		auto userTypeStorage = static_cast<const UserTypeValue *>(storage);
 
 		auto valueFields = userTypeValue->fields();
 		auto storageFields = userTypeStorage->fields();
 
-		for (auto i = 0u; i < valueFields.size(); i++)
+		for (auto [valueField, storageField] : zip(valueFields, storageFields))
 		{
-			auto valueField = valueFields[i];
-			auto storageField = storageFields[i];
-
-			auto candidate = forwardValue(builder, target, valueField->value(), storageField->value());
-
-			if (candidate->depth() < provider->depth())
-			{
-				provider = candidate;
-			}
-		}
-
-		return provider;
-	}
-	else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
-	{
-		auto provider = dependentValue->provider();
-
-		if (provider->depth() < target->depth())
-		{
-			return provider;
+			transferValue(builder
+				, valueField->value()
+				, storageField->value()
+				);
 		}
 	}
-	else if (auto tainted = dynamic_cast<const TaintedValue *>(value))
-	{
-		return nullptr;
-	}
-
-	return target;
 }
 
 std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
-
-	auto numberOfArguments = values.size();
 
 	block->insertInto(function);
 
@@ -137,22 +111,16 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 		return regularCall(entryPoint, values);
 	}
 
-	auto tailCallTarget = std::accumulate(index_iterator(0ul), index_iterator(numberOfArguments), tailCallCandidate, [&](const EntryPoint *target, size_t) -> const EntryPoint *
-	{
-		if (!target)
-		{
-			return nullptr;
-		}
-
-		auto value = inputValues.pop();
-		auto storage = targetValues.pop();
-
-		return forwardValue(builder, target, value, storage);
-	});
+	auto tailCallTarget = findTailCallTarget(tailCallCandidate, inputValues);
 
 	if (!tailCallTarget)
 	{
 		return regularCall(entryPoint, values);
+	}
+
+	for (auto [value, storage] : zip(inputValues, targetValues))
+	{
+		transferValue(builder, value, storage);
 	}
 
 	auto entry = tailCallTarget->entry();

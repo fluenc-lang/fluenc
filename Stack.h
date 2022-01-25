@@ -11,17 +11,20 @@ class BaseValue;
 class Stack
 {
 	public:
+		typedef std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator const_iterator;
+		typedef std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator const_reverse_iterator;
+
 		Stack() = default;
 		Stack(const std::vector<const BaseValue *> &values);
 		Stack(const Stack &other) = default;
 
 		size_t size() const;
 
-		std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator begin() const;
-		std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator end() const;
+		const_iterator begin() const;
+		const_iterator end() const;
 
-		std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator rbegin() const;
-		std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator rend() const;
+		const_reverse_iterator rbegin() const;
+		const_reverse_iterator rend() const;
 
 		const BaseValue *pop();
 
