@@ -9,6 +9,7 @@ class TaintedValue : public BaseValue
 		TaintedValue(const BaseValue *subject);
 
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 		const BaseValue *subject() const;
 

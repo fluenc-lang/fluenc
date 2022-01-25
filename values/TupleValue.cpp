@@ -22,6 +22,18 @@ const Type *TupleValue::type() const
 	return TupleType::get(types);
 }
 
+const BaseValue *TupleValue::clone(const EntryPoint &entryPoint) const
+{
+	std::vector<const BaseValue *> values;
+
+	std::transform(begin(m_values), end(m_values), std::back_inserter(values), [&](auto value)
+	{
+		return value->clone(entryPoint);
+	});
+
+	return new TupleValue(values);
+}
+
 Stack TupleValue::values() const
 {
 	return m_values;

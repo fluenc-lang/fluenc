@@ -22,3 +22,10 @@ const Type *LazyValue::type() const
 {
 	return m_handle.type();
 }
+
+const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const
+{
+	UNUSED(entryPoint);
+
+	return this;
+}

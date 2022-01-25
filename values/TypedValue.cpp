@@ -1,6 +1,7 @@
 #include <llvm/IR/Constant.h>
 
 #include "TypedValue.h"
+#include "Utility.h"
 
 TypedValue::TypedValue(const Type *type, llvm::Value *value)
 	: m_type(type)
@@ -11,6 +12,13 @@ TypedValue::TypedValue(const Type *type, llvm::Value *value)
 const Type *TypedValue::type() const
 {
 	return m_type;
+}
+
+const BaseValue *TypedValue::clone(const EntryPoint &entryPoint) const
+{
+	UNUSED(entryPoint);
+
+	return this;
 }
 
 llvm::Constant *TypedValue::constant() const

@@ -11,6 +11,7 @@ class UserTypeValue : public BaseValue
 		UserTypeValue(const Type *type, const std::vector<const NamedValue *> &values);
 
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 		std::vector<const NamedValue *> fields() const;
 

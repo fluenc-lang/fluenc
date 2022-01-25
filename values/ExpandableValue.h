@@ -17,6 +17,7 @@ class ExpandableValue : public BaseValue
 		ExpandableValue(const EntryPoint &provider, const DzValue *chain);
 
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 		const EntryPoint *provider() const;
 		const DzValue *chain() const;

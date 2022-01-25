@@ -18,6 +18,7 @@ class TupleValue : public BaseValue
 		size_t size() const;
 
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 		Stack values() const;
 

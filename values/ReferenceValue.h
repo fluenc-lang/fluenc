@@ -11,6 +11,7 @@ class ReferenceValue : public BaseValue
 		ReferenceValue(const Type *type, llvm::Value *value);
 
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 		operator llvm::Value *() const;
 

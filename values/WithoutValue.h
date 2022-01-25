@@ -9,6 +9,7 @@ class WithoutValue : public BaseValue
 		static const WithoutValue *instance();
 
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 };
 
 #endif // WITHOUTVALUE_H

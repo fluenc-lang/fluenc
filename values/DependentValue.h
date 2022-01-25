@@ -9,6 +9,7 @@ class DependentValue : public BaseValue
 		DependentValue(const EntryPoint *provider);
 
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 		const EntryPoint *provider() const;
 

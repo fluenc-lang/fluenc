@@ -26,3 +26,10 @@ const Type *NamedValue::type() const
 {
 	return m_value->type();
 }
+
+const BaseValue *NamedValue::clone(const EntryPoint &entryPoint) const
+{
+	return new NamedValue(m_name
+		, m_value->clone(entryPoint)
+		);
+}

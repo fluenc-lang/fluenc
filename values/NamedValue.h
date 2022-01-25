@@ -16,7 +16,9 @@ class NamedValue : public BaseValue
 		std::string name() const;
 
 		const BaseValue *value() const;
+
 		const Type *type() const override;
+		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 	private:
 		std::string m_name;

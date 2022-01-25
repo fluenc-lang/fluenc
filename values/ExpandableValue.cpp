@@ -14,6 +14,13 @@ const Type *ExpandableValue::type() const
 	return IteratorType::instance();
 }
 
+const BaseValue *ExpandableValue::clone(const EntryPoint &entryPoint) const
+{
+	UNUSED(entryPoint);
+
+	return this;
+}
+
 const EntryPoint *ExpandableValue::provider() const
 {
 	return m_provider;

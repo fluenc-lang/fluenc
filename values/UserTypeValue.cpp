@@ -21,6 +21,20 @@ const Type *UserTypeValue::type() const
 	return UserType::get(m_type, elementTypes);
 }
 
+const BaseValue *UserTypeValue::clone(const EntryPoint &entryPoint) const
+{
+	std::vector<const NamedValue *> values;
+
+	std::transform(begin(m_values), end(m_values), std::back_inserter(values), [&](auto value)
+	{
+		auto cloned = value->clone(entryPoint);
+
+		return static_cast<const NamedValue *>(cloned);
+	});
+
+	return new UserTypeValue(m_type, values);
+}
+
 std::vector<const NamedValue *> UserTypeValue::fields() const
 {
 	return m_values;

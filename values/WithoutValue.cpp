@@ -13,3 +13,10 @@ const Type *WithoutValue::type() const
 {
 	return WithoutType::instance();
 }
+
+const BaseValue *WithoutValue::clone(const EntryPoint &entryPoint) const
+{
+	UNUSED(entryPoint);
+
+	return this;
+}
