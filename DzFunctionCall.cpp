@@ -123,9 +123,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 		transferValue(builder, value, storage);
 	}
 
-	auto entry = tailCallTarget->entry();
-
-	linkBlocks(block, entry->block());
+	linkBlocks(block, tailCallTarget->block());
 
 	return std::vector<DzResult>();
 }
@@ -143,7 +141,7 @@ std::vector<DzResult> DzFunctionCall::regularCall(const EntryPoint &entryPoint, 
 
 		if (function->hasMatchingSignature(entryPoint, values))
 		{
-			auto functionBlock = llvm::BasicBlock::Create(*context);
+			auto functionBlock = llvm::BasicBlock::Create(*context, m_name);
 
 			linkBlocks(block, functionBlock);
 

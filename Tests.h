@@ -1790,17 +1790,17 @@ class Tests : public QObject
 
 				function foo(Struct s)
 				{
-					return loop(s, s.child1, s.child2);
+					return loop(s.child1, s.child2);
 				}
 
-				function loop(Struct s, Child c1, Child c2)
+				function loop(Child c1, Child c2)
 				{
-					if (c1.value == 2)
+					if ((c1.value - c2.value) == -1)
 					{
 						return 41;
 					}
 
-					return loop(s, s.child2, s.child1);
+					return loop(c2, c1);
 				}
 
 				export int main()
@@ -1892,7 +1892,7 @@ class Tests : public QObject
 		W_SLOT(scenario55)
 		W_SLOT(scenario56)
 		W_SLOT(scenario57)
-//		W_SLOT(scenario58)
+		W_SLOT(scenario58)
 		W_SLOT(scenario59)
 
 	private:

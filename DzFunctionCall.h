@@ -20,9 +20,9 @@ class DzFunctionCall : public DzValue
 
 	private:
 		template<typename Container>
-		const EntryPoint *findTailCallTarget(const EntryPoint *target, Container container) const
+		const EntryPoint *findTailCallTarget(const EntryPoint *candidate, Container container) const
 		{
-			return std::accumulate(container.begin(), container.end(), target, [&](const EntryPoint *target, auto value) -> const EntryPoint *
+			return std::accumulate(container.begin(), container.end(), candidate, [&](const EntryPoint *target, auto value) -> const EntryPoint *
 			{
 				if (!target)
 				{
@@ -49,7 +49,7 @@ class DzFunctionCall : public DzValue
 
 					if (provider->depth() < target->depth())
 					{
-						return provider;
+						return provider->entry();
 					}
 				}
 
