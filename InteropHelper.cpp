@@ -19,7 +19,6 @@
 const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *type, const EntryPoint &entryPoint)
 {
 	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
 
 	auto block = entryPoint.block();
 
@@ -52,8 +51,6 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 			if (fieldType)
 			{
-				auto storageType = fieldType->storageType(*context);
-
 				llvm::Value *indexes[] =
 				{
 					llvm::ConstantInt::get(intType, 0),
@@ -61,9 +58,6 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 				};
 
 				auto gep = llvm::GetElementPtrInst::CreateInBounds(cast, indexes, field.name(), block);
-
-				auto dataLayout = module->getDataLayout();
-				auto align = dataLayout.getABITypeAlign(storageType);
 
 				auto load = builder.createLoad(gep, field.name());
 

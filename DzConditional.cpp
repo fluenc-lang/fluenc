@@ -33,6 +33,7 @@ std::vector<DzResult> DzConditional::build(const EntryPoint &entryPoint, Stack v
 
 	auto dataLayout = module->getDataLayout();
 
+	block->setName("condition");
 	block->insertInto(function);
 
 	auto ifTrue = llvm::BasicBlock::Create(*context);

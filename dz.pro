@@ -11,7 +11,6 @@ SOURCES += \
 	DzArrayContinuation.cpp \
 	DzArrayElement.cpp \
 	DzArrayInit.cpp \
-	DzAssignment.cpp \
 	DzBinary.cpp \
 	DzBooleanLiteral.cpp \
 	DzCharacterLiteral.cpp \
@@ -94,7 +93,6 @@ HEADERS += \
 	DzArrayElement.h \
 	DzArrayInit.h \
 	DzArgument.h \
-	DzAssignment.h \
 	DzBaseArgument.h \
 	DzBinary.h \
 	DzBooleanLiteral.h \
