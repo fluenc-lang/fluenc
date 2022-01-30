@@ -16,7 +16,9 @@
 
 #include "KaleidoscopeJIT.h"
 #include "VisitorV4.h"
+#include "Utility.h"
 
+#include "DzCallable.h"
 #include "wobjectdefs.h"
 #include "wobjectimpl.h"
 
@@ -1834,6 +1836,57 @@ class Tests : public QObject
 			QCOMPARE(result, 41);
 		}
 
+		void scenario60()
+		{
+			auto regularFunction = compileFunction(R"(
+				function loop(int v1, int v2)
+				{
+					if ((v1 - v2) == -1)
+					{
+						return 41;
+					}
+
+					return loop(v2, v1);
+				}
+			)");
+
+			auto iteratorFunction1 = compileFunction(R"(
+				function loop(int v1, int v2)
+				{
+					if ((v1 - v2) == -1)
+					{
+						return 41;
+					}
+
+					return 10 -> (v2, v1);
+				}
+			)");
+
+			auto iteratorFunction2 = compileFunction(R"(
+				function generator(int i)
+				{
+					return i -> (i + 1);
+				}
+			)");
+
+			auto iteratorFunction3 = compileFunction(R"(
+				function generator(int i)
+				{
+					if (i < 20)
+					{
+						return i -> (i + 1);
+					}
+
+					return 20;
+				}
+			)");
+
+			QCOMPARE(FunctionAttribute::None, regularFunction->attribute());
+			QCOMPARE(FunctionAttribute::Iterator, iteratorFunction1->attribute());
+			QCOMPARE(FunctionAttribute::Iterator, iteratorFunction2->attribute());
+			QCOMPARE(FunctionAttribute::Iterator, iteratorFunction3->attribute());
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1894,8 +1947,30 @@ class Tests : public QObject
 		W_SLOT(scenario57)
 		W_SLOT(scenario58)
 		W_SLOT(scenario59)
+		W_SLOT(scenario60)
 
 	private:
+		DzCallable *compileFunction(std::string source)
+		{
+			std::stringstream stream(source);
+
+			antlr4::ANTLRInputStream input(stream);
+			dzLexer lexer(&input);
+			antlr4::CommonTokenStream tokens(&lexer);
+			dzParser parser(&tokens);
+
+			auto program = parser.program();
+
+			VisitorV4 visitor(nullptr, nullptr);
+
+			for (auto function : program->function())
+			{
+				return visitor.visit<DzCallable *>(function);
+			}
+
+			return nullptr;
+		}
+
 		ModuleInfo *compile(std::string source)
 		{
 			std::stringstream stream(source);
@@ -1911,7 +1986,6 @@ class Tests : public QObject
 
 			return visitor
 				.visit<ModuleInfo *>(program);
-
 		}
 
 		int exec(std::string source)

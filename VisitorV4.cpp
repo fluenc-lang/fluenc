@@ -49,6 +49,31 @@
 #include "values/LazyValue.h"
 #include "values/TaintedValue.h"
 
+class DzBlockInstruction : public DzValue
+{
+	public:
+		DzBlockInstruction(const DzValue *subject, bool containsIterator)
+			: m_subject(subject)
+			, m_containsIterator(containsIterator)
+		{
+		}
+
+		bool containsIterator() const
+		{
+			return m_containsIterator;
+		}
+
+		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override
+		{
+			return m_subject->build(entryPoint, values);
+		}
+
+	private:
+		const DzValue *m_subject;
+
+		bool m_containsIterator;
+};
+
 VisitorV4::VisitorV4(DzValue *alpha, DzValue *beta)
 	: m_alpha(alpha)
 	, m_beta(beta)
@@ -204,10 +229,17 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 	VisitorV4 visitor(terminator, nullptr);
 
+	auto content = visitor.visit<DzValue *, DzBlockInstruction *>(block);
+
+	if (content->containsIterator())
+	{
+		attribute = FunctionAttribute::Iterator;
+	}
+
 	auto function = new DzFunction(attribute
 		, name
 		, arguments
-		, visitor.visit<DzValue *>(block)
+		, content
 		);
 
 	return static_cast<DzCallable *>(function);
@@ -253,31 +285,54 @@ antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 
 		VisitorV4 visitor(ret, nullptr);
 
-		return visitor
+		auto value = visitor
 			.visit<DzValue *>(context->value);
+
+		auto instruction = new DzBlockInstruction(value, true);
+
+		return static_cast<DzValue *>(instruction);
 	}
 
 	auto ret = new DzReturn(m_alpha, nullptr);
 
 	VisitorV4 visitor(ret, nullptr);
 
-	return visitor
+	auto value = visitor
 		.visit<DzValue *>(context->value);
+
+	auto instruction = new DzBlockInstruction(value, false);
+
+	return static_cast<DzValue *>(instruction);
 }
 
 antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
 {
 	auto expressions = context->expression();
 
-	return std::accumulate(rbegin(expressions), rend(expressions), visit<DzValue *>(context->ret()), [this](DzValue *consumer, dzParser::ExpressionContext *expression)
+	auto ret = visit<DzValue *, DzBlockInstruction *>(context->ret());
+
+	auto result = std::accumulate(rbegin(expressions), rend(expressions), ret, [this](DzBlockInstruction *consumer, dzParser::ExpressionContext *expression)
 	{
 		auto stackFrame = new BlockStackFrame(consumer);
 
 		VisitorV4 visitor(stackFrame, m_alpha);
 
-		return visitor
+		auto value = visitor
 			.visit<DzValue *>(expression);
+
+		if (auto instruction = dynamic_cast<const DzBlockInstruction *>(value))
+		{
+			return new DzBlockInstruction(instruction
+				, instruction->containsIterator() || consumer->containsIterator()
+				);
+		}
+
+		return new DzBlockInstruction(value
+			, consumer->containsIterator()
+			);
 	});
+
+	return static_cast<DzValue *>(result);
 }
 
 antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
@@ -497,7 +552,7 @@ antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
 	VisitorV4 blockVisitor(m_beta, nullptr);
 
 	auto block = blockVisitor
-		.visit<DzValue *>(context->block());
+		.visit<DzValue *, DzBlockInstruction *>(context->block());
 
 	auto conditional = new DzConditional(m_alpha, block);
 
@@ -506,7 +561,11 @@ antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
 	auto condition = expressionVisitor
 		.visit<DzValue *>(context->expression());
 
-	return condition;
+	auto instruction = new DzBlockInstruction(condition
+		, block->containsIterator()
+		);
+
+	return static_cast<DzValue *>(instruction);
 }
 
 antlrcpp::Any VisitorV4::visitGlobal(dzParser::GlobalContext *context)
@@ -619,7 +678,6 @@ antlrcpp::Any VisitorV4::visitByteLiteral(dzParser::ByteLiteralContext *context)
 	auto constant = new DzIntegralLiteral(m_alpha
 		, DzTypeName::byte()
 		, context->INT()->getText()
-
 		);
 
 	return static_cast<DzValue *>(constant);

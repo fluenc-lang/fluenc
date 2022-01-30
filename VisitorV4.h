@@ -74,6 +74,12 @@ class VisitorV4 : public dzBaseVisitor
 			return result.as<T>();
 		}
 
+		template<typename T, typename TResult>
+		TResult visit(antlr4::tree::ParseTree *tree)
+		{
+			return dynamic_cast<TResult>(visit<T>(tree));
+		}
+
 	private:
 		DzValue *m_alpha;
 		DzValue *m_beta;
