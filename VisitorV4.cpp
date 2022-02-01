@@ -177,11 +177,6 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 		{
 			return FunctionAttribute::Recursive;
 		}
-
-		if (attribute == "iterator")
-		{
-			return FunctionAttribute::Iterator;
-		}
 	}
 
 	return FunctionAttribute::None;
