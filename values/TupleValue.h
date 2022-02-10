@@ -13,16 +13,20 @@
 class TupleValue : public BaseValue
 {
 	public:
-		TupleValue(const std::vector<const BaseValue *> &values);
+		TupleValue(const Type *iteratorType, const std::vector<const BaseValue *> &values);
 
 		size_t size() const;
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
+		const Type *iteratorType() const;
+
 		Stack values() const;
 
 	private:
+		const Type *m_iteratorType;
+
 		std::vector<const BaseValue *> m_values;
 };
 

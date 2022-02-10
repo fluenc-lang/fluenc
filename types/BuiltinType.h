@@ -22,6 +22,13 @@ class BuiltinType : public Type
 
 			return name() == type->name();
 		}
+
+		bool equals(const Type *type, const EntryPoint &entryPoint) const override
+		{
+			UNUSED(entryPoint);
+
+			return type == this;
+		}
 };
 
 #endif // BUILTINTYPE_H

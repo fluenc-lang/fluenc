@@ -1,8 +1,8 @@
-#include "LazySink.h"
+#include "ArraySink.h"
 
-#include "values/LazyValue.h"
+#include "values/ArrayValue.h"
 
-LazySink::LazySink(const Type *iteratorType
+ArraySink::ArraySink(const Type *iteratorType
 	, const DzValue *consumer
 	, const DzValue *subject
 	)
@@ -12,10 +12,9 @@ LazySink::LazySink(const Type *iteratorType
 {
 }
 
-std::vector<DzResult> LazySink::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ArraySink::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto lazy = new LazyValue(Stack()
-		, entryPoint
+	auto lazy = new ArrayValue(entryPoint
 		, m_iteratorType
 		, m_subject
 		);

@@ -9,6 +9,7 @@
 #include "values/TypedValue.h"
 #include "values/LazyValue.h"
 #include "values/ReferenceValue.h"
+#include "values/ArrayValue.h"
 
 DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 	: m_consumer(consumer)
@@ -39,6 +40,23 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		values.push(new TypedValue { valueType, load });
 	}
 	else if (auto value = dynamic_cast<const LazyValue *>(iterator->second))
+	{
+		std::vector<DzResult> results;
+
+		for (auto &[forwardedEntryPoint, forwardedValues] : value->build(block, values))
+		{
+			auto consumerEntryPoint = entryPoint
+				.withBlock(forwardedEntryPoint.block());
+
+			for (auto &result : m_consumer->build(consumerEntryPoint, forwardedValues))
+			{
+				results.push_back(result);
+			}
+		}
+
+		return results;
+	}
+	else if (auto value = dynamic_cast<const ArrayValue *>(iterator->second))
 	{
 		std::vector<DzResult> results;
 

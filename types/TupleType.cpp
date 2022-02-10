@@ -5,8 +5,11 @@
 #include "Utility.h"
 #include "AllIterator.h"
 
-TupleType::TupleType(const std::vector<const Type *> types)
-	: m_types(types)
+#include "types/IteratorType.h"
+
+TupleType::TupleType(const Type *iteratorType, const std::vector<const Type *> types)
+	: m_iteratorType(iteratorType)
+	, m_types(types)
 {
 }
 
@@ -86,7 +89,19 @@ bool TupleType::is(const Type *type, const EntryPoint &entryPoint) const
 	return false;
 }
 
-TupleType *TupleType::get(const std::vector<const Type *> &types)
+bool TupleType::equals(const Type *type, const EntryPoint &entryPoint) const
+{
+	UNUSED(entryPoint);
+
+	if (auto tt = dynamic_cast<const TupleType *>(type))
+	{
+		return tt->equals(m_iteratorType, entryPoint);
+	}
+
+	return type == m_iteratorType;
+}
+
+TupleType *TupleType::get(const Type *iteratorType, const std::vector<const Type *> &types)
 {
 	static std::unordered_map<size_t, TupleType> cache;
 
@@ -95,7 +110,7 @@ TupleType *TupleType::get(const std::vector<const Type *> &types)
 		return (accumulator ^ (size_t)type) * 1099511628211;
 	});
 
-	auto [iterator, _] = cache.try_emplace(hash, types);
+	auto [iterator, _] = cache.try_emplace(hash, TupleType { iteratorType, types });
 
 	return &iterator->second;
 }

@@ -73,7 +73,7 @@ const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint
 			return fetchValue(value, entryPoint);
 		});
 
-		return new TupleValue { values };
+		return new TupleValue(tupleValue->iteratorType(), values);
 	}
 
 	if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
@@ -87,7 +87,7 @@ const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint
 			return new NamedValue { field->name(), fetchValue(field->value(), entryPoint) };
 		});
 
-		return new UserTypeValue { userTypeValue->type(), values };
+		return new UserTypeValue { userTypeValue->prototype(), values };
 	}
 
 	return value;

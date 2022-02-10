@@ -1,6 +1,7 @@
 #include "LazyEvaluation.h"
 
 #include "values/LazyValue.h"
+#include "values/ArrayValue.h"
 
 std::vector<DzResult> LazyEvaluation::build(const EntryPoint &entryPoint, Stack values) const
 {
@@ -13,6 +14,13 @@ std::vector<DzResult> LazyEvaluation::build(const EntryPoint &entryPoint, Stack 
 			auto block = entryPoint.block();
 
 			return lazy->build(block, values);
+		}
+
+		if (auto array = dynamic_cast<const ArrayValue *>(value))
+		{
+			auto block = entryPoint.block();
+
+			return array->build(block, values);
 		}
 
 		values.push(value);

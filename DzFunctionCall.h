@@ -12,7 +12,7 @@
 class DzFunctionCall : public DzValue
 {
 	public:
-		DzFunctionCall(const std::string name);
+		DzFunctionCall(const std::string &name);
 
 		int order(const EntryPoint &entryPoint) const override;
 

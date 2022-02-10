@@ -9,6 +9,11 @@ WithPrototype::WithPrototype(const UserTypeValue *value)
 {
 }
 
+const IPrototype *WithPrototype::root() const
+{
+	return m_value->prototype();
+}
+
 std::string WithPrototype::name() const
 {
 	return m_value->type()->name();
@@ -38,4 +43,9 @@ llvm::Type *WithPrototype::storageType(llvm::LLVMContext &context) const
 bool WithPrototype::is(const Type *type, const EntryPoint &entryPoint) const
 {
 	return m_value->type()->is(type, entryPoint);
+}
+
+bool WithPrototype::equals(const Type *type, const EntryPoint &entryPoint) const
+{
+	return m_value->type()->equals(type, entryPoint);
 }

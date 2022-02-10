@@ -3,15 +3,16 @@
 
 #include "types/IteratorType.h"
 
-ExpandableValue::ExpandableValue(const EntryPoint &provider, const DzValue *chain)
-	: m_provider(new EntryPoint(provider))
+ExpandableValue::ExpandableValue(const Type *iteratorType, const EntryPoint &provider, const DzValue *chain)
+	: m_iteratorType(iteratorType)
+	, m_provider(new EntryPoint(provider))
 	, m_chain(chain)
 {
 }
 
 const Type *ExpandableValue::type() const
 {
-	return IteratorType::instance();
+	return m_iteratorType;
 }
 
 const BaseValue *ExpandableValue::clone(const EntryPoint &entryPoint) const

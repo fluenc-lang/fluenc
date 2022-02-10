@@ -4,6 +4,7 @@ CONFIG += DEBUG c++17
 
 SOURCES += \
 	AllIterator.cpp \
+	ArraySink.cpp \
 	BlockStackFrame.cpp \
 	CompilerException.cpp \
 	DefaultPrototypeProvider.cpp \
@@ -12,6 +13,7 @@ SOURCES += \
 	DzArrayElement.cpp \
 	DzArrayInit.cpp \
 	DzBinary.cpp \
+	DzBlockInstruction.cpp \
 	DzBooleanLiteral.cpp \
 	DzCharacterLiteral.cpp \
 	DzConditional.cpp \
@@ -28,6 +30,7 @@ SOURCES += \
 	DzImportedFunction.cpp \
 	DzInstantiation.cpp \
 	DzIntegralLiteral.cpp \
+	DzIteratorFunction.cpp \
 	DzMemberAccess.cpp \
 	DzReturn.cpp \
 	DzStringLiteral.cpp \
@@ -39,7 +42,6 @@ SOURCES += \
 	IRBuilderEx.cpp \
 	IndexIterator.cpp \
 	InteropHelper.cpp \
-	IteratorTypeHandle.cpp \
 	Junction.cpp \
 	LazyEvaluation.cpp \
 	LazySink.cpp \
@@ -72,6 +74,7 @@ SOURCES += \
 	types/VoidType.cpp \
 	types/WithPrototype.cpp \
 	types/WithoutType.cpp \
+	values/ArrayValue.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
 	values/LazyValue.cpp \
@@ -86,6 +89,7 @@ SOURCES += \
 
 HEADERS += \
 	AllIterator.h \
+	ArraySink.h \
 	BlockStackFrame.h \
 	CompilerException.h \
 	DefaultPrototypeProvider.h \
@@ -95,6 +99,7 @@ HEADERS += \
 	DzArgument.h \
 	DzBaseArgument.h \
 	DzBinary.h \
+	DzBlockInstruction.h \
 	DzBooleanLiteral.h \
 	DzCallable.h \
 	DzCharacterLiteral.h \
@@ -112,6 +117,7 @@ HEADERS += \
 	DzImportedFunction.h \
 	DzInstantiation.h \
 	DzIntegralLiteral.h \
+	DzIteratorFunction.h \
 	DzMemberAccess.h \
 	DzReturn.h \
 	DzStringLiteral.h \
@@ -126,7 +132,6 @@ HEADERS += \
 	IndexIterator.h \
 	Indexed.h \
 	InteropHelper.h \
-	IteratorTypeHandle.h \
 	Junction.h \
 	KaleidoscopeJIT.h \
 	LazyEvaluation.h \
@@ -165,6 +170,7 @@ HEADERS += \
 	types/VoidType.h \
 	types/WithPrototype.h \
 	types/WithoutType.h \
+	values/ArrayValue.h \
 	values/BaseValue.h \
 	values/DependentValue.h \
 	values/ExpandableValue.h \

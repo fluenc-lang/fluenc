@@ -1,16 +1,16 @@
-#ifndef DZRETURN_H
-#define DZRETURN_H
+#ifndef ARRAYSINK_H
+#define ARRAYSINK_H
 
 #include "DzValue.h"
 
 class Type;
 
-class DzReturn : public DzValue
+class ArraySink : public DzValue
 {
 	public:
-		DzReturn(const Type *iteratorType
+		ArraySink(const Type *iteratorType
 			, const DzValue *consumer
-			, const DzValue *chained
+			, const DzValue *subject
 			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
@@ -19,7 +19,7 @@ class DzReturn : public DzValue
 		const Type *m_iteratorType;
 
 		const DzValue *m_consumer;
-		const DzValue *m_chained;
+		const DzValue *m_subject;
 };
 
-#endif // DZRETURN_H
+#endif // ARRAYSINK_H

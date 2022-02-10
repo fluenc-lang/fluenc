@@ -4,19 +4,22 @@
 #include "BaseValue.h"
 
 class NamedValue;
+class IPrototype;
 
 class UserTypeValue : public BaseValue
 {
 	public:
-		UserTypeValue(const Type *type, const std::vector<const NamedValue *> &values);
+		UserTypeValue(const IPrototype *type, const std::vector<const NamedValue *> &values);
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
+		const IPrototype *prototype() const;
+
 		std::vector<const NamedValue *> fields() const;
 
 	private:
-		const Type *m_type;
+		const IPrototype *m_type;
 
 		std::vector<const NamedValue *> m_values;
 };

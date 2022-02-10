@@ -22,7 +22,9 @@ std::vector<DzResult> DzExpansion::build(const EntryPoint &entryPoint, Stack val
 
 	for (auto &[targetEntryPoint, _] : result)
 	{
-		auto value = new DependentValue { new EntryPoint(targetEntryPoint) };
+		auto value = new DependentValue(iterator->type()
+			, new EntryPoint(targetEntryPoint)
+			);
 
 		values.push(value);
 

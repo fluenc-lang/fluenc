@@ -17,8 +17,12 @@
 #include "values/ExpandableValue.h"
 #include "values/TupleValue.h"
 
-DzReturn::DzReturn(DzValue *consumer, DzValue *chained)
-	: m_consumer(consumer)
+DzReturn::DzReturn(const Type *iteratorType
+	, const DzValue *consumer
+	, const DzValue *chained
+	)
+	: m_iteratorType(iteratorType)
+	, m_consumer(consumer)
 	, m_chained(chained)
 {
 }
@@ -59,8 +63,8 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 
 	if (m_chained)
 	{
-		auto continuation = new ExpandableValue(entryPoint, m_chained);
-		auto tuple = new TupleValue({ continuation, value });
+		auto continuation = new ExpandableValue(m_iteratorType, entryPoint, m_chained);
+		auto tuple = new TupleValue(m_iteratorType, { continuation, value });
 
 		values.push(tuple);
 

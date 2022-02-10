@@ -19,6 +19,7 @@ class Type
 		virtual llvm::Type *storageType(llvm::LLVMContext &context) const = 0;
 
 		virtual bool is(const Type *type, const EntryPoint &entryPoint) const = 0;
+		virtual bool equals(const Type *type, const EntryPoint &entryPoint) const = 0;
 };
 
 #endif // TYPE_H

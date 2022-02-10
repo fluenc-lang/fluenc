@@ -33,10 +33,12 @@ class ModuleInfo
 		std::unique_ptr<llvm::LLVMContext> m_context;
 };
 
+class Type;
+
 class VisitorV4 : public dzBaseVisitor
 {
 	public:
-		VisitorV4(DzValue *alpha, DzValue *beta);
+		VisitorV4(const Type *iteratorType, DzValue *alpha, DzValue *beta);
 
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
@@ -81,6 +83,8 @@ class VisitorV4 : public dzBaseVisitor
 		}
 
 	private:
+		const Type *m_iteratorType;
+
 		DzValue *m_alpha;
 		DzValue *m_beta;
 };

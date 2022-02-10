@@ -54,6 +54,32 @@ bool UserType::is(const Type *type, const EntryPoint &entryPoint) const
 	return m_prototype->is(type, entryPoint);
 }
 
+bool UserType::equals(const Type *type, const EntryPoint &entryPoint) const
+{
+	auto out = dynamic_cast<const UserType *>(type);
+
+	if (!out)
+	{
+		return false;
+	}
+
+	if (out->m_elementTypes.size() != m_elementTypes.size())
+	{
+		return false;
+	}
+
+	for (auto i = 0u; i < m_elementTypes.size(); i++)
+	{
+		if (!m_elementTypes[i]->equals(out->m_elementTypes[i], entryPoint) &&
+			!out->m_elementTypes[i]->equals(m_elementTypes[i], entryPoint))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 UserType *UserType::get(const Type *prototype, const std::vector<const Type *> &elementTypes)
 {
 	static std::unordered_map<size_t, UserType> cache;

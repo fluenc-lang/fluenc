@@ -2,8 +2,9 @@
 #include "NamedValue.h"
 
 #include "types/UserType.h"
+#include "types/Prototype.h"
 
-UserTypeValue::UserTypeValue(const Type *type, const std::vector<const NamedValue *> &values)
+UserTypeValue::UserTypeValue(const IPrototype *type, const std::vector<const NamedValue *> &values)
 	: m_type(type)
 	, m_values(values)
 {
@@ -18,7 +19,12 @@ const Type *UserTypeValue::type() const
 		return value->type();
 	});
 
-	return UserType::get(m_type, elementTypes);
+	return UserType::get(m_type->root(), elementTypes);
+}
+
+const IPrototype *UserTypeValue::prototype() const
+{
+	return m_type->root();
 }
 
 const BaseValue *UserTypeValue::clone(const EntryPoint &entryPoint) const

@@ -1,17 +1,13 @@
-#ifndef LAZYVALUE_H
-#define LAZYVALUE_H
+#ifndef ARRAYVALUE_H
+#define ARRAYVALUE_H
 
 #include "BaseValue.h"
 #include "DzValue.h"
 
-class EntryPoint;
-class DzTypeName;
-
-class LazyValue : public BaseValue
+class ArrayValue : public BaseValue
 {
 	public:
-		LazyValue(const Stack &values
-			, const EntryPoint &entryPoint
+		ArrayValue(const EntryPoint &entryPoint
 			, const Type *iteratorType
 			, const DzValue *subject
 			);
@@ -22,11 +18,9 @@ class LazyValue : public BaseValue
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 	private:
-		const Stack m_values;
-
 		const EntryPoint *m_entryPoint;
 		const Type *m_iteratorType;
 		const DzValue *m_subject;
 };
 
-#endif // LAZYVALUE_H
+#endif // ARRAYVALUE_H

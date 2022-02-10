@@ -2,14 +2,15 @@
 
 #include "types/IteratorType.h"
 
-DependentValue::DependentValue(const EntryPoint *provider)
-	: m_provider(provider)
+DependentValue::DependentValue(const Type *iteratorType, const EntryPoint *provider)
+	: m_iteratorType(iteratorType)
+	, m_provider(provider)
 {
 }
 
 const Type *DependentValue::type() const
 {
-	return IteratorType::instance();
+	return m_iteratorType;
 }
 
 const BaseValue *DependentValue::clone(const EntryPoint &entryPoint) const

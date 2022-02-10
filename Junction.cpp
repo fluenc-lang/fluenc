@@ -165,7 +165,7 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 			joinedFieldValues.push_back(joinedNamedValue);
 		}
 
-		return new UserTypeValue(templateValue->type(), joinedFieldValues);
+		return new UserTypeValue(templateValue->prototype(), joinedFieldValues);
 	}
 	else if (auto templateValue = dynamic_cast<const TaintedValue *>(first))
 	{
@@ -210,7 +210,7 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 			joinedElementValues.push_back(joinedElementValue);
 		}
 
-		return new TupleValue(joinedElementValues);
+		return new TupleValue(templateValue->iteratorType(), joinedElementValues);
 	}
 	else if (auto expandableValue = dynamic_cast<const ExpandableValue *>(first))
 	{

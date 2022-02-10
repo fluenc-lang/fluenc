@@ -13,8 +13,9 @@
 #include "values/TupleValue.h"
 #include "values/TaintedValue.h"
 
-DzArrayElement::DzArrayElement(size_t index, DzValue *next)
-	: m_index(index)
+DzArrayElement::DzArrayElement(const Type *iteratorType, size_t index, DzValue *next)
+	: m_iteratorType(iteratorType)
+	, m_index(index)
 	, m_next(next)
 {
 }
@@ -62,11 +63,14 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 
 		valuesIfFalse.push(index);
 
-		auto continuation = new ExpandableValue(entryPoint
+		auto continuation = new ExpandableValue(m_iteratorType
+			, entryPoint
 			, new DzArrayContinuation(*index)
 			);
 
-		auto tuple = new TupleValue({ continuation, value });
+		auto tuple = new TupleValue(m_iteratorType
+			, { continuation, value }
+			);
 
 		valuesIfTrue.push(tuple);
 

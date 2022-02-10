@@ -1887,6 +1887,126 @@ class Tests : public QObject
 			QCOMPARE(FunctionAttribute::Iterator, iteratorFunction3->attribute());
 		}
 
+		void scenario61()
+		{
+			auto result = exec(R"(
+				struct Struct
+				{
+					values: []
+				};
+
+				function sum(int product, int v)
+				{
+					return product + v;
+				}
+
+				function sum(int product, (int v, ...values))
+				{
+					return sum(product + v, ...values);
+				}
+
+				function add(int addend, int v)
+				{
+					return v + addend;
+				}
+
+				iterator function add(int addend, (int v, ...values))
+				{
+					return v + addend -> (addend, ...values);
+				}
+
+				function first(int v)
+				{
+					return v;
+				}
+
+				function first((int v, ...values))
+				{
+					return v;
+				}
+
+				function createStruct()
+				{
+					return Struct
+					{
+						values: [1, 2, 3]
+					};
+				}
+
+				function foo(Struct s)
+				{
+					if (sum(0, s.values) < 20)
+					{
+						return foo(s with { values: add(1, s.values) });
+					}
+
+					return first(s.values);
+				}
+
+				export int main()
+				{
+					return foo(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, 6);
+		}
+
+		void scenario62()
+		{
+			auto result = exec(R"(
+				struct Struct
+				{
+					values: []
+				};
+
+				function sum(int product, int v)
+				{
+					return product + v;
+				}
+
+				function sum(int product, (int v, ...values))
+				{
+					return sum(product + v, ...values);
+				}
+
+				function first(int v)
+				{
+					return v;
+				}
+
+				function first((int v, ...values))
+				{
+					return v;
+				}
+
+				function createStruct()
+				{
+					return Struct
+					{
+						values: [1, 2, 3]
+					};
+				}
+
+				function foo(Struct s)
+				{
+//					if (sum(0, s.values) < 9)
+//					{
+						return foo(s with { values: [2, 3, 4] });
+//					}
+
+//					return first(s.values);
+				}
+
+				export int main()
+				{
+					return foo(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, 2);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -1948,6 +2068,8 @@ class Tests : public QObject
 		W_SLOT(scenario58)
 		W_SLOT(scenario59)
 		W_SLOT(scenario60)
+//		W_SLOT(scenario61)
+//		W_SLOT(scenario62)
 
 	private:
 		DzCallable *compileFunction(std::string source)
@@ -1961,7 +2083,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr);
+			VisitorV4 visitor(nullptr, nullptr, nullptr);
 
 			for (auto function : program->function())
 			{
@@ -1982,7 +2104,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr);
+			VisitorV4 visitor(nullptr, nullptr, nullptr);
 
 			return visitor
 				.visit<ModuleInfo *>(program);

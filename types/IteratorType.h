@@ -39,6 +39,16 @@ class IteratorType : public Type
 
 			return true;
 		}
+
+		bool equals(const Type *type, const EntryPoint &entryPoint) const override
+		{
+			if (dynamic_cast<const IteratorType *>(type))
+			{
+				return type == this;
+			}
+
+			return type->equals(this, entryPoint);
+		}
 };
 
 #endif // ITERATORTYPE_H

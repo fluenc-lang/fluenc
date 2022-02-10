@@ -9,6 +9,8 @@ class EntryPoint;
 class IPrototype : public Type
 {
 	public:
+		virtual const IPrototype *root() const = 0;
+
 		virtual std::vector<PrototypeField> fields(const EntryPoint &entryPoint) const = 0;
 };
 

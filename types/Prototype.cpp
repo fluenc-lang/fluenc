@@ -12,6 +12,11 @@ Prototype::Prototype(const std::string &tag
 {
 }
 
+const IPrototype *Prototype::root() const
+{
+	return this;
+}
+
 std::string Prototype::name() const
 {
 	return m_tag;
@@ -71,4 +76,11 @@ bool Prototype::is(const Type *type, const EntryPoint &entryPoint) const
 	}
 
 	return false;
+}
+
+bool Prototype::equals(const Type *type, const EntryPoint &entryPoint) const
+{
+	UNUSED(entryPoint);
+
+	return type == this;
 }

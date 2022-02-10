@@ -20,8 +20,9 @@
 #include "values/TaintedValue.h"
 #include "values/UserTypeValue.h"
 #include "values/NamedValue.h"
+#include "values/ArrayValue.h"
 
-DzFunctionCall::DzFunctionCall(const std::string name)
+DzFunctionCall::DzFunctionCall(const std::string &name)
 	: m_name(name)
 {
 }
@@ -43,32 +44,40 @@ int DzFunctionCall::order(const EntryPoint &entryPoint) const
 	return -1;
 }
 
-void transferValue(IRBuilderEx &builder
+EntryPoint transferValue(const EntryPoint &entryPoint
 	, const BaseValue *value
 	, const BaseValue *storage
 	)
 {
 	if (auto reference = dynamic_cast<const ReferenceValue *>(value))
 	{
+		IRBuilderEx builder(entryPoint);
+
 		auto load = builder.createLoad(*reference);
 
-		builder.createStore(load, *static_cast<const ReferenceValue *>(storage));
+		builder.createStore(load, *dynamic_cast<const ReferenceValue *>(storage));
 	}
 	else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 	{
-		auto userTypeStorage = static_cast<const UserTypeValue *>(storage);
+		auto userTypeStorage = dynamic_cast<const UserTypeValue *>(storage);
 
 		auto valueFields = userTypeValue->fields();
 		auto storageFields = userTypeStorage->fields();
 
-		for (auto [valueField, storageField] : zip(valueFields, storageFields))
+		auto zipped = zip(valueFields, storageFields);
+
+		return std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto fields)
 		{
-			transferValue(builder
+			auto [valueField, storageField] = fields;
+
+			return transferValue(accumulatedEntryPoint
 				, valueField->value()
 				, storageField->value()
 				);
-		}
+		});
 	}
+
+	return entryPoint;
 }
 
 std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
@@ -86,8 +95,6 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 		return regularCall(entryPoint, values);
 	}
 
-	IRBuilderEx builder(entryPoint);
-
 	auto targetValues = tailCallCandidate->values();
 	auto inputValues = values;
 
@@ -103,7 +110,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 		auto storageType = storage->type();
 		auto valueType = value->type();
 
-		return valueType->is(storageType, entryPoint);
+		return valueType->equals(storageType, entryPoint);
 	});
 
 	if (!result)
@@ -118,12 +125,16 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 		return regularCall(entryPoint, values);
 	}
 
-	for (auto [value, storage] : zip(inputValues, targetValues))
-	{
-		transferValue(builder, value, storage);
-	}
+	auto zipped = zip(inputValues, targetValues);
 
-	linkBlocks(block, tailCallTarget->block());
+	auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto result)
+	{
+		auto [value, storage] = result;
+
+		return transferValue(accumulatedEntryPoint, value, storage);
+	});
+
+	linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
 
 	return std::vector<DzResult>();
 }
@@ -141,7 +152,7 @@ std::vector<DzResult> DzFunctionCall::regularCall(const EntryPoint &entryPoint, 
 
 		if (function->hasMatchingSignature(entryPoint, values))
 		{
-			auto functionBlock = llvm::BasicBlock::Create(*context, m_name);
+			auto functionBlock = llvm::BasicBlock::Create(*context);
 
 			linkBlocks(block, functionBlock);
 
