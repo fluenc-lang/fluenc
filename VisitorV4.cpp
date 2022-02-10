@@ -44,6 +44,7 @@
 #include "DzIteratorFunction.h"
 #include "IRBuilderEx.h"
 #include "ArraySink.h"
+#include "ReferenceSink.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -353,8 +354,9 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [this](dzParser::ExpressionContext *parameter)
 	{
 		auto evaluation = new LazyEvaluation();
+		auto sink = new ReferenceSink(evaluation);
 
-		VisitorV4 visitor(m_iteratorType, evaluation, nullptr);
+		VisitorV4 visitor(m_iteratorType, sink, nullptr);
 
 		return visitor
 			.visit<DzValue *>(parameter);
@@ -630,8 +632,9 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 	auto firstElement = std::accumulate(begin(indexed), end(indexed), (DzValue *)nullptr, [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
 	{
 		auto element = new DzArrayElement(iteratorType, expression.index, next);
+		auto sink = new ReferenceSink(element);
 
-		VisitorV4 visitor(m_iteratorType, element, nullptr);
+		VisitorV4 visitor(m_iteratorType, sink, nullptr);
 
 		return visitor
 			.visit<DzValue *>(expression.value);

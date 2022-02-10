@@ -45,6 +45,7 @@ SOURCES += \
 	Junction.cpp \
 	LazyEvaluation.cpp \
 	LazySink.cpp \
+	ReferenceSink.cpp \
 	Stack.cpp \
 	StackSegment.cpp \
 	TaintedSink.cpp \
@@ -136,6 +137,7 @@ HEADERS += \
 	KaleidoscopeJIT.h \
 	LazyEvaluation.h \
 	LazySink.h \
+	ReferenceSink.h \
 	Stack.h \
 	StackSegment.h \
 	TaintedSink.h \

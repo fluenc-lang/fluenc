@@ -27,72 +27,6 @@ int StackSegment::order(const EntryPoint &entryPoint) const
 	return m_call->order(entryPoint);
 }
 
-const BaseValue *fetchValue(const BaseValue *value, const EntryPoint &entryPoint)
-{
-	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
-
-	auto dataLayout = module->getDataLayout();
-
-	IRBuilderEx builder(entryPoint);
-
-	if (auto typedValue = dynamic_cast<const TypedValue *>(value))
-	{
-		auto argumentType = typedValue->type();
-		auto storageType = argumentType->storageType(*context);
-
-		auto alloc = entryPoint.alloc(storageType);
-
-		builder.createStore(*typedValue, alloc);
-
-		return new ReferenceValue { argumentType, alloc };
-	}
-
-	if (auto referenceValue = dynamic_cast<const ReferenceValue *>(value))
-	{
-		auto argumentType = referenceValue->type();
-		auto storageType = argumentType->storageType(*context);
-
-		auto load = builder.createLoad(*referenceValue);
-
-		auto alloc = entryPoint.alloc(storageType);
-
-		builder.createStore(load, alloc);
-
-		return new ReferenceValue { argumentType, alloc };
-	}
-
-	if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
-	{
-		auto tupleValues = tupleValue->values();
-
-		std::vector<const BaseValue *> values;
-
-		std::transform(tupleValues.begin(), tupleValues.end(), std::back_inserter(values), [&](auto value)
-		{
-			return fetchValue(value, entryPoint);
-		});
-
-		return new TupleValue(tupleValue->iteratorType(), values);
-	}
-
-	if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
-	{
-		auto fields = userTypeValue->fields();
-
-		std::vector<const NamedValue *> values;
-
-		std::transform(begin(fields), end(fields), std::back_inserter(values), [&](auto field)
-		{
-			return new NamedValue { field->name(), fetchValue(field->value(), entryPoint) };
-		});
-
-		return new UserTypeValue { userTypeValue->prototype(), values };
-	}
-
-	return value;
-}
-
 std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack values) const
 {
 	std::vector<DzResult> result;
@@ -124,7 +58,7 @@ std::vector<DzResult> StackSegment::build(const EntryPoint &entryPoint, Stack va
 
 				for (auto resultValue : resultValues)
 				{
-					auto returnValue = new IndexedValue{ argument.index, fetchValue(resultValue, resultEntryPoint) };
+					auto returnValue = new IndexedValue{ argument.index, resultValue };
 
 					scopedReturnValues.push(returnValue);
 				}
