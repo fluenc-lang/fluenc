@@ -45,6 +45,7 @@
 #include "IRBuilderEx.h"
 #include "ArraySink.h"
 #include "ReferenceSink.h"
+#include "IndexSink.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -54,6 +55,7 @@
 #include "values/LazyValue.h"
 #include "values/TaintedValue.h"
 #include "values/ArrayValue.h"
+#include "values/IndexedValue.h"
 
 VisitorV4::VisitorV4(const Type *iteratorType, DzValue *alpha, DzValue *beta)
 	: m_iteratorType(iteratorType)
@@ -622,17 +624,31 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 
 	std::vector<Indexed<dzParser::ExpressionContext *>> indexed;
 
-	std::transform(rbegin(expressions), rend(expressions), index_iterator(1u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<dzParser::ExpressionContext *>
+	std::transform(begin(expressions), end(expressions), index_iterator(1u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<dzParser::ExpressionContext *>
 	{
 		return { expressions.size() - y, x };
 	});
 
 	auto iteratorType = new IteratorType();
 
-	auto firstElement = std::accumulate(begin(indexed), end(indexed), (DzValue *)nullptr, [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
+	auto firstElement = std::accumulate(begin(indexed), end(indexed), (DzValue *)nullptr, [&](auto next, auto)
 	{
-		auto element = new DzArrayElement(iteratorType, expression.index, next);
-		auto sink = new ReferenceSink(element);
+		return new DzArrayElement(iteratorType, next);
+	});
+
+	if (!firstElement)
+	{
+		auto empty = new DzEmptyArray(DzTerminator::instance());
+
+		return static_cast<DzValue *>(empty);
+	}
+
+	auto init = new DzArrayInit(firstElement);
+
+	auto firstValue = std::accumulate(rbegin(indexed), rend(indexed), (DzValue *)init, [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
+	{
+		auto k = new IndexSink(expression.index, next);
+		auto sink = new ReferenceSink(k);
 
 		VisitorV4 visitor(m_iteratorType, sink, nullptr);
 
@@ -640,19 +656,11 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 			.visit<DzValue *>(expression.value);
 	});
 
-	if (firstElement)
-	{
-		auto init = new DzArrayInit(firstElement);
-		auto junction = new Junction(init);
-		auto taintedSink = new TaintedSink(junction);
-		auto lazySink = new ArraySink(iteratorType, m_alpha, taintedSink);
+	auto junction = new Junction(firstValue);
+	auto taintedSink = new TaintedSink(junction);
+	auto lazySink = new ArraySink(iteratorType, m_alpha, taintedSink);
 
-		return static_cast<DzValue *>(lazySink);
-	}
-
-	auto empty = new DzEmptyArray(DzTerminator::instance());
-
-	return static_cast<DzValue *>(empty);
+	return static_cast<DzValue *>(lazySink);
 }
 
 antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)

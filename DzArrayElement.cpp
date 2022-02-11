@@ -12,16 +12,18 @@
 #include "values/ExpandableValue.h"
 #include "values/TupleValue.h"
 #include "values/TaintedValue.h"
+#include "values/IndexedValue.h"
 
-DzArrayElement::DzArrayElement(const Type *iteratorType, size_t index, DzValue *next)
+DzArrayElement::DzArrayElement(const Type *iteratorType, const DzValue *next)
 	: m_iteratorType(iteratorType)
-	, m_index(index)
 	, m_next(next)
 {
 }
 
 std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack values) const
 {
+	Stack valuesIfTrue;
+
 	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
 
@@ -30,13 +32,12 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 
 	auto dataLayout = module->getDataLayout();
 
-	auto value = values.pop();
 	auto index = values.require<TypedValue>();
+	auto value = values.require<IndexedValue>();
 
 	if (m_next)
 	{
 		auto valuesIfFalse = values;
-		auto valuesIfTrue = values;
 
 		block->insertInto(function);
 
@@ -49,7 +50,7 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 		IRBuilderEx builder(entryPoint);
 
 		auto indexLoad = builder.createLoad(*index, "index");
-		auto indexConstant = llvm::ConstantInt::get(storageType, m_index);
+		auto indexConstant = llvm::ConstantInt::get(storageType, value->index());
 
 		auto comparison =  builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, indexLoad, indexConstant);
 
@@ -69,7 +70,7 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 			);
 
 		auto tuple = new TupleValue(m_iteratorType
-			, { continuation, value }
+			, { continuation, value->subject() }
 			);
 
 		valuesIfTrue.push(tuple);
@@ -83,7 +84,7 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 		return result;
 	}
 
-	values.push(value);
+	values.push(value->subject());
 
 	return {{ entryPoint, values }};
 }

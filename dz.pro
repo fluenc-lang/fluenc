@@ -41,6 +41,7 @@ SOURCES += \
 	EntryPoint.cpp \
 	IRBuilderEx.cpp \
 	IndexIterator.cpp \
+	IndexSink.cpp \
 	InteropHelper.cpp \
 	Junction.cpp \
 	LazyEvaluation.cpp \
@@ -131,6 +132,7 @@ HEADERS += \
 	IPrototypeProvider.h \
 	IRBuilderEx.h \
 	IndexIterator.h \
+	IndexSink.h \
 	Indexed.h \
 	InteropHelper.h \
 	Junction.h \
