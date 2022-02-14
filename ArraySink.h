@@ -10,7 +10,8 @@ class ArraySink : public DzValue
 	public:
 		ArraySink(const Type *iteratorType
 			, const DzValue *consumer
-			, const DzValue *subject
+			, const DzValue *iterator
+			, const DzValue *firstValue
 			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
@@ -19,7 +20,8 @@ class ArraySink : public DzValue
 		const Type *m_iteratorType;
 
 		const DzValue *m_consumer;
-		const DzValue *m_subject;
+		const DzValue *m_iterator;
+		const DzValue *m_firstValue;
 };
 
 #endif // ARRAYSINK_H

@@ -643,9 +643,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 		return static_cast<DzValue *>(empty);
 	}
 
-	auto init = new DzArrayInit(firstElement);
-
-	auto firstValue = std::accumulate(rbegin(indexed), rend(indexed), (DzValue *)init, [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
+	auto firstValue = std::accumulate(rbegin(indexed), rend(indexed), (DzValue *)DzTerminator::instance(), [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
 	{
 		auto k = new IndexSink(expression.index, next);
 		auto sink = new ReferenceSink(k);
@@ -656,9 +654,11 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 			.visit<DzValue *>(expression.value);
 	});
 
-	auto junction = new Junction(firstValue);
-	auto taintedSink = new TaintedSink(junction);
-	auto lazySink = new ArraySink(iteratorType, m_alpha, taintedSink);
+//	auto init = new DzArrayInit(firstElement, firstValue);
+
+//	auto junction = new Junction(firstValue);
+//	auto taintedSink = new TaintedSink(firstValue);
+	auto lazySink = new ArraySink(iteratorType, m_alpha, firstElement, firstValue);
 
 	return static_cast<DzValue *>(lazySink);
 }

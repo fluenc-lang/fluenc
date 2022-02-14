@@ -6,14 +6,15 @@
 class DzArrayInit : public DzValue
 {
 	public:
-		DzArrayInit(DzValue *consumer);
+		DzArrayInit(const DzValue *consumer, const DzValue *subject);
 
 		int order(const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		DzValue *m_consumer;
+		const DzValue *m_consumer;
+		const DzValue *m_subject;
 };
 
 #endif // DZARRAYINIT_H

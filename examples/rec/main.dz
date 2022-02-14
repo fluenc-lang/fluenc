@@ -13,16 +13,6 @@ function sum(int product, (int v, ...values))
     return sum(product + v, ...values);
 }
 
-function add(int addend, int v)
-{
-    return v + addend;
-}
-
-function add(int addend, (int v, ...values))
-{
-    return v + addend -> (addend, ...values);
-}
-
 function first(int v)
 {
     return v;
@@ -37,18 +27,18 @@ function createStruct()
 {
     return Struct
     {
-        values: [1, 2, 3]
+        values: [1, 2]
     };
 }
 
 function foo(Struct s)
 {
-//     if (sum(0, s.values) < 20)
-//     {
-        return foo(s with { values: add(1, s.values) });
-//     }
+    if (sum(0, s.values) < 4)
+    {
+        return foo(s with { values: [2, 3] });
+    }
 
-//     return first(s.values);
+    return first(s.values);
 }
 
 export int main()

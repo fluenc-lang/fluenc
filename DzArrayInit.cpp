@@ -6,8 +6,9 @@
 #include "types/Int64Type.h"
 #include "values/TypedValue.h"
 
-DzArrayInit::DzArrayInit(DzValue *consumer)
+DzArrayInit::DzArrayInit(const DzValue *consumer, const DzValue *subject)
 	: m_consumer(consumer)
+	, m_subject(subject)
 {
 }
 
@@ -43,16 +44,26 @@ std::vector<DzResult> DzArrayInit::build(const EntryPoint &entryPoint, Stack val
 
 	UNUSED(store);
 
-	values.push(new TypedValue { indexType, index });
+	std::vector<DzResult> results;
 
-	auto arrayBlock = llvm::BasicBlock::Create(*context);
+	for (auto &[vep, va] : m_subject->build(entryPoint, values))
+	{
+		va.push(new TypedValue { indexType, index });
 
-	linkBlocks(block, arrayBlock);
+		auto arrayBlock = llvm::BasicBlock::Create(*context);
 
-	auto ep = entryPoint
-		.withBlock(arrayBlock)
-		.markEntry()
-		;
+		linkBlocks(block, arrayBlock);
 
-	return m_consumer->build(ep, values);
+		auto ep = entryPoint
+			.withBlock(arrayBlock)
+			.markEntry()
+			;
+
+		for (auto &r : m_consumer->build(ep, va))
+		{
+			results.push_back(r);
+		}
+	}
+
+	return results;
 }
