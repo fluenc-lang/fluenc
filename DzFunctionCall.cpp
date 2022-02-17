@@ -21,7 +21,6 @@
 #include "values/UserTypeValue.h"
 #include "values/NamedValue.h"
 #include "values/ArrayValue.h"
-#include "values/TupleValue.h"
 #include "values/ExpandableValue.h"
 
 DzFunctionCall::DzFunctionCall(const std::string &name)

@@ -23,6 +23,7 @@ class ArrayValue : public BaseValue
 		const EntryPoint *m_entryPoint;
 		const Type *m_iteratorType;
 		const DzValue *m_iterator;
+
 		const std::vector<DzResult> m_values;
 };
 
