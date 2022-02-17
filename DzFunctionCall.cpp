@@ -21,6 +21,7 @@
 #include "values/UserTypeValue.h"
 #include "values/NamedValue.h"
 #include "values/ArrayValue.h"
+#include "values/ExpandableValue.h"
 
 DzFunctionCall::DzFunctionCall(const std::string &name)
 	: m_name(name)
@@ -75,6 +76,12 @@ EntryPoint transferValue(const EntryPoint &entryPoint
 				, storageField->value()
 				);
 		});
+	}
+	else if (auto arrayValue = dynamic_cast<const ArrayValue *>(value))
+	{
+		auto arrayStorage = dynamic_cast<const ArrayValue *>(storage);
+
+		return arrayValue->storeInto(entryPoint.block(), arrayStorage);
 	}
 
 	return entryPoint;

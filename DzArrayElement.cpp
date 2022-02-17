@@ -39,7 +39,7 @@ std::vector<DzResult> DzArrayElement::build(const EntryPoint &entryPoint, Stack 
 	{
 		auto valuesIfFalse = values;
 
-		block->insertInto(function);
+		insertBlock(block, function);
 
 		auto indexType = index->type();
 		auto storageType = indexType->storageType(*context);

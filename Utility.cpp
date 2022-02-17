@@ -17,13 +17,10 @@ void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target)
 	builder.CreateBr(target);
 }
 
-std::string nextTag()
+void insertBlock(llvm::BasicBlock *block, llvm::Function *function)
 {
-	static int i;
-
-	std::stringstream ss;
-	ss << "tag";
-	ss << i++;
-
-	return ss.str();
+	if (!block->getParent())
+	{
+		block->insertInto(function);
+	}
 }

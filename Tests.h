@@ -1990,12 +1990,12 @@ class Tests : public QObject
 
 				function foo(Struct s)
 				{
-//					if (sum(0, s.values) < 9)
-//					{
+					if (sum(0, s.values) < 9)
+					{
 						return foo(s with { values: [2, 3, 4] });
-//					}
+					}
 
-//					return first(s.values);
+					return first(s.values);
 				}
 
 				export int main()
@@ -2069,7 +2069,7 @@ class Tests : public QObject
 		W_SLOT(scenario59)
 		W_SLOT(scenario60)
 //		W_SLOT(scenario61)
-//		W_SLOT(scenario62)
+		W_SLOT(scenario62)
 
 	private:
 		DzCallable *compileFunction(std::string source)

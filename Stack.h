@@ -28,6 +28,13 @@ class Stack
 
 		const BaseValue *pop();
 
+		Stack &discard()
+		{
+			pop();
+
+			return *this;
+		}
+
 		template<typename T>
 		const T *require()
 		{

@@ -11,7 +11,6 @@ SOURCES += \
 	DzArgument.cpp \
 	DzArrayContinuation.cpp \
 	DzArrayElement.cpp \
-	DzArrayInit.cpp \
 	DzBinary.cpp \
 	DzBlockInstruction.cpp \
 	DzBooleanLiteral.cpp \
@@ -97,7 +96,6 @@ HEADERS += \
 	DefaultPrototypeProvider.h \
 	DzArrayContinuation.h \
 	DzArrayElement.h \
-	DzArrayInit.h \
 	DzArgument.h \
 	DzBaseArgument.h \
 	DzBinary.h \
@@ -197,12 +195,14 @@ OTHER_FILES += dz.g4 \
 #QMAKE_CXXFLAGS += -std=c++20
 
 LIBS += \
-    -L/home/znurre/Program/Develop/C++/llvm-project/build/lib/ \
-#    -lLLVM-14git \
+#    -L/home/znurre/Program/Develop/C++/llvm-project/build/lib/ \
+#    -lLLVM-15git \
     -lLLVM-13 \
     -lantlr4-runtime
 
 DEPENDPATH += /usr/include/antlr4-runtime
-#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ /home/znurre/Program/Develop/C++/llvm-project/build/include/
+#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ \
+#    /home/znurre/Program/Develop/C++/llvm-project/build/include/
 INCLUDEPATH += /usr/include/antlr4-runtime
-#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ /home/znurre/Program/Develop/C++/llvm-project/build/include/
+#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ \
+#    /home/znurre/Program/Develop/C++/llvm-project/build/include/

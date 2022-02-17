@@ -57,7 +57,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 					llvm::ConstantInt::get(intType, index)
 				};
 
-				auto gep = llvm::GetElementPtrInst::CreateInBounds(cast, indexes, field.name(), block);
+				auto gep = llvm::GetElementPtrInst::CreateInBounds(structType, cast, indexes, field.name(), block);
 
 				auto load = builder.createLoad(gep, field.name());
 
@@ -133,7 +133,7 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 			llvm::ConstantInt::get(intType, index)
 		};
 
-		auto gep = llvm::GetElementPtrInst::CreateInBounds(alloc, indexes, "gep", block);
+		auto gep = llvm::GetElementPtrInst::CreateInBounds(structType, alloc, indexes, "gep", block);
 
 		return builder.createStore(*field, gep);
 	});
