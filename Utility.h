@@ -14,8 +14,7 @@ void UNUSED(T &&)
 std::ostream& operator<<(std::ostream &stream, const llvm::StringRef &string);
 
 void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target);
-
-std::string nextTag();
+void insertBlock(llvm::BasicBlock *source, llvm::Function *function);
 
 template<typename TKey, typename TValue>
 bool compareKey(const std::pair<TKey, TValue> &left, const std::pair<TKey, TValue> &right)

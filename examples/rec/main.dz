@@ -33,7 +33,7 @@ function createStruct()
 
 function foo(Struct s)
 {
-    if (sum(0, s.values) < 4)
+    if (sum(0, s.values) < 9)
     {
         return foo(s with { values: [2, 3] });
     }

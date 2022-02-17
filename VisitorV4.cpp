@@ -31,7 +31,6 @@
 #include "DzExpansion.h"
 #include "Indexed.h"
 #include "DzArrayElement.h"
-#include "DzArrayInit.h"
 #include "BlockStackFrame.h"
 #include "DzTupleArgument.h"
 #include "DzEmptyArray.h"
@@ -624,9 +623,9 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 
 	std::vector<Indexed<dzParser::ExpressionContext *>> indexed;
 
-	std::transform(begin(expressions), end(expressions), index_iterator(1u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<dzParser::ExpressionContext *>
+	std::transform(begin(expressions), end(expressions), index_iterator(0u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<dzParser::ExpressionContext *>
 	{
-		return { expressions.size() - y, x };
+		return { y, x };
 	});
 
 	auto iteratorType = new IteratorType();
@@ -643,7 +642,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 		return static_cast<DzValue *>(empty);
 	}
 
-	auto firstValue = std::accumulate(rbegin(indexed), rend(indexed), (DzValue *)DzTerminator::instance(), [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
+	auto firstValue = std::accumulate(begin(indexed), end(indexed), (DzValue *)DzTerminator::instance(), [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
 	{
 		auto k = new IndexSink(expression.index, next);
 		auto sink = new ReferenceSink(k);

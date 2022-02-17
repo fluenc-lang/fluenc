@@ -53,14 +53,14 @@ std::vector<DzResult> ArrayValue::build(llvm::BasicBlock *block, const Stack &va
 
 	for (auto [elementEntryPoint, elementValues] : m_values)
 	{
-		auto f = values;
+		auto forwardedValues = values;
 
-		for (auto &v : elementValues)
+		for (auto &value : elementValues)
 		{
-			f.push(v);
+			forwardedValues.push(value);
 		}
 
-		f.push(new TypedValue { indexType, index });
+		forwardedValues.push(new TypedValue { indexType, index });
 
 		auto arrayBlock = llvm::BasicBlock::Create(*context);
 
@@ -71,7 +71,7 @@ std::vector<DzResult> ArrayValue::build(llvm::BasicBlock *block, const Stack &va
 			.markEntry()
 			;
 
-		for (auto &result : m_iterator->build(iteratorEntryPoint, f))
+		for (auto &result : m_iterator->build(iteratorEntryPoint, forwardedValues))
 		{
 			results.push_back(result);
 		}
@@ -89,7 +89,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 	auto function = entryPoint.function();
 
-	block->insertInto(function);
+	insertBlock(block, function);
 
 	auto dataLayout = module->getDataLayout();
 
@@ -164,9 +164,9 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 							auto sourceTupleValues = sourceTupleValue->values();
 
 							auto targetAddress = targetTupleValues.require<ReferenceValue>();
-							auto continuation = targetTupleValues.require<ExpandableValue>();
 
 							auto sourceAddress = sourceTupleValues.require<ReferenceValue>();
+							auto continuation = sourceTupleValues.require<ExpandableValue>();
 
 							IRBuilderEx builder(targetEntryPoint);
 
@@ -183,7 +183,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 							{
 								auto loopTarget = chainEntryPoint.entry();
 
-								linkBlocks(targetEntryPoint.block(), loopTarget->block());
+								linkBlocks(targetBlock, loopTarget->block());
 							}
 						}
 					}
@@ -215,7 +215,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 							{
 								auto loopTarget = chainEntryPoint.entry();
 
-								linkBlocks(targetEntryPoint.block(), loopTarget->block());
+								linkBlocks(targetBlock, loopTarget->block());
 							}
 						}
 						else
@@ -241,8 +241,10 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 const Type *ArrayValue::type() const
 {
+	// This is too naive.
+	// Need to come up with a way of how to represent the type of arrays.
+
 	return IteratorType::instance();
-//	return m_iteratorType;
 }
 
 const BaseValue *ArrayValue::clone(const EntryPoint &entryPoint) const

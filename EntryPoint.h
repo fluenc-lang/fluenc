@@ -4,6 +4,8 @@
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Module.h>
 
+#include <map>
+
 #include "Stack.h"
 
 class DzCallable;
