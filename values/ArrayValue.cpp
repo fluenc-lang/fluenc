@@ -108,7 +108,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 	auto exitBlock = llvm::BasicBlock::Create(*context);
 
-	for (auto [sourceElementEntryPoint, sourceElementValues] : m_values)
+	for (auto [sourceElementEntryPoint, sourceElementValues] : target->m_values)
 	{
 		sourceElementValues.push(new TypedValue { indexType, index });
 
@@ -121,7 +121,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 			.markEntry()
 			;
 
-		for (auto &[sourceEntryPoint, sourceValues] : m_iterator->build(sourceIteratorEntryPoint, sourceElementValues))
+		for (auto &[sourceEntryPoint, sourceValues] : target->m_iterator->build(sourceIteratorEntryPoint, sourceElementValues))
 		{
 			auto sourceBlock = sourceEntryPoint.block();
 
@@ -129,7 +129,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 			auto sourceValue = sourceValues.pop();
 
-			for (auto [targetElementEntryPoint, targetElementValues] : target->m_values)
+			for (auto [targetElementEntryPoint, targetElementValues] : m_values)
 			{
 				targetElementValues.push(new TypedValue { indexType, index });
 
@@ -142,7 +142,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 					.markEntry()
 					;
 
-				for (auto &[targetEntryPoint, targetValues] : target->m_iterator->build(targetIteratorEntryPoint, targetElementValues))
+				for (auto &[targetEntryPoint, targetValues] : m_iterator->build(targetIteratorEntryPoint, targetElementValues))
 				{
 					auto targetBlock = targetEntryPoint.block();
 

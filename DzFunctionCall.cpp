@@ -78,11 +78,11 @@ EntryPoint transferValue(const EntryPoint &entryPoint
 				);
 		});
 	}
-	else if (auto lazyValue = dynamic_cast<const ArrayValue *>(value))
+	else if (auto arrayValue = dynamic_cast<const ArrayValue *>(value))
 	{
 		auto arrayStorage = dynamic_cast<const ArrayValue *>(storage);
 
-		return arrayStorage->storeInto(entryPoint.block(), lazyValue);
+		return arrayValue->storeInto(entryPoint.block(), arrayStorage);
 	}
 
 	return entryPoint;

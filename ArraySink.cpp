@@ -16,12 +16,10 @@ ArraySink::ArraySink(const Type *iteratorType
 
 std::vector<DzResult> ArraySink::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto val = m_firstValue->build(entryPoint, Stack());
-
 	auto lazy = new ArrayValue(entryPoint
 		, m_iteratorType
 		, m_iterator
-		, val
+		, m_firstValue->build(entryPoint, Stack())
 		);
 
 	values.push(lazy);
