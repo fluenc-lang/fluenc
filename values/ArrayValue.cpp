@@ -1,6 +1,3 @@
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/Instructions.h>
-
 #include "ArrayValue.h"
 #include "TypedValue.h"
 #include "TupleValue.h"
@@ -100,17 +97,20 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 	auto zero = llvm::ConstantInt::get(storageType, 0);
 
-	auto index = entryPoint.alloc(storageType);
+	auto targetIndex = entryPoint.alloc(storageType);
+	auto sourceIndex = entryPoint.alloc(storageType);
 
-	auto store = new llvm::StoreInst(zero, index, false, align, block);
+	auto targetStore = new llvm::StoreInst(zero, targetIndex, false, align, block);
+	auto sourceStore = new llvm::StoreInst(zero, sourceIndex, false, align, block);
 
-	UNUSED(store);
+	UNUSED(targetStore);
+	UNUSED(sourceStore);
 
 	auto exitBlock = llvm::BasicBlock::Create(*context);
 
 	for (auto [sourceElementEntryPoint, sourceElementValues] : target->m_values)
 	{
-		sourceElementValues.push(new TypedValue { indexType, index });
+		sourceElementValues.push(new TypedValue { indexType, targetIndex });
 
 		auto sourceIteratorEntry = llvm::BasicBlock::Create(*context, "", function);
 
@@ -131,7 +131,7 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 			for (auto [targetElementEntryPoint, targetElementValues] : m_values)
 			{
-				targetElementValues.push(new TypedValue { indexType, index });
+				targetElementValues.push(new TypedValue { indexType, sourceIndex });
 
 				auto targetIteratorEntry = llvm::BasicBlock::Create(*context, "", function);
 
@@ -164,9 +164,10 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 							auto sourceTupleValues = sourceTupleValue->values();
 
 							auto targetAddress = targetTupleValues.require<ReferenceValue>();
+							auto targetContinuation = targetTupleValues.require<ExpandableValue>();
 
 							auto sourceAddress = sourceTupleValues.require<ReferenceValue>();
-							auto continuation = sourceTupleValues.require<ExpandableValue>();
+							auto sourceContinuation = sourceTupleValues.require<ExpandableValue>();
 
 							IRBuilderEx builder(targetEntryPoint);
 
@@ -174,12 +175,18 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 							builder.createStore(load, *sourceAddress);
 
-							auto chain = continuation->chain();
-							auto provider = continuation->provider();
+							auto sourceChain = sourceContinuation->chain();
+							auto targetChain = targetContinuation->chain();
 
-							auto continuationEntryPoint = provider->withBlock(targetBlock);
+							auto sourceProvider = sourceContinuation->provider();
+							auto targetProvider = targetContinuation->provider();
 
-							for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
+							auto sourceContinuationEntryPoint = sourceProvider->withBlock(targetBlock);
+							auto targetContinuationEntryPoint = targetProvider->withBlock(targetBlock);
+
+							targetChain->build(targetContinuationEntryPoint, Stack());
+
+							for (auto &[chainEntryPoint, _] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
 							{
 								auto loopTarget = chainEntryPoint.entry();
 
