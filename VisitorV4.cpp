@@ -40,11 +40,11 @@
 #include "TaintedSink.h"
 #include "Junction.h"
 #include "DzBlockInstruction.h"
-#include "DzIteratorFunction.h"
 #include "IRBuilderEx.h"
 #include "ArraySink.h"
 #include "ReferenceSink.h"
 #include "IndexSink.h"
+#include "DzFunctionCallProxy.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -222,16 +222,6 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 		, content
 		);
 
-//	if (attribute == FunctionAttribute::Iterator)
-//	{
-//		auto iteratorFunction = new DzIteratorFunction(arguments
-//			, iteratorType
-//			, function
-//			);
-
-//		return static_cast<DzCallable *>(iteratorFunction);
-//	}
-
 	return static_cast<DzCallable *>(function);
 }
 
@@ -347,14 +337,15 @@ antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
 antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 {
 	auto expression = context->expression();
+	auto name = context->ID()->getText();
 
-	auto call = new DzFunctionCall(context->ID()->getText());
+	auto call = new DzFunctionCall(name);
 
 	std::vector<DzValue *> values;
 
 	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [this](dzParser::ExpressionContext *parameter)
 	{
-		auto evaluation = new LazyEvaluation();
+		auto evaluation = new LazyEvaluation(DzTerminator::instance());
 		auto sink = new ReferenceSink(evaluation);
 
 		VisitorV4 visitor(m_iteratorType, sink, nullptr);
@@ -363,9 +354,10 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 			.visit<DzValue *>(parameter);
 	});
 
-	auto segment = new StackSegment(values, call, m_alpha);
+	auto segment = new StackSegment(values, call, DzTerminator::instance());
+	auto proxy = new DzFunctionCallProxy(name, m_alpha, segment);
 
-	return static_cast<DzValue *>(segment);
+	return static_cast<DzValue *>(proxy);
 }
 
 antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)

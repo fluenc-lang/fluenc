@@ -27,7 +27,8 @@ std::vector<DzResult> LazyValue::build(llvm::BasicBlock *block, const Stack &val
 
 const Type *LazyValue::type() const
 {
-	return m_iteratorType;
+	return IteratorType::instance();
+//	return m_iteratorType;
 }
 
 const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const

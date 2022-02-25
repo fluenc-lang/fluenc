@@ -96,7 +96,7 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 
 			auto resultBlock = resultEntryPoint.block();
 
-			resultBlock->insertInto(function);
+			insertBlock(resultBlock, function);
 
 			IRBuilderEx resultBuilder(resultEntryPoint);
 
@@ -126,7 +126,7 @@ const BaseValue *Junction::join(const std::vector<Junction::SingleResult> &range
 
 			auto resultBlock = resultEntryPoint.block();
 
-			resultBlock->insertInto(function);
+			insertBlock(resultBlock, function);
 
 			IRBuilderEx resultBuilder(resultEntryPoint);
 

@@ -56,23 +56,6 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 
 		return results;
 	}
-	else if (auto value = dynamic_cast<const ArrayValue *>(iterator->second))
-	{
-		std::vector<DzResult> results;
-
-		for (auto &[forwardedEntryPoint, forwardedValues] : value->build(block, values))
-		{
-			auto consumerEntryPoint = entryPoint
-				.withBlock(forwardedEntryPoint.block());
-
-			for (auto &result : m_consumer->build(consumerEntryPoint, forwardedValues))
-			{
-				results.push_back(result);
-			}
-		}
-
-		return results;
-	}
 	else if (iterator->second)
 	{
 		values.push(iterator->second);

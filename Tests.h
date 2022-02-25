@@ -2068,7 +2068,7 @@ class Tests : public QObject
 		W_SLOT(scenario58)
 		W_SLOT(scenario59)
 		W_SLOT(scenario60)
-//		W_SLOT(scenario61)
+		W_SLOT(scenario61)
 		W_SLOT(scenario62)
 
 	private:

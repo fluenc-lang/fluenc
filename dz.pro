@@ -24,12 +24,12 @@ SOURCES += \
 	DzFieldAccess.cpp \
 	DzFunction.cpp \
 	DzFunctionCall.cpp \
+	DzFunctionCallProxy.cpp \
 	DzGlobal.cpp \
 	DzGlobalTerminator.cpp \
 	DzImportedFunction.cpp \
 	DzInstantiation.cpp \
 	DzIntegralLiteral.cpp \
-	DzIteratorFunction.cpp \
 	DzMemberAccess.cpp \
 	DzReturn.cpp \
 	DzStringLiteral.cpp \
@@ -112,12 +112,12 @@ HEADERS += \
 	DzFieldAccess.h \
 	DzFunction.h \
 	DzFunctionCall.h \
+	DzFunctionCallProxy.h \
 	DzGlobal.h \
 	DzGlobalTerminator.h \
 	DzImportedFunction.h \
 	DzInstantiation.h \
 	DzIntegralLiteral.h \
-	DzIteratorFunction.h \
 	DzMemberAccess.h \
 	DzReturn.h \
 	DzStringLiteral.h \

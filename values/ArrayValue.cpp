@@ -4,6 +4,7 @@
 #include "ReferenceValue.h"
 #include "ExpandableValue.h"
 #include "IRBuilderEx.h"
+#include "LazyValue.h"
 
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
@@ -20,16 +21,16 @@ ArrayValue::ArrayValue(const EntryPoint &entryPoint
 {
 }
 
-std::vector<DzResult> ArrayValue::build(llvm::BasicBlock *block, const Stack &values) const
+std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint, const Stack &values) const
 {
-	auto entryPoint = m_entryPoint->withBlock(block);
+	auto block = entryPoint.block();
 
 	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
 
 	auto function = entryPoint.function();
 
-	block->insertInto(function);
+	insertBlock(block, function);
 
 	auto dataLayout = module->getDataLayout();
 
@@ -50,14 +51,7 @@ std::vector<DzResult> ArrayValue::build(llvm::BasicBlock *block, const Stack &va
 
 	for (auto [elementEntryPoint, elementValues] : m_values)
 	{
-		auto forwardedValues = values;
-
-		for (auto &value : elementValues)
-		{
-			forwardedValues.push(value);
-		}
-
-		forwardedValues.push(new TypedValue { indexType, index });
+		elementValues.push(new TypedValue { indexType, index });
 
 		auto arrayBlock = llvm::BasicBlock::Create(*context);
 
@@ -68,18 +62,25 @@ std::vector<DzResult> ArrayValue::build(llvm::BasicBlock *block, const Stack &va
 			.markEntry()
 			;
 
-		for (auto &result : m_iterator->build(iteratorEntryPoint, forwardedValues))
+		for (auto &[resultEntryPoint, resultValues] : m_iterator->build(iteratorEntryPoint, elementValues))
 		{
-			results.push_back(result);
+			auto forwardedValues = values;
+
+			for (auto &value : resultValues)
+			{
+				forwardedValues.push(value);
+			}
+
+			results.push_back({ resultEntryPoint, forwardedValues });
 		}
 	}
 
 	return results;
 }
 
-EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *target) const
+EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const ArrayValue *source) const
 {
-	auto entryPoint = m_entryPoint->withBlock(block);
+	auto block = entryPoint.block();
 
 	auto &context = entryPoint.context();
 	auto &module = entryPoint.module();
@@ -97,145 +98,290 @@ EntryPoint ArrayValue::storeInto(llvm::BasicBlock *block, const ArrayValue *targ
 
 	auto zero = llvm::ConstantInt::get(storageType, 0);
 
-	auto targetIndex = entryPoint.alloc(storageType);
-	auto sourceIndex = entryPoint.alloc(storageType);
+	auto index = entryPoint.alloc(storageType);
 
-	auto targetStore = new llvm::StoreInst(zero, targetIndex, false, align, block);
-	auto sourceStore = new llvm::StoreInst(zero, sourceIndex, false, align, block);
+	auto store = new llvm::StoreInst(zero, index, false, align, block);
 
-	UNUSED(targetStore);
-	UNUSED(sourceStore);
+	UNUSED(store);
 
 	auto exitBlock = llvm::BasicBlock::Create(*context);
 
-	for (auto [sourceElementEntryPoint, sourceElementValues] : target->m_values)
+	for (auto &[sourceEntryPoint, sourceValues] : source->build(entryPoint, Stack()))
 	{
-		sourceElementValues.push(new TypedValue { indexType, targetIndex });
+		auto sourceBlock = sourceEntryPoint.block();
 
-		auto sourceIteratorEntry = llvm::BasicBlock::Create(*context, "", function);
+		insertBlock(sourceBlock, function);
 
-		linkBlocks(block, sourceIteratorEntry);
+		auto sourceValue = sourceValues.pop();
 
-		auto sourceIteratorEntryPoint = sourceElementEntryPoint
-			.withBlock(sourceIteratorEntry)
-			.markEntry()
-			;
-
-		for (auto &[sourceEntryPoint, sourceValues] : target->m_iterator->build(sourceIteratorEntryPoint, sourceElementValues))
+		for (auto [targetElementEntryPoint, targetElementValues] : m_values)
 		{
-			auto sourceBlock = sourceEntryPoint.block();
+			targetElementValues.push(new TypedValue { indexType, index });
 
-			sourceBlock->insertInto(function);
+			auto targetIteratorEntry = llvm::BasicBlock::Create(*context, "", function);
 
-			auto sourceValue = sourceValues.pop();
+			linkBlocks(sourceBlock, targetIteratorEntry);
 
-			for (auto [targetElementEntryPoint, targetElementValues] : m_values)
+			auto targetIteratorEntryPoint = targetElementEntryPoint
+				.withBlock(targetIteratorEntry)
+				.markEntry()
+				;
+
+			for (auto &[targetEntryPoint, targetValues] : m_iterator->build(targetIteratorEntryPoint, targetElementValues))
 			{
-				targetElementValues.push(new TypedValue { indexType, sourceIndex });
+				auto targetBlock = targetEntryPoint.block();
 
-				auto targetIteratorEntry = llvm::BasicBlock::Create(*context, "", function);
+				insertBlock(targetBlock, function);
 
-				linkBlocks(sourceBlock, targetIteratorEntry);
+				auto targetValue = targetValues.pop();
 
-				auto targetIteratorEntryPoint = targetElementEntryPoint
-					.withBlock(targetIteratorEntry)
-					.markEntry()
-					;
-
-				for (auto &[targetEntryPoint, targetValues] : m_iterator->build(targetIteratorEntryPoint, targetElementValues))
+				if (auto targetTupleValue = dynamic_cast<const TupleValue *>(targetValue))
 				{
-					auto targetBlock = targetEntryPoint.block();
+					auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
 
-					targetBlock->insertInto(function);
+					if (!sourceTupleValue)
+					{
+						linkBlocks(targetEntryPoint.block(), targetIteratorEntry);
+					}
+					else
+					{
+						auto targetTupleValues = targetTupleValue->values();
+						auto sourceTupleValues = sourceTupleValue->values();
 
-					auto targetValue = targetValues.pop();
+						auto targetAddress = targetTupleValues.require<ReferenceValue>();
+						auto targetContinuation = targetTupleValues.require<ExpandableValue>();
 
-					if (auto targetTupleValue = dynamic_cast<const TupleValue *>(targetValue))
+						auto sourceAddress = sourceTupleValues.require<ReferenceValue>();
+						auto sourceContinuation = sourceTupleValues.require<ExpandableValue>();
+
+						IRBuilderEx builder(targetEntryPoint);
+
+						auto load = builder.createLoad(*sourceAddress);
+
+						builder.createStore(load, *targetAddress);
+
+						auto sourceChain = sourceContinuation->chain();
+						auto targetChain = targetContinuation->chain();
+
+						auto sourceProvider = sourceContinuation->provider();
+						auto targetProvider = targetContinuation->provider();
+
+						auto sourceContinuationEntryPoint = sourceProvider->withBlock(targetBlock);
+						auto targetContinuationEntryPoint = targetProvider->withBlock(targetBlock);
+
+						targetChain->build(targetContinuationEntryPoint, Stack());
+
+						for (auto &[chainEntryPoint, _] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
+						{
+							auto loopTarget = chainEntryPoint.entry();
+
+							linkBlocks(targetBlock, loopTarget->block());
+						}
+					}
+				}
+				else if (auto targetAddress = dynamic_cast<const ReferenceValue *>(targetValue))
+				{
+					auto sourceAddress = dynamic_cast<const ReferenceValue *>(sourceValue);
+
+					if (!sourceAddress)
 					{
 						auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
 
 						if (!sourceTupleValue)
 						{
-							linkBlocks(targetEntryPoint.block(), targetIteratorEntry);
+							throw new std::exception();
 						}
-						else
+
+						auto sourceTupleValues = sourceTupleValue->values();
+
+						auto continuation = sourceTupleValues
+							.discard()
+							.require<ExpandableValue>();
+
+						auto chain = continuation->chain();
+						auto provider = continuation->provider();
+
+						auto continuationEntryPoint = provider->withBlock(targetBlock);
+
+						for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
 						{
-							auto targetTupleValues = targetTupleValue->values();
-							auto sourceTupleValues = sourceTupleValue->values();
+							auto loopTarget = chainEntryPoint.entry();
 
-							auto targetAddress = targetTupleValues.require<ReferenceValue>();
-							auto targetContinuation = targetTupleValues.require<ExpandableValue>();
-
-							auto sourceAddress = sourceTupleValues.require<ReferenceValue>();
-							auto sourceContinuation = sourceTupleValues.require<ExpandableValue>();
-
-							IRBuilderEx builder(targetEntryPoint);
-
-							auto load = builder.createLoad(*targetAddress);
-
-							builder.createStore(load, *sourceAddress);
-
-							auto sourceChain = sourceContinuation->chain();
-							auto targetChain = targetContinuation->chain();
-
-							auto sourceProvider = sourceContinuation->provider();
-							auto targetProvider = targetContinuation->provider();
-
-							auto sourceContinuationEntryPoint = sourceProvider->withBlock(targetBlock);
-							auto targetContinuationEntryPoint = targetProvider->withBlock(targetBlock);
-
-							targetChain->build(targetContinuationEntryPoint, Stack());
-
-							for (auto &[chainEntryPoint, _] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
-							{
-								auto loopTarget = chainEntryPoint.entry();
-
-								linkBlocks(targetBlock, loopTarget->block());
-							}
+							linkBlocks(targetBlock, loopTarget->block());
 						}
 					}
-					else if (auto targetAddress = dynamic_cast<const ReferenceValue *>(targetValue))
+					else
 					{
-						auto sourceAddress = dynamic_cast<const ReferenceValue *>(sourceValue);
+						IRBuilderEx builder(targetEntryPoint);
 
-						if (!sourceAddress)
+						auto load = builder.createLoad(*sourceAddress);
+
+						builder.createStore(load, *targetAddress);
+
+						linkBlocks(targetEntryPoint.block(), exitBlock);
+					}
+				}
+			}
+		}
+	}
+
+	exitBlock->insertInto(function);
+
+	return entryPoint.withBlock(exitBlock);
+}
+
+EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const
+{
+	auto block = entryPoint.block();
+
+	auto &context = entryPoint.context();
+	auto &module = entryPoint.module();
+
+	auto function = entryPoint.function();
+
+	insertBlock(block, function);
+
+	auto dataLayout = module->getDataLayout();
+
+	auto indexType = Int64Type::instance();
+	auto storageType = indexType->storageType(*context);
+
+	auto align = dataLayout.getABITypeAlign(storageType);
+
+	auto zero = llvm::ConstantInt::get(storageType, 0);
+
+	auto index = entryPoint.alloc(storageType);
+
+	auto store = new llvm::StoreInst(zero, index, false, align, block);
+
+	UNUSED(store);
+
+	auto exitBlock = llvm::BasicBlock::Create(*context);
+
+	for (auto &[sourceEntryPoint, sourceValues] : source->build(block, Stack()))
+	{
+		auto sourceBlock = sourceEntryPoint.block();
+
+		insertBlock(sourceBlock, function);
+
+		auto sourceValue = sourceValues.pop();
+
+		for (auto [targetElementEntryPoint, targetElementValues] : m_values)
+		{
+			targetElementValues.push(new TypedValue { indexType, index });
+
+			auto targetIteratorEntry = llvm::BasicBlock::Create(*context, "", function);
+
+			linkBlocks(sourceBlock, targetIteratorEntry);
+
+			auto targetIteratorEntryPoint = targetElementEntryPoint
+				.withBlock(targetIteratorEntry)
+				.markEntry()
+				;
+
+			for (auto &[targetEntryPoint, targetValues] : m_iterator->build(targetIteratorEntryPoint, targetElementValues))
+			{
+				auto targetBlock = targetEntryPoint.block();
+
+				insertBlock(targetBlock, function);
+
+				auto targetValue = targetValues.pop();
+
+				if (auto targetTupleValue = dynamic_cast<const TupleValue *>(targetValue))
+				{
+					auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+
+					if (!sourceTupleValue)
+					{
+						linkBlocks(targetBlock, sourceBlock);
+					}
+					else
+					{
+						auto targetTupleValues = targetTupleValue->values();
+						auto sourceTupleValues = sourceTupleValue->values();
+
+						auto targetAddress = targetTupleValues.require<ReferenceValue>();
+						auto targetContinuation = targetTupleValues.require<ExpandableValue>();
+
+						auto sourceValue = sourceTupleValues.pop();
+						auto sourceContinuation = sourceTupleValues.require<ExpandableValue>();
+
+						IRBuilderEx builder(targetEntryPoint);
+
+						// This should somehow feed back into DzFunctionCall::transferValue at a later point.
+						if (auto address = dynamic_cast<const ReferenceValue *>(sourceValue))
 						{
-							auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+							auto load = builder.createLoad(*address);
 
-							if (!sourceTupleValue)
-							{
-								throw new std::exception();
-							}
-
-							auto sourceTupleValues = sourceTupleValue->values();
-
-							auto continuation = sourceTupleValues
-								.discard()
-								.require<ExpandableValue>();
-
-							auto chain = continuation->chain();
-							auto provider = continuation->provider();
-
-							auto continuationEntryPoint = provider->withBlock(targetBlock);
-
-							for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
-							{
-								auto loopTarget = chainEntryPoint.entry();
-
-								linkBlocks(targetBlock, loopTarget->block());
-							}
+							builder.createStore(load, *targetAddress);
 						}
-						else
+						else if (auto value = dynamic_cast<const TypedValue *>(sourceValue))
 						{
-							IRBuilderEx builder(targetEntryPoint);
+							builder.createStore(*value, *targetAddress);
+						}
 
-							auto load = builder.createLoad(*targetAddress);
+						auto sourceChain = sourceContinuation->chain();
+						auto targetChain = targetContinuation->chain();
 
-							builder.createStore(load, *sourceAddress);
+						auto sourceProvider = sourceContinuation->provider();
+						auto targetProvider = targetContinuation->provider();
 
-							linkBlocks(targetEntryPoint.block(), exitBlock);
+						auto sourceContinuationEntryPoint = sourceProvider->withBlock(targetBlock);
+						auto targetContinuationEntryPoint = targetProvider->withBlock(targetBlock);
+
+						targetChain->build(targetContinuationEntryPoint, Stack());
+
+						for (auto &[chainEntryPoint, _] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
+						{
+							auto loopTarget = chainEntryPoint.entry();
+
+							linkBlocks(targetBlock, loopTarget->block());
 						}
 					}
+				}
+				else if (auto targetAddress = dynamic_cast<const ReferenceValue *>(targetValue))
+				{
+					auto sourceTypedValue = dynamic_cast<const TypedValue *>(sourceValue);
+
+					if (!sourceTypedValue)
+					{
+						auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+
+						if (!sourceTupleValue)
+						{
+							throw new std::exception();
+						}
+
+						auto sourceTupleValues = sourceTupleValue->values();
+
+						auto continuation = sourceTupleValues
+							.discard()
+							.require<ExpandableValue>();
+
+						auto chain = continuation->chain();
+						auto provider = continuation->provider();
+
+						auto continuationEntryPoint = provider->withBlock(targetBlock);
+
+						for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
+						{
+							auto loopTarget = chainEntryPoint.entry();
+
+							linkBlocks(targetBlock, loopTarget->block());
+						}
+					}
+					else
+					{
+						IRBuilderEx builder(targetEntryPoint);
+
+						builder.createStore(*sourceTypedValue, *targetAddress);
+
+						linkBlocks(targetBlock, exitBlock);
+					}
+				}
+				else
+				{
+					throw new std::exception();
 				}
 			}
 		}

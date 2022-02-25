@@ -5,6 +5,7 @@
 
 #include "Type.h"
 #include "Utility.h"
+#include "TupleType.h"
 
 class IIteratorType : public Type
 {

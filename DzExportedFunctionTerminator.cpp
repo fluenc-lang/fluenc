@@ -13,6 +13,8 @@ std::vector<DzResult> DzExportedFunctionTerminator::build(const EntryPoint &entr
 	auto function = entryPoint.function();
 	auto previous = entryPoint.block();
 
+	insertBlock(previous, function);
+
 	auto block = llvm::BasicBlock::Create(*context, "entry", function);
 
 	linkBlocks(previous, block);

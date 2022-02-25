@@ -4,6 +4,8 @@
 #include "BaseValue.h"
 #include "DzValue.h"
 
+class LazyValue;
+
 class ArrayValue : public BaseValue
 {
 	public:
@@ -13,8 +15,10 @@ class ArrayValue : public BaseValue
 			, const std::vector<DzResult> &values
 			);
 
-		std::vector<DzResult> build(llvm::BasicBlock *block, const Stack &values) const;
-		EntryPoint storeInto(llvm::BasicBlock *block, const ArrayValue *target) const;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, const Stack &values) const;
+
+		EntryPoint assignFrom(const EntryPoint &entryPoint, const ArrayValue *source) const;
+		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;

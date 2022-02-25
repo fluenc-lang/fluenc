@@ -57,7 +57,7 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
 
-	block->insertInto(function);
+	insertBlock(block, function);
 
 	auto value = fetchValue(values, entryPoint);
 
@@ -72,11 +72,6 @@ std::vector<DzResult> DzReturn::build(const EntryPoint &entryPoint, Stack values
 	}
 
 	values.push(value);
-
-	if (dynamic_cast<const TupleValue *>(value))
-	{
-		return m_consumer->build(entryPoint, values);
-	}
 
 	return m_consumer->build(entryPoint, values);
 }

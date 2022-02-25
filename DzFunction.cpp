@@ -129,7 +129,7 @@ std::vector<DzFunction::Argument> DzFunction::handleArgument(DzBaseArgument *arg
 
 	if (auto tupleArgument = dynamic_cast<DzTupleArgument *>(argument))
 	{
-		auto tupleValue = static_cast<const TupleValue *>(value);
+		auto tupleValue = dynamic_cast<const TupleValue *>(value);
 
 		auto tupleValues = tupleValue->values();
 		auto arguments = tupleArgument->arguments();
