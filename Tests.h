@@ -2007,6 +2007,89 @@ class Tests : public QObject
 			QCOMPARE(result, 2);
 		}
 
+		void scenario63()
+		{
+			auto result = exec(R"(
+				struct Struct
+				{
+					values: []
+				};
+
+				struct Element
+				{
+					value
+				};
+
+				function sum(int product, Element v)
+				{
+					return product + v.value;
+				}
+
+				function sum(int product, (Element v, ...values))
+				{
+					return sum(product + v.value, ...values);
+				}
+
+				function add(int addend, Element v)
+				{
+					return v with { value: v.value + addend };
+				}
+
+				iterator function add(int addend, (Element v, ...values))
+				{
+					return v with { value: v.value + addend } -> (addend, ...values);
+				}
+
+				function first(Element v)
+				{
+					return v.value;
+				}
+
+				function first((Element v, ...values))
+				{
+					return v.value;
+				}
+
+				function createStruct()
+				{
+					return Struct
+					{
+						values: [
+							Element
+							{
+								value: 1
+							},
+							Element
+							{
+								value: 2
+							},
+							Element
+							{
+								value: 3
+							}
+						]
+					};
+				}
+
+				function foo(Struct s)
+				{
+					if (sum(0, s.values) < 20)
+					{
+						return foo(s with { values: add(1, s.values) });
+					}
+
+					return first(s.values);
+				}
+
+				export int main()
+				{
+					return foo(createStruct());
+				}
+			)");
+
+			QCOMPARE(result, 6);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2070,6 +2153,7 @@ class Tests : public QObject
 		W_SLOT(scenario60)
 		W_SLOT(scenario61)
 		W_SLOT(scenario62)
+		W_SLOT(scenario63)
 
 	private:
 		DzCallable *compileFunction(std::string source)

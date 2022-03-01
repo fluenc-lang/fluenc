@@ -52,6 +52,7 @@ SOURCES += \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
 	Utility.cpp \
+	ValueHelper.cpp \
 	VisitorV1.cpp \
 	VisitorV4.cpp \
 	WithPrototypeProvider.cpp \
@@ -145,6 +146,7 @@ HEADERS += \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \
 	Utility.h \
+	ValueHelper.h \
 	VisitorV4.h \
 	VoidIterator.h \
 	WithPrototypeProvider.h \

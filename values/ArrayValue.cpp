@@ -5,6 +5,7 @@
 #include "ExpandableValue.h"
 #include "IRBuilderEx.h"
 #include "LazyValue.h"
+#include "ValueHelper.h"
 
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
@@ -301,25 +302,13 @@ EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const LazyValue 
 						auto targetTupleValues = targetTupleValue->values();
 						auto sourceTupleValues = sourceTupleValue->values();
 
-						auto targetAddress = targetTupleValues.require<ReferenceValue>();
+						ValueHelper::transferValue(targetEntryPoint
+							, sourceTupleValues.pop()
+							, targetTupleValues.pop()
+							);
+
 						auto targetContinuation = targetTupleValues.require<ExpandableValue>();
-
-						auto sourceValue = sourceTupleValues.pop();
 						auto sourceContinuation = sourceTupleValues.require<ExpandableValue>();
-
-						IRBuilderEx builder(targetEntryPoint);
-
-						// This should somehow feed back into DzFunctionCall::transferValue at a later point.
-						if (auto address = dynamic_cast<const ReferenceValue *>(sourceValue))
-						{
-							auto load = builder.createLoad(*address);
-
-							builder.createStore(load, *targetAddress);
-						}
-						else if (auto value = dynamic_cast<const TypedValue *>(sourceValue))
-						{
-							builder.createStore(*value, *targetAddress);
-						}
 
 						auto sourceChain = sourceContinuation->chain();
 						auto targetChain = targetContinuation->chain();
@@ -340,49 +329,31 @@ EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const LazyValue 
 						}
 					}
 				}
-				else if (auto targetAddress = dynamic_cast<const ReferenceValue *>(targetValue))
+				else if (auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue))
 				{
-					auto sourceTypedValue = dynamic_cast<const TypedValue *>(sourceValue);
+					auto sourceTupleValues = sourceTupleValue->values();
 
-					if (!sourceTypedValue)
+					auto continuation = sourceTupleValues
+						.discard()
+						.require<ExpandableValue>();
+
+					auto chain = continuation->chain();
+					auto provider = continuation->provider();
+
+					auto continuationEntryPoint = provider->withBlock(targetBlock);
+
+					for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
 					{
-						auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+						auto loopTarget = chainEntryPoint.entry();
 
-						if (!sourceTupleValue)
-						{
-							throw new std::exception();
-						}
-
-						auto sourceTupleValues = sourceTupleValue->values();
-
-						auto continuation = sourceTupleValues
-							.discard()
-							.require<ExpandableValue>();
-
-						auto chain = continuation->chain();
-						auto provider = continuation->provider();
-
-						auto continuationEntryPoint = provider->withBlock(targetBlock);
-
-						for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
-						{
-							auto loopTarget = chainEntryPoint.entry();
-
-							linkBlocks(targetBlock, loopTarget->block());
-						}
-					}
-					else
-					{
-						IRBuilderEx builder(targetEntryPoint);
-
-						builder.createStore(*sourceTypedValue, *targetAddress);
-
-						linkBlocks(targetBlock, exitBlock);
+						linkBlocks(targetBlock, loopTarget->block());
 					}
 				}
 				else
 				{
-					throw new std::exception();
+					ValueHelper::transferValue(targetEntryPoint, sourceValue, targetValue);
+
+					linkBlocks(targetBlock, exitBlock);
 				}
 			}
 		}

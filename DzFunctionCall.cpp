@@ -13,6 +13,7 @@
 #include "AllIterator.h"
 #include "IRBuilderEx.h"
 #include "ZipIterator.h"
+#include "ValueHelper.h"
 
 #include "values/DependentValue.h"
 #include "values/TypedValue.h"
@@ -46,54 +47,6 @@ int DzFunctionCall::order(const EntryPoint &entryPoint) const
 	}
 
 	return -1;
-}
-
-EntryPoint transferValue(const EntryPoint &entryPoint
-	, const BaseValue *value
-	, const BaseValue *storage
-	)
-{
-	if (auto reference = dynamic_cast<const ReferenceValue *>(value))
-	{
-		IRBuilderEx builder(entryPoint);
-
-		auto load = builder.createLoad(*reference);
-
-		builder.createStore(load, *dynamic_cast<const ReferenceValue *>(storage));
-	}
-	else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
-	{
-		auto userTypeStorage = dynamic_cast<const UserTypeValue *>(storage);
-
-		auto valueFields = userTypeValue->fields();
-		auto storageFields = userTypeStorage->fields();
-
-		auto zipped = zip(valueFields, storageFields);
-
-		return std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto fields)
-		{
-			auto [valueField, storageField] = fields;
-
-			return transferValue(accumulatedEntryPoint
-				, valueField->value()
-				, storageField->value()
-				);
-		});
-	}
-	else if (auto arrayValue = dynamic_cast<const ArrayValue *>(value))
-	{
-		auto arrayStorage = dynamic_cast<const ArrayValue *>(storage);
-
-		return arrayStorage->assignFrom(entryPoint, arrayValue);
-	}
-	else if (auto lazyValue = dynamic_cast<const LazyValue *>(value))
-	{
-		auto arrayStorage = dynamic_cast<const ArrayValue *>(storage);
-
-		return arrayStorage->assignFrom(entryPoint, lazyValue);
-	}
-
-	return entryPoint;
 }
 
 std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack values) const
@@ -147,7 +100,7 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 	{
 		auto [value, storage] = result;
 
-		return transferValue(accumulatedEntryPoint, value, storage);
+		return ValueHelper::transferValue(accumulatedEntryPoint, value, storage);
 	});
 
 	linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
