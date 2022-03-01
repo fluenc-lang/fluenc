@@ -59,6 +59,7 @@ std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint, const Stac
 
 		auto iteratorEntryPoint = entryPoint
 			.withBlock(arrayBlock)
+			.withName("__array")
 			.markEntry()
 			;
 

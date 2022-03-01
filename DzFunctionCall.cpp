@@ -150,13 +150,6 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 		return transferValue(accumulatedEntryPoint, value, storage);
 	});
 
-	// Fixes test case for scenario61. Obviously not OK.
-	// Will have to figure out why we get the wrong tailCallTarget in this case.
-	if (m_name == "foo")
-	{
-		tailCallTarget = tailCallTarget->entry();
-	}
-
 	linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
 
 	return std::vector<DzResult>();
