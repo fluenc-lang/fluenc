@@ -19,7 +19,6 @@ DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 
 std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto block = entryPoint.block();
 	auto locals = entryPoint.locals();
 
 	auto iterator = locals.find(m_name);
@@ -38,23 +37,6 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		auto load = builder.createLoad(*value, m_name);
 
 		values.push(new TypedValue { valueType, load });
-	}
-	else if (auto value = dynamic_cast<const LazyValue *>(iterator->second))
-	{
-		std::vector<DzResult> results;
-
-		for (auto &[forwardedEntryPoint, forwardedValues] : value->build(block, values))
-		{
-			auto consumerEntryPoint = entryPoint
-				.withBlock(forwardedEntryPoint.block());
-
-			for (auto &result : m_consumer->build(consumerEntryPoint, forwardedValues))
-			{
-				results.push_back(result);
-			}
-		}
-
-		return results;
 	}
 	else if (iterator->second)
 	{

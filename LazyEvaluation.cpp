@@ -2,6 +2,7 @@
 
 #include "values/LazyValue.h"
 #include "values/ArrayValue.h"
+#include "values/TupleValue.h"
 
 LazyEvaluation::LazyEvaluation(const DzValue *consumer)
 	: m_consumer(consumer)
@@ -52,6 +53,38 @@ std::vector<DzResult> digest(const EntryPoint &entryPoint, Stack values)
 				for (auto &result : digest(resultEntryPoint, forwardedValues))
 				{
 					results.push_back(result);
+				}
+			}
+
+			return results;
+		}
+
+		if (auto tuple = dynamic_cast<const TupleValue *>(value))
+		{
+			std::vector<DzResult> results;
+
+			auto digestedResults = digest(entryPoint
+				, tuple->values()
+				);
+
+			for (auto &[digestedEntryPoint, digestedValues] : digestedResults)
+			{
+				auto digestedTuple = new TupleValue(tuple->iteratorType()
+					, { digestedValues.begin(), digestedValues.end() }
+					);
+
+				for (auto &[resultEntryPoint, resultValues] : digest(digestedEntryPoint, values))
+				{
+					std::vector<const BaseValue *> forwardedValues;
+
+					for (auto resultValue : resultValues)
+					{
+						forwardedValues.push_back(resultValue);
+					}
+
+					forwardedValues.push_back(digestedTuple);
+
+					results.push_back({ resultEntryPoint, forwardedValues });
 				}
 			}
 

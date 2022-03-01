@@ -6,6 +6,7 @@
 
 #include "types/IteratorType.h"
 
+// TODO Could this be moved into StackSegment instead?
 DzFunctionCallProxy::DzFunctionCallProxy(const std::string name, const DzValue *consumer, const DzValue *candidate)
 	: m_name(name)
 	, m_consumer(consumer)

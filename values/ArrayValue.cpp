@@ -141,7 +141,7 @@ EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const ArrayValue
 
 					if (!sourceTupleValue)
 					{
-						linkBlocks(targetEntryPoint.block(), targetIteratorEntry);
+						linkBlocks(targetBlock, targetIteratorEntry);
 					}
 					else
 					{

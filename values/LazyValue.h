@@ -7,6 +7,7 @@
 class EntryPoint;
 class DzTypeName;
 
+// TODO Create common interface (IIteratable?) for LazyValue and ArrayValue
 class LazyValue : public BaseValue
 {
 	public:
