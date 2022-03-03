@@ -29,6 +29,12 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
+	public:
+		Tests()
+		{
+			scenario64();
+		}
+
 	private:
 		void scenario1()
 		{
@@ -2090,6 +2096,69 @@ class Tests : public QObject
 			QCOMPARE(result, 6);
 		}
 
+		void scenario64()
+		{
+			auto result = exec(R"(
+				struct Struct
+				{
+					value
+				};
+
+				struct Color
+				{
+					r: 0,
+					g: 0,
+					b: 0
+				}
+
+				function rgb(int r, int g, int b)
+				{
+					return Color
+					{
+						r: r,
+						g: g,
+						b: b
+					};
+				}
+
+				function sum(Color c)
+				{
+					return c.r + c.g + c.b;
+				}
+
+				function sum(int product, Struct s)
+				{
+					return product + sum(s.value);
+				}
+
+				function sum(int product, (Struct s, ...structs))
+				{
+					return sum(product + sum(s.value), ...structs);
+				}
+
+				function createStructs()
+				{
+					return [
+						Struct
+						{
+							value: rgb(1, 2, 3)
+						},
+						Struct
+						{
+							value: rgb(4, 5, 6)
+						}
+					];
+				}
+
+				export int main()
+				{
+					return sum(0, createStructs());
+				}
+			)");
+
+			QCOMPARE(result, 21);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2154,6 +2223,7 @@ class Tests : public QObject
 		W_SLOT(scenario61)
 		W_SLOT(scenario62)
 		W_SLOT(scenario63)
+		W_SLOT(scenario64)
 
 	private:
 		DzCallable *compileFunction(std::string source)
