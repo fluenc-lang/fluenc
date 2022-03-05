@@ -300,9 +300,19 @@ function selectTemplate(ControlTemplate template, Item item)
     return template.normal;
 }
 
+function iterate(without item)
+{
+    return nothing;
+}
+
+function iterate((any item, ...items))
+{
+    return iterate(...items);
+}
+
 function drawButton(long renderer, State state, Button button)
 {
-    draw(renderer, state, selectTemplate(buttonTemplate(button), button));
+    iterate(draw(renderer, state, selectTemplate(buttonTemplate(button), button)));
 
     return button;
 }
@@ -324,8 +334,6 @@ function updateButton(EventState events, Button button)
 {
     if (containsMouse(button, events.motion))
     {
-        puts("containsMouse");
-
         if (isPressed(events.button))
         {
             return button with
@@ -348,9 +356,10 @@ function updateButton(EventState events, Button button)
 
 function update(ApplicationState state, Rectangle rectangle)
 {
-    //run(state.user, update(state, rectangle.children));
-
-    return rectangle;
+    return rectangle with
+    {
+        children: update(state, rectangle.children)
+    };
 }
 
 function update(ApplicationState state, Button button)

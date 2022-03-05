@@ -10,6 +10,7 @@
 #include "types/WithoutType.h"
 #include "types/Prototype.h"
 #include "types/ByteType.h"
+#include "types/AnyType.h"
 
 DzTypeName::DzTypeName(const std::string &name)
 	: m_name(name)
@@ -61,6 +62,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 	if (m_name == "without")
 	{
 		return WithoutType::instance();
+	}
+
+	if (m_name == "any")
+	{
+		return AnyType::instance();
 	}
 
 	if (m_name == "...")
