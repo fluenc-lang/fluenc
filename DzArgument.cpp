@@ -2,7 +2,7 @@
 #include "DzTypeName.h"
 #include "EntryPoint.h"
 
-DzArgument::DzArgument(const std::string &name, DzTypeName *type)
+DzArgument::DzArgument(const std::string &name, ITypeName *type)
 	: m_name(name)
 	, m_type(type)
 {

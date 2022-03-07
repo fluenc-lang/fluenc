@@ -29,12 +29,6 @@ class Tests : public QObject
 {
 	W_OBJECT(Tests)
 
-	public:
-		Tests()
-		{
-			scenario64();
-		}
-
 	private:
 		void scenario1()
 		{
@@ -1005,7 +999,7 @@ class Tests : public QObject
 		void scenario37()
 		{
 			auto result = exec(R"(
-				iterator function numbersBelow(int i, int number)
+				function numbersBelow(int i, int number)
 				{
 					if (i == number)
 					{
@@ -1610,27 +1604,27 @@ class Tests : public QObject
 					return draw(selectTemplate(button));
 				}
 
-				iterator function draw(without item)
+				function draw(without item)
 				{
 					return 0;
 				}
 
-				iterator function draw(Rectangle rectangle)
+				function draw(Rectangle rectangle)
 				{
 					return rectangle.width;
 				}
 
-				iterator function draw((Rectangle rectangle, ...items))
+				function draw((Rectangle rectangle, ...items))
 				{
 					return rectangle.width -> (...items);
 				}
 
-				iterator function draw(Button button)
+				function draw(Button button)
 				{
 					return drawButton(button);
 				}
 
-				iterator function draw((Button button, ...items))
+				function draw((Button button, ...items))
 				{
 					return drawButton(button) -> (...items);
 				}
@@ -1916,7 +1910,7 @@ class Tests : public QObject
 					return v + addend;
 				}
 
-				iterator function add(int addend, (int v, ...values))
+				function add(int addend, (int v, ...values))
 				{
 					return v + addend -> (addend, ...values);
 				}
@@ -2041,7 +2035,7 @@ class Tests : public QObject
 					return v with { value: v.value + addend };
 				}
 
-				iterator function add(int addend, (Element v, ...values))
+				function add(int addend, (Element v, ...values))
 				{
 					return v with { value: v.value + addend } -> (addend, ...values);
 				}
@@ -2159,6 +2153,33 @@ class Tests : public QObject
 			QCOMPARE(result, 21);
 		}
 
+		void scenario65()
+		{
+			auto result = exec(R"(
+				function add(int v1, int v2)
+				{
+					return v1 + v2;
+				}
+
+				function mul(int v1, int v2)
+				{
+					return v1 * v2;
+				}
+
+				function foo(int v1, int v2, function (int, int) fp)
+				{
+					return fp(v1, v2);
+				}
+
+				export int main()
+				{
+					return foo(3, 4, add) + foo(3, 4, mul);
+				}
+			)");
+
+			QCOMPARE(result, 19);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2224,6 +2245,7 @@ class Tests : public QObject
 		W_SLOT(scenario62)
 		W_SLOT(scenario63)
 		W_SLOT(scenario64)
+		W_SLOT(scenario65)
 
 	private:
 		DzCallable *compileFunction(std::string source)

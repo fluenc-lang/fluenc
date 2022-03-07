@@ -5,7 +5,7 @@
 #include "DzValue.h"
 
 class EntryPoint;
-class DzTypeName;
+class ITypeName;
 
 // TODO Create common interface (IIteratable?) for LazyValue and ArrayValue
 class LazyValue : public BaseValue

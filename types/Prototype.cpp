@@ -4,7 +4,7 @@
 
 Prototype::Prototype(const std::string &tag
 	, const std::vector<PrototypeFieldEmbryo> &fields
-	, const std::vector<DzTypeName *> &parentTypes
+	, const std::vector<ITypeName *> &parentTypes
 	)
 	: m_tag(tag)
 	, m_fields(fields)

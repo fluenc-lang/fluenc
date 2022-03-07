@@ -1,19 +1,17 @@
 #ifndef DZTYPENAME_H
 #define DZTYPENAME_H
 
-#include <llvm/IR/Type.h>
+#include "ITypeName.h"
 
 class EntryPoint;
 class Type;
 
-class DzTypeName
+class DzTypeName : public ITypeName
 {
 	public:
 		DzTypeName(const std::string &name);
 
-		std::string name() const;
-
-		Type *resolve(const EntryPoint &entryPoint) const;
+		Type *resolve(const EntryPoint &entryPoint) const override;
 
 		static DzTypeName *int32();
 		static DzTypeName *int64();

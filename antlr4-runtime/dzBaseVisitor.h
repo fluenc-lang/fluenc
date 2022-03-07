@@ -131,7 +131,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitTypeName(dzParser::TypeNameContext *ctx) override {
+  virtual antlrcpp::Any visitRegularType(dzParser::RegularTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFunctionType(dzParser::FunctionTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 

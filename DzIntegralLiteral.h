@@ -5,12 +5,12 @@
 
 #include "DzValue.h"
 
-class DzTypeName;
+class ITypeName;
 
 class DzIntegralLiteral : public DzValue
 {
 	public:
-		DzIntegralLiteral(DzValue *consumer, DzTypeName *type, const std::string &value);
+		DzIntegralLiteral(DzValue *consumer, ITypeName *type, const std::string &value);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
@@ -18,7 +18,7 @@ class DzIntegralLiteral : public DzValue
 		llvm::ConstantInt *getValue(llvm::Type *storageType) const;
 
 		DzValue *m_consumer;
-		DzTypeName *m_type;
+		ITypeName *m_type;
 
 		std::string m_value;
 };

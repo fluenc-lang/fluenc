@@ -4,7 +4,7 @@
 #include <string>
 
 class DzValue;
-class DzTypeName;
+class ITypeName;
 class Type;
 class EntryPoint;
 
@@ -13,7 +13,7 @@ class PrototypeFieldEmbryo
 	public:
 		PrototypeFieldEmbryo(const std::string &name
 			, const DzValue *defaultValue
-			, const DzTypeName *type
+			, const ITypeName *type
 			);
 
 		std::string name() const;
@@ -25,7 +25,7 @@ class PrototypeFieldEmbryo
 		std::string m_name;
 
 		const DzValue *m_defaultValue;
-		const DzTypeName *m_type;
+		const ITypeName *m_type;
 };
 
 #endif // PROTOTYPEFIELDEMBRYO_H

@@ -45,6 +45,7 @@
 #include "ReferenceSink.h"
 #include "IndexSink.h"
 #include "DzFunctionCallProxy.h"
+#include "FunctionTypeName.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -183,7 +184,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	{
 		auto import = new DzImportedFunction(name
 			, arguments
-			, visit<DzTypeName *>(context->typeName())
+			, visit<ITypeName *>(context->typeName())
 			);
 
 		return static_cast<DzCallable *>(import);
@@ -197,7 +198,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 		auto entryPoint = new DzExportedFunction(name
 			, visitor.visit<DzValue *>(block)
-			, visitor.visit<DzTypeName *>(context->typeName())
+			, visitor.visit<ITypeName *>(context->typeName())
 			);
 
 		return static_cast<DzCallable *>(entryPoint);
@@ -225,15 +226,33 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	return static_cast<DzCallable *>(function);
 }
 
-antlrcpp::Any VisitorV4::visitTypeName(dzParser::TypeNameContext *context)
+antlrcpp::Any VisitorV4::visitRegularType(dzParser::RegularTypeContext *context)
 {
-	return new DzTypeName(context->getText());
+	return static_cast<ITypeName *>(
+		new DzTypeName(context->getText())
+		);
+}
+
+antlrcpp::Any VisitorV4::visitFunctionType(dzParser::FunctionTypeContext *context)
+{
+	auto parameterTypes = context->typeName();
+
+	std::vector<const ITypeName *> types;
+
+	std::transform(begin(parameterTypes), end(parameterTypes), std::back_inserter(types), [this](auto typeName)
+	{
+		return visit<ITypeName *>(typeName);
+	});
+
+	return static_cast<ITypeName *>(
+		new FunctionTypeName(types)
+		);
 }
 
 antlrcpp::Any VisitorV4::visitStandardArgument(dzParser::StandardArgumentContext *context)
 {
 	auto argument = new DzArgument(context->ID()->getText()
-		, visit<DzTypeName *>(context->typeName())
+		, visit<ITypeName *>(context->typeName())
 		);
 
 	return static_cast<DzBaseArgument *>(argument);
@@ -470,11 +489,11 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 	{
 		auto name = field->ID()->getText();
 
-		DzTypeName *type = nullptr;
+		ITypeName *type = nullptr;
 
 		if (field->typeName())
 		{
-			type = visit<DzTypeName *>(field->typeName());
+			type = visit<ITypeName *>(field->typeName());
 		}
 
 		if (field->expression())
@@ -490,13 +509,13 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 		return { name, nullptr, type };
 	});
 
-	std::vector<DzTypeName *> parentTypes;
+	std::vector<ITypeName *> parentTypes;
 
 	auto parentTypeNames = context->typeName();
 
-	std::transform(begin(parentTypeNames), end(parentTypeNames), std::back_insert_iterator(parentTypes), [this](dzParser::TypeNameContext *typeName) -> DzTypeName *
+	std::transform(begin(parentTypeNames), end(parentTypeNames), std::back_insert_iterator(parentTypes), [this](dzParser::TypeNameContext *typeName) -> ITypeName *
 	{
-		return visit<DzTypeName *>(typeName);
+		return visit<ITypeName *>(typeName);
 	});
 
 	return new Prototype(name, fields, parentTypes);
@@ -513,7 +532,7 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 		return assignment->field()->ID()->getText();
 	});
 
-	auto typeName = visit<DzTypeName *>(context->typeName());
+	auto typeName = visit<ITypeName *>(context->typeName());
 
 	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
 	auto instantiation = new DzInstantiation(m_alpha

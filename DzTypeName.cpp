@@ -17,11 +17,6 @@ DzTypeName::DzTypeName(const std::string &name)
 {
 }
 
-std::string DzTypeName::name() const
-{
-	return m_name;
-}
-
 Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 {
 	if (m_name == "int")

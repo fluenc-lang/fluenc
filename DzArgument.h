@@ -5,14 +5,14 @@
 
 #include "DzBaseArgument.h"
 
-class DzTypeName;
+class ITypeName;
 class EntryPoint;
 class Type;
 
 class DzArgument : public DzBaseArgument
 {
 	public:
-		DzArgument(const std::string &name, DzTypeName *type);
+		DzArgument(const std::string &name, ITypeName *type);
 
 		std::string name() const;
 
@@ -21,7 +21,7 @@ class DzArgument : public DzBaseArgument
 	private:
 		std::string m_name;
 
-		DzTypeName *m_type;
+		ITypeName *m_type;
 };
 
 #endif // DZARGUMENT_H

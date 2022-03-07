@@ -8,7 +8,6 @@
 #include "DzValue.h"
 #include "DzTypeName.h"
 
-class DzTypeName;
 class DzAssignment;
 class IPrototypeProvider;
 

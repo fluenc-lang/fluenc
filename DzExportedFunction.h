@@ -3,14 +3,15 @@
 
 #include "DzCallable.h"
 
-class DzTypeName;
+class ITypeName;
 
 class DzExportedFunction : public DzCallable
 {
 	public:
-		DzExportedFunction(const std::string &name, DzValue *block, DzTypeName *returnType);
+		DzExportedFunction(const std::string &name, DzValue *block, ITypeName *returnType);
 
 		std::string name() const override;
+		std::vector<DzBaseArgument *> arguments() const override;
 
 		FunctionAttribute attribute() const override;
 
@@ -22,7 +23,7 @@ class DzExportedFunction : public DzCallable
 		std::string m_name;
 
 		DzValue *m_block;
-		DzTypeName *m_returnType;
+		ITypeName *m_returnType;
 };
 
 #endif // DZEXPORTEDFUNCTION_H

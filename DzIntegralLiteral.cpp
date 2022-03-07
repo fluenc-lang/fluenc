@@ -9,7 +9,7 @@
 
 #include "values/TypedValue.h"
 
-DzIntegralLiteral::DzIntegralLiteral(DzValue *consumer, DzTypeName *type, const std::string &value)
+DzIntegralLiteral::DzIntegralLiteral(DzValue *consumer, ITypeName *type, const std::string &value)
 	: m_consumer(consumer)
 	, m_type(type)
 	, m_value(value)

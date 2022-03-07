@@ -4,17 +4,18 @@
 #include "DzCallable.h"
 
 class DzBaseArgument;
-class DzTypeName;
+class ITypeName;
 
 class DzImportedFunction : public DzCallable
 {
 	public:
 		DzImportedFunction(const std::string &name
 			, const std::vector<DzBaseArgument *> &arguments
-			, DzTypeName *returnType
+			, ITypeName *returnType
 			);
 
 		std::string name() const override;
+		std::vector<DzBaseArgument *> arguments() const override;
 
 		FunctionAttribute attribute() const override;
 
@@ -26,7 +27,7 @@ class DzImportedFunction : public DzCallable
 		std::string m_name;
 		std::vector<DzBaseArgument *> m_arguments;
 
-		DzTypeName *m_returnType;
+		ITypeName *m_returnType;
 };
 
 #endif // DZIMPORTEDFUNCTION_H

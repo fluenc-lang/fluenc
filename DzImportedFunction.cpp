@@ -19,7 +19,7 @@
 
 DzImportedFunction::DzImportedFunction(const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
-	, DzTypeName *returnType
+	, ITypeName *returnType
 	)
 	: m_name(name)
 	, m_arguments(arguments)
@@ -30,6 +30,11 @@ DzImportedFunction::DzImportedFunction(const std::string &name
 std::string DzImportedFunction::name() const
 {
 	return m_name;
+}
+
+std::vector<DzBaseArgument *> DzImportedFunction::arguments() const
+{
+	return m_arguments;
 }
 
 FunctionAttribute DzImportedFunction::attribute() const

@@ -24,6 +24,7 @@ class DzFunction : public DzCallable
 			);
 
 		std::string name() const override;
+		std::vector<DzBaseArgument *> arguments() const override;
 
 		FunctionAttribute attribute() const override;
 

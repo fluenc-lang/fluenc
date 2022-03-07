@@ -4,14 +4,14 @@
 #include "IPrototype.h"
 #include "PrototypeFieldEmbryo.h"
 
-class DzTypeName;
+class ITypeName;
 
 class Prototype : public IPrototype
 {
 	public:
 		Prototype(const std::string &tag
 			, const std::vector<PrototypeFieldEmbryo> &fields
-			, const std::vector<DzTypeName *> &parentTypes
+			, const std::vector<ITypeName *> &parentTypes
 			);
 
 		const IPrototype *root() const override;
@@ -28,7 +28,7 @@ class Prototype : public IPrototype
 		std::string m_tag;
 
 		std::vector<PrototypeFieldEmbryo> m_fields;
-		std::vector<DzTypeName *> m_parentTypes;
+		std::vector<ITypeName *> m_parentTypes;
 };
 
 #endif // PROTOTYPE_H

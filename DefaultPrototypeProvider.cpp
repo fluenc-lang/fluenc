@@ -1,7 +1,7 @@
 #include "DefaultPrototypeProvider.h"
 #include "DzTypeName.h"
 
-DefaultPrototypeProvider::DefaultPrototypeProvider(DzTypeName *type)
+DefaultPrototypeProvider::DefaultPrototypeProvider(ITypeName *type)
 	: m_type(type)
 {
 }

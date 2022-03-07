@@ -3,17 +3,17 @@
 
 #include "IPrototypeProvider.h"
 
-class DzTypeName;
+class ITypeName;
 
 class DefaultPrototypeProvider : public IPrototypeProvider
 {
 	public:
-		DefaultPrototypeProvider(DzTypeName *type);
+		DefaultPrototypeProvider(ITypeName *type);
 
 		IPrototype *provide(const EntryPoint &entryPoint, Stack &values) override;
 
 	private:
-		DzTypeName *m_type;
+		ITypeName *m_type;
 };
 
 #endif // DEFAULTPROTOTYPEPROVIDER_H

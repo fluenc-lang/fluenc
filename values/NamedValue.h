@@ -6,7 +6,7 @@
 #include "BaseValue.h"
 #include "DzValue.h"
 
-class DzTypeName;
+class ITypeName;
 
 class NamedValue : public BaseValue
 {

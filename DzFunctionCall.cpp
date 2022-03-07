@@ -24,6 +24,7 @@
 #include "values/ArrayValue.h"
 #include "values/ExpandableValue.h"
 #include "values/LazyValue.h"
+#include "values/FunctionValue.h"
 
 #include "types/IteratorType.h"
 
@@ -108,12 +109,24 @@ std::vector<DzResult> DzFunctionCall::build(const EntryPoint &entryPoint, Stack 
 	return std::vector<DzResult>();
 }
 
-std::vector<DzResult> DzFunctionCall::regularCall(const EntryPoint &entryPoint, Stack values) const
+const DzCallable *DzFunctionCall::findFunction(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
-
 	auto functions = entryPoint.functions();
-	auto block = entryPoint.block();
+	auto locals = entryPoint.locals();
+
+	auto local = locals.find(m_name);
+
+	if (local != locals.end())
+	{
+		auto value = dynamic_cast<const FunctionValue *>(local->second);
+
+		if (!value)
+		{
+			throw new std::exception();
+		}
+
+		return value->function();
+	}
 
 	for (auto [i, end] = functions.equal_range(m_name); i != end; i++)
 	{
@@ -121,37 +134,56 @@ std::vector<DzResult> DzFunctionCall::regularCall(const EntryPoint &entryPoint, 
 
 		if (function->hasMatchingSignature(entryPoint, values))
 		{
-			auto functionBlock = llvm::BasicBlock::Create(*context);
-
-			linkBlocks(block, functionBlock);
-
-			auto functionEntryPoint = entryPoint
-				.withBlock(functionBlock);
-
-			if (function->attribute() == FunctionAttribute::Import)
-			{
-				return function->build(functionEntryPoint, values);
-			}
-
-			std::vector<DzResult> result;
-
-			auto functionResults = function->build(functionEntryPoint, values);
-
-			for (const auto &[lastEntryPoint, returnValue] : functionResults)
-			{
-				auto consumerBlock = llvm::BasicBlock::Create(*context);
-
-				linkBlocks(lastEntryPoint.block(), consumerBlock);
-
-				auto consumerEntryPoint = functionEntryPoint
-					.withDepth(lastEntryPoint.depth())
-					.withBlock(consumerBlock);
-
-				result.push_back({ consumerEntryPoint, returnValue });
-			}
-
-			return result;
+			return function;
 		}
+	}
+
+	return nullptr;
+}
+
+std::vector<DzResult> DzFunctionCall::regularCall(const EntryPoint &entryPoint, Stack values) const
+{
+	auto &context = entryPoint.context();
+
+	auto functions = entryPoint.functions();
+	auto locals = entryPoint.locals();
+
+	auto block = entryPoint.block();
+
+	auto function = findFunction(entryPoint, values);
+
+	if (function)
+	{
+		auto functionBlock = llvm::BasicBlock::Create(*context);
+
+		linkBlocks(block, functionBlock);
+
+		auto functionEntryPoint = entryPoint
+			.withBlock(functionBlock);
+
+		if (function->attribute() == FunctionAttribute::Import)
+		{
+			return function->build(functionEntryPoint, values);
+		}
+
+		std::vector<DzResult> result;
+
+		auto functionResults = function->build(functionEntryPoint, values);
+
+		for (const auto &[lastEntryPoint, returnValue] : functionResults)
+		{
+			auto consumerBlock = llvm::BasicBlock::Create(*context);
+
+			linkBlocks(lastEntryPoint.block(), consumerBlock);
+
+			auto consumerEntryPoint = functionEntryPoint
+				.withDepth(lastEntryPoint.depth())
+				.withBlock(consumerBlock);
+
+			result.push_back({ consumerEntryPoint, returnValue });
+		}
+
+		return result;
 	}
 
 	throw new std::exception(); // TODO

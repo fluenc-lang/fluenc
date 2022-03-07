@@ -14,7 +14,7 @@
 
 DzExportedFunction::DzExportedFunction(const std::string &name
 	, DzValue *block
-	, DzTypeName *returnType
+	, ITypeName *returnType
 	)
 	: m_name(name)
 	, m_block(block)
@@ -25,6 +25,11 @@ DzExportedFunction::DzExportedFunction(const std::string &name
 std::string DzExportedFunction::name() const
 {
 	return m_name;
+}
+
+std::vector<DzBaseArgument *> DzExportedFunction::arguments() const
+{
+	return std::vector<DzBaseArgument *>();
 }
 
 FunctionAttribute DzExportedFunction::attribute() const

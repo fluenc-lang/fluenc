@@ -77,7 +77,9 @@ public:
 
     virtual antlrcpp::Any visitTupleArgument(dzParser::TupleArgumentContext *context) = 0;
 
-    virtual antlrcpp::Any visitTypeName(dzParser::TypeNameContext *context) = 0;
+    virtual antlrcpp::Any visitRegularType(dzParser::RegularTypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitFunctionType(dzParser::FunctionTypeContext *context) = 0;
 
 
 };

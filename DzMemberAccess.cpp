@@ -10,6 +10,7 @@
 #include "values/LazyValue.h"
 #include "values/ReferenceValue.h"
 #include "values/ArrayValue.h"
+#include "values/FunctionValue.h"
 
 DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 	: m_consumer(consumer)
@@ -20,28 +21,40 @@ DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
 std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto locals = entryPoint.locals();
+	auto functions = entryPoint.functions();
 
-	auto iterator = locals.find(m_name);
+	auto localsIterator = locals.find(m_name);
 
-	if (iterator == locals.end())
+	if (localsIterator != locals.end())
 	{
-		throw new std::exception();
+		if (auto value = dynamic_cast<const ReferenceValue *>(localsIterator->second))
+		{
+			auto valueType = value->type();
+
+			IRBuilderEx builder(entryPoint);
+
+			auto load = builder.createLoad(*value, m_name);
+
+			values.push(new TypedValue { valueType, load });
+		}
+		else if (localsIterator->second)
+		{
+			values.push(localsIterator->second);
+		}
+
+		return m_consumer->build(entryPoint, values);
 	}
 
-	if (auto value = dynamic_cast<const ReferenceValue *>(iterator->second))
+	auto functionsIterator = functions.find(m_name);
+
+	if (functionsIterator != functions.end())
 	{
-		auto valueType = value->type();
+		auto value = new FunctionValue(functionsIterator->second, entryPoint);
 
-		IRBuilderEx builder(entryPoint);
+		values.push(value);
 
-		auto load = builder.createLoad(*value, m_name);
-
-		values.push(new TypedValue { valueType, load });
-	}
-	else if (iterator->second)
-	{
-		values.push(iterator->second);
+		return m_consumer->build(entryPoint, values);
 	}
 
-	return m_consumer->build(entryPoint, values);
+	throw new std::exception();
 }

@@ -42,7 +42,8 @@ class VisitorV4 : public dzBaseVisitor
 
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
-		antlrcpp::Any visitTypeName(dzParser::TypeNameContext *context) override;
+		antlrcpp::Any visitRegularType(dzParser::RegularTypeContext *context) override;
+		antlrcpp::Any visitFunctionType(dzParser::FunctionTypeContext *context) override;
 		antlrcpp::Any visitStandardArgument(dzParser::StandardArgumentContext *context) override;
 		antlrcpp::Any visitTupleArgument(dzParser::TupleArgumentContext *context) override;
 		antlrcpp::Any visitRet(dzParser::RetContext *context) override;

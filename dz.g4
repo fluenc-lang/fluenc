@@ -21,7 +21,9 @@ field
 	;
 	
 function 
-	: attribute=ID? typeName name=ID '(' (argument (',' argument)*)? ')' block?
+	: attribute='export' typeName name=ID '(' (argument (',' argument)*)? ')' block
+	| attribute='import' typeName name=ID '(' (argument (',' argument)*)? ')'
+	| 'function' name=ID '(' (argument (',' argument)*)? ')' block
 	;
 
 literal
@@ -69,7 +71,8 @@ argument
 	;
 
 typeName
-	: (ID | '...')
+	: (ID | '...') #regularType
+	| 'function' '(' (typeName (',' typeName)*) ')' #functionType
 	;
 	
 INT

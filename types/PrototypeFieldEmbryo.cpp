@@ -3,7 +3,7 @@
 
 PrototypeFieldEmbryo::PrototypeFieldEmbryo(const std::string &name
 	, const DzValue *defaultValue
-	, const DzTypeName *type
+	, const ITypeName *type
 	)
 	: m_name(name)
 	, m_defaultValue(defaultValue)

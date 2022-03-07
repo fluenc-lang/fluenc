@@ -38,6 +38,7 @@ SOURCES += \
 	DzTypeName.cpp \
 	DzValue.cpp \
 	EntryPoint.cpp \
+	FunctionTypeName.cpp \
 	IRBuilderEx.cpp \
 	IndexIterator.cpp \
 	IndexSink.cpp \
@@ -61,8 +62,10 @@ SOURCES += \
 	antlr4-runtime/dzLexer.cpp \
 	antlr4-runtime/dzParser.cpp \
 	antlr4-runtime/dzVisitor.cpp \
+	types/AnyType.cpp \
 	types/BooleanType.cpp \
 	types/ByteType.cpp \
+	types/FunctionType.cpp \
 	types/Int32Type.cpp \
 	types/Int64Type.cpp \
 	types/Prototype.cpp \
@@ -79,6 +82,7 @@ SOURCES += \
 	values/ArrayValue.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/FunctionValue.cpp \
 	values/LazyValue.cpp \
 	values/NamedValue.cpp \
 	values/ReferenceValue.cpp \
@@ -128,8 +132,10 @@ HEADERS += \
 	DzValue.h \
 	EntryPoint.h \
 	FunctionAttribute.h \
+	FunctionTypeName.h \
 	IPrototypeProvider.h \
 	IRBuilderEx.h \
+	ITypeName.h \
 	IndexIterator.h \
 	IndexSink.h \
 	Indexed.h \
@@ -155,9 +161,11 @@ HEADERS += \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \
 	antlr4-runtime/dzVisitor.h \
+	types/AnyType.h \
 	types/BooleanType.h \
 	types/BuiltinType.h \
 	types/ByteType.h \
+	types/FunctionType.h \
 	types/IPrototype.h \
 	types/Int32Type.h \
 	types/Int64Type.h \
@@ -178,6 +186,7 @@ HEADERS += \
 	values/BaseValue.h \
 	values/DependentValue.h \
 	values/ExpandableValue.h \
+	values/FunctionValue.h \
 	values/IndexedValue.h \
 	values/LazyValue.h \
 	values/NamedValue.h \

@@ -40,6 +40,11 @@ std::string DzFunction::name() const
 	return m_name;
 }
 
+std::vector<DzBaseArgument *> DzFunction::arguments() const
+{
+	return m_arguments;
+}
+
 FunctionAttribute DzFunction::attribute() const
 {
 	return m_attribute;

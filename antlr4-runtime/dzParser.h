@@ -15,8 +15,8 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    INT = 21, BOOL = 22, OP = 23, COMMENT = 24, STRING = 25, CHARACTER = 26, 
-    WS = 27, ID = 28
+    T__20 = 21, T__21 = 22, T__22 = 23, INT = 24, BOOL = 25, OP = 26, COMMENT = 27, 
+    STRING = 28, CHARACTER = 29, WS = 30, ID = 31
   };
 
   enum {
@@ -139,11 +139,10 @@ public:
     FunctionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     TypeNameContext *typeName();
-    std::vector<antlr4::tree::TerminalNode *> ID();
-    antlr4::tree::TerminalNode* ID(size_t i);
+    BlockContext *block();
+    antlr4::tree::TerminalNode *ID();
     std::vector<ArgumentContext *> argument();
     ArgumentContext* argument(size_t i);
-    BlockContext *block();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -444,12 +443,33 @@ public:
   class  TypeNameContext : public antlr4::ParserRuleContext {
   public:
     TypeNameContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *ID();
+   
+    TypeNameContext() = default;
+    void copyFrom(TypeNameContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
 
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  FunctionTypeContext : public TypeNameContext {
+  public:
+    FunctionTypeContext(TypeNameContext *ctx);
+
+    std::vector<TypeNameContext *> typeName();
+    TypeNameContext* typeName(size_t i);
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
+  };
+
+  class  RegularTypeContext : public TypeNameContext {
+  public:
+    RegularTypeContext(TypeNameContext *ctx);
+
+    antlr4::tree::TerminalNode *ID();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   TypeNameContext* typeName();

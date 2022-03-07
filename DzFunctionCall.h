@@ -19,6 +19,8 @@ class DzFunctionCall : public DzValue
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		const DzCallable *findFunction(const EntryPoint &entryPoint, Stack values) const;
+
 		template<typename Container>
 		const EntryPoint *findTailCallTarget(const EntryPoint *candidate, Container container) const
 		{
