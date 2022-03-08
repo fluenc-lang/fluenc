@@ -68,6 +68,7 @@ class VisitorV4 : public dzBaseVisitor
 		antlrcpp::Any visitArray(dzParser::ArrayContext *context) override;
 		antlrcpp::Any visitCharLiteral(dzParser::CharLiteralContext *context) override;
 		antlrcpp::Any visitByteLiteral(dzParser::ByteLiteralContext *context) override;
+		antlrcpp::Any visitLocal(dzParser::LocalContext *context) override;
 
 		template<typename T>
 		T visit(antlr4::tree::ParseTree *tree)

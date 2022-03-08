@@ -46,6 +46,7 @@
 #include "IndexSink.h"
 #include "DzFunctionCallProxy.h"
 #include "FunctionTypeName.h"
+#include "DzLocal.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -690,4 +691,15 @@ antlrcpp::Any VisitorV4::visitByteLiteral(dzParser::ByteLiteralContext *context)
 		);
 
 	return static_cast<DzValue *>(constant);
+}
+
+antlrcpp::Any VisitorV4::visitLocal(dzParser::LocalContext *context)
+{
+	auto local = new DzLocal(m_alpha
+		, context->ID()->getText()
+		);
+
+	VisitorV4 visitor(m_iteratorType, local, nullptr);
+
+	return visitor.visit<DzValue *>(context->expression());
 }

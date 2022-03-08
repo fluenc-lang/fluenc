@@ -61,6 +61,8 @@ public:
 
     virtual antlrcpp::Any visitMember(dzParser::MemberContext *context) = 0;
 
+    virtual antlrcpp::Any visitLocal(dzParser::LocalContext *context) = 0;
+
     virtual antlrcpp::Any visitInstantiation(dzParser::InstantiationContext *context) = 0;
 
     virtual antlrcpp::Any visitGroup(dzParser::GroupContext *context) = 0;

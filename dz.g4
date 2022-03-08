@@ -51,6 +51,7 @@ expression
 	| '[' expression? (',' expression)* ']'				#array
 	| '(' expression ')'								#group
 	| '...' expression									#expansion
+	| 'let' ID '=' expression							#local
 	;
 
 continuation

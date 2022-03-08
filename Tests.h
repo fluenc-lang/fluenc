@@ -2246,6 +2246,40 @@ class Tests : public QObject
 			QCOMPARE(result, 19);
 		}
 
+		void scenario67()
+		{
+			auto result = exec(R"(
+				function sum(int product, int value)
+				{
+					return product + value;
+				}
+
+				function sum(int product, (int value, ...values))
+				{
+					return sum(product + value, ...values);
+				}
+
+				function foo(int product, int value)
+				{
+					return product + value;
+				}
+
+				function foo(int product, (int value, ...values))
+				{
+					let result = product + value;
+
+					return result -> (result, ...values);
+				}
+
+				export int main()
+				{
+					return sum(0, foo(0, [1, 2, 3]));
+				}
+			)");
+
+			QCOMPARE(result, 10);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2313,6 +2347,7 @@ class Tests : public QObject
 		W_SLOT(scenario64)
 		W_SLOT(scenario65)
 		W_SLOT(scenario66)
+		W_SLOT(scenario67)
 
 	private:
 		DzCallable *compileFunction(std::string source)

@@ -15,8 +15,9 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, T__21 = 22, T__22 = 23, INT = 24, BOOL = 25, OP = 26, COMMENT = 27, 
-    STRING = 28, CHARACTER = 29, WS = 30, ID = 31
+    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, INT = 26, 
+    BOOL = 27, OP = 28, COMMENT = 29, STRING = 30, CHARACTER = 31, WS = 32, 
+    ID = 33
   };
 
   enum {
@@ -325,6 +326,16 @@ public:
     std::vector<antlr4::tree::TerminalNode *> ID();
     antlr4::tree::TerminalNode* ID(size_t i);
     WithContext *with();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  LocalContext : public ExpressionContext {
+  public:
+    LocalContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *ID();
+    ExpressionContext *expression();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
