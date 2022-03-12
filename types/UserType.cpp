@@ -1,6 +1,7 @@
 #include <sstream>
 #include <numeric>
 
+#include "AnyType.h"
 #include "UserType.h"
 #include "Utility.h"
 
@@ -51,6 +52,11 @@ llvm::Type *UserType::storageType(llvm::LLVMContext &context) const
 
 bool UserType::is(const Type *type, const EntryPoint &entryPoint) const
 {
+	if (dynamic_cast<const AnyType *>(type))
+	{
+		return true;
+	}
+
 	return m_prototype->is(type, entryPoint);
 }
 

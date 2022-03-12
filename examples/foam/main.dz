@@ -86,7 +86,8 @@ struct Item
 
 struct Button : Item
 {
-    text
+    text,
+    onClicked: nothing
 };
 
 struct Color
@@ -122,8 +123,9 @@ struct EventState
 
 struct ApplicationState
 {
-    events,
-    user
+    events: nothing,
+    user,
+    ui: nothing
 };
 
 function createEventState()
@@ -155,7 +157,7 @@ function rgb(int r, int g, int b)
     };
 }
 
-function buttonTemplate(Button button)
+function defaultTemplate(Button button)
 {
     return ControlTemplate
     {
@@ -206,6 +208,32 @@ function buttonTemplate(Button button)
     };
 }
 
+function invoke(without callback, State state)
+{
+    return state;
+}
+
+function invoke(function (State) callback, State state)
+{
+    return callback(state);
+}
+
+function increaseCounter(State state)
+{
+    return state with
+    {
+        counter: state.counter + 1
+    };
+}
+
+function decreaseCounter(State state)
+{
+    return state with
+    {
+        counter: state.counter - 1
+    };
+}
+
 function application(State state)
 {
     return [
@@ -239,7 +267,8 @@ function application(State state)
                     y: 110,
                     width: 70,
                     height: 30,
-                    text: "Click me!"
+                    text: "Click me!",
+                    onClicked: decreaseCounter
                 },
                 Button
                 {
@@ -247,7 +276,8 @@ function application(State state)
                     y: 110,
                     width: 70,
                     height: 30,
-                    text: "Click me!"
+                    text: "Click me!",
+                    onClicked: increaseCounter
                 }
             ]
         }
@@ -263,14 +293,6 @@ function boundingRect(Item item)
         width: item.width,
         height: item.height
     };
-}
-
-function clear(long renderer, State state)
-{
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-
-    return state;
 }
 
 function present(long renderer, State state)
@@ -305,16 +327,14 @@ function iterate(without item)
     return nothing;
 }
 
+function iterate(any item)
+{
+    return item;
+}
+
 function iterate((any item, ...items))
 {
     return iterate(...items);
-}
-
-function drawButton(long renderer, State state, Button button)
-{
-    iterate(draw(renderer, state, selectTemplate(buttonTemplate(button), button)));
-
-    return button;
 }
 
 function containsMouse(Item item, SDL_MouseMotionEvent motion)
@@ -329,6 +349,12 @@ function isPressed(SDL_MouseButtonEvent button)
 {
     return button.type == SDL_MOUSEBUTTONDOWN;
 }
+
+struct ItemState
+{
+    item,
+    state
+};
 
 function updateButton(EventState events, Button button)
 {
@@ -354,6 +380,21 @@ function updateButton(EventState events, Button button)
     };
 }
 
+function processButton(EventState events, State state, Button button)
+{
+    if (containsMouse(button, events.motion))
+    {
+        if (isPressed(events.button))
+        {
+            return invoke(button.onClicked, state);
+        }
+
+        return state;
+    }
+
+    return state;
+}
+
 function update(ApplicationState state, Rectangle rectangle)
 {
     return rectangle with
@@ -372,38 +413,50 @@ function update(ApplicationState state, (Button button, ...controls))
     return updateButton(state.events, button) -> (state, ...controls);
 }
 
-function draw(long renderer, State state, without item)
+function process(ApplicationState state, Rectangle rectangle)
+{
+    return process(state, rectangle.children);
+}
+
+function process(ApplicationState state, Button button)
+{
+    return processButton(state.events, state.user, button);
+}
+
+function process(ApplicationState state, (Button button, ...controls))
+{
+    let as = state with
+    {
+        user: processButton(state.events, state.user, button)
+    };
+
+    return process(as, ...controls);
+}
+
+function draw(long renderer, without item)
 {
     return nothing;
 }
 
-function draw(long renderer, State state, Rectangle rectangle)
+function draw(long renderer, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
     SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
-    return draw(renderer, state, rectangle.children);
+    return draw(renderer, rectangle.children);
 }
 
-function draw(long renderer, State state, Button button)
+function draw(long renderer, Button button)
 {
-    return drawButton(renderer, state, button);
+    return draw(renderer, selectTemplate(defaultTemplate(button), button));
 }
 
-function draw(long renderer, State state, (Button button, ...controls))
+function draw(long renderer, (any item, ...controls))
 {
-    return drawButton(renderer, state, button) -> (renderer, state, ...controls);
-}
+    draw(renderer, item);
 
-function run(State state, Item item)
-{
-    return state;
-}
-
-function run(State state, (Item item, ...items))
-{
-    return run(state, ...items);
+    return draw(renderer, ...controls);
 }
 
 function initState()
@@ -411,19 +464,20 @@ function initState()
     return State {};
 }
 
-function mainLoop(long renderer, State state)
+function mainLoop(long renderer, any state)
 {
+    let ui = application(state);
+    let as = createApplicationState(state);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    draw(renderer, ui);
+
+    SDL_RenderPresent(renderer);
+
     return mainLoop(renderer
-        , present(renderer
-            , run(state
-                , draw(renderer
-                    , clear(renderer, state)
-                    , update(createApplicationState(state)
-                        , application(state)
-                        )
-                    )
-                )
-            )
+        , process(as, ui)
         );
 }
 
@@ -431,9 +485,10 @@ export int main()
 {
     SDL_Init(SDL_INIT_VIDEO);
 
-    return mainLoop(
-        SDL_CreateRenderer(
-            SDL_CreateWindow("test", 0, 0, 800, 600, 0), 0, 0)
-            , initState()
+    let window = SDL_CreateWindow("test", 0, 0, 800, 600, 0);
+    let renderer = SDL_CreateRenderer(window, 0, 0);
+
+    return mainLoop(renderer
+        , initState()
         );
 }
