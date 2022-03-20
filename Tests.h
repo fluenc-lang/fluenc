@@ -2280,6 +2280,48 @@ class Tests : public QObject
 			QCOMPARE(result, 10);
 		}
 
+		void scenario68()
+		{
+			auto result = exec(R"(
+				function add(int left, int right)
+				{
+					return left + right;
+				}
+
+				function add((int left, ...lefts), (int right, ...rights))
+				{
+					return left + right -> (...lefts, ...rights);
+				}
+
+				function add((int left, ...lefts), int right)
+				{
+					return left + right;
+				}
+
+				function add(int left, (int right, ...rights))
+				{
+					return left + right;
+				}
+
+				function sum(int product, int value)
+				{
+					return product + value;
+				}
+
+				function sum(int product, (int value, ...values))
+				{
+					return sum(product + value, ...values);
+				}
+
+				export int main()
+				{
+					return sum(0, add([1, 2, 3], [4, 5, 6]));
+				}
+			)");
+
+			QCOMPARE(result, 21);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2348,6 +2390,7 @@ class Tests : public QObject
 		W_SLOT(scenario65)
 		W_SLOT(scenario66)
 		W_SLOT(scenario67)
+		W_SLOT(scenario68)
 
 	private:
 		DzCallable *compileFunction(std::string source)

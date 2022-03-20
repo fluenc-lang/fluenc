@@ -24,11 +24,20 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	}
 	else if (auto reference = dynamic_cast<const ReferenceValue *>(value))
 	{
+		auto referenceStorage = dynamic_cast<const ReferenceValue *>(storage);
+
+		if (!referenceStorage)
+		{
+			// TODO: This will be fixed when array transfer is O(N)
+
+			return entryPoint;
+		}
+
 		IRBuilderEx builder(entryPoint);
 
 		auto load = builder.createLoad(*reference);
 
-		builder.createStore(load, *dynamic_cast<const ReferenceValue *>(storage));
+		builder.createStore(load, *referenceStorage);
 	}
 	else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 	{

@@ -6,6 +6,9 @@
 #include "IRBuilderEx.h"
 #include "LazyValue.h"
 #include "ValueHelper.h"
+#include "IteratorValue.h"
+#include "LazyEvaluation.h"
+#include "DzTerminator.h"
 
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
@@ -22,7 +25,7 @@ ArrayValue::ArrayValue(const EntryPoint &entryPoint
 {
 }
 
-std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint, const Stack &values) const
+std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint) const
 {
 	auto block = entryPoint.block();
 
@@ -50,31 +53,13 @@ std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint, const Stac
 
 	std::vector<DzResult> results;
 
-	for (auto [elementEntryPoint, elementValues] : m_values)
+	for (auto [_, elementValues] : m_values)
 	{
 		elementValues.push(new TypedValue { indexType, index });
 
-		auto arrayBlock = llvm::BasicBlock::Create(*context);
+		auto iterator = new IteratorValue(m_iterator, elementValues);
 
-		linkBlocks(block, arrayBlock);
-
-		auto iteratorEntryPoint = entryPoint
-			.withBlock(arrayBlock)
-			.withName("__array")
-			.markEntry()
-			;
-
-		for (auto &[resultEntryPoint, resultValues] : m_iterator->build(iteratorEntryPoint, elementValues))
-		{
-			auto forwardedValues = values;
-
-			for (auto &value : resultValues)
-			{
-				forwardedValues.push(value);
-			}
-
-			results.push_back({ resultEntryPoint, forwardedValues });
-		}
+		results.push_back({ entryPoint, iterator });
 	}
 
 	return results;
@@ -108,7 +93,9 @@ EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const ArrayValue
 
 	auto exitBlock = llvm::BasicBlock::Create(*context);
 
-	for (auto &[sourceEntryPoint, sourceValues] : source->build(entryPoint, Stack()))
+	auto evaluationHack = new LazyEvaluation(DzTerminator::instance());
+
+	for (auto &[sourceEntryPoint, sourceValues] : evaluationHack->build(entryPoint, source))
 	{
 		auto sourceBlock = sourceEntryPoint.block();
 
@@ -143,24 +130,20 @@ EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const ArrayValue
 
 					if (!sourceTupleValue)
 					{
-						linkBlocks(targetBlock, targetIteratorEntry);
+						linkBlocks(targetBlock, sourceBlock);
 					}
 					else
 					{
 						auto targetTupleValues = targetTupleValue->values();
 						auto sourceTupleValues = sourceTupleValue->values();
 
-						auto targetAddress = targetTupleValues.require<ReferenceValue>();
+						ValueHelper::transferValue(targetEntryPoint
+							, sourceTupleValues.pop()
+							, targetTupleValues.pop()
+							);
+
 						auto targetContinuation = targetTupleValues.require<ExpandableValue>();
-
-						auto sourceAddress = sourceTupleValues.require<ReferenceValue>();
 						auto sourceContinuation = sourceTupleValues.require<ExpandableValue>();
-
-						IRBuilderEx builder(targetEntryPoint);
-
-						auto load = builder.createLoad(*sourceAddress);
-
-						builder.createStore(load, *targetAddress);
 
 						auto sourceChain = sourceContinuation->chain();
 						auto targetChain = targetContinuation->chain();
@@ -181,47 +164,31 @@ EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const ArrayValue
 						}
 					}
 				}
-				else if (auto targetAddress = dynamic_cast<const ReferenceValue *>(targetValue))
+				else if (auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue))
 				{
-					auto sourceAddress = dynamic_cast<const ReferenceValue *>(sourceValue);
+					auto sourceTupleValues = sourceTupleValue->values();
 
-					if (!sourceAddress)
+					auto continuation = sourceTupleValues
+						.discard()
+						.require<ExpandableValue>();
+
+					auto chain = continuation->chain();
+					auto provider = continuation->provider();
+
+					auto continuationEntryPoint = provider->withBlock(targetBlock);
+
+					for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
 					{
-						auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+						auto loopTarget = chainEntryPoint.entry();
 
-						if (!sourceTupleValue)
-						{
-							throw new std::exception();
-						}
-
-						auto sourceTupleValues = sourceTupleValue->values();
-
-						auto continuation = sourceTupleValues
-							.discard()
-							.require<ExpandableValue>();
-
-						auto chain = continuation->chain();
-						auto provider = continuation->provider();
-
-						auto continuationEntryPoint = provider->withBlock(targetBlock);
-
-						for (auto &[chainEntryPoint, _] : chain->build(continuationEntryPoint, Stack()))
-						{
-							auto loopTarget = chainEntryPoint.entry();
-
-							linkBlocks(targetBlock, loopTarget->block());
-						}
+						linkBlocks(targetBlock, loopTarget->block());
 					}
-					else
-					{
-						IRBuilderEx builder(targetEntryPoint);
+				}
+				else
+				{
+					ValueHelper::transferValue(targetEntryPoint, sourceValue, targetValue);
 
-						auto load = builder.createLoad(*sourceAddress);
-
-						builder.createStore(load, *targetAddress);
-
-						linkBlocks(targetEntryPoint.block(), exitBlock);
-					}
+					linkBlocks(targetBlock, exitBlock);
 				}
 			}
 		}
@@ -260,7 +227,7 @@ EntryPoint ArrayValue::assignFrom(const EntryPoint &entryPoint, const LazyValue 
 
 	auto exitBlock = llvm::BasicBlock::Create(*context);
 
-	for (auto &[sourceEntryPoint, sourceValues] : source->build(block, Stack()))
+	for (auto &[sourceEntryPoint, sourceValues] : source->build(entryPoint, Stack()))
 	{
 		auto sourceBlock = sourceEntryPoint.block();
 

@@ -53,7 +53,7 @@ std::vector<DzResult> DzFunctionCallProxy::regularCall(const EntryPoint &entryPo
 std::vector<DzResult> DzFunctionCallProxy::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto tailCallCandidate = entryPoint
-			.byName(m_name);
+		.byName(m_name);
 
 	if (!tailCallCandidate)
 	{

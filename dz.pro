@@ -84,6 +84,7 @@ SOURCES += \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
 	values/FunctionValue.cpp \
+	values/IteratorValue.cpp \
 	values/LazyValue.cpp \
 	values/NamedValue.cpp \
 	values/ReferenceValue.cpp \
@@ -190,6 +191,7 @@ HEADERS += \
 	values/ExpandableValue.h \
 	values/FunctionValue.h \
 	values/IndexedValue.h \
+	values/IteratorValue.h \
 	values/LazyValue.h \
 	values/NamedValue.h \
 	values/ReferenceValue.h \

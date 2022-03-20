@@ -365,8 +365,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 
 	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [this](dzParser::ExpressionContext *parameter)
 	{
-		auto evaluation = new LazyEvaluation(DzTerminator::instance());
-		auto sink = new ReferenceSink(evaluation);
+		auto sink = new ReferenceSink(DzTerminator::instance());
 
 		VisitorV4 visitor(m_iteratorType, sink, nullptr);
 
@@ -374,7 +373,8 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 			.visit<DzValue *>(parameter);
 	});
 
-	auto segment = new StackSegment(values, call, DzTerminator::instance());
+	auto evaluation = new LazyEvaluation(call);
+	auto segment = new StackSegment(values, evaluation, DzTerminator::instance());
 	auto proxy = new DzFunctionCallProxy(name, m_alpha, segment);
 
 	return static_cast<DzValue *>(proxy);

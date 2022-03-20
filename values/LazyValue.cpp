@@ -16,13 +16,22 @@ LazyValue::LazyValue(const Stack &values
 {
 }
 
-std::vector<DzResult> LazyValue::build(llvm::BasicBlock *block, const Stack &values) const
+std::vector<DzResult> LazyValue::build(const EntryPoint &entryPoint, const Stack &values) const
 {
 	UNUSED(values);
 
-	auto entryPoint = m_entryPoint->withBlock(block);
+	auto locals = entryPoint.locals();
 
-	return m_subject->build(entryPoint, m_values);
+	for (auto &[key, value] : m_entryPoint->locals())
+	{
+		locals[key] = value;
+	}
+
+	auto ep = (*m_entryPoint)
+		.withBlock(entryPoint.block())
+		.withLocals(locals);
+
+	return m_subject->build(ep, m_values);
 }
 
 const Type *LazyValue::type() const

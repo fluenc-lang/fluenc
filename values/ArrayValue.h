@@ -15,7 +15,7 @@ class ArrayValue : public BaseValue
 			, const std::vector<DzResult> &values
 			);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, const Stack &values) const;
+		std::vector<DzResult> build(const EntryPoint &entryPoint) const;
 
 		EntryPoint assignFrom(const EntryPoint &entryPoint, const ArrayValue *source) const;
 		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;

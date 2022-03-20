@@ -17,7 +17,7 @@ class LazyValue : public BaseValue
 			, const DzValue *subject
 			);
 
-		std::vector<DzResult> build(llvm::BasicBlock *block, const Stack &values) const;
+		std::vector<DzResult> build(const EntryPoint &entryPoint, const Stack &values) const;
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
