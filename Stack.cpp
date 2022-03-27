@@ -5,6 +5,11 @@ Stack::Stack(const std::vector<const BaseValue *> &values)
 {
 }
 
+Stack::Stack(const BaseValue *value)
+	: m_values({ value })
+{
+}
+
 size_t Stack::size() const
 {
 	return m_values.size();
