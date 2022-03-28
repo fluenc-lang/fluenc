@@ -58,17 +58,11 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 				);
 		});
 	}
-	else if (auto arrayValue = dynamic_cast<const ArrayValue *>(value))
-	{
-		auto arrayStorage = dynamic_cast<const ArrayValue *>(storage);
-
-		return arrayStorage->assignFrom(entryPoint, arrayValue);
-	}
 	else if (auto lazyValue = dynamic_cast<const LazyValue *>(value))
 	{
-		auto arrayStorage = dynamic_cast<const ArrayValue *>(storage);
+		auto lazyStorage = dynamic_cast<const LazyValue *>(storage);
 
-		return arrayStorage->assignFrom(entryPoint, lazyValue);
+		return lazyStorage->assignFrom(entryPoint, lazyValue);
 	}
 
 	return entryPoint;

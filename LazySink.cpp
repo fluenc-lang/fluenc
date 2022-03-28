@@ -1,6 +1,7 @@
 #include "LazySink.h"
 
 #include "values/LazyValue.h"
+#include "values/IteratorValueGenerator.h"
 
 LazySink::LazySink(const Type *iteratorType
 	, const DzValue *consumer
@@ -14,11 +15,8 @@ LazySink::LazySink(const Type *iteratorType
 
 std::vector<DzResult> LazySink::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto lazy = new LazyValue(Stack()
-		, entryPoint
-		, m_iteratorType
-		, m_subject
-		);
+	auto generator = new IteratorValueGenerator(m_subject, entryPoint);
+	auto lazy = new LazyValue(id(), generator);
 
 	values.push(lazy);
 

@@ -3,29 +3,24 @@
 
 #include "BaseValue.h"
 #include "DzValue.h"
+#include "IIteratable.h"
 
+class IteratorValue;
+class TypedValue;
 class LazyValue;
 
-class ArrayValue : public BaseValue
+class ArrayValue : public IIteratable
 {
 	public:
-		ArrayValue(const EntryPoint &entryPoint
-			, const Type *iteratorType
+		ArrayValue(const TypedValue *index
 			, const DzValue *iterator
 			, const std::vector<DzResult> &values
 			);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint) const;
-
-		EntryPoint assignFrom(const EntryPoint &entryPoint, const ArrayValue *source) const;
-		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;
-
-		const Type *type() const override;
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
 
 	private:
-		const EntryPoint *m_entryPoint;
-		const Type *m_iteratorType;
+		const TypedValue *m_index;
 		const DzValue *m_iterator;
 
 		const std::vector<DzResult> m_values;

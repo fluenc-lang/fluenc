@@ -3,6 +3,7 @@
 #include "DzCallable.h"
 
 #include "values/LazyValue.h"
+#include "values/IteratorValueGenerator.h"
 
 #include "types/IteratorType.h"
 
@@ -25,11 +26,8 @@ std::vector<DzResult> DzFunctionCallProxy::regularCall(const EntryPoint &entryPo
 		// Naive. Really naive.
 		if (function->attribute() == FunctionAttribute::Iterator)
 		{
-			auto lazy = new LazyValue(Stack()
-				, entryPoint
-				, IteratorType::instance()
-				, m_subject
-				);
+			auto generator = new IteratorValueGenerator(m_subject, entryPoint);
+			auto lazy = new LazyValue(LazyValue::NoCache, generator);
 
 			values.push(lazy);
 

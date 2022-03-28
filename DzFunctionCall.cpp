@@ -23,7 +23,7 @@
 #include "values/NamedValue.h"
 #include "values/ArrayValue.h"
 #include "values/ExpandableValue.h"
-#include "values/LazyValue.h"
+#include "values/IteratorValue.h"
 #include "values/FunctionValue.h"
 
 #include "types/IteratorType.h"

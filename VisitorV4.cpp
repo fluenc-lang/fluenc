@@ -53,7 +53,7 @@
 
 #include "values/TypedValue.h"
 #include "values/ReferenceValue.h"
-#include "values/LazyValue.h"
+#include "values/IteratorValue.h"
 #include "values/TaintedValue.h"
 #include "values/ArrayValue.h"
 #include "values/IndexedValue.h"

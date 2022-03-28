@@ -3,23 +3,23 @@
 
 #include "BaseValue.h"
 #include "DzValue.h"
+#include "IIteratable.h"
 
 class EntryPoint;
+class ITypeName;
 
-class IteratorValue : public BaseValue
+class IteratorValue : public IIteratable
 {
 	public:
-		IteratorValue(const DzValue *iterator, const Stack &values);
+		IteratorValue(const EntryPoint *entryPoint
+			, const DzValue *subject
+			);
 
-		const Type *type() const override;
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
-
-		std::vector<DzResult> build(const EntryPoint &entryPoint) const;
+		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
 
 	private:
-		const DzValue *m_iterator;
-
-		Stack m_values;
+		const EntryPoint *m_entryPoint;
+		const DzValue *m_subject;
 };
 
 #endif // ITERATORVALUE_H

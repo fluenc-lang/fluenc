@@ -1,6 +1,7 @@
 #include "ArraySink.h"
 
-#include "values/ArrayValue.h"
+#include "values/LazyValue.h"
+#include "values/ArrayValueGenerator.h"
 
 ArraySink::ArraySink(const Type *iteratorType
 	, const DzValue *consumer
@@ -18,11 +19,8 @@ std::vector<DzResult> ArraySink::build(const EntryPoint &entryPoint, Stack value
 {
 	auto arrayContents = m_firstValue->build(entryPoint, Stack());
 
-	auto lazy = new ArrayValue(entryPoint
-		, m_iteratorType
-		, m_iterator
-		, arrayContents
-		);
+	auto generator = new ArrayValueGenerator(m_iterator, arrayContents);
+	auto lazy = new LazyValue(id(), generator);
 
 	values.push(lazy);
 

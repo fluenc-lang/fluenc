@@ -1,50 +1,29 @@
 #include "IteratorValue.h"
+#include "EntryPoint.h"
+#include "DzTypeName.h"
 
 #include "types/IteratorType.h"
 
-IteratorValue::IteratorValue(const DzValue *iterator, const Stack &values)
-	: m_iterator(iterator)
-	, m_values(values)
+IteratorValue::IteratorValue(const EntryPoint *entryPoint
+	, const DzValue *subject
+	)
+	: m_entryPoint(entryPoint)
+	, m_subject(subject)
 {
-}
-
-const Type *IteratorValue::type() const
-{
-	return IteratorType::instance(); // Idk
-}
-
-const BaseValue *IteratorValue::clone(const EntryPoint &entryPoint) const
-{
-	UNUSED(entryPoint);
-
-	return this;
 }
 
 std::vector<DzResult> IteratorValue::build(const EntryPoint &entryPoint) const
 {
-	auto &context = entryPoint.context();
+	auto locals = entryPoint.locals();
 
-	auto block = entryPoint.block();
-	auto function = entryPoint.function();
-
-	insertBlock(block, function);
-
-	auto arrayBlock = llvm::BasicBlock::Create(*context);
-
-	linkBlocks(block, arrayBlock);
-
-	auto iteratorEntryPoint = entryPoint
-		.withBlock(arrayBlock)
-		.withName("__array")
-		.markEntry()
-		;
-
-	std::vector<DzResult> results;
-
-	for (auto &result : m_iterator->build(iteratorEntryPoint, m_values))
+	for (auto &[key, value] : m_entryPoint->locals())
 	{
-		results.push_back(result);
+		locals[key] = value;
 	}
 
-	return results;
+	auto ep = (*m_entryPoint)
+		.withBlock(entryPoint.block())
+		.withLocals(locals);
+
+	return m_subject->build(ep, Stack());
 }

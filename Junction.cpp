@@ -16,7 +16,7 @@
 #include "values/ExpandableValue.h"
 #include "values/NamedValue.h"
 #include "values/ReferenceValue.h"
-#include "values/LazyValue.h"
+#include "values/IteratorValue.h"
 #include "values/WithoutValue.h"
 
 Junction::Junction(DzValue *subject)

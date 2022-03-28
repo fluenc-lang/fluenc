@@ -4,30 +4,29 @@
 #include "BaseValue.h"
 #include "DzValue.h"
 
-class EntryPoint;
-class ITypeName;
+class ILazyValueGenerator;
+class IIteratable;
 
-// TODO Create common interface (IIteratable?) for LazyValue and ArrayValue
 class LazyValue : public BaseValue
 {
 	public:
-		LazyValue(const Stack &values
-			, const EntryPoint &entryPoint
-			, const Type *iteratorType
-			, const DzValue *subject
-			);
+		static const size_t NoCache = -1;
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, const Stack &values) const;
+		LazyValue(size_t id, ILazyValueGenerator *generator);
+
+		size_t id() const;
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
-	private:
-		const Stack m_values;
+		IIteratable *generate(const EntryPoint &entryPoint) const;
 
-		const EntryPoint *m_entryPoint;
-		const Type *m_iteratorType;
-		const DzValue *m_subject;
+		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;
+
+	private:
+		size_t m_id;
+
+		ILazyValueGenerator *m_generator;
 };
 
 #endif // LAZYVALUE_H

@@ -81,10 +81,12 @@ SOURCES += \
 	types/WithPrototype.cpp \
 	types/WithoutType.cpp \
 	values/ArrayValue.cpp \
+	values/ArrayValueGenerator.cpp \
 	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
 	values/FunctionValue.cpp \
 	values/IteratorValue.cpp \
+	values/IteratorValueGenerator.cpp \
 	values/LazyValue.cpp \
 	values/NamedValue.cpp \
 	values/ReferenceValue.cpp \
@@ -186,12 +188,16 @@ HEADERS += \
 	types/WithPrototype.h \
 	types/WithoutType.h \
 	values/ArrayValue.h \
+	values/ArrayValueGenerator.h \
 	values/BaseValue.h \
 	values/DependentValue.h \
 	values/ExpandableValue.h \
 	values/FunctionValue.h \
+	values/IIteratable.h \
+	values/ILazyValueGenerator.h \
 	values/IndexedValue.h \
 	values/IteratorValue.h \
+	values/IteratorValueGenerator.h \
 	values/LazyValue.h \
 	values/NamedValue.h \
 	values/ReferenceValue.h \
