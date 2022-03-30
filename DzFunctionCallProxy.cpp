@@ -83,15 +83,5 @@ std::vector<DzResult> DzFunctionCallProxy::build(const EntryPoint &entryPoint, S
 
 	// Tail call
 
-	std::vector<DzResult> results;
-
-	for (auto &[subjectEntryPoint, subjectValues] : m_subject->build(entryPoint, values))
-	{
-		for (auto &consumerResult : m_consumer->build(subjectEntryPoint, subjectValues))
-		{
-			results.push_back(consumerResult);
-		}
-	}
-
-	return results;
+	return m_subject->build(entryPoint, values);
 }

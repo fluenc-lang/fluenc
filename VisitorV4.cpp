@@ -139,7 +139,10 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		throw new std::exception();
 	}
 
-	return new ModuleInfo(std::move(module), std::move(llvmContext));
+	return new ModuleInfo(entryPoint
+		, std::move(module)
+		, std::move(llvmContext)
+		);
 }
 
 FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)

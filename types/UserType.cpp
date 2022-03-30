@@ -86,6 +86,11 @@ bool UserType::equals(const Type *type, const EntryPoint &entryPoint) const
 	return true;
 }
 
+int8_t UserType::compatibility(const Type *type, const EntryPoint &entryPoint) const
+{
+	return m_prototype->compatibility(type, entryPoint);
+}
+
 UserType *UserType::get(const Type *prototype, const std::vector<const Type *> &elementTypes)
 {
 	static std::unordered_map<size_t, UserType> cache;

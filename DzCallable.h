@@ -15,6 +15,8 @@ class DzCallable : public DzValue
 		virtual FunctionAttribute attribute() const = 0;
 
 		virtual bool hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values) const = 0;
+
+		virtual int8_t signatureCompatibility(const EntryPoint &entryPoint, const Stack &values) const = 0;
 };
 
 #endif // DZCALLABLE_H

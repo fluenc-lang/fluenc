@@ -67,6 +67,16 @@ bool DzImportedFunction::hasMatchingSignature(const EntryPoint &entryPoint, cons
 	return result;
 }
 
+int8_t DzImportedFunction::signatureCompatibility(const EntryPoint &entryPoint, const Stack &values) const
+{
+	if (hasMatchingSignature(entryPoint, values))
+	{
+		return 0;
+	}
+
+	return -1;
+}
+
 std::vector<DzResult> DzImportedFunction::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &module = entryPoint.module();

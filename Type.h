@@ -20,6 +20,16 @@ class Type
 
 		virtual bool is(const Type *type, const EntryPoint &entryPoint) const = 0;
 		virtual bool equals(const Type *type, const EntryPoint &entryPoint) const = 0;
+
+		virtual int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const
+		{
+			if (is(type, entryPoint))
+			{
+				return 0;
+			}
+
+			return -1;
+		}
 };
 
 #endif // TYPE_H

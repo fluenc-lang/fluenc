@@ -24,7 +24,11 @@ class Prototype : public IPrototype
 		bool is(const Type *type, const EntryPoint &entryPoint) const override;
 		bool equals(const Type *type, const EntryPoint &entryPoint) const override;
 
+		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
+
 	private:
+		std::pair<bool, int8_t> compatibility(int8_t score, const Type *type, const EntryPoint &entryPoint) const;
+
 		std::string m_tag;
 
 		std::vector<PrototypeFieldEmbryo> m_fields;

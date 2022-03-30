@@ -5,17 +5,26 @@
 
 #include "antlr4-runtime/dzBaseVisitor.h"
 
+#include "EntryPoint.h"
+
 class DzValue;
 
 class ModuleInfo
 {
 	public:
-		ModuleInfo(std::unique_ptr<llvm::Module> module
+		ModuleInfo(const EntryPoint &entryPoint
+			, std::unique_ptr<llvm::Module> module
 			, std::unique_ptr<llvm::LLVMContext> context
 			)
-			: m_module(std::move(module))
+			: m_entryPoint(entryPoint)
+			, m_module(std::move(module))
 			, m_context(std::move(context))
 		{
+		}
+
+		EntryPoint entryPoint()
+		{
+			return m_entryPoint;
 		}
 
 		std::unique_ptr<llvm::Module> &module()
@@ -29,6 +38,8 @@ class ModuleInfo
 		}
 
 	private:
+		EntryPoint m_entryPoint;
+
 		std::unique_ptr<llvm::Module> m_module;
 		std::unique_ptr<llvm::LLVMContext> m_context;
 };

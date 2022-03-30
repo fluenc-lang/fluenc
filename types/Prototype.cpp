@@ -1,6 +1,9 @@
+#include <numeric>
+
 #include "Prototype.h"
 #include "DzTypeName.h"
 #include "DzValue.h"
+#include "AnyType.h"
 
 Prototype::Prototype(const std::string &tag
 	, const std::vector<PrototypeFieldEmbryo> &fields
@@ -83,4 +86,50 @@ bool Prototype::equals(const Type *type, const EntryPoint &entryPoint) const
 	UNUSED(entryPoint);
 
 	return type == this;
+}
+
+int8_t Prototype::compatibility(const Type *type, const EntryPoint &entryPoint) const
+{
+	auto [match, score] = compatibility(0, type, entryPoint);
+
+	if (match)
+	{
+		return score;
+	}
+
+	if (dynamic_cast<const AnyType *>(type))
+	{
+		return score + 1;
+	}
+
+	return -1;
+}
+
+std::pair<bool, int8_t> Prototype::compatibility(int8_t score, const Type *type, const EntryPoint &entryPoint) const
+{
+	if (type->name() == m_tag)
+	{
+		return { true, score };
+	}
+
+	return std::accumulate(begin(m_parentTypes), end(m_parentTypes), std::make_pair(false, score), [=](auto accumulated, auto parentType) -> std::pair<bool, int8_t>
+	{
+		auto resolvedType = parentType->resolve(entryPoint);
+		auto prototype = static_cast<const Prototype *>(resolvedType);
+
+		auto [accumulatedMatch, accumulatedScore] = accumulated;
+		auto [currentMatch, currentScore] = prototype->compatibility(score + 1, type, entryPoint);
+
+		if (!accumulatedMatch)
+		{
+			return { currentMatch, currentScore };
+		}
+
+		if (!currentMatch)
+		{
+			return { accumulatedMatch, accumulatedScore };
+		}
+
+		return { true, std::min(currentScore, accumulatedScore) };
+	});
 }

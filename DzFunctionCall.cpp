@@ -128,14 +128,34 @@ const DzCallable *DzFunctionCall::findFunction(const EntryPoint &entryPoint, Sta
 		return value->function();
 	}
 
+	std::map<int8_t, DzCallable *> candidates;
+
 	for (auto [i, end] = functions.equal_range(m_name); i != end; i++)
 	{
 		auto function = i->second;
 
-		if (function->hasMatchingSignature(entryPoint, values))
+		auto score = function->signatureCompatibility(entryPoint, values);
+
+		if (score < 0)
 		{
-			return function;
+			continue;
 		}
+
+		auto candidate = candidates.find(score);
+
+		if (candidate != candidates.end())
+		{
+			throw new std::exception();
+		}
+
+		candidates[score] = function;
+	}
+
+	if (candidates.size() > 0)
+	{
+		auto [_, function] = *candidates.begin();
+
+		return function;
 	}
 
 	return nullptr;

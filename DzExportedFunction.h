@@ -17,6 +17,8 @@ class DzExportedFunction : public DzCallable
 
 		bool hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values) const override;
 
+		int8_t signatureCompatibility(const EntryPoint &entryPoint, const Stack &values) const override;
+
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:

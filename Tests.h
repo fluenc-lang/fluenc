@@ -17,8 +17,13 @@
 #include "KaleidoscopeJIT.h"
 #include "VisitorV4.h"
 #include "Utility.h"
-
 #include "DzCallable.h"
+#include "EntryPoint.h"
+
+#include "types/AnyType.h"
+#include "types/Prototype.h"
+#include "types/Int32Type.h"
+
 #include "wobjectdefs.h"
 #include "wobjectimpl.h"
 
@@ -2374,6 +2379,122 @@ class Tests : public QObject
 			QCOMPARE(result, 27);
 		}
 
+		void selectsTheCorrectOverload_1()
+		{
+			auto result = exec(R"(
+				struct Parent
+				{
+					x: 0
+				}
+
+				struct Child : Parent
+				{
+					y: 0
+				}
+
+				function foo(any bar)
+				{
+					return 1;
+				}
+
+				function foo(Parent bar)
+				{
+					return 2;
+				}
+
+				function foo(Child bar)
+				{
+					return 3;
+				}
+
+				export int main()
+				{
+					return foo(Child {});
+				}
+			)");
+
+			QCOMPARE(result, 3);
+		}
+
+		void selectsTheCorrectOverload_2()
+		{
+			auto result = exec(R"(
+				struct Parent
+				{
+					x: 0
+				}
+
+				struct Child : Parent
+				{
+					y: 0
+				}
+
+				function foo(any bar)
+				{
+					return 1;
+				}
+
+				function foo(Parent bar)
+				{
+					return 2;
+				}
+
+				export int main()
+				{
+					return foo(Child {});
+				}
+			)");
+
+			QCOMPARE(result, 2);
+		}
+
+		void compatibility()
+		{
+			auto module = compile(R"(
+				struct Unrelated
+				{
+					x: 0
+				};
+
+				struct Ancestor
+				{
+					w: 0
+				}
+
+				struct Father : Ancestor
+				{
+					x: 0
+				}
+
+				struct Mother : Ancestor
+				{
+					z: 0
+				}
+
+				struct Child : Father, Mother
+				{
+					y: 0
+				}
+			)");
+
+			auto entryPoint = module->entryPoint();
+			auto types = entryPoint.types();
+
+			auto unrelatedType = types["Unrelated"];
+			auto childType = types["Child"];
+			auto fatherType = types["Father"];
+			auto motherType = types["Mother"];
+			auto ancestorType = types["Ancestor"];
+
+			QCOMPARE(childType->compatibility(childType, entryPoint), 0);
+			QCOMPARE(childType->compatibility(fatherType, entryPoint), 1);
+			QCOMPARE(childType->compatibility(motherType, entryPoint), 1);
+			QCOMPARE(childType->compatibility(ancestorType, entryPoint), 2);
+			QCOMPARE(childType->compatibility(AnyType::instance(), entryPoint), 3);
+			QCOMPARE(childType->compatibility(unrelatedType, entryPoint), -1);
+			QCOMPARE(childType->compatibility(Int32Type::instance(), entryPoint), -1);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2444,6 +2565,9 @@ class Tests : public QObject
 		W_SLOT(scenario67)
 		W_SLOT(scenario68)
 		W_SLOT(scenario69)
+		W_SLOT(selectsTheCorrectOverload_1)
+		W_SLOT(selectsTheCorrectOverload_2)
+		W_SLOT(compatibility)
 
 	private:
 		DzCallable *compileFunction(std::string source)
