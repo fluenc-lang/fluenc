@@ -4,40 +4,28 @@
 #include "ArrayValueGenerator.h"
 #include "ArrayValue.h"
 #include "TypedValue.h"
+#include "IteratorStorage.h"
 
 #include "types/Int64Type.h"
 
-ArrayValueGenerator::ArrayValueGenerator(const DzValue *iterator
+ArrayValueGenerator::ArrayValueGenerator(size_t id
+	, const DzValue *iterator
 	, const std::vector<DzResult> &values
 	)
-	: m_iterator(iterator)
+	: m_id(id)
+	, m_iterator(iterator)
 	, m_values(values)
 {
 }
 
 IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint) const
 {
-	auto block = entryPoint.block();
+	auto iteratorStorage = entryPoint
+		.iteratorStorage();
 
-	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
-
-	auto dataLayout = module->getDataLayout();
-
-	auto indexType = Int64Type::instance();
-	auto storageType = indexType->storageType(*context);
-
-	auto align = dataLayout.getABITypeAlign(storageType);
-
-	auto zero = llvm::ConstantInt::get(storageType, 0);
-
-	auto alloc = entryPoint.alloc(storageType);
-
-	auto store = new llvm::StoreInst(zero, alloc, false, align, block);
-
-	UNUSED(store);
-
-	auto index = new TypedValue(indexType, alloc);
+	auto index = new TypedValue(Int64Type::instance()
+		, iteratorStorage->getOrCreate(m_id, entryPoint)
+		);
 
 	return new ArrayValue(index, m_iterator, m_values);
 }

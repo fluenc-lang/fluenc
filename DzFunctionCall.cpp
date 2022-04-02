@@ -14,6 +14,7 @@
 #include "IRBuilderEx.h"
 #include "ZipIterator.h"
 #include "ValueHelper.h"
+#include "FunctionNotFoundException.h"
 
 #include "values/DependentValue.h"
 #include "values/TypedValue.h"
@@ -28,8 +29,9 @@
 
 #include "types/IteratorType.h"
 
-DzFunctionCall::DzFunctionCall(const std::string &name)
-	: m_name(name)
+DzFunctionCall::DzFunctionCall(antlr4::ParserRuleContext *context, const std::string &name)
+	: m_context(context)
+	, m_name(name)
 {
 }
 
@@ -206,5 +208,5 @@ std::vector<DzResult> DzFunctionCall::regularCall(const EntryPoint &entryPoint, 
 		return result;
 	}
 
-	throw new std::exception(); // TODO
+	throw new FunctionNotFoundException(m_context, m_name, values);
 }

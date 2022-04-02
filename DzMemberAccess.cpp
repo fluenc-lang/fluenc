@@ -5,6 +5,7 @@
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 #include "Type.h"
+#include "UndeclaredIdentifierException.h"
 
 #include "values/TypedValue.h"
 #include "values/IteratorValue.h"
@@ -12,8 +13,9 @@
 #include "values/ArrayValue.h"
 #include "values/FunctionValue.h"
 
-DzMemberAccess::DzMemberAccess(DzValue *consumer, const std::string &name)
-	: m_consumer(consumer)
+DzMemberAccess::DzMemberAccess(antlr4::ParserRuleContext *context, DzValue *consumer, const std::string &name)
+	: m_context(context)
+	, m_consumer(consumer)
 	, m_name(name)
 {
 }
@@ -56,5 +58,5 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		return m_consumer->build(entryPoint, values);
 	}
 
-	throw new std::exception();
+	throw new UndeclaredIdentifierException(m_context, m_name);
 }

@@ -10,11 +10,7 @@ class IIteratable;
 class LazyValue : public BaseValue
 {
 	public:
-		static const size_t NoCache = -1;
-
-		LazyValue(size_t id, ILazyValueGenerator *generator);
-
-		size_t id() const;
+		LazyValue(ILazyValueGenerator *generator);
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
@@ -24,8 +20,6 @@ class LazyValue : public BaseValue
 		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;
 
 	private:
-		size_t m_id;
-
 		ILazyValueGenerator *m_generator;
 };
 

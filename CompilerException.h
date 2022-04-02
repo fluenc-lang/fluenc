@@ -9,19 +9,26 @@
 
 using namespace antlr4;
 
+struct TokenInfo
+{
+	size_t row;
+	size_t column;
+	size_t length;
+};
+
 class CompilerException : public std::exception
 {
 	public:
 		CompilerException(ParserRuleContext *context);
 
-		int row() const;
-		int column() const;
-		int length() const;
+		size_t row() const;
+		size_t column() const;
+		size_t length() const;
 
 		virtual std::string message() const = 0;
 
 	private:
-		ParserRuleContext *m_context;
+		TokenInfo m_tokenInfo;
 };
 
 #endif // COMPILEREXCEPTION_H

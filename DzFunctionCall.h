@@ -12,7 +12,7 @@
 class DzFunctionCall : public DzValue
 {
 	public:
-		DzFunctionCall(const std::string &name);
+		DzFunctionCall(antlr4::ParserRuleContext *context, const std::string &name);
 
 		int order(const EntryPoint &entryPoint) const override;
 
@@ -65,6 +65,8 @@ class DzFunctionCall : public DzValue
 		}
 
 		std::vector<DzResult> regularCall(const EntryPoint &entryPoint, Stack values) const;
+
+		antlr4::ParserRuleContext *m_context;
 
 		std::string m_name;
 };

@@ -130,7 +130,8 @@ std::vector<DzResult> DzFunction::build(const EntryPoint &entryPoint, Stack valu
 	auto ep = pep
 		.withName(m_name)
 		.markEntry()
-		.withLocals(locals);
+		.withLocals(locals)
+		.withIteratorStorage(nullptr);
 
 	return m_block->build(ep, values);
 }

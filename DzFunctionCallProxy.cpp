@@ -27,7 +27,7 @@ std::vector<DzResult> DzFunctionCallProxy::regularCall(const EntryPoint &entryPo
 		if (function->attribute() == FunctionAttribute::Iterator)
 		{
 			auto generator = new IteratorValueGenerator(m_subject, entryPoint);
-			auto lazy = new LazyValue(LazyValue::NoCache, generator);
+			auto lazy = new LazyValue(generator);
 
 			values.push(lazy);
 

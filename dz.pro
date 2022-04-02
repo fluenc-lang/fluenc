@@ -39,11 +39,13 @@ SOURCES += \
 	DzTypeName.cpp \
 	DzValue.cpp \
 	EntryPoint.cpp \
+	FunctionNotFoundException.cpp \
 	FunctionTypeName.cpp \
 	IRBuilderEx.cpp \
 	IndexIterator.cpp \
 	IndexSink.cpp \
 	InteropHelper.cpp \
+	IteratorStorage.cpp \
 	Junction.cpp \
 	LazyEvaluation.cpp \
 	LazySink.cpp \
@@ -137,6 +139,7 @@ HEADERS += \
 	DzValue.h \
 	EntryPoint.h \
 	FunctionAttribute.h \
+	FunctionNotFoundException.h \
 	FunctionTypeName.h \
 	IPrototypeProvider.h \
 	IRBuilderEx.h \
@@ -145,6 +148,7 @@ HEADERS += \
 	IndexSink.h \
 	Indexed.h \
 	InteropHelper.h \
+	IteratorStorage.h \
 	Junction.h \
 	KaleidoscopeJIT.h \
 	LazyEvaluation.h \

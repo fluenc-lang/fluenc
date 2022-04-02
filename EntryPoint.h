@@ -11,6 +11,7 @@
 class DzCallable;
 class DzStruct;
 class Prototype;
+class IteratorStorage;
 
 class EntryPoint
 {
@@ -29,6 +30,7 @@ class EntryPoint
 			, const std::map<std::string, const BaseValue *> &locals
 			, const std::map<std::string, Prototype *> &types
 			, const Stack &values
+			, IteratorStorage *iteratorStorage
 			);
 
 		EntryPoint() = default;
@@ -55,11 +57,14 @@ class EntryPoint
 
 		Stack values() const;
 
+		IteratorStorage *iteratorStorage() const;
+
 		const EntryPoint *byName(const std::string &name) const;
 		const EntryPoint *entry() const;
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
+		EntryPoint withIteratorStorage(IteratorStorage *iteratorStorage) const;
 		EntryPoint markEntry() const;
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
@@ -90,6 +95,8 @@ class EntryPoint
 		std::map<std::string, Prototype *> m_types;
 
 		Stack m_values;
+
+		IteratorStorage *m_iteratorStorage;
 };
 
 #endif // ENTRYPOINT_H

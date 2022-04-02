@@ -5,18 +5,13 @@
 #include "TupleValue.h"
 #include "ExpandableValue.h"
 #include "ValueHelper.h"
+#include "IteratorStorage.h"
 
 #include "types/IteratorType.h"
 
-LazyValue::LazyValue(size_t id, ILazyValueGenerator *generator)
-	: m_id(id)
-	, m_generator(generator)
+LazyValue::LazyValue(ILazyValueGenerator *generator)
+	: m_generator(generator)
 {
-}
-
-size_t LazyValue::id() const
-{
-	return m_id;
 }
 
 const Type *LazyValue::type() const
@@ -51,8 +46,13 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 	auto exitBlock = llvm::BasicBlock::Create(*context);
 
-	auto iteratable = source->generate(entryPoint);
-	auto array = m_generator->generate(entryPoint);
+	IteratorStorage iteratorStorage;
+
+	auto generatorEntryPoint = entryPoint
+		.withIteratorStorage(&iteratorStorage);
+
+	auto iteratable = source->generate(generatorEntryPoint);
+	auto array = m_generator->generate(generatorEntryPoint);
 
 	for (auto &[sourceEntryPoint, sourceValues] : iteratable->build(entryPoint))
 	{

@@ -2495,6 +2495,52 @@ class Tests : public QObject
 			QCOMPARE(childType->compatibility(Int32Type::instance(), entryPoint), -1);
 		}
 
+		void scenario70()
+		{
+			auto result = exec(R"(
+				function elementAt(int index, int i, int item)
+				{
+					if (i == index)
+					{
+						return item;
+					}
+
+					return 0;
+				}
+
+				function elementAt(int index, int i, (int item, ...items))
+				{
+					if (i == index)
+					{
+						return item;
+					}
+
+					return elementAt(index, i + 1, ...items);
+				}
+
+				function foo(int product, int index)
+				{
+					let table = [10, 20];
+
+					return product + elementAt(index, 0, table);
+				}
+
+				function foo(int product, (int index, ...indexes))
+				{
+					let table = [10, 20];
+
+					return foo(product + elementAt(index, 0, table), ...indexes);
+				}
+
+				export int main()
+				{
+					return foo(0, [1, 0, 1]);
+				}
+			)");
+
+			QCOMPARE(result, 50);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2568,6 +2614,7 @@ class Tests : public QObject
 		W_SLOT(selectsTheCorrectOverload_1)
 		W_SLOT(selectsTheCorrectOverload_2)
 		W_SLOT(compatibility)
+		W_SLOT(scenario70)
 
 	private:
 		DzCallable *compileFunction(std::string source)

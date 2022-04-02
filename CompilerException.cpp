@@ -1,21 +1,31 @@
 #include "CompilerException.h"
 
+TokenInfo createTokenInfo(ParserRuleContext *context)
+{
+	return
+	{
+		context->start->getLine(),
+		context->start->getCharPositionInLine(),
+		context->start->getStopIndex() - context->start->getStartIndex(),
+	};
+}
+
 CompilerException::CompilerException(ParserRuleContext *context)
-	: m_context(context)
+	: m_tokenInfo(createTokenInfo(context))
 {
 }
 
-int CompilerException::row() const
+size_t CompilerException::row() const
 {
-	return m_context->start->getLine();
+	return m_tokenInfo.row;
 }
 
-int CompilerException::column() const
+size_t CompilerException::column() const
 {
-	return m_context->start->getCharPositionInLine();
+	return m_tokenInfo.column;
 }
 
-int CompilerException::length() const
+size_t CompilerException::length() const
 {
-	return m_context->start->getStopIndex() - m_context->start->getStartIndex();
+	return m_tokenInfo.length;
 }

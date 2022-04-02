@@ -7,6 +7,11 @@
 #include "Utility.h"
 #include "EntryPoint.h"
 
+namespace antlr4
+{
+	class ParserRuleContext;
+}
+
 struct DzResult
 {
 	EntryPoint entryPoint;

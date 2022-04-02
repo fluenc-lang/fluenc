@@ -23,7 +23,8 @@ std::vector<DzResult> IteratorValue::build(const EntryPoint &entryPoint) const
 
 	auto ep = (*m_entryPoint)
 		.withBlock(entryPoint.block())
-		.withLocals(locals);
+		.withLocals(locals)
+		.withIteratorStorage(entryPoint.iteratorStorage());
 
 	return m_subject->build(ep, Stack());
 }

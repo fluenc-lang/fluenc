@@ -16,6 +16,7 @@ EntryPoint::EntryPoint(int depth
 	, const std::map<std::string, const BaseValue *> &locals
 	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
+	, IteratorStorage *iteratorStorage
 	)
 	: m_depth(depth)
 	, m_parent(parent)
@@ -31,6 +32,7 @@ EntryPoint::EntryPoint(int depth
 	, m_locals(locals)
 	, m_types(types)
 	, m_values(values)
+	, m_iteratorStorage(iteratorStorage)
 {
 }
 
@@ -106,6 +108,11 @@ Stack EntryPoint::values() const
 	return m_values;
 }
 
+IteratorStorage *EntryPoint::iteratorStorage() const
+{
+	return m_iteratorStorage;
+}
+
 const EntryPoint *EntryPoint::byName(const std::string &name) const
 {
 	if (m_name == name)
@@ -137,6 +144,7 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, m_locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
 		);
 }
 
@@ -156,6 +164,27 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		, m_locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
+		);
+}
+
+EntryPoint EntryPoint::withIteratorStorage(IteratorStorage *iteratorStorage) const
+{
+	return EntryPoint(m_depth + 1
+		, m_parent
+		, m_entry
+		, m_block
+		, m_alloc
+		, m_function
+		, m_returnValueAddress
+		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, m_types
+		, m_values
+		, iteratorStorage
 		);
 }
 
@@ -175,6 +204,7 @@ EntryPoint EntryPoint::markEntry() const
 		, m_locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
 		);
 }
 
@@ -194,6 +224,7 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, m_locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
 		);
 }
 
@@ -213,6 +244,7 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *>
 		, locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
 		);
 }
 
@@ -232,6 +264,7 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		, m_locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
 		);
 }
 
@@ -251,6 +284,7 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 		, m_locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
 		);
 }
 
@@ -270,6 +304,7 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 		, m_locals
 		, m_types
 		, values
+		, m_iteratorStorage
 		);
 }
 
@@ -289,5 +324,6 @@ EntryPoint EntryPoint::withDepth(int depth) const
 		, m_locals
 		, m_types
 		, m_values
+		, m_iteratorStorage
 		);
 }

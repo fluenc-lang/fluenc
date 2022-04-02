@@ -19,8 +19,8 @@ std::vector<DzResult> ArraySink::build(const EntryPoint &entryPoint, Stack value
 {
 	auto arrayContents = m_firstValue->build(entryPoint, Stack());
 
-	auto generator = new ArrayValueGenerator(m_iterator, arrayContents);
-	auto lazy = new LazyValue(id(), generator);
+	auto generator = new ArrayValueGenerator(id(), m_iterator, arrayContents);
+	auto lazy = new LazyValue(generator);
 
 	values.push(lazy);
 

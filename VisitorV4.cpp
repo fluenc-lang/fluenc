@@ -112,6 +112,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, locals
 		, types
 		, values
+		, nullptr
 		);
 
 	for (auto global : context->global())
@@ -362,7 +363,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 	auto expression = context->expression();
 	auto name = context->ID()->getText();
 
-	auto call = new DzFunctionCall(name);
+	auto call = new DzFunctionCall(context, name);
 
 	std::vector<DzValue *> values;
 
@@ -424,12 +425,12 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 
 	if (with)
 	{
-		auto member = new DzMemberAccess(visit<DzValue *>(with), path);
+		auto member = new DzMemberAccess(context, visit<DzValue *>(with), path);
 
 		return static_cast<DzValue *>(member);
 	}
 
-	auto member = new DzMemberAccess(m_alpha, path);
+	auto member = new DzMemberAccess(context, m_alpha, path);
 
 	return static_cast<DzValue *>(member);
 }
