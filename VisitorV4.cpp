@@ -22,7 +22,6 @@
 #include "DzImportedFunction.h"
 #include "DzInstantiation.h"
 #include "DzGlobal.h"
-#include "DzGlobalTerminator.h"
 #include "IndexIterator.h"
 #include "DefaultPrototypeProvider.h"
 #include "WithPrototypeProvider.h"
@@ -644,12 +643,10 @@ antlrcpp::Any VisitorV4::visitGlobal(dzParser::GlobalContext *context)
 {
 	auto name = context->ID()->getText();
 
-	auto terminator = new DzGlobalTerminator(name);
-
-	VisitorV4 visitor(m_iteratorType, terminator, nullptr);
+	VisitorV4 visitor(m_iteratorType, DzTerminator::instance(), nullptr);
 
 	auto literal = visitor
-		.visit<DzValue *>(context->literal());
+		.visit<DzValue *>(context->expression());
 
 	return new DzGlobal(literal, name);
 }

@@ -26,7 +26,6 @@ SOURCES += \
 	DzFunctionCall.cpp \
 	DzFunctionCallProxy.cpp \
 	DzGlobal.cpp \
-	DzGlobalTerminator.cpp \
 	DzImportedFunction.cpp \
 	DzInstantiation.cpp \
 	DzIntegralLiteral.cpp \
@@ -127,7 +126,6 @@ HEADERS += \
 	DzFunctionCall.h \
 	DzFunctionCallProxy.h \
 	DzGlobal.h \
-	DzGlobalTerminator.h \
 	DzImportedFunction.h \
 	DzInstantiation.h \
 	DzIntegralLiteral.h \
@@ -228,9 +226,9 @@ LIBS += \
     -lLLVM-13 \
     -lantlr4-runtime
 
-DEPENDPATH += /usr/include/antlr4-runtime
-#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ \
-#    /home/znurre/Program/Develop/C++/llvm-project/build/include/
-INCLUDEPATH += /usr/include/antlr4-runtime
-#    /home/znurre/Program/Develop/C++/llvm-project/llvm/include/ \
-#    /home/znurre/Program/Develop/C++/llvm-project/build/include/
+DEPENDPATH += /usr/include/antlr4-runtime # \
+    #/home/znurre/Program/Develop/C++/llvm-project/llvm/include/ \
+    #/home/znurre/Program/Develop/C++/llvm-project/build/include/
+INCLUDEPATH += /usr/include/antlr4-runtime # \
+    #/home/znurre/Program/Develop/C++/llvm-project/llvm/include/ \
+    #/home/znurre/Program/Develop/C++/llvm-project/build/include/

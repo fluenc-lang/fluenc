@@ -123,7 +123,7 @@ public:
     GlobalContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *ID();
-    LiteralContext *literal();
+    ExpressionContext *expression();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;

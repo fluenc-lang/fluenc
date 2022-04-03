@@ -18,7 +18,7 @@ structure
 	;
 
 global
-	: 'global' ID ':' literal
+	: 'global' ID ':' expression
 	;
 
 assignment
