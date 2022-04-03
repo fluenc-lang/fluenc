@@ -14,6 +14,7 @@ ns
 
 structure
 	: 'struct' name=ID (':' typeName (',' typeName)*)? '{' field (',' field)* '}'
+	| 'struct' name=ID (':' typeName (',' typeName)*)?
 	;
 
 global
@@ -63,7 +64,7 @@ expression
 	;
 
 continuation
-	: '(' (expression (',' expression)*)? ')'
+	: ID '(' (expression (',' expression)*)? ')'
 	;
 
 ret
