@@ -69,12 +69,33 @@ VisitorV4::VisitorV4(const Type *iteratorType, DzValue *alpha, DzValue *beta)
 
 void populateInstructions(const std::vector<std::string> &namespaces
 	, const std::vector<antlrcpp::Any> &instructions
+	, std::unique_ptr<llvm::Module> *module
+	, std::unique_ptr<llvm::LLVMContext> *context
 	, std::vector<DzCallable *> &roots
 	, std::multimap<std::string, DzCallable *> &functions
 	, std::map<std::string, const BaseValue *> &locals
 	, std::map<std::string, Prototype *> &types
 	)
 {
+	Stack values;
+
+	EntryPoint entryPoint(0
+		, nullptr
+		, nullptr
+		, nullptr
+		, nullptr
+		, nullptr
+		, nullptr
+		, module
+		, context
+		, "term"
+		, functions
+		, locals
+		, types
+		, values
+		, nullptr
+		);
+
 	for (auto &instruction : instructions)
 	{
 		if (instruction.is<Namespace *>())
@@ -85,7 +106,15 @@ void populateInstructions(const std::vector<std::string> &namespaces
 
 			nestedNamespaces.push_back(_namespace->name());
 
-			populateInstructions(nestedNamespaces, _namespace->children(), roots, functions, locals, types);
+			populateInstructions(nestedNamespaces
+				, _namespace->children()
+				, module
+				, context
+				, roots
+				, functions
+				, locals
+				, types
+				);
 		}
 		else
 		{
@@ -118,6 +147,17 @@ void populateInstructions(const std::vector<std::string> &namespaces
 
 				types.insert({ qualifiedName.str(), prototype });
 			}
+			else if (instruction.is<DzGlobal *>())
+			{
+				auto global = instruction.as<DzGlobal *>(); // TODO Lazy value? We can defer evaluation.
+
+				for (auto &[_, globalValues] : global->build(entryPoint, values))
+				{
+					qualifiedName << global->name();
+
+					locals.insert({ qualifiedName.str(), globalValues.require<ReferenceValue>() });
+				}
+			}
 		}
 	}
 }
@@ -143,6 +183,8 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 
 	populateInstructions(std::vector<std::string>()
 		, results
+		, &module
+		, &llvmContext
 		, roots
 		, functions
 		, locals
@@ -168,25 +210,9 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, nullptr
 		);
 
-	for (auto &result : results)
-	{
-		if (result.is<DzGlobal *>())
-		{
-			auto global = result.as<DzGlobal *>();
-
-			for (auto &[_, globalValues] : global->build(entryPoint, values))
-			{
-				locals.insert({ global->name(), globalValues.require<ReferenceValue>() });
-			}
-		}
-	}
-
 	for (auto root : roots)
 	{
-		auto ep = entryPoint
-			.withLocals(locals);
-
-		root->build(ep, values);
+		root->build(entryPoint, values);
 	}
 
 	module->print(llvm::errs(), nullptr);
