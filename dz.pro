@@ -53,6 +53,7 @@ SOURCES += \
 	Stack.cpp \
 	StackSegment.cpp \
 	TaintedSink.cpp \
+	Type.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
 	Utility.cpp \

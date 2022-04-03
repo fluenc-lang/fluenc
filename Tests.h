@@ -23,6 +23,7 @@
 #include "types/AnyType.h"
 #include "types/Prototype.h"
 #include "types/Int32Type.h"
+#include "types/Int64Type.h"
 
 #include "wobjectdefs.h"
 #include "wobjectimpl.h"
@@ -2493,6 +2494,10 @@ class Tests : public QObject
 			QCOMPARE(childType->compatibility(AnyType::instance(), entryPoint), 3);
 			QCOMPARE(childType->compatibility(unrelatedType, entryPoint), -1);
 			QCOMPARE(childType->compatibility(Int32Type::instance(), entryPoint), -1);
+
+			QCOMPARE(Int32Type::instance()->compatibility(Int32Type::instance(), entryPoint), 0);
+			QCOMPARE(Int32Type::instance()->compatibility(Int64Type::instance(), entryPoint), -1);
+			QCOMPARE(Int32Type::instance()->compatibility(AnyType::instance(), entryPoint), 1);
 		}
 
 		void scenario70()

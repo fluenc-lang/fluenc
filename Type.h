@@ -11,25 +11,14 @@ class Type
 {
 	public:
 		virtual std::string name() const = 0;
-		virtual std::string fullName() const
-		{
-			return name();
-		}
+		virtual std::string fullName() const;
 
 		virtual llvm::Type *storageType(llvm::LLVMContext &context) const = 0;
 
 		virtual bool is(const Type *type, const EntryPoint &entryPoint) const = 0;
 		virtual bool equals(const Type *type, const EntryPoint &entryPoint) const = 0;
 
-		virtual int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const
-		{
-			if (is(type, entryPoint))
-			{
-				return 0;
-			}
-
-			return -1;
-		}
+		virtual int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const;
 };
 
 #endif // TYPE_H
