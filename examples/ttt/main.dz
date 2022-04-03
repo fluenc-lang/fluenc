@@ -1,0 +1,317 @@
+import int puts(string str);
+import void printnum(int num);
+
+namespace SDL
+{
+    import int SDL_Init(uint flags);
+
+    import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
+    import int SDL_RenderClear(long renderer);
+    import int SDL_RenderFillRect(long renderer, SDL::Rect rect);
+
+    import long SDL_CreateRenderer(long window, int index, int flags);
+    import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
+
+    import void SDL_RenderPresent(long renderer);
+
+    import EventState SDL_WaitEventEx(EventState events);
+
+    struct Rect
+    {
+        int x: 0,
+        int y: 0,
+        int width: 0,
+        int height: 0
+    };
+
+    struct KeyboardEvent
+    {
+        int type: 0,
+        int timestamp: 0,
+        int windowID: 0,
+        int padding: 0,
+        int scancode: 0,
+        int sym: 0,
+        long padding: 0L
+    };
+
+    struct MouseMotionEvent
+    {
+        int type: 0,
+        int timestamp: 0,
+        int windowID: 0,
+        int which: 0,
+        int state: 0,
+        int x: 0,
+        int y: 0,
+        int xrel: 0,
+        int yrel: 0
+    };
+
+    struct MouseButtonEvent
+    {
+        int type: 0,
+        int timestamp: 0,
+        int windowId: 0,
+        int which: 0,
+        byte button: 0u8,
+        byte state: 0u8,
+        byte clicks: 0u8,
+        byte padding: 0u8,
+        int x: 0,
+        int y: 0
+    };
+
+    global INIT_VIDEO: 0x00000020u;
+    global WINDOWPOS_UNDEFINED: 0x1FFF0000u;
+    global MOUSEBUTTONDOWN: 0x401u;
+}
+
+namespace Array
+{
+    function elementAt(any item, int index, int i)
+    {
+        if (i == index)
+        {
+            return item;
+        }
+
+        return nothing;
+    }
+
+    function elementAt((any item, ...items), int index, int i)
+    {
+        if (i == index)
+        {
+            return item;
+        }
+
+        return elementAt(...items, index, i + 1);
+    }
+
+    function set((int value, ...values), int index, int result, int i)
+    {
+        if (i == index)
+        {
+            return result -> (...values, index, result, i + 1);
+        }
+
+        return value -> (...values, index, result, i + 1);
+    }
+
+    function set(int value, int index, int result, int i)
+    {
+        if (i == index)
+        {
+            return result;
+        }
+
+        return value;
+    }
+}
+
+struct Color
+{
+    r: 0,
+    g: 0,
+    b: 0
+}
+
+struct State
+{
+    player,
+    cells
+};
+
+struct Square
+{
+    x: 0,
+    y: 0,
+    owner: 0
+}
+
+struct EventState
+{
+    SDL::KeyboardEvent key,
+    SDL::MouseMotionEvent motion,
+    SDL::MouseButtonEvent button
+};
+
+function createEventState()
+{
+    return EventState
+    {
+        key: SDL::KeyboardEvent {},
+        motion: SDL::MouseMotionEvent {},
+        button: SDL::MouseButtonEvent {}
+    };
+}
+
+function rgb(int r, int g, int b)
+{
+    return Color
+    {
+        r: r,
+        g: g,
+        b: b
+    };
+}
+
+function createSquare(int index, int owner)
+{
+    let x = index % 3;
+
+    return Square
+    {
+        x: x,
+        y: (index - x) / 3,
+        owner: owner
+    };
+}
+
+function square((int owner, ...values), int index)
+{
+    return createSquare(index, owner) -> (...values, index + 1);
+}
+
+function square(int owner, int index)
+{
+    return createSquare(index, owner);
+}
+
+function application(State state)
+{
+    return square(state.cells, 0);
+}
+
+function bounds(Square square)
+{
+    let width = (800 - 20) / 3;
+    let height = (600 - 20) / 3;
+
+    return SDL::Rect
+    {
+        x: square.x * (width + 10),
+        y: square.y * (height + 10),
+        width: width,
+        height: height
+    };
+}
+
+function setRenderDrawColor(long renderer, Color color)
+{
+    return SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+}
+
+function setRenderDrawColor(long renderer, without color)
+{
+    return SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 255, 0);
+}
+
+function drawSquare(long renderer, Square square)
+{
+    let colors = [rgb(255, 0, 0), rgb(0, 255, 0)];
+
+    let color = Array::elementAt(colors, square.owner, 0);
+
+    setRenderDrawColor(renderer, color);
+
+    SDL::SDL_RenderFillRect(renderer, bounds(square));
+
+    return nothing;
+}
+
+function draw(long renderer, (Square square, ...squares))
+{
+    drawSquare(renderer, square);
+
+    return draw(renderer, ...squares);
+}
+
+function draw(long renderer, Square square)
+{
+    return drawSquare(renderer, square);
+}
+
+function containsMouse(SDL::Rect bounds, SDL::MouseMotionEvent motion)
+{
+    return (motion.x > bounds.x)
+        && (motion.x < (bounds.x + bounds.width))
+        && (motion.y > bounds.y)
+        && (motion.y < (bounds.y + bounds.height));
+}
+
+function isPressed(SDL::MouseButtonEvent button)
+{
+    return button.type == SDL::MOUSEBUTTONDOWN;
+}
+
+function updateCell(State state, EventState events, int index, Square square)
+{
+    if (square.owner >= 0)
+    {
+        return state;
+    }
+
+    if (containsMouse(bounds(square), events.motion) && isPressed(events.button))
+    {
+        return state with
+        {
+            player: (state.player + 1) % 2,
+            cells: Array::set(state.cells, index, state.player, 0)
+        };
+    }
+
+    return state;
+}
+
+function update(State state, EventState events, int index, (Square square, ...squares))
+{
+    let updatedState = updateCell(state, events, index, square);
+
+    return update(updatedState, events, index + 1, ...squares);
+}
+
+function update(State state, EventState events, int index, Square square)
+{
+    return updateCell(state, events, index, square);
+}
+
+function mainLoop(long renderer, State state)
+{
+    SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL::SDL_RenderClear(renderer);
+
+    let ui = application(state);
+
+    draw(renderer, ui);
+
+    SDL::SDL_RenderPresent(renderer);
+
+    let events = SDL::SDL_WaitEventEx(createEventState());
+
+    return mainLoop(renderer
+        , update(state, events, 0, ui)
+        );
+}
+
+function initState()
+{
+    return State
+    {
+        player: 0,
+        cells: [-1, -1, -1, -1, -1, -1, -1, -1, -1]
+    };
+}
+
+export int main()
+{
+    SDL::SDL_Init(SDL::INIT_VIDEO);
+
+    let window = SDL::SDL_CreateWindow("test", 0, 0, 800, 600, 0);
+    let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
+
+    return mainLoop(renderer
+        , initState()
+        );
+}
