@@ -14,6 +14,7 @@ EntryPoint::EntryPoint(int depth
 	, const std::string &name
 	, const std::multimap<std::string, DzCallable *> &functions
 	, const std::map<std::string, const BaseValue *> &locals
+	, const std::map<std::string, const DzValue *> &globals
 	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
 	, IteratorStorage *iteratorStorage
@@ -30,6 +31,7 @@ EntryPoint::EntryPoint(int depth
 	, m_name(name)
 	, m_functions(functions)
 	, m_locals(locals)
+	, m_globals(globals)
 	, m_types(types)
 	, m_values(values)
 	, m_iteratorStorage(iteratorStorage)
@@ -98,6 +100,11 @@ std::map<std::string, const BaseValue *> EntryPoint::locals() const
 	return m_locals;
 }
 
+std::map<std::string, const DzValue *> EntryPoint::globals() const
+{
+	return m_globals;
+}
+
 std::map<std::string, Prototype *> EntryPoint::types() const
 {
 	return m_types;
@@ -142,6 +149,7 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage
@@ -162,6 +170,7 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage
@@ -182,6 +191,7 @@ EntryPoint EntryPoint::withIteratorStorage(IteratorStorage *iteratorStorage) con
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, iteratorStorage
@@ -202,6 +212,7 @@ EntryPoint EntryPoint::markEntry() const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage
@@ -222,6 +233,7 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage
@@ -242,6 +254,7 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *>
 		, m_name
 		, m_functions
 		, locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage
@@ -262,6 +275,7 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		, name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage
@@ -282,6 +296,7 @@ EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage
@@ -302,6 +317,7 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, values
 		, m_iteratorStorage
@@ -322,6 +338,7 @@ EntryPoint EntryPoint::withDepth(int depth) const
 		, m_name
 		, m_functions
 		, m_locals
+		, m_globals
 		, m_types
 		, m_values
 		, m_iteratorStorage

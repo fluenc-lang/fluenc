@@ -24,6 +24,7 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 {
 	auto locals = entryPoint.locals();
 	auto functions = entryPoint.functions();
+	auto globals = entryPoint.globals();
 
 	auto localsIterator = locals.find(m_name);
 
@@ -56,6 +57,23 @@ std::vector<DzResult> DzMemberAccess::build(const EntryPoint &entryPoint, Stack 
 		values.push(value);
 
 		return m_consumer->build(entryPoint, values);
+	}
+
+	auto globalsIterator = globals.find(m_name);
+
+	if (globalsIterator != globals.end())
+	{
+		std::vector<DzResult> results;
+
+		for (auto &[resultEntryPoint, resultValues] : globalsIterator->second->build(entryPoint, values))
+		{
+			for (auto &result : m_consumer->build(resultEntryPoint, resultValues))
+			{
+				results.push_back(result);
+			}
+		}
+
+		return results;
 	}
 
 	throw new UndeclaredIdentifierException(m_context, m_name);

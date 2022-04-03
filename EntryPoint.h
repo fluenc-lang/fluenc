@@ -12,6 +12,7 @@ class DzCallable;
 class DzStruct;
 class Prototype;
 class IteratorStorage;
+class DzValue;
 
 class EntryPoint
 {
@@ -28,6 +29,7 @@ class EntryPoint
 			, const std::string &name
 			, const std::multimap<std::string, DzCallable *> &functions
 			, const std::map<std::string, const BaseValue *> &locals
+			, const std::map<std::string, const DzValue *> &globals
 			, const std::map<std::string, Prototype *> &types
 			, const Stack &values
 			, IteratorStorage *iteratorStorage
@@ -53,6 +55,7 @@ class EntryPoint
 
 		std::multimap<std::string, DzCallable *> functions() const;
 		std::map<std::string, const BaseValue *> locals() const;
+		std::map<std::string, const DzValue *> globals() const;
 		std::map<std::string, Prototype *> types() const;
 
 		Stack values() const;
@@ -92,6 +95,7 @@ class EntryPoint
 
 		std::multimap<std::string, DzCallable *> m_functions;
 		std::map<std::string, const BaseValue *> m_locals;
+		std::map<std::string, const DzValue *> m_globals;
 		std::map<std::string, Prototype *> m_types;
 
 		Stack m_values;

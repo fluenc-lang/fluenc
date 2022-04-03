@@ -74,28 +74,10 @@ void populateInstructions(const std::vector<std::string> &namespaces
 	, std::vector<DzCallable *> &roots
 	, std::multimap<std::string, DzCallable *> &functions
 	, std::map<std::string, const BaseValue *> &locals
+	, std::map<std::string, const DzValue *> &globals
 	, std::map<std::string, Prototype *> &types
 	)
 {
-	Stack values;
-
-	EntryPoint entryPoint(0
-		, nullptr
-		, nullptr
-		, nullptr
-		, nullptr
-		, nullptr
-		, nullptr
-		, module
-		, context
-		, "term"
-		, functions
-		, locals
-		, types
-		, values
-		, nullptr
-		);
-
 	for (auto &instruction : instructions)
 	{
 		if (instruction.is<Namespace *>())
@@ -113,6 +95,7 @@ void populateInstructions(const std::vector<std::string> &namespaces
 				, roots
 				, functions
 				, locals
+				, globals
 				, types
 				);
 		}
@@ -149,14 +132,11 @@ void populateInstructions(const std::vector<std::string> &namespaces
 			}
 			else if (instruction.is<DzGlobal *>())
 			{
-				auto global = instruction.as<DzGlobal *>(); // TODO Lazy value? We can defer evaluation.
+				auto global = instruction.as<DzGlobal *>();
 
-				for (auto &[_, globalValues] : global->build(entryPoint, values))
-				{
-					qualifiedName << global->name();
+				qualifiedName << global->name();
 
-					locals.insert({ qualifiedName.str(), globalValues.require<ReferenceValue>() });
-				}
+				globals.insert({ qualifiedName.str(), global });
 			}
 		}
 	}
@@ -170,6 +150,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	std::vector<DzCallable *> roots;
 	std::multimap<std::string, DzCallable *> functions;
 	std::map<std::string, const BaseValue *> locals;
+	std::map<std::string, const DzValue *> globals;
 	std::map<std::string, Prototype *> types;
 
 	auto instructions = context->instruction();
@@ -188,6 +169,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, roots
 		, functions
 		, locals
+		, globals
 		, types
 		);
 
@@ -205,6 +187,7 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, "term"
 		, functions
 		, locals
+		, globals
 		, types
 		, values
 		, nullptr
