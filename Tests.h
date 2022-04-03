@@ -1012,7 +1012,7 @@ class Tests : public QObject
 						return i;
 					}
 
-					return i -> (i + 1, number);
+					return i -> numbersBelow(i + 1, number);
 				}
 
 				function sum(int value, int number)
@@ -1173,7 +1173,7 @@ class Tests : public QObject
 
 				function add((int value, ...values))
 				{
-					return value + 2 -> (...values);
+					return value + 2 -> add(...values);
 				}
 
 				function sum(int product, int value)
@@ -1622,7 +1622,7 @@ class Tests : public QObject
 
 				function draw((Rectangle rectangle, ...items))
 				{
-					return rectangle.width -> (...items);
+					return rectangle.width -> draw(...items);
 				}
 
 				function draw(Button button)
@@ -1632,7 +1632,7 @@ class Tests : public QObject
 
 				function draw((Button button, ...items))
 				{
-					return drawButton(button) -> (...items);
+					return drawButton(button) -> draw(...items);
 				}
 
 				function sum(int accumulator, int value)
@@ -1864,14 +1864,14 @@ class Tests : public QObject
 						return 41;
 					}
 
-					return 10 -> (v2, v1);
+					return 10 -> loop(v2, v1);
 				}
 			)");
 
 			auto iteratorFunction2 = compileFunction(R"(
 				function generator(int i)
 				{
-					return i -> (i + 1);
+					return i -> generator(i + 1);
 				}
 			)");
 
@@ -1880,7 +1880,7 @@ class Tests : public QObject
 				{
 					if (i < 20)
 					{
-						return i -> (i + 1);
+						return i -> generator(i + 1);
 					}
 
 					return 20;
@@ -1918,7 +1918,7 @@ class Tests : public QObject
 
 				function add(int addend, (int v, ...values))
 				{
-					return v + addend -> (addend, ...values);
+					return v + addend -> add(addend, ...values);
 				}
 
 				function first(int v)
@@ -2043,7 +2043,7 @@ class Tests : public QObject
 
 				function add(int addend, (Element v, ...values))
 				{
-					return v with { value: v.value + addend } -> (addend, ...values);
+					return v with { value: v.value + addend } -> add(addend, ...values);
 				}
 
 				function first(Element v)
@@ -2216,7 +2216,7 @@ class Tests : public QObject
 
 				function foo(int v1, int v2, (Struct s, ...structs))
 				{
-					return invoke(v1, v2, s.fp) -> (v1, v2, ...structs);
+					return invoke(v1, v2, s.fp) -> foo(v1, v2, ...structs);
 				}
 
 				function sum(int product, int value)
@@ -2274,7 +2274,7 @@ class Tests : public QObject
 				{
 					let result = product + value;
 
-					return result -> (result, ...values);
+					return result -> foo(result, ...values);
 				}
 
 				export int main()
@@ -2296,7 +2296,7 @@ class Tests : public QObject
 
 				function add((int left, ...lefts), (int right, ...rights))
 				{
-					return left + right -> (...lefts, ...rights);
+					return left + right -> add(...lefts, ...rights);
 				}
 
 				function add((int left, ...lefts), int right)
@@ -2338,7 +2338,7 @@ class Tests : public QObject
 
 				function add((int left, ...lefts), (int right, ...rights))
 				{
-					return left + right -> (...lefts, ...rights);
+					return left + right -> add(...lefts, ...rights);
 				}
 
 				function add((int left, ...lefts), int right)
@@ -2368,7 +2368,7 @@ class Tests : public QObject
 
 				function addOne((int value, ...values))
 				{
-					return value + 1 -> (...values);
+					return value + 1 -> addOne(...values);
 				}
 
 				export int main()
