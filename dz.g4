@@ -1,7 +1,15 @@
 grammar dz;
 
 program 
-	: (COMMENT | function | structure | global)*
+	: instruction*
+	;
+
+instruction
+	: (COMMENT | function | structure | global | ns)
+	;
+
+ns
+	: 'namespace' ID '{' instruction* '}'
 	;
 
 structure
@@ -119,7 +127,7 @@ WS
 	;
 
 ID
-	: CHAR (CHAR | DIGIT)*
+	: CHAR (CHAR | DIGIT | '::')*
 	;
 
 fragment CHAR

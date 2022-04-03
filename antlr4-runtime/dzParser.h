@@ -15,16 +15,16 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, INT = 26, 
-    BOOL = 27, OP = 28, COMMENT = 29, STRING = 30, CHARACTER = 31, WS = 32, 
-    ID = 33
+    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
+    INT = 27, BOOL = 28, OP = 29, COMMENT = 30, STRING = 31, CHARACTER = 32, 
+    WS = 33, ID = 34
   };
 
   enum {
-    RuleProgram = 0, RuleStructure = 1, RuleGlobal = 2, RuleAssignment = 3, 
-    RuleField = 4, RuleFunction = 5, RuleLiteral = 6, RuleWith = 7, RuleExpression = 8, 
-    RuleContinuation = 9, RuleRet = 10, RuleBlock = 11, RuleArgument = 12, 
-    RuleTypeName = 13
+    RuleProgram = 0, RuleInstruction = 1, RuleNs = 2, RuleStructure = 3, 
+    RuleGlobal = 4, RuleAssignment = 5, RuleField = 6, RuleFunction = 7, 
+    RuleLiteral = 8, RuleWith = 9, RuleExpression = 10, RuleContinuation = 11, 
+    RuleRet = 12, RuleBlock = 13, RuleArgument = 14, RuleTypeName = 15
   };
 
   explicit dzParser(antlr4::TokenStream *input);
@@ -38,6 +38,8 @@ public:
 
 
   class ProgramContext;
+  class InstructionContext;
+  class NsContext;
   class StructureContext;
   class GlobalContext;
   class AssignmentContext;
@@ -56,14 +58,8 @@ public:
   public:
     ProgramContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> COMMENT();
-    antlr4::tree::TerminalNode* COMMENT(size_t i);
-    std::vector<FunctionContext *> function();
-    FunctionContext* function(size_t i);
-    std::vector<StructureContext *> structure();
-    StructureContext* structure(size_t i);
-    std::vector<GlobalContext *> global();
-    GlobalContext* global(size_t i);
+    std::vector<InstructionContext *> instruction();
+    InstructionContext* instruction(size_t i);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -71,6 +67,38 @@ public:
   };
 
   ProgramContext* program();
+
+  class  InstructionContext : public antlr4::ParserRuleContext {
+  public:
+    InstructionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *COMMENT();
+    FunctionContext *function();
+    StructureContext *structure();
+    GlobalContext *global();
+    NsContext *ns();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  InstructionContext* instruction();
+
+  class  NsContext : public antlr4::ParserRuleContext {
+  public:
+    NsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *ID();
+    std::vector<InstructionContext *> instruction();
+    InstructionContext* instruction(size_t i);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  NsContext* ns();
 
   class  StructureContext : public antlr4::ParserRuleContext {
   public:

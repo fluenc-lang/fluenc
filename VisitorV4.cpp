@@ -48,6 +48,8 @@
 #include "FunctionTypeName.h"
 #include "DzLocal.h"
 
+#include "nodes/Namespace.h"
+
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
 
@@ -65,6 +67,61 @@ VisitorV4::VisitorV4(const Type *iteratorType, DzValue *alpha, DzValue *beta)
 {
 }
 
+void populateInstructions(const std::vector<std::string> &namespaces
+	, const std::vector<antlrcpp::Any> &instructions
+	, std::vector<DzCallable *> &roots
+	, std::multimap<std::string, DzCallable *> &functions
+	, std::map<std::string, const BaseValue *> &locals
+	, std::map<std::string, Prototype *> &types
+	)
+{
+	for (auto &instruction : instructions)
+	{
+		if (instruction.is<Namespace *>())
+		{
+			auto _namespace = instruction.as<Namespace *>();
+
+			std::vector<std::string> nestedNamespaces(namespaces);
+
+			nestedNamespaces.push_back(_namespace->name());
+
+			populateInstructions(nestedNamespaces, _namespace->children(), roots, functions, locals, types);
+		}
+		else
+		{
+			std::ostringstream qualifiedName;
+
+			std::copy(begin(namespaces), end(namespaces)
+				, std::ostream_iterator<std::string>(qualifiedName, "::")
+				);
+
+			if (instruction.is<DzCallable *>())
+			{
+				auto callable = instruction.as<DzCallable *>();
+
+				if (callable->attribute() == FunctionAttribute::Export)
+				{
+					roots.push_back(callable);
+				}
+				else
+				{
+					qualifiedName << callable->name();
+
+					functions.insert({ qualifiedName.str(), callable });
+				}
+			}
+			else if (instruction.is<Prototype *>())
+			{
+				auto prototype = instruction.as<Prototype *>();
+
+				qualifiedName << prototype->name();
+
+				types.insert({ qualifiedName.str(), prototype });
+			}
+		}
+	}
+}
+
 antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 {
 	auto llvmContext = std::make_unique<llvm::LLVMContext>();
@@ -75,26 +132,22 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, Prototype *> types;
 
-	for (auto function : context->function())
+	auto instructions = context->instruction();
+
+	std::vector<antlrcpp::Any> results;
+
+	std::transform(begin(instructions), end(instructions), std::back_inserter(results), [this](auto instruction)
 	{
-		auto result = visit<DzCallable *>(function);
+		return dzBaseVisitor::visit(instruction);
+	});
 
-		if (result->attribute() == FunctionAttribute::Export)
-		{
-			roots.push_back(result);
-		}
-		else
-		{
-			functions.insert({ result->name(), result });
-		}
-	}
-
-	for (auto structure : context->structure())
-	{
-		auto result = visit<Prototype *>(structure);
-
-		types.insert({ result->name(), result });
-	}
+	populateInstructions(std::vector<std::string>()
+		, results
+		, roots
+		, functions
+		, locals
+		, types
+		);
 
 	Stack values;
 
@@ -115,13 +168,16 @@ antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
 		, nullptr
 		);
 
-	for (auto global : context->global())
+	for (auto &result : results)
 	{
-		auto result = visit<DzGlobal *>(global);
-
-		for (auto &[_, globalValues] : result->build(entryPoint, values))
+		if (result.is<DzGlobal *>())
 		{
-			locals.insert({ result->name(), globalValues.require<ReferenceValue>() });
+			auto global = result.as<DzGlobal *>();
+
+			for (auto &[_, globalValues] : global->build(entryPoint, values))
+			{
+				locals.insert({ global->name(), globalValues.require<ReferenceValue>() });
+			}
 		}
 	}
 
@@ -706,4 +762,25 @@ antlrcpp::Any VisitorV4::visitLocal(dzParser::LocalContext *context)
 	VisitorV4 visitor(m_iteratorType, local, nullptr);
 
 	return visitor.visit<DzValue *>(context->expression());
+}
+
+antlrcpp::Any VisitorV4::visitInstruction(dzParser::InstructionContext *context)
+{
+	return visitChildren(context);
+}
+
+antlrcpp::Any VisitorV4::visitNs(dzParser::NsContext *context)
+{
+	auto instructions = context->instruction();
+
+	std::vector<antlrcpp::Any> children;
+
+	std::transform(begin(instructions), end(instructions), std::back_inserter(children), [this ](auto instruction)
+	{
+		return dzBaseVisitor::visit(instruction);
+	});
+
+	return new Namespace(children
+		, context->ID()->getText()
+		);
 }

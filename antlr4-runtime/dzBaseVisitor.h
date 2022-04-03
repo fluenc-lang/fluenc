@@ -19,6 +19,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitInstruction(dzParser::InstructionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitNs(dzParser::NsContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitStructure(dzParser::StructureContext *ctx) override {
     return visitChildren(ctx);
   }

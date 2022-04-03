@@ -2635,9 +2635,9 @@ class Tests : public QObject
 
 			VisitorV4 visitor(nullptr, nullptr, nullptr);
 
-			for (auto function : program->function())
+			for (auto instruction : program->instruction())
 			{
-				return visitor.visit<DzCallable *>(function);
+				return visitor.visit<DzCallable *>(instruction);
 			}
 
 			return nullptr;

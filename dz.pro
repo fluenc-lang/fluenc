@@ -66,6 +66,7 @@ SOURCES += \
 	antlr4-runtime/dzLexer.cpp \
 	antlr4-runtime/dzParser.cpp \
 	antlr4-runtime/dzVisitor.cpp \
+	nodes/Namespace.cpp \
 	types/AnyType.cpp \
 	types/BooleanType.cpp \
 	types/ByteType.cpp \
@@ -171,6 +172,7 @@ HEADERS += \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \
 	antlr4-runtime/dzVisitor.h \
+	nodes/Namespace.h \
 	types/AnyType.h \
 	types/BooleanType.h \
 	types/BuiltinType.h \
