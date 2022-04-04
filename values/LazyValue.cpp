@@ -16,7 +16,7 @@ LazyValue::LazyValue(ILazyValueGenerator *generator)
 
 const Type *LazyValue::type() const
 {
-	return IteratorType::instance(); // ??
+	return m_generator->type();
 }
 
 const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const
@@ -26,7 +26,7 @@ const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const
 	return this;
 }
 
-IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
+const IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
 {
 	return m_generator->generate(entryPoint);
 }

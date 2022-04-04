@@ -15,7 +15,7 @@ class LazyValue : public BaseValue
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
-		IIteratable *generate(const EntryPoint &entryPoint) const;
+		const IIteratable *generate(const EntryPoint &entryPoint) const;
 
 		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;
 

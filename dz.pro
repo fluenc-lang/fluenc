@@ -67,6 +67,7 @@ SOURCES += \
 	antlr4-runtime/dzVisitor.cpp \
 	nodes/Namespace.cpp \
 	types/AnyType.cpp \
+	types/ArrayType.cpp \
 	types/BooleanType.cpp \
 	types/ByteType.cpp \
 	types/FunctionType.cpp \
@@ -172,6 +173,7 @@ HEADERS += \
 	antlr4-runtime/dzVisitor.h \
 	nodes/Namespace.h \
 	types/AnyType.h \
+	types/ArrayType.h \
 	types/BooleanType.h \
 	types/BuiltinType.h \
 	types/ByteType.h \

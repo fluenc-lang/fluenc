@@ -14,7 +14,9 @@ class ArrayValueGenerator : public ILazyValueGenerator
 			, const std::vector<DzResult> &values
 			);
 
-		IIteratable *generate(const EntryPoint &entryPoint) const override;
+		const IIteratable *generate(const EntryPoint &entryPoint) const override;
+
+		const Type *type() const override;
 
 	private:
 		size_t m_id;

@@ -10,7 +10,9 @@ class IteratorValueGenerator : public ILazyValueGenerator
 	public:
 		IteratorValueGenerator(const DzValue *subject, const EntryPoint &entryPoint);
 
-		IIteratable *generate(const EntryPoint &entryPoint) const override;
+		const IIteratable *generate(const EntryPoint &entryPoint) const override;
+
+		const Type *type() const override;
 
 	private:
 		const DzValue *m_subject;

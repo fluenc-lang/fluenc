@@ -20,11 +20,14 @@
 #include "DzCallable.h"
 #include "EntryPoint.h"
 
+#include "values/LazyValue.h"
+
 #include "types/AnyType.h"
 #include "types/Prototype.h"
 #include "types/Int32Type.h"
 #include "types/Int64Type.h"
 
+#include "DzGlobal.h"
 #include "wobjectdefs.h"
 #include "wobjectimpl.h"
 
@@ -2546,6 +2549,30 @@ class Tests : public QObject
 			QCOMPARE(result, 50);
 		}
 
+		void arrayType_1()
+		{
+			auto value1 = compileValue("[1, 2, 3]");
+			auto value2 = compileValue("[1, 2L, \"foo\"]");
+
+			QCOMPARE(value1->type()->name(), "[int, int, int]");
+			QCOMPARE(value2->type()->name(), "[int, long, string]");
+		}
+
+		void arrayType_2()
+		{
+			auto value1 = compileValue("[1, 2, 3]");
+			auto value2 = compileValue("[1, 2L, \"foo\"]");
+			auto value3 = compileValue("[7, 5, 34]");
+
+			QCOMPARE(value1->type()->equals(value1->type(), EntryPoint()), true);
+			QCOMPARE(value2->type()->equals(value2->type(), EntryPoint()), true);
+			QCOMPARE(value1->type()->equals(value3->type(), EntryPoint()), true);
+			QCOMPARE(value3->type()->equals(value1->type(), EntryPoint()), true);
+
+			QCOMPARE(value1->type()->equals(value2->type(), EntryPoint()), false);
+			QCOMPARE(value2->type()->equals(value1->type(), EntryPoint()), false);
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2620,6 +2647,8 @@ class Tests : public QObject
 		W_SLOT(selectsTheCorrectOverload_2)
 		W_SLOT(compatibility)
 		W_SLOT(scenario70)
+		W_SLOT(arrayType_1)
+//		W_SLOT(arrayType_2)
 
 	private:
 		DzCallable *compileFunction(std::string source)
@@ -2638,6 +2667,64 @@ class Tests : public QObject
 			for (auto instruction : program->instruction())
 			{
 				return visitor.visit<DzCallable *>(instruction);
+			}
+
+			return nullptr;
+		}
+
+		const BaseValue *compileValue(std::string source)
+		{
+			std::stringstream stream;
+			stream << "global dummy: ";
+			stream << source;
+			stream << ";";
+
+			antlr4::ANTLRInputStream input(stream);
+			dzLexer lexer(&input);
+			antlr4::CommonTokenStream tokens(&lexer);
+			dzParser parser(&tokens);
+
+			auto program = parser.program();
+
+			VisitorV4 visitor(nullptr, nullptr, nullptr);
+
+			for (auto instruction : program->instruction())
+			{
+				auto global = visitor.visit<DzGlobal *>(instruction);
+
+				auto context = std::make_unique<llvm::LLVMContext>();
+				auto module = std::make_unique<llvm::Module>("dz", *context);
+
+				auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(*context), false);
+				auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module.get());
+
+				UNUSED(function);
+
+				auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
+				auto block = llvm::BasicBlock::Create(*context, "block", function);
+
+				EntryPoint ep(0
+					, nullptr
+					, nullptr
+					, block
+					, alloc
+					, nullptr
+					, nullptr
+					, &module
+					, &context
+					, "entry"
+					, std::multimap<std::string, DzCallable *>()
+					, std::map<std::string, const BaseValue *>()
+					, std::map<std::string, const DzValue *>()
+					, std::map<std::string, Prototype *>()
+					, Stack()
+					, nullptr
+					);
+
+				for (auto &[_, values] : global->build(ep, Stack()))
+				{
+					return *values.begin();
+				}
 			}
 
 			return nullptr;
