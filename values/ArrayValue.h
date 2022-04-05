@@ -2,7 +2,7 @@
 #define ARRAYVALUE_H
 
 #include "BaseValue.h"
-#include "DzValue.h"
+#include "Node.h"
 #include "IIteratable.h"
 
 class IteratorValue;
@@ -13,7 +13,7 @@ class ArrayValue : public IIteratable
 {
 	public:
 		ArrayValue(const TypedValue *index
-			, const DzValue *iterator
+			, const Node *iterator
 			, const std::vector<DzResult> &values
 			);
 
@@ -21,7 +21,7 @@ class ArrayValue : public IIteratable
 
 	private:
 		const TypedValue *m_index;
-		const DzValue *m_iterator;
+		const Node *m_iterator;
 
 		const std::vector<DzResult> m_values;
 };

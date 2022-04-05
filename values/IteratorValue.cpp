@@ -5,7 +5,7 @@
 #include "types/IteratorType.h"
 
 IteratorValue::IteratorValue(const EntryPoint *entryPoint
-	, const DzValue *subject
+	, const Node *subject
 	)
 	: m_entryPoint(entryPoint)
 	, m_subject(subject)

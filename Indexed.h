@@ -3,7 +3,7 @@
 
 #include <cstddef>
 
-class DzValue;
+class Node;
 
 template <typename T>
 struct Indexed

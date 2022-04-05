@@ -2,15 +2,15 @@
 #define ARRAYVALUEGENERATOR_H
 
 #include "ILazyValueGenerator.h"
-#include "DzValue.h"
+#include "Node.h"
 
-class DzValue;
+class Node;
 
 class ArrayValueGenerator : public ILazyValueGenerator
 {
 	public:
 		ArrayValueGenerator(size_t id
-			, const DzValue *iterator
+			, const Node *iterator
 			, const std::vector<DzResult> &values
 			);
 
@@ -21,7 +21,7 @@ class ArrayValueGenerator : public ILazyValueGenerator
 	private:
 		size_t m_id;
 
-		const DzValue *m_iterator;
+		const Node *m_iterator;
 
 		const std::vector<DzResult> m_values;
 };

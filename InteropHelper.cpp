@@ -5,7 +5,6 @@
 #include "InteropHelper.h"
 #include "IndexIterator.h"
 #include "EntryPoint.h"
-#include "DzFieldAccess.h"
 #include "VoidIterator.h"
 #include "IRBuilderEx.h"
 

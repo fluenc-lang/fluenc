@@ -11,7 +11,7 @@
 #include "types/IteratorType.h"
 
 ArrayValueGenerator::ArrayValueGenerator(size_t id
-	, const DzValue *iterator
+	, const Node *iterator
 	, const std::vector<DzResult> &values
 	)
 	: m_id(id)

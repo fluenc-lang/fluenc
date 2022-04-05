@@ -1,5 +1,4 @@
 #include "WithPrototypeProvider.h"
-#include "DzFieldAccess.h"
 
 #include "types/WithPrototype.h"
 

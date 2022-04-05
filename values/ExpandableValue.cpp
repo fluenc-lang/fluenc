@@ -3,7 +3,7 @@
 
 #include "types/IteratorType.h"
 
-ExpandableValue::ExpandableValue(const Type *iteratorType, const EntryPoint &provider, const DzValue *chain)
+ExpandableValue::ExpandableValue(const Type *iteratorType, const EntryPoint &provider, const Node *chain)
 	: m_iteratorType(iteratorType)
 	, m_provider(new EntryPoint(provider))
 	, m_chain(chain)
@@ -27,7 +27,7 @@ const EntryPoint *ExpandableValue::provider() const
 	return m_provider;
 }
 
-const DzValue *ExpandableValue::chain() const
+const Node *ExpandableValue::chain() const
 {
 	return m_chain;
 }

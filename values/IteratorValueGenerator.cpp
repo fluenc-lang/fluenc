@@ -3,7 +3,7 @@
 
 #include "types/IteratorType.h"
 
-IteratorValueGenerator::IteratorValueGenerator(const DzValue *subject, const EntryPoint &entryPoint)
+IteratorValueGenerator::IteratorValueGenerator(const Node *subject, const EntryPoint &entryPoint)
 	: m_subject(subject)
 	, m_entryPoint(new EntryPoint(entryPoint))
 {

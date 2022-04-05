@@ -9,24 +9,24 @@
 
 class Type;
 class EntryPoint;
-class DzValue;
+class Node;
 class IteratorType;
 
 class ExpandableValue : public BaseValue
 {
 	public:
-		ExpandableValue(const Type *iteratorType, const EntryPoint &provider, const DzValue *chain);
+		ExpandableValue(const Type *iteratorType, const EntryPoint &provider, const Node *chain);
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 		const EntryPoint *provider() const;
-		const DzValue *chain() const;
+		const Node *chain() const;
 
 	private:
 		const Type *m_iteratorType;
 		const EntryPoint *m_provider;
-		const DzValue *m_chain;
+		const Node *m_chain;
 };
 
 #endif // EXPANDABLEVALUE_H

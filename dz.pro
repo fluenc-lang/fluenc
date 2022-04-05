@@ -4,54 +4,53 @@ CONFIG += DEBUG c++17
 
 SOURCES += \
 	AllIterator.cpp \
-	ArraySink.cpp \
-	BlockStackFrame.cpp \
+	nodes/BlockInstruction.cpp \
+	nodes/Continuation.cpp \
+	nodes/Expansion.cpp \
+	nodes/ExportedFunctionTerminator.cpp \
+	nodes/FunctionCallProxy.cpp \
+	nodes/IntegralLiteral.cpp \
+	nodes/ImportedFunction.cpp \
+	nodes/Instantiation.cpp \
+	nodes/MemberAccess.cpp \
+	nodes/StringLiteral.cpp \
+	nodes/FunctionCall.cpp \
+	nodes/Global.cpp \
+	nodes/Local.cpp \
+	nodes/Return.cpp \
+	nodes/ArrayContinuation.cpp \
+	nodes/ArrayElement.cpp \
+	nodes/ArraySink.cpp \
+	nodes/Binary.cpp \
+	nodes/BlockStackFrame.cpp \
+	nodes/BooleanLiteral.cpp \
+	nodes/CharacterLiteral.cpp \
 	CompilerException.cpp \
+	nodes/Conditional.cpp \
 	DefaultPrototypeProvider.cpp \
 	DzArgument.cpp \
-	DzArrayContinuation.cpp \
-	DzArrayElement.cpp \
-	DzBinary.cpp \
-	DzBlockInstruction.cpp \
-	DzBooleanLiteral.cpp \
-	DzCharacterLiteral.cpp \
-	DzConditional.cpp \
-	DzContinuation.cpp \
-	DzEmptyArray.cpp \
-	DzExpansion.cpp \
-	DzExportedFunction.cpp \
-	DzExportedFunctionTerminator.cpp \
-	DzFieldAccess.cpp \
-	DzFunction.cpp \
-	DzFunctionCall.cpp \
-	DzFunctionCallProxy.cpp \
-	DzGlobal.cpp \
-	DzImportedFunction.cpp \
-	DzInstantiation.cpp \
-	DzIntegralLiteral.cpp \
-	DzLocal.cpp \
-	DzMemberAccess.cpp \
-	DzReturn.cpp \
-	DzStringLiteral.cpp \
-	DzTerminator.cpp \
 	DzTupleArgument.cpp \
 	DzTypeName.cpp \
-	DzValue.cpp \
+	nodes/EmptyArray.cpp \
 	EntryPoint.cpp \
+	nodes/ExportedFunction.cpp \
+	nodes/Function.cpp \
 	FunctionNotFoundException.cpp \
 	FunctionTypeName.cpp \
 	IRBuilderEx.cpp \
 	IndexIterator.cpp \
-	IndexSink.cpp \
+	nodes/IndexSink.cpp \
 	InteropHelper.cpp \
 	IteratorStorage.cpp \
-	Junction.cpp \
-	LazyEvaluation.cpp \
-	LazySink.cpp \
-	ReferenceSink.cpp \
+	nodes/Junction.cpp \
+	nodes/LazyEvaluation.cpp \
+	nodes/LazySink.cpp \
+	Node.cpp \
+	nodes/ReferenceSink.cpp \
 	Stack.cpp \
-	StackSegment.cpp \
-	TaintedSink.cpp \
+	nodes/StackSegment.cpp \
+	nodes/TaintedSink.cpp \
+	nodes/Terminator.cpp \
 	Type.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
@@ -103,42 +102,39 @@ SOURCES += \
 
 HEADERS += \
 	AllIterator.h \
-	ArraySink.h \
-	BlockStackFrame.h \
+	nodes/BlockInstruction.h \
+	nodes/Continuation.h \
+	nodes/Expansion.h \
+	nodes/ExportedFunctionTerminator.h \
+	nodes/FunctionCallProxy.h \
+	nodes/IntegralLiteral.h \
+	nodes/ImportedFunction.h \
+	nodes/Instantiation.h \
+	nodes/MemberAccess.h \
+	nodes/StringLiteral.h \
+	nodes/FunctionCall.h \
+	nodes/Global.h \
+	nodes/Local.h \
+	nodes/Return.h \
+	nodes/ArrayContinuation.h \
+	nodes/ArrayElement.h \
+	nodes/ArraySink.h \
+	nodes/Binary.h \
+	nodes/BlockStackFrame.h \
+	nodes/BooleanLiteral.h \
+	nodes/Callable.h \
+	nodes/CharacterLiteral.h \
 	CompilerException.h \
+	nodes/Conditional.h \
 	DefaultPrototypeProvider.h \
-	DzArrayContinuation.h \
-	DzArrayElement.h \
 	DzArgument.h \
 	DzBaseArgument.h \
-	DzBinary.h \
-	DzBlockInstruction.h \
-	DzBooleanLiteral.h \
-	DzCallable.h \
-	DzCharacterLiteral.h \
-	DzConditional.h \
-	DzContinuation.h \
-	DzEmptyArray.h \
-	DzExpansion.h \
-	DzExportedFunction.h \
-	DzExportedFunctionTerminator.h \
-	DzFieldAccess.h \
-	DzFunction.h \
-	DzFunctionCall.h \
-	DzFunctionCallProxy.h \
-	DzGlobal.h \
-	DzImportedFunction.h \
-	DzInstantiation.h \
-	DzIntegralLiteral.h \
-	DzLocal.h \
-	DzMemberAccess.h \
-	DzReturn.h \
-	DzStringLiteral.h \
-	DzTerminator.h \
 	DzTupleArgument.h \
 	DzTypeName.h \
-	DzValue.h \
+	nodes/EmptyArray.h \
 	EntryPoint.h \
+	nodes/ExportedFunction.h \
+	nodes/Function.h \
 	FunctionAttribute.h \
 	FunctionNotFoundException.h \
 	FunctionTypeName.h \
@@ -146,18 +142,20 @@ HEADERS += \
 	IRBuilderEx.h \
 	ITypeName.h \
 	IndexIterator.h \
-	IndexSink.h \
+	nodes/IndexSink.h \
 	Indexed.h \
 	InteropHelper.h \
 	IteratorStorage.h \
-	Junction.h \
+	nodes/Junction.h \
 	KaleidoscopeJIT.h \
-	LazyEvaluation.h \
-	LazySink.h \
-	ReferenceSink.h \
+	nodes/LazyEvaluation.h \
+	nodes/LazySink.h \
+	Node.h \
+	nodes/ReferenceSink.h \
 	Stack.h \
-	StackSegment.h \
-	TaintedSink.h \
+	nodes/StackSegment.h \
+	nodes/TaintedSink.h \
+	nodes/Terminator.h \
 	Tests.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \

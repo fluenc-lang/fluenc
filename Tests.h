@@ -17,8 +17,10 @@
 #include "KaleidoscopeJIT.h"
 #include "VisitorV4.h"
 #include "Utility.h"
-#include "DzCallable.h"
 #include "EntryPoint.h"
+
+#include "nodes/Callable.h"
+#include "nodes/Global.h"
 
 #include "values/LazyValue.h"
 
@@ -27,7 +29,6 @@
 #include "types/Int32Type.h"
 #include "types/Int64Type.h"
 
-#include "DzGlobal.h"
 #include "wobjectdefs.h"
 #include "wobjectimpl.h"
 
@@ -2651,7 +2652,7 @@ class Tests : public QObject
 //		W_SLOT(arrayType_2)
 
 	private:
-		DzCallable *compileFunction(std::string source)
+		Callable *compileFunction(std::string source)
 		{
 			std::stringstream stream(source);
 
@@ -2666,7 +2667,7 @@ class Tests : public QObject
 
 			for (auto instruction : program->instruction())
 			{
-				return visitor.visit<DzCallable *>(instruction);
+				return visitor.visit<Callable *>(instruction);
 			}
 
 			return nullptr;
@@ -2690,7 +2691,7 @@ class Tests : public QObject
 
 			for (auto instruction : program->instruction())
 			{
-				auto global = visitor.visit<DzGlobal *>(instruction);
+				auto global = visitor.visit<Global *>(instruction);
 
 				auto context = std::make_unique<llvm::LLVMContext>();
 				auto module = std::make_unique<llvm::Module>("dz", *context);
@@ -2713,9 +2714,9 @@ class Tests : public QObject
 					, &module
 					, &context
 					, "entry"
-					, std::multimap<std::string, DzCallable *>()
+					, std::multimap<std::string, Callable *>()
 					, std::map<std::string, const BaseValue *>()
-					, std::map<std::string, const DzValue *>()
+					, std::map<std::string, const Node *>()
 					, std::map<std::string, Prototype *>()
 					, Stack()
 					, nullptr

@@ -3,7 +3,7 @@
 
 #include "antlr4-runtime/support/Any.h"
 
-#include "DzValue.h"
+#include "Node.h"
 
 class Namespace
 {

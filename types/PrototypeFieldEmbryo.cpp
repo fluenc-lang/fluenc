@@ -2,7 +2,7 @@
 #include "DzTypeName.h"
 
 PrototypeFieldEmbryo::PrototypeFieldEmbryo(const std::string &name
-	, const DzValue *defaultValue
+	, const Node *defaultValue
 	, const ITypeName *type
 	)
 	: m_name(name)
@@ -16,7 +16,7 @@ std::string PrototypeFieldEmbryo::name() const
 	return m_name;
 }
 
-const DzValue *PrototypeFieldEmbryo::defaultValue() const
+const Node *PrototypeFieldEmbryo::defaultValue() const
 {
 	return m_defaultValue;
 }

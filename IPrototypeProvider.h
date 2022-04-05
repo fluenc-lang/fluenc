@@ -1,7 +1,7 @@
 #ifndef IPROTOTYPEPROVIDER_H
 #define IPROTOTYPEPROVIDER_H
 
-#include "DzValue.h"
+#include "Node.h"
 
 class IPrototype;
 

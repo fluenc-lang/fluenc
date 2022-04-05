@@ -2,7 +2,7 @@
 #define ITERATORVALUE_H
 
 #include "BaseValue.h"
-#include "DzValue.h"
+#include "Node.h"
 #include "IIteratable.h"
 
 class EntryPoint;
@@ -12,14 +12,14 @@ class IteratorValue : public IIteratable
 {
 	public:
 		IteratorValue(const EntryPoint *entryPoint
-			, const DzValue *subject
+			, const Node *subject
 			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
 
 	private:
 		const EntryPoint *m_entryPoint;
-		const DzValue *m_subject;
+		const Node *m_subject;
 };
 
 #endif // ITERATORVALUE_H

@@ -2,7 +2,7 @@
 
 #include "Prototype.h"
 #include "DzTypeName.h"
-#include "DzValue.h"
+#include "Node.h"
 #include "AnyType.h"
 
 Prototype::Prototype(const std::string &tag

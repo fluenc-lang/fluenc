@@ -6,15 +6,16 @@
 #include "IRBuilderEx.h"
 #include "IteratorValue.h"
 #include "ValueHelper.h"
-#include "LazyEvaluation.h"
-#include "DzTerminator.h"
 #include "LazyValue.h"
+
+#include "nodes/Terminator.h"
+#include "nodes/LazyEvaluation.h"
 
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
 
 ArrayValue::ArrayValue(const TypedValue *index
-	, const DzValue *iterator
+	, const Node *iterator
 	, const std::vector<DzResult> &values
 	)
 	: m_index(index)

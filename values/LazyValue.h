@@ -2,7 +2,7 @@
 #define LAZYVALUE_H
 
 #include "BaseValue.h"
-#include "DzValue.h"
+#include "Node.h"
 
 class ILazyValueGenerator;
 class IIteratable;

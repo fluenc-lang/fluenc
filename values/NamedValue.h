@@ -4,7 +4,7 @@
 #include <llvm/IR/BasicBlock.h>
 
 #include "BaseValue.h"
-#include "DzValue.h"
+#include "Node.h"
 
 class ITypeName;
 

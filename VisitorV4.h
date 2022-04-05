@@ -7,7 +7,7 @@
 
 #include "EntryPoint.h"
 
-class DzValue;
+class Node;
 
 class ModuleInfo
 {
@@ -49,7 +49,7 @@ class Type;
 class VisitorV4 : public dzBaseVisitor
 {
 	public:
-		VisitorV4(const Type *iteratorType, DzValue *alpha, DzValue *beta);
+		VisitorV4(const Type *iteratorType, Node *alpha, Node *beta);
 
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
@@ -100,8 +100,8 @@ class VisitorV4 : public dzBaseVisitor
 	private:
 		const Type *m_iteratorType;
 
-		DzValue *m_alpha;
-		DzValue *m_beta;
+		Node *m_alpha;
+		Node *m_beta;
 };
 
 #endif // VISITORV4_H

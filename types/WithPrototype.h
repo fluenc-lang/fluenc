@@ -2,7 +2,7 @@
 #define WITHPROTOTYPE_H
 
 #include "IPrototype.h"
-#include "DzValue.h"
+#include "Node.h"
 
 #include "values/UserTypeValue.h"
 

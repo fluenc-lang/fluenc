@@ -1,7 +1,7 @@
 #ifndef IITERATABLE_H
 #define IITERATABLE_H
 
-#include "DzValue.h"
+#include "Node.h"
 
 class EntryPoint;
 
