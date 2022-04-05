@@ -4,7 +4,7 @@
 #include "EntryPoint.h"
 #include "DzTypeName.h"
 
-#include "values/TypedValue.h"
+#include "values/ScalarValue.h"
 
 NamedValue::NamedValue(const std::string &name, const BaseValue *value)
 	: m_name(name)

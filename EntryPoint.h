@@ -8,7 +8,7 @@
 
 #include "Stack.h"
 
-class Callable;
+class CallableNode;
 class DzStruct;
 class Prototype;
 class IteratorStorage;
@@ -27,7 +27,7 @@ class EntryPoint
 			, std::unique_ptr<llvm::Module> *module
 			, std::unique_ptr<llvm::LLVMContext> *context
 			, const std::string &name
-			, const std::multimap<std::string, Callable *> &functions
+			, const std::multimap<std::string, CallableNode *> &functions
 			, const std::map<std::string, const BaseValue *> &locals
 			, const std::map<std::string, const Node *> &globals
 			, const std::map<std::string, Prototype *> &types
@@ -53,7 +53,7 @@ class EntryPoint
 		std::string name() const;
 		std::string tag() const;
 
-		std::multimap<std::string, Callable *> functions() const;
+		std::multimap<std::string, CallableNode *> functions() const;
 		std::map<std::string, const BaseValue *> locals() const;
 		std::map<std::string, const Node *> globals() const;
 		std::map<std::string, Prototype *> types() const;
@@ -93,7 +93,7 @@ class EntryPoint
 
 		std::string m_name;
 
-		std::multimap<std::string, Callable *> m_functions;
+		std::multimap<std::string, CallableNode *> m_functions;
 		std::map<std::string, const BaseValue *> m_locals;
 		std::map<std::string, const Node *> m_globals;
 		std::map<std::string, Prototype *> m_types;

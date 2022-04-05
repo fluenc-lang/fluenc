@@ -2,7 +2,7 @@
 
 #include "types/WithPrototype.h"
 
-#include "values/TypedValue.h"
+#include "values/ScalarValue.h"
 #include "values/UserTypeValue.h"
 
 WithPrototypeProvider *WithPrototypeProvider::instance()

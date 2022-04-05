@@ -6,7 +6,7 @@
 
 #include "values/UserTypeValue.h"
 
-class TypedValue;
+class ScalarValue;
 
 class WithPrototype : public IPrototype
 {

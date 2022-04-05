@@ -1,6 +1,6 @@
 #include "WithPrototype.h"
 
-#include "values/TypedValue.h"
+#include "values/ScalarValue.h"
 #include "values/NamedValue.h"
 
 WithPrototype::WithPrototype(const UserTypeValue *value)

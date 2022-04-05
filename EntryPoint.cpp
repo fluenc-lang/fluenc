@@ -12,7 +12,7 @@ EntryPoint::EntryPoint(int depth
 	, std::unique_ptr<llvm::Module> *module
 	, std::unique_ptr<llvm::LLVMContext> *context
 	, const std::string &name
-	, const std::multimap<std::string, Callable *> &functions
+	, const std::multimap<std::string, CallableNode *> &functions
 	, const std::map<std::string, const BaseValue *> &locals
 	, const std::map<std::string, const Node *> &globals
 	, const std::map<std::string, Prototype *> &types
@@ -90,7 +90,7 @@ std::string EntryPoint::name() const
 	return m_name;
 }
 
-std::multimap<std::string, Callable *> EntryPoint::functions() const
+std::multimap<std::string, CallableNode *> EntryPoint::functions() const
 {
 	return m_functions;
 }

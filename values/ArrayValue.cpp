@@ -1,5 +1,5 @@
 #include "ArrayValue.h"
-#include "TypedValue.h"
+#include "ScalarValue.h"
 #include "TupleValue.h"
 #include "ReferenceValue.h"
 #include "ExpandableValue.h"
@@ -8,13 +8,13 @@
 #include "ValueHelper.h"
 #include "LazyValue.h"
 
-#include "nodes/Terminator.h"
-#include "nodes/LazyEvaluation.h"
+#include "nodes/TerminatorNode.h"
+#include "nodes/LazyEvaluationNode.h"
 
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
 
-ArrayValue::ArrayValue(const TypedValue *index
+ArrayValue::ArrayValue(const ScalarValue *index
 	, const Node *iterator
 	, const std::vector<DzResult> &values
 	)

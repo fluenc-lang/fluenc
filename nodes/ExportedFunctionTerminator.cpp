@@ -4,7 +4,7 @@
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 
-#include "values/TypedValue.h"
+#include "values/ScalarValue.h"
 
 std::vector<DzResult> ExportedFunctionTerminator::build(const EntryPoint &entryPoint, Stack values) const
 {
@@ -22,7 +22,7 @@ std::vector<DzResult> ExportedFunctionTerminator::build(const EntryPoint &entryP
 	auto ep = entryPoint
 		.withBlock(block);
 
-	auto returnValue = values.require<TypedValue>();
+	auto returnValue = values.require<ScalarValue>();
 
 	IRBuilderEx builder(ep);
 	builder.createRet(*returnValue);

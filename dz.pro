@@ -4,53 +4,53 @@ CONFIG += DEBUG c++17
 
 SOURCES += \
 	AllIterator.cpp \
-	nodes/BlockInstruction.cpp \
-	nodes/Continuation.cpp \
-	nodes/Expansion.cpp \
+	nodes/ArrayContinuationNode.cpp \
+	nodes/ArrayElementNode.cpp \
+	nodes/ArraySinkNode.cpp \
+	nodes/BinaryNode.cpp \
+	nodes/BlockInstructionNode.cpp \
+	nodes/BlockStackFrameNode.cpp \
+	nodes/BooleanLiteralNode.cpp \
+	nodes/CharacterLiteralNode.cpp \
+	nodes/ConditionalNode.cpp \
+	nodes/ContinuationNode.cpp \
+	nodes/EmptyArrayNode.cpp \
+	nodes/ExpansionNode.cpp \
+	nodes/ExportedFunctionNode.cpp \
 	nodes/ExportedFunctionTerminator.cpp \
 	nodes/FunctionCallProxy.cpp \
-	nodes/IntegralLiteral.cpp \
-	nodes/ImportedFunction.cpp \
-	nodes/Instantiation.cpp \
-	nodes/MemberAccess.cpp \
-	nodes/StringLiteral.cpp \
+	nodes/FunctionNode.cpp \
+	nodes/GlobalNode.cpp \
+	nodes/ImportedFunctionNode.cpp \
+	nodes/IndexSinkNode.cpp \
+	nodes/InstantiationNode.cpp \
+	nodes/IntegralLiteralNode.cpp \
+	nodes/JunctionNode.cpp \
+	nodes/LazyEvaluationNode.cpp \
+	nodes/LazySinkNode.cpp \
+	nodes/LocalNode.cpp \
+	nodes/MemberAccessNode.cpp \
+	Namespace.cpp \
+	nodes/ReferenceSinkNode.cpp \
+	nodes/ReturnNode.cpp \
+	nodes/StackSegmentNode.cpp \
 	nodes/FunctionCall.cpp \
-	nodes/Global.cpp \
-	nodes/Local.cpp \
-	nodes/Return.cpp \
-	nodes/ArrayContinuation.cpp \
-	nodes/ArrayElement.cpp \
-	nodes/ArraySink.cpp \
-	nodes/Binary.cpp \
-	nodes/BlockStackFrame.cpp \
-	nodes/BooleanLiteral.cpp \
-	nodes/CharacterLiteral.cpp \
 	CompilerException.cpp \
-	nodes/Conditional.cpp \
 	DefaultPrototypeProvider.cpp \
 	DzArgument.cpp \
 	DzTupleArgument.cpp \
 	DzTypeName.cpp \
-	nodes/EmptyArray.cpp \
 	EntryPoint.cpp \
-	nodes/ExportedFunction.cpp \
-	nodes/Function.cpp \
 	FunctionNotFoundException.cpp \
 	FunctionTypeName.cpp \
 	IRBuilderEx.cpp \
 	IndexIterator.cpp \
-	nodes/IndexSink.cpp \
 	InteropHelper.cpp \
 	IteratorStorage.cpp \
-	nodes/Junction.cpp \
-	nodes/LazyEvaluation.cpp \
-	nodes/LazySink.cpp \
 	Node.cpp \
-	nodes/ReferenceSink.cpp \
 	Stack.cpp \
-	nodes/StackSegment.cpp \
-	nodes/TaintedSink.cpp \
-	nodes/Terminator.cpp \
+	nodes/StringLiteralNode.cpp \
+	nodes/TaintedSinkNode.cpp \
 	Type.cpp \
 	UndeclaredIdentifierException.cpp \
 	UnknownTypeException.cpp \
@@ -64,7 +64,7 @@ SOURCES += \
 	antlr4-runtime/dzLexer.cpp \
 	antlr4-runtime/dzParser.cpp \
 	antlr4-runtime/dzVisitor.cpp \
-	nodes/Namespace.cpp \
+	nodes/TerminatorNode.cpp \
 	types/AnyType.cpp \
 	types/ArrayType.cpp \
 	types/BooleanType.cpp \
@@ -93,48 +93,54 @@ SOURCES += \
 	values/LazyValue.cpp \
 	values/NamedValue.cpp \
 	values/ReferenceValue.cpp \
+	values/ScalarValue.cpp \
 	values/TaintedValue.cpp \
 	values/TupleValue.cpp \
-	values/TypedValue.cpp \
 	values/IndexedValue.cpp \
 	values/UserTypeValue.cpp \
 	values/WithoutValue.cpp
 
 HEADERS += \
 	AllIterator.h \
-	nodes/BlockInstruction.h \
-	nodes/Continuation.h \
-	nodes/Expansion.h \
+	nodes/ArrayContinuationNode.h \
+	nodes/ArrayElementNode.h \
+	nodes/ArraySinkNode.h \
+	nodes/BinaryNode.h \
+	nodes/BlockInstructionNode.h \
+	nodes/BlockStackFrameNode.h \
+	nodes/BooleanLiteralNode.h \
+	nodes/CallableNode.h \
+	nodes/CharacterLiteralNode.h \
+	nodes/ConditionalNode.h \
+	nodes/ContinuationNode.h \
+	nodes/EmptyArrayNode.h \
+	nodes/ExpansionNode.h \
+	nodes/ExportedFunctionNode.h \
 	nodes/ExportedFunctionTerminator.h \
 	nodes/FunctionCallProxy.h \
-	nodes/IntegralLiteral.h \
-	nodes/ImportedFunction.h \
-	nodes/Instantiation.h \
-	nodes/MemberAccess.h \
-	nodes/StringLiteral.h \
+	nodes/FunctionNode.h \
+	nodes/GlobalNode.h \
+	nodes/ImportedFunctionNode.h \
+	nodes/IndexSinkNode.h \
+	nodes/InstantiationNode.h \
+	nodes/IntegralLiteralNode.h \
+	nodes/JunctionNode.h \
+	nodes/LazyEvaluationNode.h \
+	nodes/LazySinkNode.h \
+	nodes/LocalNode.h \
+	nodes/MemberAccessNode.h \
+	Namespace.h \
+	nodes/ReferenceSinkNode.h \
+	nodes/ReturnNode.h \
+	nodes/StackSegmentNode.h \
 	nodes/FunctionCall.h \
-	nodes/Global.h \
-	nodes/Local.h \
-	nodes/Return.h \
-	nodes/ArrayContinuation.h \
-	nodes/ArrayElement.h \
-	nodes/ArraySink.h \
-	nodes/Binary.h \
-	nodes/BlockStackFrame.h \
-	nodes/BooleanLiteral.h \
-	nodes/Callable.h \
-	nodes/CharacterLiteral.h \
 	CompilerException.h \
-	nodes/Conditional.h \
 	DefaultPrototypeProvider.h \
 	DzArgument.h \
 	DzBaseArgument.h \
 	DzTupleArgument.h \
 	DzTypeName.h \
-	nodes/EmptyArray.h \
 	EntryPoint.h \
-	nodes/ExportedFunction.h \
-	nodes/Function.h \
 	FunctionAttribute.h \
 	FunctionNotFoundException.h \
 	FunctionTypeName.h \
@@ -142,20 +148,14 @@ HEADERS += \
 	IRBuilderEx.h \
 	ITypeName.h \
 	IndexIterator.h \
-	nodes/IndexSink.h \
 	Indexed.h \
 	InteropHelper.h \
 	IteratorStorage.h \
-	nodes/Junction.h \
 	KaleidoscopeJIT.h \
-	nodes/LazyEvaluation.h \
-	nodes/LazySink.h \
 	Node.h \
-	nodes/ReferenceSink.h \
 	Stack.h \
-	nodes/StackSegment.h \
-	nodes/TaintedSink.h \
-	nodes/Terminator.h \
+	nodes/StringLiteralNode.h \
+	nodes/TaintedSinkNode.h \
 	Tests.h \
 	UndeclaredIdentifierException.h \
 	UnknownTypeException.h \
@@ -169,7 +169,7 @@ HEADERS += \
 	antlr4-runtime/dzLexer.h \
 	antlr4-runtime/dzParser.h \
 	antlr4-runtime/dzVisitor.h \
-	nodes/Namespace.h \
+	nodes/TerminatorNode.h \
 	types/AnyType.h \
 	types/ArrayType.h \
 	types/BooleanType.h \
@@ -206,9 +206,9 @@ HEADERS += \
 	values/LazyValue.h \
 	values/NamedValue.h \
 	values/ReferenceValue.h \
+	values/ScalarValue.h \
 	values/TaintedValue.h \
 	values/TupleValue.h \
-	values/TypedValue.h \
 	values/UserTypeValue.h \
 	values/WithoutValue.h \
 	wobjectdefs.h \

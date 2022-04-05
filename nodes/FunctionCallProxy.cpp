@@ -1,7 +1,7 @@
 #include "FunctionCallProxy.h"
 #include "AllIterator.h"
 
-#include "nodes/Callable.h"
+#include "nodes/CallableNode.h"
 
 #include "values/LazyValue.h"
 #include "values/IteratorValueGenerator.h"

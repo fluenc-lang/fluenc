@@ -2,11 +2,11 @@
 #include "EntryPoint.h"
 #include "DzBaseArgument.h"
 
-#include "nodes/Callable.h"
+#include "nodes/CallableNode.h"
 
 #include "types/FunctionType.h"
 
-FunctionValue::FunctionValue(const Callable *function, const EntryPoint &entryPoint)
+FunctionValue::FunctionValue(const CallableNode *function, const EntryPoint &entryPoint)
 	: m_function(function)
 	, m_entryPoint(new EntryPoint(entryPoint))
 {
@@ -33,7 +33,7 @@ const BaseValue *FunctionValue::clone(const EntryPoint &entryPoint) const
 	return this;
 }
 
-const Callable *FunctionValue::function() const
+const CallableNode *FunctionValue::function() const
 {
 	return m_function;
 }

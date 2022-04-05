@@ -6,13 +6,13 @@
 #include "IIteratable.h"
 
 class IteratorValue;
-class TypedValue;
+class ScalarValue;
 class LazyValue;
 
 class ArrayValue : public IIteratable
 {
 	public:
-		ArrayValue(const TypedValue *index
+		ArrayValue(const ScalarValue *index
 			, const Node *iterator
 			, const std::vector<DzResult> &values
 			);
@@ -20,7 +20,7 @@ class ArrayValue : public IIteratable
 		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
 
 	private:
-		const TypedValue *m_index;
+		const ScalarValue *m_index;
 		const Node *m_iterator;
 
 		const std::vector<DzResult> m_values;

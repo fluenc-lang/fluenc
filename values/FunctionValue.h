@@ -3,21 +3,21 @@
 
 #include "BaseValue.h"
 
-class Callable;
+class CallableNode;
 class EntryPoint;
 
 class FunctionValue : public BaseValue
 {
 	public:
-		FunctionValue(const Callable *function, const EntryPoint &entryPoint);
+		FunctionValue(const CallableNode *function, const EntryPoint &entryPoint);
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
-		const Callable *function() const;
+		const CallableNode *function() const;
 
 	private:
-		const Callable *m_function;
+		const CallableNode *m_function;
 		const EntryPoint *m_entryPoint;
 };
 #endif // FUNCTIONVALUE_H

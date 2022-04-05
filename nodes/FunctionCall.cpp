@@ -15,10 +15,10 @@
 #include "ValueHelper.h"
 #include "FunctionNotFoundException.h"
 
-#include "nodes/Function.h"
+#include "nodes/FunctionNode.h"
 
 #include "values/DependentValue.h"
-#include "values/TypedValue.h"
+#include "values/ScalarValue.h"
 #include "values/ReferenceValue.h"
 #include "values/TaintedValue.h"
 #include "values/UserTypeValue.h"
@@ -112,7 +112,7 @@ std::vector<DzResult> FunctionCall::build(const EntryPoint &entryPoint, Stack va
 	return std::vector<DzResult>();
 }
 
-const Callable *FunctionCall::findFunction(const EntryPoint &entryPoint, Stack values) const
+const CallableNode *FunctionCall::findFunction(const EntryPoint &entryPoint, Stack values) const
 {
 	auto functions = entryPoint.functions();
 	auto locals = entryPoint.locals();
@@ -131,7 +131,7 @@ const Callable *FunctionCall::findFunction(const EntryPoint &entryPoint, Stack v
 		return value->function();
 	}
 
-	std::map<int8_t, Callable *> candidates;
+	std::map<int8_t, CallableNode *> candidates;
 
 	for (auto [i, end] = functions.equal_range(m_name); i != end; i++)
 	{

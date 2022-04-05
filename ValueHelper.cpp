@@ -9,14 +9,14 @@
 #include "values/ArrayValue.h"
 #include "values/LazyValue.h"
 #include "values/NamedValue.h"
-#include "values/TypedValue.h"
+#include "values/ScalarValue.h"
 
 EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *value
 	, const BaseValue *storage
 	)
 {
-	if (auto typedValue = dynamic_cast<const TypedValue *>(value))
+	if (auto typedValue = dynamic_cast<const ScalarValue *>(value))
 	{
 		IRBuilderEx builder(entryPoint);
 

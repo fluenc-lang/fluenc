@@ -11,7 +11,7 @@
 #include "types/IPrototype.h"
 
 #include "values/NamedValue.h"
-#include "values/TypedValue.h"
+#include "values/ScalarValue.h"
 #include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
 
@@ -71,7 +71,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 		return new UserTypeValue { prototype, fieldValues };
 	}
 
-	return new TypedValue { type, value };
+	return new ScalarValue { type, value };
 }
 
 llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue, const EntryPoint &entryPoint)
@@ -87,9 +87,9 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 	auto fields = userTypeValue->fields();
 
-	std::vector<const TypedValue *> elementValues;
+	std::vector<const ScalarValue *> elementValues;
 
-	std::transform(begin(fields), end(fields), std::back_inserter(elementValues), [&](const NamedValue *field) -> const TypedValue *
+	std::transform(begin(fields), end(fields), std::back_inserter(elementValues), [&](const NamedValue *field) -> const ScalarValue *
 	{
 		auto fieldValue = field->value();
 
@@ -99,12 +99,12 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 			auto load = builder.createLoad(*reference, field->name());
 
-			return new TypedValue { type, load };
+			return new ScalarValue { type, load };
 		}
 
 		if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(fieldValue))
 		{
-			return new TypedValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
+			return new ScalarValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
 		}
 
 		throw new std::exception();

@@ -19,8 +19,8 @@
 #include "Utility.h"
 #include "EntryPoint.h"
 
-#include "nodes/Callable.h"
-#include "nodes/Global.h"
+#include "nodes/CallableNode.h"
+#include "nodes/GlobalNode.h"
 
 #include "values/LazyValue.h"
 
@@ -2652,7 +2652,7 @@ class Tests : public QObject
 //		W_SLOT(arrayType_2)
 
 	private:
-		Callable *compileFunction(std::string source)
+		CallableNode *compileFunction(std::string source)
 		{
 			std::stringstream stream(source);
 
@@ -2667,7 +2667,7 @@ class Tests : public QObject
 
 			for (auto instruction : program->instruction())
 			{
-				return visitor.visit<Callable *>(instruction);
+				return visitor.visit<CallableNode *>(instruction);
 			}
 
 			return nullptr;
@@ -2691,7 +2691,7 @@ class Tests : public QObject
 
 			for (auto instruction : program->instruction())
 			{
-				auto global = visitor.visit<Global *>(instruction);
+				auto global = visitor.visit<GlobalNode *>(instruction);
 
 				auto context = std::make_unique<llvm::LLVMContext>();
 				auto module = std::make_unique<llvm::Module>("dz", *context);
@@ -2714,7 +2714,7 @@ class Tests : public QObject
 					, &module
 					, &context
 					, "entry"
-					, std::multimap<std::string, Callable *>()
+					, std::multimap<std::string, CallableNode *>()
 					, std::map<std::string, const BaseValue *>()
 					, std::map<std::string, const Node *>()
 					, std::map<std::string, Prototype *>()
