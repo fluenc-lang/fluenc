@@ -4,6 +4,9 @@ CONFIG += DEBUG c++17
 
 SOURCES += \
 	AllIterator.cpp \
+	exceptions/InvalidArgumentTypeException.cpp \
+	exceptions/InvalidFunctionPointerTypeException.cpp \
+	exceptions/MissingTypeDeclarationException.cpp \
 	nodes/ArrayContinuationNode.cpp \
 	nodes/ArrayElementNode.cpp \
 	nodes/ArraySinkNode.cpp \
@@ -53,7 +56,7 @@ SOURCES += \
 	nodes/TaintedSinkNode.cpp \
 	Type.cpp \
 	UndeclaredIdentifierException.cpp \
-	UnknownTypeException.cpp \
+	exceptions/UnknownTypeException.cpp \
 	Utility.cpp \
 	ValueHelper.cpp \
 	VisitorV1.cpp \
@@ -102,6 +105,9 @@ SOURCES += \
 
 HEADERS += \
 	AllIterator.h \
+	exceptions/InvalidArgumentTypeException.h \
+	exceptions/InvalidFunctionPointerTypeException.h \
+	exceptions/MissingTypeDeclarationException.h \
 	nodes/ArrayContinuationNode.h \
 	nodes/ArrayElementNode.h \
 	nodes/ArraySinkNode.h \
@@ -158,7 +164,7 @@ HEADERS += \
 	nodes/TaintedSinkNode.h \
 	Tests.h \
 	UndeclaredIdentifierException.h \
-	UnknownTypeException.h \
+	exceptions/UnknownTypeException.h \
 	Utility.h \
 	ValueHelper.h \
 	VisitorV4.h \
@@ -214,9 +220,7 @@ HEADERS += \
 	wobjectdefs.h \
 	wobjectimpl.h
 
-OTHER_FILES += dz.g4 \
-        main.dz \
-	foo.dz
+OTHER_FILES += dz.g4
 
 #QMAKE_CXXFLAGS += -std=c++20
 

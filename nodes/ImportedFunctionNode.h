@@ -9,7 +9,8 @@ class ITypeName;
 class ImportedFunctionNode : public CallableNode
 {
 	public:
-		ImportedFunctionNode(const std::string &name
+		ImportedFunctionNode(antlr4::ParserRuleContext *context
+			, const std::string &name
 			, const std::vector<DzBaseArgument *> &arguments
 			, ITypeName *returnType
 			);
@@ -26,6 +27,8 @@ class ImportedFunctionNode : public CallableNode
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		antlr4::ParserRuleContext *m_context;
+
 		std::string m_name;
 		std::vector<DzBaseArgument *> m_arguments;
 

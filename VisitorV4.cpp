@@ -251,7 +251,8 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 	if (attribute == FunctionAttribute::Import)
 	{
-		auto import = new ImportedFunctionNode(name
+		auto import = new ImportedFunctionNode(context
+			, name
 			, arguments
 			, visit<ITypeName *>(context->typeName())
 			);
@@ -298,8 +299,10 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 antlrcpp::Any VisitorV4::visitRegularType(dzParser::RegularTypeContext *context)
 {
 	return static_cast<ITypeName *>(
-		new DzTypeName(context->getText())
-		);
+		new DzTypeName(context
+			, context->getText()
+		)
+	);
 }
 
 antlrcpp::Any VisitorV4::visitFunctionType(dzParser::FunctionTypeContext *context)

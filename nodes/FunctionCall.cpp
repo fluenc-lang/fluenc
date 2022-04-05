@@ -30,6 +30,8 @@
 
 #include "types/IteratorType.h"
 
+#include "exceptions/InvalidFunctionPointerTypeException.h"
+
 FunctionCall::FunctionCall(antlr4::ParserRuleContext *context, const std::string &name)
 	: m_context(context)
 	, m_name(name)
@@ -125,7 +127,7 @@ const CallableNode *FunctionCall::findFunction(const EntryPoint &entryPoint, Sta
 
 		if (!value)
 		{
-			throw new std::exception();
+			throw new InvalidFunctionPointerTypeException(m_context, m_name);
 		}
 
 		return value->function();

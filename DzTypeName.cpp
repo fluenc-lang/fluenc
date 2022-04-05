@@ -12,8 +12,11 @@
 #include "types/ByteType.h"
 #include "types/AnyType.h"
 
-DzTypeName::DzTypeName(const std::string &name)
-	: m_name(name)
+#include "exceptions/UnknownTypeException.h"
+
+DzTypeName::DzTypeName(antlr4::ParserRuleContext *context, const std::string &name)
+	: m_context(context)
+	, m_name(name)
 {
 }
 
@@ -75,7 +78,7 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 
 	if (iterator == types.end())
 	{
-		throw new std::exception(); // TODO
+		throw new UnknownTypeException(m_context, m_name);
 	}
 
 	return iterator->second;
@@ -83,49 +86,49 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 
 DzTypeName *DzTypeName::int32()
 {
-	static DzTypeName typeName("int");
+	static DzTypeName typeName(nullptr, "int");
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::int64()
 {
-	static DzTypeName typeName("long");
+	static DzTypeName typeName(nullptr, "long");
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::uint32()
 {
-	static DzTypeName typeName("uint");
+	static DzTypeName typeName(nullptr, "uint");
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::byte()
 {
-	static DzTypeName typeName("byte");
+	static DzTypeName typeName(nullptr, "byte");
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::boolean()
 {
-	static DzTypeName typeName("bool");
+	static DzTypeName typeName(nullptr, "bool");
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::string()
 {
-	static DzTypeName typeName("string");
+	static DzTypeName typeName(nullptr, "string");
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::without()
 {
-	static DzTypeName typeName("without");
+	static DzTypeName typeName(nullptr, "without");
 
 	return &typeName;
 }

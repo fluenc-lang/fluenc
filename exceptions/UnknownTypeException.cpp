@@ -9,7 +9,7 @@ UnknownTypeException::UnknownTypeException(ParserRuleContext *context, const std
 std::string UnknownTypeException::message() const
 {
 	std::stringstream stream;
-	stream << "Unknown type name '" << m_typeName << "'";
+	stream << "Type '" << m_typeName << "' was not found";
 
 	return  stream.str();
 }

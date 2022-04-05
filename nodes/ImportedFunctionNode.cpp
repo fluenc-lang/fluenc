@@ -16,11 +16,15 @@
 #include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
 
-ImportedFunctionNode::ImportedFunctionNode(const std::string &name
+#include "exceptions/InvalidArgumentTypeException.h"
+
+ImportedFunctionNode::ImportedFunctionNode(antlr4::ParserRuleContext *context
+	, const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
 	, ITypeName *returnType
 	)
-	: m_name(name)
+	: m_context(context)
+	, m_name(name)
 	, m_arguments(arguments)
 	, m_returnType(returnType)
 {
@@ -116,7 +120,7 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 		}
 		else
 		{
-			throw new std::exception();
+			throw new InvalidArgumentTypeException(m_context);
 		}
 	}
 
@@ -128,7 +132,7 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 
 	if (returnType != VoidType::instance())
 	{
-		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint);
+		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint, m_context);
 
 		values.push(returnValue);
 	}

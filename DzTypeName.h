@@ -6,10 +6,15 @@
 class EntryPoint;
 class Type;
 
+namespace antlr4
+{
+	class ParserRuleContext;
+};
+
 class DzTypeName : public ITypeName
 {
 	public:
-		DzTypeName(const std::string &name);
+		DzTypeName(antlr4::ParserRuleContext *context, const std::string &name);
 
 		Type *resolve(const EntryPoint &entryPoint) const override;
 
@@ -22,6 +27,8 @@ class DzTypeName : public ITypeName
 		static DzTypeName *without();
 
 	private:
+		antlr4::ParserRuleContext *m_context;
+
 		std::string m_name;
 };
 

@@ -15,7 +15,13 @@
 #include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
 
-const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *type, const EntryPoint &entryPoint)
+#include "exceptions/MissingTypeDeclarationException.h"
+
+const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
+	, const Type *type
+	, const EntryPoint &entryPoint
+	, antlr4::ParserRuleContext *token
+	)
 {
 	auto &context = entryPoint.context();
 
@@ -60,12 +66,12 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value, const Type *
 
 				auto load = builder.createLoad(gep, field.name());
 
-				auto value = createReadProxy(load, fieldType, entryPoint);
+				auto value = createReadProxy(load, fieldType, entryPoint, token);
 
 				return new NamedValue { field.name(), value };
 			}
 
-			throw new std::exception();
+			throw new MissingTypeDeclarationException(token, type->name(), field.name());
 		});
 
 		return new UserTypeValue { prototype, fieldValues };
