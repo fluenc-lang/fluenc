@@ -107,9 +107,9 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 
 			if (auto addressOfArgument = dynamic_cast<const ReferenceValue *>(value))
 			{
-				auto load = builder.createLoad(*addressOfArgument, name);
+				auto load = builder.createLoad(addressOfArgument, name);
 
-				argumentValues.push_back(load);
+				argumentValues.push_back(*load);
 			}
 			else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 			{

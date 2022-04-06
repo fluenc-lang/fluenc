@@ -2,123 +2,149 @@
 
 #include "IRBuilderEx.h"
 
+#include "types/BooleanType.h"
+
+#include "values/ReferenceValue.h"
+#include "values/ScalarValue.h"
+
 IRBuilderEx::IRBuilderEx(const EntryPoint &entryPoint)
 	: m_entryPoint(entryPoint)
 {
 }
 
-llvm::Value *IRBuilderEx::createLoad(llvm::Value *address, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createLoad(const ReferenceValue *address, const llvm::Twine &name)
 {
 	auto &module = m_entryPoint.module();
+	auto &context = m_entryPoint.context();
+
 	auto block = m_entryPoint.block();
 
-	auto type = address->getType();
-	auto pet = type->getPointerElementType();
+	auto type = address->type();
+	auto storageType = type->storageType(*context);
 
 	auto dataLayout = module->getDataLayout();
 
-	auto align = dataLayout.getABITypeAlign(pet);
+	auto align = dataLayout.getABITypeAlign(storageType);
 
-	auto load = new llvm::LoadInst(pet, address, name, false, align, block);
+	auto load = new llvm::LoadInst(storageType, *address, name, false, align, block);
 
-	return load;
+	return new ScalarValue(address->type(), load);
 }
 
-llvm::Value *IRBuilderEx::createStore(llvm::Value *value, llvm::Value *address)
+llvm::Value *IRBuilderEx::createStore(const ScalarValue *value, const ReferenceValue *address)
 {
 	auto &module = m_entryPoint.module();
+	auto &context = m_entryPoint.context();
+
 	auto block = m_entryPoint.block();
 
-	auto type = value->getType();
+	auto type = value->type();
+	auto storageType = type->storageType(*context);
 
 	auto dataLayout = module->getDataLayout();
 
-	auto align = dataLayout.getABITypeAlign(type);
+	auto align = dataLayout.getABITypeAlign(storageType);
 
-	auto store = new llvm::StoreInst(value, address, false, align, block);
+	auto store = new llvm::StoreInst(*value, *address, false, align, block);
 
 	return store;
 }
 
-llvm::Value *IRBuilderEx::createAdd(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateAdd(lhs, rhs, name);
+	return new ScalarValue(lhs->type()
+		, builder.CreateAdd(*lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createSub(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateSub(lhs, rhs, name);
+	return new ScalarValue(lhs->type()
+		, builder.CreateSub(*lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createMul(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateMul(lhs, rhs, name);
+	return new ScalarValue(lhs->type()
+		, builder.CreateMul(*lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createSDiv(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createSDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateSDiv(lhs, rhs, name);
+	return new ScalarValue(lhs->type()
+		, builder.CreateSDiv(*lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createCmp(llvm::CmpInst::Predicate pred, llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createCmp(llvm::CmpInst::Predicate pred, const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateCmp(pred, lhs, rhs, name);
+	return new ScalarValue(BooleanType::instance()
+		, builder.CreateCmp(pred, *lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createAnd(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateAnd(lhs, rhs, name);
+	return new ScalarValue(BooleanType::instance()
+		, builder.CreateAnd(*lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createOr(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateOr(lhs, rhs, name);
+	return new ScalarValue(BooleanType::instance()
+		, builder.CreateOr(*lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createSRem(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateSRem(lhs, rhs, name);
+	return new ScalarValue(lhs->type()
+		, builder.CreateSRem(*lhs, *rhs, name)
+		);
 }
 
-llvm::Value *IRBuilderEx::createCondBr(llvm::Value *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse)
+llvm::Value *IRBuilderEx::createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse)
 {
 	auto block = m_entryPoint.block();
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateCondBr(condition, ifTrue, ifFalse);
+	return builder.CreateCondBr(*condition, ifTrue, ifFalse);
 }
 
 llvm::Value *IRBuilderEx::createRet(llvm::Value *value)

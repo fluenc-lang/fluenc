@@ -79,6 +79,7 @@ SOURCES += \
 	types/Prototype.cpp \
 	types/PrototypeField.cpp \
 	types/PrototypeFieldEmbryo.cpp \
+	types/ProxyType.cpp \
 	types/StringType.cpp \
 	types/TupleType.cpp \
 	types/Uint32Type.cpp \
@@ -191,6 +192,7 @@ HEADERS += \
 	types/Prototype.h \
 	types/PrototypeField.h \
 	types/PrototypeFieldEmbryo.h \
+	types/ProxyType.h \
 	types/StringType.h \
 	Type.h \
 	types/TupleType.h \

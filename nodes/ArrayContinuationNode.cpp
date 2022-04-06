@@ -5,9 +5,11 @@
 #include "ArrayContinuationNode.h"
 #include "IRBuilderEx.h"
 
+#include "values/ScalarValue.h"
+
 #include "types/Int64Type.h"
 
-ArrayContinuationNode::ArrayContinuationNode(llvm::Value *index)
+ArrayContinuationNode::ArrayContinuationNode(const ReferenceValue *index)
 	: m_index(index)
 {
 }
@@ -21,7 +23,9 @@ std::vector<DzResult> ArrayContinuationNode::build(const EntryPoint &entryPoint,
 	auto indexType = Int64Type::instance();
 	auto storageType = indexType->storageType(*context);
 
-	auto indexConstant = llvm::ConstantInt::get(storageType, 1);
+	auto indexConstant = new ScalarValue(indexType
+		, llvm::ConstantInt::get(storageType, 1)
+		);
 
 	IRBuilderEx builder(entryPoint);
 

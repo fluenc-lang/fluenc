@@ -42,7 +42,7 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 
 	IRBuilderEx builder(entryPoint);
 
-	builder.createCondBr(*values.require<ScalarValue>(), ifTrue, ifFalse);
+	builder.createCondBr(values.require<ScalarValue>(), ifTrue, ifFalse);
 
 	auto epIfFalse = entryPoint
 		.withName("ifFalse")
@@ -94,9 +94,7 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 
 		auto range = groupedResults.equal_range(type);
 
-		auto storageType = type->storageType(*context);
-
-		auto alloc = entryPoint.alloc(storageType);
+		auto alloc = entryPoint.alloc(type);
 
 		auto mergeBlock = llvm::BasicBlock::Create(*context, "merge", function);
 
@@ -108,7 +106,7 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 
 			IRBuilderEx resultBuilder(resultEntryPoint);
 
-			resultBuilder.createStore(*value, alloc);
+			resultBuilder.createStore(value, alloc);
 
 			linkBlocks(resultBlock, mergeBlock);
 		}
@@ -120,11 +118,9 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 
 		auto mergeLoad = mergeBuilder.createLoad(alloc, "mergeLoad");
 
-		auto mergeResult = new ScalarValue { type, mergeLoad };
-
 		auto mergeValues = values;
 
-		mergeValues.push(mergeResult);
+		mergeValues.push(mergeLoad);
 
 		mergedResults.push_back({ mergeEntryPoint, mergeValues });
 	}

@@ -2,10 +2,13 @@
 
 #include "IteratorStorage.h"
 #include "EntryPoint.h"
+#include "IRBuilderEx.h"
+
+#include "values/ScalarValue.h"
 
 #include "types/Int64Type.h"
 
-llvm::Value *IteratorStorage::getOrCreate(size_t id, const EntryPoint &entryPoint)
+const ReferenceValue *IteratorStorage::getOrCreate(size_t id, const EntryPoint &entryPoint)
 {
 	auto indexType = Int64Type::instance();
 
@@ -13,24 +16,19 @@ llvm::Value *IteratorStorage::getOrCreate(size_t id, const EntryPoint &entryPoin
 
 	if (iterator == m_storage.end())
 	{
-		auto block = entryPoint.block();
+		IRBuilderEx builder(entryPoint);
 
 		auto &context = entryPoint.context();
-		auto &module = entryPoint.module();
-
-		auto dataLayout = module->getDataLayout();
 
 		auto storageType = indexType->storageType(*context);
 
-		auto align = dataLayout.getABITypeAlign(storageType);
+		auto zero = new ScalarValue(indexType
+			, llvm::ConstantInt::get(storageType, 0)
+			);
 
-		auto zero = llvm::ConstantInt::get(storageType, 0);
+		auto alloc = entryPoint.alloc(indexType);
 
-		auto alloc = entryPoint.alloc(storageType);
-
-		auto store = new llvm::StoreInst(zero, alloc, false, align, block);
-
-		UNUSED(store);
+		builder.createStore(zero, alloc);
 
 		m_storage.insert({ id, alloc });
 

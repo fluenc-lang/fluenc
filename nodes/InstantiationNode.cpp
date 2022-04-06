@@ -7,6 +7,7 @@
 #include "DzTypeName.h"
 #include "IndexIterator.h"
 #include "IPrototypeProvider.h"
+#include "IRBuilderEx.h"
 
 #include "types/Prototype.h"
 
@@ -87,6 +88,8 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 		return new NamedValue { field.name(), field.defaultValue() };
 	});
 
+	IRBuilderEx builder(entryPoint);
+
 	std::vector<const NamedValue *> finalValues;
 
 	std::transform(begin(namedValues), end(namedValues), std::back_inserter(finalValues), [&](auto field) -> const NamedValue *
@@ -96,19 +99,12 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 		if (auto typedValue = dynamic_cast<const ScalarValue *>(value))
 		{
 			auto type = typedValue->type();
-			auto storageType = type->storageType(*context);
 
-			auto align = dataLayout.getABITypeAlign(storageType);
+			auto alloc = entryPoint.alloc(type);
 
-			auto alloc = entryPoint.alloc(storageType);
+			builder.createStore(typedValue, alloc);
 
-			auto store = new llvm::StoreInst(*typedValue, alloc, false, align, block);
-
-			UNUSED(store);
-
-			auto reference = new ReferenceValue { type, alloc };
-
-			return new NamedValue { field->name(), reference };
+			return new NamedValue { field->name(), alloc };
 		}
 
 		return field;

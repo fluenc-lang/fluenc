@@ -13,6 +13,8 @@ class DzStruct;
 class Prototype;
 class IteratorStorage;
 class Node;
+class ReferenceValue;
+class Type;
 
 class EntryPoint
 {
@@ -45,7 +47,7 @@ class EntryPoint
 		llvm::Function *function() const;
 		llvm::Value *returnValueAddress() const;
 
-		llvm::Value *alloc(llvm::Type *type) const;
+		const ReferenceValue *alloc(const Type *type) const;
 
 		std::unique_ptr<llvm::Module> &module() const;
 		std::unique_ptr<llvm::LLVMContext> &context() const;

@@ -3,7 +3,7 @@
 
 #include "ArrayValueGenerator.h"
 #include "ArrayValue.h"
-#include "ScalarValue.h"
+#include "ReferenceValue.h"
 #include "IteratorStorage.h"
 
 #include "types/Int64Type.h"
@@ -25,9 +25,7 @@ const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint) c
 	auto iteratorStorage = entryPoint
 		.iteratorStorage();
 
-	auto index = new ScalarValue(Int64Type::instance()
-		, iteratorStorage->getOrCreate(m_id, entryPoint)
-		);
+	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
 
 	return new ArrayValue(index, m_iterator, m_values);
 }

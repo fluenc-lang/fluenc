@@ -14,12 +14,7 @@ const Type *ReferenceValue::type() const
 
 const BaseValue *ReferenceValue::clone(const EntryPoint &entryPoint) const
 {
-	auto &context = entryPoint.context();
-
-	auto storageType = m_type->storageType(*context);
-	auto alloc = entryPoint.alloc(storageType);
-
-	return new ReferenceValue(m_type, alloc);
+	return entryPoint.alloc(m_type);
 }
 
 ReferenceValue::operator llvm::Value *() const

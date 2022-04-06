@@ -9,11 +9,12 @@
 
 #include "types/IteratorType.h"
 
-#include "values/ScalarValue.h"
+#include "values/ReferenceValue.h"
 #include "values/ExpandableValue.h"
 #include "values/TupleValue.h"
 #include "values/TaintedValue.h"
 #include "values/IndexedValue.h"
+#include "values/ScalarValue.h"
 
 ArrayElementNode::ArrayElementNode(const Type *iteratorType, const Node *next)
 	: m_iteratorType(iteratorType)
@@ -33,7 +34,7 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 
 	auto dataLayout = module->getDataLayout();
 
-	auto index = values.require<ScalarValue>();
+	auto index = values.require<ReferenceValue>();
 	auto value = values.require<IndexedValue>();
 
 	if (m_next)
@@ -50,8 +51,11 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 
 		IRBuilderEx builder(entryPoint);
 
-		auto indexLoad = builder.createLoad(*index, "index");
-		auto indexConstant = llvm::ConstantInt::get(storageType, value->index());
+		auto indexLoad = builder.createLoad(index, "index");
+
+		auto indexConstant = new ScalarValue(indexType
+			, llvm::ConstantInt::get(storageType, value->index())
+			);
 
 		auto comparison =  builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, indexLoad, indexConstant);
 
@@ -67,7 +71,7 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 
 		auto continuation = new ExpandableValue(m_iteratorType
 			, entryPoint
-			, new ArrayContinuationNode(*index)
+			, new ArrayContinuationNode(index)
 			);
 
 		auto tuple = new TupleValue(m_iteratorType

@@ -5,14 +5,14 @@ namespace SDL
 {
     import int SDL_Init(uint flags);
 
-    import int SDL_SetRenderDrawColor(SDL::Renderer renderer, int r, int g, int b, int a);
-    import int SDL_RenderClear(SDL::Renderer renderer);
-    import int SDL_RenderFillRect(SDL::Renderer renderer, SDL::Rect rect);
+    import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
+    import int SDL_RenderClear(long renderer);
+    import int SDL_RenderFillRect(long renderer, SDL::Rect rect);
 
-    import SDL::Renderer SDL_CreateRenderer(SDL::Window window, int index, int flags);
-    import SDL::Window SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
+    import long SDL_CreateRenderer(long window, int index, int flags);
+    import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
 
-    import void SDL_RenderPresent(SDL::Renderer renderer);
+    import void SDL_RenderPresent(long renderer);
 
     import EventState SDL_WaitEventEx(EventState events);
 
@@ -61,9 +61,6 @@ namespace SDL
         int x: 0,
         int y: 0
     };
-
-    struct Renderer;
-    struct Window;
 
     global INIT_VIDEO: 0x00000020u;
     global WINDOWPOS_UNDEFINED: 0x1FFF0000u;
@@ -201,17 +198,17 @@ function bounds(Square square)
     };
 }
 
-function setRenderDrawColor(SDL::Renderer renderer, Color color)
+function setRenderDrawColor(long renderer, Color color)
 {
     return SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
 
-function setRenderDrawColor(SDL::Renderer renderer, without color)
+function setRenderDrawColor(long renderer, without color)
 {
     return SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 255, 0);
 }
 
-function drawSquare(SDL::Renderer renderer, Square square)
+function drawSquare(long renderer, Square square)
 {
     let colors = [rgb(255, 0, 0), rgb(0, 255, 0)];
 
@@ -224,14 +221,14 @@ function drawSquare(SDL::Renderer renderer, Square square)
     return nothing;
 }
 
-function draw(SDL::Renderer renderer, (Square square, ...next))
+function draw(long renderer, (Square square, ...next))
 {
     drawSquare(renderer, square);
 
     return draw(renderer, ...next);
 }
 
-function draw(SDL::Renderer renderer, Square square)
+function draw(long renderer, Square square)
 {
     return drawSquare(renderer, square);
 }
@@ -280,7 +277,7 @@ function update(State state, EventState events, int index, Square square)
     return updateCell(state, events, index, square);
 }
 
-function mainLoop(SDL::Renderer renderer, State state)
+function mainLoop(long renderer, State state)
 {
     SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL::SDL_RenderClear(renderer);

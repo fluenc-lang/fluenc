@@ -14,7 +14,7 @@
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
 
-ArrayValue::ArrayValue(const ScalarValue *index
+ArrayValue::ArrayValue(const ReferenceValue *index
 	, const Node *iterator
 	, const std::vector<DzResult> &values
 	)

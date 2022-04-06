@@ -86,9 +86,8 @@ const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult
 	if (auto templateValue = dynamic_cast<const ScalarValue *>(first))
 	{
 		auto type = templateValue->type();
-		auto storageType = type->storageType(*context);
 
-		auto alloc = entryPoint.alloc(storageType);
+		auto alloc = entryPoint.alloc(type);
 
 		for (auto &[resultEntryPoint, value] : range)
 		{
@@ -100,23 +99,20 @@ const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult
 
 			IRBuilderEx resultBuilder(resultEntryPoint);
 
-			auto junctionStore = resultBuilder.createStore(*typedValue, alloc);
+			auto junctionStore = resultBuilder.createStore(typedValue, alloc);
 
 			UNUSED(junctionStore);
 		}
 
 		IRBuilderEx junctionBuilder(entryPoint);
 
-		auto junctionLoad = junctionBuilder.createLoad(alloc, "junctionLoad");
-
-		return new ScalarValue { type, junctionLoad };
+		return junctionBuilder.createLoad(alloc, "junctionLoad");
 	}
 	if (auto templateValue = dynamic_cast<const ReferenceValue *>(first))
 	{
 		auto type = templateValue->type();
-		auto storageType = type->storageType(*context);
 
-		auto alloc = entryPoint.alloc(storageType);
+		auto alloc = entryPoint.alloc(type);
 
 		auto dataLayout = module->getDataLayout();
 
@@ -130,12 +126,12 @@ const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult
 
 			IRBuilderEx resultBuilder(resultEntryPoint);
 
-			auto load = resultBuilder.createLoad(*referenceValue, "load");
+			auto load = resultBuilder.createLoad(referenceValue, "load");
 
 			resultBuilder.createStore(load, alloc);
 		}
 
-		return new ReferenceValue { type, alloc };
+		return alloc;
 	}
 	else if (auto templateValue = dynamic_cast<const UserTypeValue *>(first))
 	{

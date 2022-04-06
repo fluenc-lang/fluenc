@@ -34,20 +34,15 @@ const BaseValue *fetchValue(Stack &values, const EntryPoint &entryPoint)
 
 	if (auto typedValue = dynamic_cast<const ScalarValue *>(value))
 	{
-		auto &context = entryPoint.context();
-
 		IRBuilderEx builder(entryPoint);
 
 		auto type = value->type();
-		auto storageType = type->storageType(*context);
 
-		auto alloc = entryPoint.alloc(storageType);
+		auto alloc = entryPoint.alloc(type);
 
-		builder.createStore(*typedValue, alloc);
+		builder.createStore(typedValue, alloc);
 
-		auto load = builder.createLoad(alloc);
-
-		return new ScalarValue { type, load };
+		return builder.createLoad(alloc);
 	}
 
 	return value;

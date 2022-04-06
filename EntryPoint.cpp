@@ -1,6 +1,9 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "EntryPoint.h"
+#include "Type.h"
+
+#include "values/ReferenceValue.h"
 
 EntryPoint::EntryPoint(int depth
 	, const EntryPoint *parent
@@ -68,11 +71,15 @@ llvm::Value *EntryPoint::returnValueAddress() const
 	return m_returnValueAddress;
 }
 
-llvm::Value *EntryPoint::alloc(llvm::Type *type) const
+const ReferenceValue *EntryPoint::alloc(const Type *type) const
 {
 	llvm::IRBuilder<> builder(m_alloc, m_alloc->begin());
 
-	return builder.CreateAlloca(type);
+	auto storageType = type->storageType(**m_context);
+
+	return new ReferenceValue(type
+		, builder.CreateAlloca(storageType)
+		);
 }
 
 std::unique_ptr<llvm::Module> &EntryPoint::module() const

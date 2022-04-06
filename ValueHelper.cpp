@@ -20,7 +20,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	{
 		IRBuilderEx builder(entryPoint);
 
-		builder.createStore(*typedValue, *dynamic_cast<const ReferenceValue *>(storage));
+		builder.createStore(typedValue, dynamic_cast<const ReferenceValue *>(storage));
 	}
 	else if (auto reference = dynamic_cast<const ReferenceValue *>(value))
 	{
@@ -35,9 +35,9 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 
 		IRBuilderEx builder(entryPoint);
 
-		auto load = builder.createLoad(*reference);
+		auto load = builder.createLoad(reference);
 
-		builder.createStore(load, *referenceStorage);
+		builder.createStore(load, referenceStorage);
 	}
 	else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 	{

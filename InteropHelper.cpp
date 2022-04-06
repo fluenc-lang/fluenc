@@ -9,6 +9,7 @@
 #include "IRBuilderEx.h"
 
 #include "types/IPrototype.h"
+#include "types/ProxyType.h"
 
 #include "values/NamedValue.h"
 #include "values/ScalarValue.h"
@@ -62,11 +63,13 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 					llvm::ConstantInt::get(intType, index)
 				};
 
-				auto gep = llvm::GetElementPtrInst::CreateInBounds(structType, cast, indexes, field.name(), block);
+				auto gep = new ReferenceValue(field.type()
+					, llvm::GetElementPtrInst::CreateInBounds(structType, cast, indexes, field.name(), block)
+					);
 
 				auto load = builder.createLoad(gep, field.name());
 
-				auto value = createReadProxy(load, fieldType, entryPoint, token);
+				auto value = createReadProxy(*load, fieldType, entryPoint, token);
 
 				return new NamedValue { field.name(), value };
 			}
@@ -101,11 +104,7 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 
 		if (auto reference = dynamic_cast<const ReferenceValue *>(fieldValue))
 		{
-			auto type = reference->type();
-
-			auto load = builder.createLoad(*reference, field->name());
-
-			return new ScalarValue { type, load };
+			return builder.createLoad(reference, field->name());
 		}
 
 		if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(fieldValue))
@@ -128,7 +127,9 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 	auto intType = llvm::Type::getInt32Ty(*context);
 	auto structType = llvm::StructType::get(*context, elementTypes);
 
-	auto alloc = entryPoint.alloc(structType);
+	auto proxyType = new ProxyType(structType);
+
+	auto alloc = entryPoint.alloc(proxyType);
 
 	std::transform(begin(elementValues), end(elementValues), index_iterator(), void_iterator<llvm::Value *>(), [&](auto field, auto index)
 	{
@@ -138,10 +139,12 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 			llvm::ConstantInt::get(intType, index)
 		};
 
-		auto gep = llvm::GetElementPtrInst::CreateInBounds(structType, alloc, indexes, "gep", block);
+		auto gep = new ReferenceValue(field->type()
+			, llvm::GetElementPtrInst::CreateInBounds(structType, *alloc, indexes, "gep", block)
+			);
 
-		return builder.createStore(*field, gep);
+		return builder.createStore(field, gep);
 	});
 
-	return builder.createBitCast(alloc, llvm::Type::getInt8PtrTy(*context), "cast");
+	return builder.createBitCast(*alloc, llvm::Type::getInt8PtrTy(*context), "cast");
 }

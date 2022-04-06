@@ -32,13 +32,11 @@ std::vector<DzResult> MemberAccessNode::build(const EntryPoint &entryPoint, Stac
 	{
 		if (auto value = dynamic_cast<const ReferenceValue *>(localsIterator->second))
 		{
-			auto valueType = value->type();
-
 			IRBuilderEx builder(entryPoint);
 
-			auto load = builder.createLoad(*value, m_name);
+			auto load = builder.createLoad(value, m_name);
 
-			values.push(new ScalarValue { valueType, load });
+			values.push(load);
 		}
 		else if (localsIterator->second)
 		{

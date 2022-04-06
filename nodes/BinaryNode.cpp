@@ -31,67 +31,67 @@ const ScalarValue *BinaryNode::resolveOp(const EntryPoint &entryPoint, const Sca
 
 	if (m_op == "+")
 	{
-		return new ScalarValue { left->type(), builder.createAdd(*left, *right) };
+		return builder.createAdd(left, right);
 	}
 
 	if (m_op == "-")
 	{
-		return new ScalarValue { left->type(), builder.createSub(*left, *right) };
+		return builder.createSub(left, right);
 	}
 
 	if (m_op == "*")
 	{
-		return new ScalarValue { left->type(), builder.createMul(*left, *right) };
+		return builder.createMul(left, right);
 	}
 
 	if (m_op == "/")
 	{
-		return new ScalarValue { left->type(), builder.createSDiv(*left, *right) };
+		return builder.createSDiv(left, right);
 	}
 
 	if (m_op == "<")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLT, *left, *right) };
+		return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLT, left, right);
 	}
 
 	if (m_op == "<=")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLE, *left, *right) };
+		return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLE, left, right);
 	}
 
 	if (m_op == ">")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGT, *left, *right) };
+		return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGT, left, right);
 	}
 
 	if (m_op == ">=")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGE, *left, *right) };
+		return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGE, left, right);
 	}
 
 	if (m_op == "==")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, *left, *right) };
+		return builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right);
 	}
 
 	if (m_op == "!=")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createCmp(llvm::CmpInst::Predicate::ICMP_NE, *left, *right) };
+		return builder.createCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right);
 	}
 
 	if (m_op == "&&")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createAnd(*left, *right) };
+		return builder.createAnd(left, right);
 	}
 
 	if (m_op == "||")
 	{
-		return new ScalarValue { BooleanType::instance(), builder.createOr(*left, *right) };
+		return builder.createOr(left, right);
 	}
 
 	if (m_op == "%")
 	{
-		return new ScalarValue { left->type(), builder.createSRem(*left, *right) };
+		return builder.createSRem(left, right);
 	}
 
 	throw new std::exception();

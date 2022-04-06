@@ -4,14 +4,15 @@
 #include <llvm/IR/Value.h>
 
 class EntryPoint;
+class ReferenceValue;
 
 class IteratorStorage
 {
 	public:
-		llvm::Value *getOrCreate(size_t id, const EntryPoint &entryPoint);
+		const ReferenceValue *getOrCreate(size_t id, const EntryPoint &entryPoint);
 
 	private:
-		std::unordered_map<size_t, llvm::Value *> m_storage;
+		std::unordered_map<size_t, const ReferenceValue *> m_storage;
 };
 
 #endif // ITERATORSTORAGE_H

@@ -5,22 +5,25 @@
 
 #include "EntryPoint.h"
 
+class ReferenceValue;
+class ScalarValue;
+
 class IRBuilderEx
 {
 	public:
 		IRBuilderEx(const EntryPoint &entryPoint);
 
-		llvm::Value *createLoad(llvm::Value *address, const llvm::Twine &name = "");
-		llvm::Value *createStore(llvm::Value *value, llvm::Value *address);
-		llvm::Value *createAdd(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createSub(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createMul(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createSDiv(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createCmp(llvm::CmpInst::Predicate pred, llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createAnd(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createOr(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createSRem(llvm::Value *lhs, llvm::Value *rhs, const llvm::Twine &name = "");
-		llvm::Value *createCondBr(llvm::Value *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse);
+		const ScalarValue *createLoad(const ReferenceValue *address, const llvm::Twine &name = "");
+		llvm::Value *createStore(const ScalarValue *value, const ReferenceValue *address);
+		const ScalarValue *createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createSDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createCmp(llvm::CmpInst::Predicate pred, const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		llvm::Value *createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse);
 		llvm::Value *createRet(llvm::Value *value);
 		llvm::Value *createCall(llvm::FunctionCallee function, const std::vector<llvm::Value *> &arguments);
 		llvm::Value *createGlobalStringPtr(const llvm::StringRef &string, const llvm::Twine &name);
