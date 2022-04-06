@@ -11,5 +11,5 @@ std::string UnknownTypeException::message() const
 	std::stringstream stream;
 	stream << "Type '" << m_typeName << "' was not found";
 
-	return  stream.str();
+	return stream.str();
 }

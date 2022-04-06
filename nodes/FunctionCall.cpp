@@ -31,6 +31,7 @@
 #include "types/IteratorType.h"
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
+#include "exceptions/AmbiguousFunctionException.h"
 
 FunctionCall::FunctionCall(antlr4::ParserRuleContext *context, const std::string &name)
 	: m_context(context)
@@ -150,7 +151,12 @@ const CallableNode *FunctionCall::findFunction(const EntryPoint &entryPoint, Sta
 
 		if (candidate != candidates.end())
 		{
-			throw new std::exception();
+			std::vector<CallableNode *> functions = { candidate->second, function };
+
+			throw new AmbiguousFunctionException(m_context
+				, functions
+				, entryPoint
+				);
 		}
 
 		candidates[score] = function;

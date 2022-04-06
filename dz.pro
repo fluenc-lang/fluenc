@@ -7,6 +7,7 @@ SOURCES += \
 	exceptions/InvalidArgumentTypeException.cpp \
 	exceptions/InvalidFunctionPointerTypeException.cpp \
 	exceptions/MissingTypeDeclarationException.cpp \
+	exceptions/AmbiguousFunctionException.cpp \
 	nodes/ArrayContinuationNode.cpp \
 	nodes/ArrayElementNode.cpp \
 	nodes/ArraySinkNode.cpp \
@@ -108,6 +109,7 @@ HEADERS += \
 	exceptions/InvalidArgumentTypeException.h \
 	exceptions/InvalidFunctionPointerTypeException.h \
 	exceptions/MissingTypeDeclarationException.h \
+	exceptions/AmbiguousFunctionException.h \
 	nodes/ArrayContinuationNode.h \
 	nodes/ArrayElementNode.h \
 	nodes/ArraySinkNode.h \

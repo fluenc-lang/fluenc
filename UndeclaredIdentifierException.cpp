@@ -11,5 +11,5 @@ std::string UndeclaredIdentifierException::message() const
 	std::stringstream stream;
 	stream << "'" << m_identifier << "' was not declared in this scope";
 
-	return  stream.str();
+	return stream.str();
 }
