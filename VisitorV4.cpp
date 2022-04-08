@@ -24,8 +24,8 @@
 #include "nodes/MemberAccessNode.h"
 #include "nodes/LocalNode.h"
 #include "nodes/IntegralLiteralNode.h"
-#include "nodes/FunctionCallProxy.h"
-#include "nodes/ExportedFunctionTerminator.h"
+#include "nodes/FunctionCallProxyNode.h"
+#include "nodes/ExportedFunctionTerminatorNode.h"
 #include "nodes/ExpansionNode.h"
 #include "nodes/BlockInstructionNode.h"
 #include "nodes/ConditionalNode.h"
@@ -33,7 +33,7 @@
 #include "nodes/CharacterLiteralNode.h"
 #include "nodes/ImportedFunctionNode.h"
 #include "nodes/InstantiationNode.h"
-#include "nodes/FunctionCall.h"
+#include "nodes/FunctionCallNode.h"
 #include "nodes/GlobalNode.h"
 #include "nodes/LazySinkNode.h"
 #include "nodes/ReferenceSinkNode.h"
@@ -262,7 +262,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 	if (attribute == FunctionAttribute::Export)
 	{
-		auto terminator = new ExportedFunctionTerminator();
+		auto terminator = new ExportedFunctionTerminatorNode();
 
 		VisitorV4 visitor(nullptr, terminator, nullptr);
 
@@ -430,7 +430,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 	auto expression = context->expression();
 	auto name = context->ID()->getText();
 
-	auto call = new FunctionCall(context, name);
+	auto call = new FunctionCallNode(context, name);
 
 	std::vector<Node *> values;
 
@@ -446,7 +446,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 
 	auto evaluation = new LazyEvaluationNode(call);
 	auto segment = new StackSegmentNode(values, evaluation, TerminatorNode::instance());
-	auto proxy = new FunctionCallProxy(name, m_alpha, segment);
+	auto proxy = new FunctionCallProxyNode(name, m_alpha, segment);
 
 	return static_cast<Node *>(proxy);
 }

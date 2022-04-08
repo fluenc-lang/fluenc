@@ -1,5 +1,5 @@
-#ifndef FUNCTIONCALL_H
-#define FUNCTIONCALL_H
+#ifndef FUNCTIONCALLNODE_H
+#define FUNCTIONCALLNODE_H
 
 #include <numeric>
 
@@ -9,10 +9,10 @@
 #include "values/DependentValue.h"
 #include "values/TaintedValue.h"
 
-class FunctionCall : public Node
+class FunctionCallNode : public Node
 {
 	public:
-		FunctionCall(antlr4::ParserRuleContext *context, const std::string &name);
+		FunctionCallNode(antlr4::ParserRuleContext *context, const std::string &name);
 
 		int order(const EntryPoint &entryPoint) const override;
 
@@ -71,4 +71,4 @@ class FunctionCall : public Node
 		std::string m_name;
 };
 
-#endif // FUNCTIONCALL_H
+#endif // FUNCTIONCALLNODE_H

@@ -1,12 +1,12 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include "ExportedFunctionTerminator.h"
+#include "ExportedFunctionTerminatorNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 
 #include "values/ScalarValue.h"
 
-std::vector<DzResult> ExportedFunctionTerminator::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ExportedFunctionTerminatorNode::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
 

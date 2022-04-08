@@ -5,7 +5,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "FunctionCall.h"
+#include "FunctionCallNode.h"
 #include "EntryPoint.h"
 #include "Type.h"
 #include "IndexIterator.h"
@@ -35,13 +35,13 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
-FunctionCall::FunctionCall(antlr4::ParserRuleContext *context, const std::string &name)
+FunctionCallNode::FunctionCallNode(antlr4::ParserRuleContext *context, const std::string &name)
 	: m_context(context)
 	, m_name(name)
 {
 }
 
-int FunctionCall::order(const EntryPoint &entryPoint) const
+int FunctionCallNode::order(const EntryPoint &entryPoint) const
 {
 	auto functions = entryPoint.functions();
 
@@ -58,7 +58,7 @@ int FunctionCall::order(const EntryPoint &entryPoint) const
 	return -1;
 }
 
-std::vector<DzResult> FunctionCall::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();
@@ -118,7 +118,7 @@ std::vector<DzResult> FunctionCall::build(const EntryPoint &entryPoint, Stack va
 	return std::vector<DzResult>();
 }
 
-const CallableNode *FunctionCall::findFunction(const EntryPoint &entryPoint, Stack values) const
+const CallableNode *FunctionCallNode::findFunction(const EntryPoint &entryPoint, Stack values) const
 {
 	auto functions = entryPoint.functions();
 	auto locals = entryPoint.locals();
@@ -175,7 +175,7 @@ const CallableNode *FunctionCall::findFunction(const EntryPoint &entryPoint, Sta
 	return nullptr;
 }
 
-std::vector<DzResult> FunctionCall::regularCall(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FunctionCallNode::regularCall(const EntryPoint &entryPoint, Stack values) const
 {
 	auto &context = entryPoint.context();
 

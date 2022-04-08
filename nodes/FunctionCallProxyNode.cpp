@@ -1,4 +1,4 @@
-#include "FunctionCallProxy.h"
+#include "FunctionCallProxyNode.h"
 #include "AllIterator.h"
 
 #include "nodes/CallableNode.h"
@@ -11,14 +11,14 @@
 #include "iterators/ExtremitiesIterator.h"
 
 // TODO Could this be moved into StackSegment instead?
-FunctionCallProxy::FunctionCallProxy(const std::string name, const Node *consumer, const Node *candidate)
+FunctionCallProxyNode::FunctionCallProxyNode(const std::string name, const Node *consumer, const Node *candidate)
 	: m_name(name)
 	, m_consumer(consumer)
 	, m_subject(candidate)
 {
 }
 
-std::vector<DzResult> FunctionCallProxy::regularCall(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FunctionCallProxyNode::regularCall(const EntryPoint &entryPoint, Stack values) const
 {
 	auto functions = entryPoint.functions();
 
@@ -51,7 +51,7 @@ std::vector<DzResult> FunctionCallProxy::regularCall(const EntryPoint &entryPoin
 	return results;
 }
 
-std::vector<DzResult> FunctionCallProxy::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FunctionCallProxyNode::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto tailCallCandidate = entryPoint
 		.byName(m_name);

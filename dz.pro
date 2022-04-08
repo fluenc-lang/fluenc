@@ -21,8 +21,9 @@ SOURCES += \
 	nodes/EmptyArrayNode.cpp \
 	nodes/ExpansionNode.cpp \
 	nodes/ExportedFunctionNode.cpp \
-	nodes/ExportedFunctionTerminator.cpp \
-	nodes/FunctionCallProxy.cpp \
+	nodes/ExportedFunctionTerminatorNode.cpp \
+	nodes/FunctionCallNode.cpp \
+	nodes/FunctionCallProxyNode.cpp \
 	nodes/FunctionNode.cpp \
 	nodes/GlobalNode.cpp \
 	nodes/ImportedFunctionNode.cpp \
@@ -38,7 +39,6 @@ SOURCES += \
 	nodes/ReferenceSinkNode.cpp \
 	nodes/ReturnNode.cpp \
 	nodes/StackSegmentNode.cpp \
-	nodes/FunctionCall.cpp \
 	CompilerException.cpp \
 	DefaultPrototypeProvider.cpp \
 	DzArgument.cpp \
@@ -126,8 +126,9 @@ HEADERS += \
 	nodes/EmptyArrayNode.h \
 	nodes/ExpansionNode.h \
 	nodes/ExportedFunctionNode.h \
-	nodes/ExportedFunctionTerminator.h \
-	nodes/FunctionCallProxy.h \
+	nodes/ExportedFunctionTerminatorNode.h \
+	nodes/FunctionCallNode.h \
+	nodes/FunctionCallProxyNode.h \
 	nodes/FunctionNode.h \
 	nodes/GlobalNode.h \
 	nodes/ImportedFunctionNode.h \
@@ -143,7 +144,6 @@ HEADERS += \
 	nodes/ReferenceSinkNode.h \
 	nodes/ReturnNode.h \
 	nodes/StackSegmentNode.h \
-	nodes/FunctionCall.h \
 	CompilerException.h \
 	DefaultPrototypeProvider.h \
 	DzArgument.h \

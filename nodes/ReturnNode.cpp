@@ -10,7 +10,7 @@
 #include "TerminatorNode.h"
 #include "IRBuilderEx.h"
 
-#include "nodes/ExportedFunctionTerminator.h"
+#include "nodes/ExportedFunctionTerminatorNode.h"
 
 #include "types/IteratorType.h"
 

@@ -1,12 +1,12 @@
-#ifndef FUNCTIONCALLPROXY_H
-#define FUNCTIONCALLPROXY_H
+#ifndef FUNCTIONCALLPROXYNODE_H
+#define FUNCTIONCALLPROXYNODE_H
 
 #include "Node.h"
 
-class FunctionCallProxy : public Node
+class FunctionCallProxyNode : public Node
 {
 	public:
-		FunctionCallProxy(const std::string name, const Node *consumer, const Node *candidate);
+		FunctionCallProxyNode(const std::string name, const Node *consumer, const Node *candidate);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
@@ -19,4 +19,4 @@ class FunctionCallProxy : public Node
 		const Node *m_subject;
 };
 
-#endif // FUNCTIONCALLPROXY_H
+#endif // FUNCTIONCALLPROXYNODE_H
