@@ -61,36 +61,9 @@ llvm::Type *Prototype::storageType(llvm::LLVMContext &context) const
 	return llvm::Type::getInt8PtrTy(context);
 }
 
-bool Prototype::is(const Type *type, const EntryPoint &entryPoint) const
-{
-	if (type->name() == m_tag)
-	{
-		return true;
-	}
-
-	for (auto parentType : m_parentTypes)
-	{
-		auto prototype = parentType->resolve(entryPoint);
-
-		if (prototype->is(type, entryPoint))
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool Prototype::equals(const Type *type, const EntryPoint &entryPoint) const
-{
-	UNUSED(entryPoint);
-
-	return type == this;
-}
-
 int8_t Prototype::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
-	auto [match, score] = compatibility(0, type, entryPoint);
+	auto [match, score] = compatibility(1, type, entryPoint);
 
 	if (match)
 	{

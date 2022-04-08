@@ -37,14 +37,6 @@ FunctionAttribute ExportedFunctionNode::attribute() const
 	return FunctionAttribute::Export;
 }
 
-bool ExportedFunctionNode::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values) const
-{
-	UNUSED(entryPoint);
-	UNUSED(values);
-
-	return true;
-}
-
 int8_t ExportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const Stack &values) const
 {
 	UNUSED(entryPoint);

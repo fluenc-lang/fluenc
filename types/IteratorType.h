@@ -33,22 +33,21 @@ class IteratorType : public Type
 			return llvm::Type::getInt8PtrTy(context);
 		}
 
-		bool is(const Type *type, const EntryPoint &entryPoint) const override
+		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override
 		{
-			UNUSED(type);
 			UNUSED(entryPoint);
 
-			return true;
-		}
-
-		bool equals(const Type *type, const EntryPoint &entryPoint) const override
-		{
-			if (dynamic_cast<const IteratorType *>(type))
+			if (auto other = dynamic_cast<const IteratorType *>(type))
 			{
-				return type == this;
+				if (other == this)
+				{
+					return 0;
+				}
+
+				return 1;
 			}
 
-			return type->equals(this, entryPoint);
+			return type->compatibility(this, entryPoint);
 		}
 };
 

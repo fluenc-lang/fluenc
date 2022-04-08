@@ -5,6 +5,8 @@
 #include "UserType.h"
 #include "Utility.h"
 
+#include "iterators/ExtremitiesIterator.h"
+
 UserType::UserType(const Type *prototype, const std::vector<const Type *> &elementTypes)
 	: m_prototype(prototype)
 	, m_elementTypes(elementTypes)
@@ -50,45 +52,34 @@ llvm::Type *UserType::storageType(llvm::LLVMContext &context) const
 	return llvm::Type::getInt8PtrTy(context);
 }
 
-bool UserType::is(const Type *type, const EntryPoint &entryPoint) const
-{
-	if (dynamic_cast<const AnyType *>(type))
-	{
-		return true;
-	}
-
-	return m_prototype->is(type, entryPoint);
-}
-
-bool UserType::equals(const Type *type, const EntryPoint &entryPoint) const
-{
-	auto out = dynamic_cast<const UserType *>(type);
-
-	if (!out)
-	{
-		return false;
-	}
-
-	if (out->m_elementTypes.size() != m_elementTypes.size())
-	{
-		return false;
-	}
-
-	for (auto i = 0u; i < m_elementTypes.size(); i++)
-	{
-		if (!m_elementTypes[i]->equals(out->m_elementTypes[i], entryPoint) &&
-			!out->m_elementTypes[i]->equals(m_elementTypes[i], entryPoint))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
 int8_t UserType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
-	return m_prototype->compatibility(type, entryPoint);
+	auto other = dynamic_cast<const UserType *>(type);
+
+	if (!other)
+	{
+		return m_prototype->compatibility(type, entryPoint);
+	}
+
+	if (m_elementTypes.size() != other->m_elementTypes.size())
+	{
+		return -1;
+	}
+
+	int8_t min = 0;
+	int8_t max = 0;
+
+	std::transform(begin(m_elementTypes), end(m_elementTypes), begin(other->m_elementTypes), extremities_iterator(min, max), [&](auto left, auto right)
+	{
+		return left->compatibility(right, entryPoint);
+	});
+
+	if (min < 0 || max > 0)
+	{
+		return m_prototype->compatibility(type, entryPoint);
+	}
+
+	return 0;
 }
 
 UserType *UserType::get(const Type *prototype, const std::vector<const Type *> &elementTypes)

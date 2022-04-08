@@ -56,20 +56,12 @@ llvm::Type *ArrayType::storageType(llvm::LLVMContext &context) const
 	return llvm::Type::getInt8PtrTy(context);
 }
 
-bool ArrayType::is(const Type *type, const EntryPoint &entryPoint) const
+int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
 	UNUSED(type);
 	UNUSED(entryPoint);
 
-	return true;
-}
-
-bool ArrayType::equals(const Type *type, const EntryPoint &entryPoint) const
-{
-	UNUSED(type);
-	UNUSED(entryPoint);
-
-	return true;
+	return 0;
 }
 
 ArrayType *ArrayType::get(const std::vector<const Type *> &types)

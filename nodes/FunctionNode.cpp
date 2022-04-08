@@ -50,31 +50,6 @@ FunctionAttribute FunctionNode::attribute() const
 	return m_attribute;
 }
 
-bool FunctionNode::hasMatchingSignature(const EntryPoint &entryPoint, const Stack &values) const
-{
-	if (m_arguments.size() != values.size())
-	{
-		return false;
-	}
-
-	auto result = true;
-
-	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), all_true(result), [=](DzBaseArgument *argument, auto value)
-	{
-		if (!value)
-		{
-			return false;
-		}
-
-		auto argumentType = argument->type(entryPoint);
-		auto valueType = value->type();
-
-		return valueType->is(argumentType, entryPoint);
-	});
-
-	return result;
-}
-
 int8_t FunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const Stack &values) const
 {
 	if (m_arguments.size() != values.size())

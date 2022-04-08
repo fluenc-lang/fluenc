@@ -33,6 +33,8 @@
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/AmbiguousFunctionException.h"
 
+#include "iterators/ExtremitiesIterator.h"
+
 FunctionCall::FunctionCall(antlr4::ParserRuleContext *context, const std::string &name)
 	: m_context(context)
 	, m_name(name)
@@ -79,17 +81,18 @@ std::vector<DzResult> FunctionCall::build(const EntryPoint &entryPoint, Stack va
 		return regularCall(entryPoint, values);
 	}
 
-	auto result = true;
+	int8_t min = 0;
+	int8_t max = 0;
 
-	std::transform(targetValues.begin(), targetValues.end(), inputValues.begin(), all_true(result), [=](auto storage, auto value)
+	std::transform(targetValues.begin(), targetValues.end(), inputValues.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
 	{
 		auto storageType = storage->type();
 		auto valueType = value->type();
 
-		return valueType->equals(storageType, entryPoint);
+		return valueType->compatibility(storageType, entryPoint);
 	});
 
-	if (!result)
+	if (min < 0 || max > 0)
 	{
 		return regularCall(entryPoint, values);
 	}

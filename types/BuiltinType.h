@@ -4,6 +4,7 @@
 #include "Type.h"
 #include "Utility.h"
 #include "IteratorType.h"
+#include "AnyType.h"
 
 template<typename T>
 class BuiltinType : public Type
@@ -16,18 +17,26 @@ class BuiltinType : public Type
 			return &instance;
 		}
 
-		bool is(const Type *type, const EntryPoint &entryPoint) const override
+		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override
 		{
 			UNUSED(entryPoint);
 
-			return name() == type->name();
-		}
+			if (type == this)
+			{
+				return 0;
+			}
 
-		bool equals(const Type *type, const EntryPoint &entryPoint) const override
-		{
-			UNUSED(entryPoint);
+			if (type->name() == name())
+			{
+				return 1;
+			}
 
-			return type == this;
+			if (dynamic_cast<const AnyType *>(type))
+			{
+				return 1;
+			}
+
+			return -1;
 		}
 };
 

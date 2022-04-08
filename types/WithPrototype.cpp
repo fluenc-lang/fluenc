@@ -39,12 +39,7 @@ llvm::Type *WithPrototype::storageType(llvm::LLVMContext &context) const
 	return m_value->type()->storageType(context);
 }
 
-bool WithPrototype::is(const Type *type, const EntryPoint &entryPoint) const
+int8_t WithPrototype::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
-	return m_value->type()->is(type, entryPoint);
-}
-
-bool WithPrototype::equals(const Type *type, const EntryPoint &entryPoint) const
-{
-	return m_value->type()->equals(type, entryPoint);
+	return m_value->type()->compatibility(type, entryPoint);
 }

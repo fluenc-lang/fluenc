@@ -111,6 +111,7 @@ HEADERS += \
 	exceptions/InvalidFunctionPointerTypeException.h \
 	exceptions/MissingTypeDeclarationException.h \
 	exceptions/AmbiguousFunctionException.h \
+	iterators/ExtremitiesIterator.h \
 	nodes/ArrayContinuationNode.h \
 	nodes/ArrayElementNode.h \
 	nodes/ArraySinkNode.h \

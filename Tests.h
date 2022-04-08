@@ -2491,11 +2491,11 @@ class Tests : public QObject
 			auto motherType = types["Mother"];
 			auto ancestorType = types["Ancestor"];
 
-			QCOMPARE(childType->compatibility(childType, entryPoint), 0);
-			QCOMPARE(childType->compatibility(fatherType, entryPoint), 1);
-			QCOMPARE(childType->compatibility(motherType, entryPoint), 1);
-			QCOMPARE(childType->compatibility(ancestorType, entryPoint), 2);
-			QCOMPARE(childType->compatibility(AnyType::instance(), entryPoint), 3);
+			QCOMPARE(childType->compatibility(childType, entryPoint), 1);
+			QCOMPARE(childType->compatibility(fatherType, entryPoint), 2);
+			QCOMPARE(childType->compatibility(motherType, entryPoint), 2);
+			QCOMPARE(childType->compatibility(ancestorType, entryPoint), 3);
+			QCOMPARE(childType->compatibility(AnyType::instance(), entryPoint), 4);
 			QCOMPARE(childType->compatibility(unrelatedType, entryPoint), -1);
 			QCOMPARE(childType->compatibility(Int32Type::instance(), entryPoint), -1);
 
@@ -2565,13 +2565,13 @@ class Tests : public QObject
 			auto value2 = compileValue("[1, 2L, \"foo\"]");
 			auto value3 = compileValue("[7, 5, 34]");
 
-			QCOMPARE(value1->type()->equals(value1->type(), EntryPoint()), true);
-			QCOMPARE(value2->type()->equals(value2->type(), EntryPoint()), true);
-			QCOMPARE(value1->type()->equals(value3->type(), EntryPoint()), true);
-			QCOMPARE(value3->type()->equals(value1->type(), EntryPoint()), true);
+			QCOMPARE(value1->type()->compatibility(value1->type(), EntryPoint()), 0);
+			QCOMPARE(value2->type()->compatibility(value2->type(), EntryPoint()), 0);
+			QCOMPARE(value1->type()->compatibility(value3->type(), EntryPoint()), 0);
+			QCOMPARE(value3->type()->compatibility(value1->type(), EntryPoint()), 0);
 
-			QCOMPARE(value1->type()->equals(value2->type(), EntryPoint()), false);
-			QCOMPARE(value2->type()->equals(value1->type(), EntryPoint()), false);
+			QCOMPARE(value1->type()->compatibility(value2->type(), EntryPoint()), -1);
+			QCOMPARE(value2->type()->compatibility(value1->type(), EntryPoint()), -1);
 		}
 
 		W_SLOT(scenario1)

@@ -7,6 +7,8 @@
 
 #include "types/IteratorType.h"
 
+#include "iterators/ExtremitiesIterator.h"
+
 TupleType::TupleType(const Type *iteratorType, const std::vector<const Type *> types)
 	: m_iteratorType(iteratorType)
 	, m_types(types)
@@ -67,38 +69,42 @@ llvm::Type *TupleType::storageType(llvm::LLVMContext &context) const
 	return llvm::StructType::get(context, types);
 }
 
-bool TupleType::is(const Type *type, const EntryPoint &entryPoint) const
+int8_t TupleType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
+	if (type == m_iteratorType)
+	{
+		return 0;
+	}
+
 	if (auto tuple = dynamic_cast<const TupleType *>(type))
 	{
-		if (m_types.size() != tuple->m_types.size())
+		if (tuple->m_iteratorType == m_iteratorType)
 		{
-			return false;
+			return 0;
 		}
 
-		auto result = true;
-
-		std::transform(begin(m_types), end(m_types), begin(tuple->m_types), all_true(result), [&](auto left, auto right)
+		if (m_types.size() != tuple->m_types.size())
 		{
-			return left->is(right, entryPoint);
+			return -1;
+		}
+
+		int8_t min = 0;
+		int8_t max = 0;
+
+		std::transform(begin(m_types), end(m_types), begin(tuple->m_types), extremities_iterator(min, max), [&](auto left, auto right)
+		{
+			return left->compatibility(right, entryPoint);
 		});
 
-		return result;
+		if (min < 0)
+		{
+			return min;
+		}
+
+		return max;
 	}
 
-	return false;
-}
-
-bool TupleType::equals(const Type *type, const EntryPoint &entryPoint) const
-{
-	UNUSED(entryPoint);
-
-	if (auto tt = dynamic_cast<const TupleType *>(type))
-	{
-		return tt->equals(m_iteratorType, entryPoint);
-	}
-
-	return type == m_iteratorType;
+	return -1;
 }
 
 TupleType *TupleType::get(const Type *iteratorType, const std::vector<const Type *> &types)

@@ -1,17 +1,18 @@
 #ifndef ANYTYPE_H
 #define ANYTYPE_H
 
-#include "BuiltinType.h"
+#include "Type.h"
 
-class AnyType : public BuiltinType<AnyType>
+class AnyType : public Type
 {
 	public:
+		static Type *instance();
+
 		std::string name() const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
-		bool is(const Type *type, const EntryPoint &entryPoint) const override;
-		bool equals(const Type *type, const EntryPoint &entryPoint) const override;
+		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
 };
 
 #endif // ANYTYPE_H

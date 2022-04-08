@@ -20,8 +20,7 @@ class WithPrototype : public IPrototype
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
-		bool is(const Type *type, const EntryPoint &entryPoint) const override;
-		bool equals(const Type *type, const EntryPoint &entryPoint) const override;
+		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
 
 	private:
 		const UserTypeValue *m_value;

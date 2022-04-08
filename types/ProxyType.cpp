@@ -18,18 +18,10 @@ llvm::Type *ProxyType::storageType(llvm::LLVMContext &context) const
 	return m_type;
 }
 
-bool ProxyType::is(const Type *type, const EntryPoint &entryPoint) const
+int8_t ProxyType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
 	UNUSED(type);
 	UNUSED(entryPoint);
 
-	return false;
-}
-
-bool ProxyType::equals(const Type *type, const EntryPoint &entryPoint) const
-{
-	UNUSED(type);
-	UNUSED(entryPoint);
-
-	return false;
+	return -1;
 }

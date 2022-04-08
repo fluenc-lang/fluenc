@@ -3,6 +3,8 @@
 #include "FunctionType.h"
 #include "AllIterator.h"
 
+#include "iterators/ExtremitiesIterator.h"
+
 FunctionType::FunctionType(const std::vector<const Type *> &types)
 	: m_types(types)
 {
@@ -55,29 +57,32 @@ llvm::Type *FunctionType::storageType(llvm::LLVMContext &context) const
 	return llvm::Type::getInt1Ty(context);
 }
 
-bool FunctionType::is(const Type *type, const EntryPoint &entryPoint) const
+int8_t FunctionType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
-	if (auto other = dynamic_cast<const FunctionType *>(type))
+	auto other = dynamic_cast<const FunctionType *>(type);
+
+	if (!other)
 	{
-		if (m_types.size() != other->m_types.size())
-		{
-			return false;
-		}
-
-		auto result = true;
-
-		std::transform(begin(m_types), end(m_types), begin(other->m_types), all_true(result), [&](auto left, auto right)
-		{
-			return left->is(right, entryPoint);
-		});
-
-		return result;
+		return -1;
 	}
 
-	return false;
-}
+	if (m_types.size() != other->m_types.size())
+	{
+		return -1;
+	}
 
-bool FunctionType::equals(const Type *type, const EntryPoint &entryPoint) const
-{
-	return is(type, entryPoint);
+	int8_t min = 0;
+	int8_t max = 0;
+
+	std::transform(begin(m_types), end(m_types), begin(other->m_types), extremities_iterator(min, max), [&](auto left, auto right)
+	{
+		return left->compatibility(right, entryPoint);
+	});
+
+	if (min < 0)
+	{
+		return min;
+	}
+
+	return max;
 }
