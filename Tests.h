@@ -15,7 +15,7 @@
 #include "antlr4-runtime/dzParser.h"
 
 #include "KaleidoscopeJIT.h"
-#include "VisitorV4.h"
+#include "Visitor.h"
 #include "Utility.h"
 #include "EntryPoint.h"
 
@@ -2663,7 +2663,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+			Visitor visitor(nullptr, nullptr, nullptr);
 
 			for (auto instruction : program->instruction())
 			{
@@ -2687,7 +2687,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+			Visitor visitor(nullptr, nullptr, nullptr);
 
 			for (auto instruction : program->instruction())
 			{
@@ -2742,7 +2742,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+			Visitor visitor(nullptr, nullptr, nullptr);
 
 			return visitor
 				.visit<ModuleInfo *>(program);

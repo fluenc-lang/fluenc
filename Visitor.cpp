@@ -3,7 +3,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
 
-#include "VisitorV4.h"
+#include "Visitor.h"
 #include "EntryPoint.h"
 #include "DzArgument.h"
 #include "DzTypeName.h"
@@ -57,7 +57,7 @@
 #include "values/ArrayValue.h"
 #include "values/IndexedValue.h"
 
-VisitorV4::VisitorV4(const Type *iteratorType, Node *alpha, Node *beta)
+Visitor::Visitor(const Type *iteratorType, Node *alpha, Node *beta)
 	: m_iteratorType(iteratorType)
 	, m_alpha(alpha)
 	, m_beta(beta)
@@ -139,7 +139,7 @@ void populateInstructions(const std::vector<std::string> &namespaces
 	}
 }
 
-antlrcpp::Any VisitorV4::visitProgram(dzParser::ProgramContext *context)
+antlrcpp::Any Visitor::visitProgram(dzParser::ProgramContext *context)
 {
 	auto llvmContext = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
@@ -233,7 +233,7 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 	return FunctionAttribute::None;
 }
 
-antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
+antlrcpp::Any Visitor::visitFunction(dzParser::FunctionContext *context)
 {
 	std::vector<DzBaseArgument *> arguments;
 
@@ -262,7 +262,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	{
 		auto terminator = new ExportedFunctionTerminatorNode();
 
-		VisitorV4 visitor(nullptr, terminator, nullptr);
+		Visitor visitor(nullptr, terminator, nullptr);
 
 		auto entryPoint = new ExportedFunctionNode(name
 			, visitor.visit<Node *>(block)
@@ -276,7 +276,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 
 	auto terminator = new TerminatorNode(name, attribute);
 
-	VisitorV4 visitor(iteratorType, terminator, nullptr);
+	Visitor visitor(iteratorType, terminator, nullptr);
 
 	auto content = visitor.visit<Node *, BlockInstructionNode *>(block);
 
@@ -294,7 +294,7 @@ antlrcpp::Any VisitorV4::visitFunction(dzParser::FunctionContext *context)
 	return static_cast<CallableNode *>(function);
 }
 
-antlrcpp::Any VisitorV4::visitRegularType(dzParser::RegularTypeContext *context)
+antlrcpp::Any Visitor::visitRegularType(dzParser::RegularTypeContext *context)
 {
 	return static_cast<ITypeName *>(
 		new DzTypeName(context
@@ -303,7 +303,7 @@ antlrcpp::Any VisitorV4::visitRegularType(dzParser::RegularTypeContext *context)
 	);
 }
 
-antlrcpp::Any VisitorV4::visitFunctionType(dzParser::FunctionTypeContext *context)
+antlrcpp::Any Visitor::visitFunctionType(dzParser::FunctionTypeContext *context)
 {
 	auto parameterTypes = context->typeName();
 
@@ -319,7 +319,7 @@ antlrcpp::Any VisitorV4::visitFunctionType(dzParser::FunctionTypeContext *contex
 		);
 }
 
-antlrcpp::Any VisitorV4::visitStandardArgument(dzParser::StandardArgumentContext *context)
+antlrcpp::Any Visitor::visitStandardArgument(dzParser::StandardArgumentContext *context)
 {
 	auto argument = new DzArgument(context->ID()->getText()
 		, visit<ITypeName *>(context->typeName())
@@ -328,7 +328,7 @@ antlrcpp::Any VisitorV4::visitStandardArgument(dzParser::StandardArgumentContext
 	return static_cast<DzBaseArgument *>(argument);
 }
 
-antlrcpp::Any VisitorV4::visitTupleArgument(dzParser::TupleArgumentContext *context)
+antlrcpp::Any Visitor::visitTupleArgument(dzParser::TupleArgumentContext *context)
 {
 	auto arguments = context->argument();
 
@@ -344,7 +344,7 @@ antlrcpp::Any VisitorV4::visitTupleArgument(dzParser::TupleArgumentContext *cont
 	return static_cast<DzBaseArgument *>(argument);
 }
 
-antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
+antlrcpp::Any Visitor::visitRet(dzParser::RetContext *context)
 {
 	if (context->chained)
 	{
@@ -352,7 +352,7 @@ antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 
 		auto ret = new ReturnNode(m_iteratorType, m_alpha, continuation);
 
-		VisitorV4 visitor(nullptr, ret, nullptr);
+		Visitor visitor(nullptr, ret, nullptr);
 
 		auto value = visitor
 			.visit<Node *>(context->value);
@@ -364,7 +364,7 @@ antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 
 	auto ret = new ReturnNode(m_iteratorType, m_alpha, nullptr);
 
-	VisitorV4 visitor(nullptr, ret, nullptr);
+	Visitor visitor(nullptr, ret, nullptr);
 
 	auto value = visitor
 		.visit<Node *>(context->value);
@@ -374,7 +374,7 @@ antlrcpp::Any VisitorV4::visitRet(dzParser::RetContext *context)
 	return static_cast<Node *>(instruction);
 }
 
-antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
+antlrcpp::Any Visitor::visitBlock(dzParser::BlockContext *context)
 {
 	auto expressions = context->expression();
 
@@ -384,7 +384,7 @@ antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
 	{
 		auto stackFrame = new BlockStackFrameNode(consumer);
 
-		VisitorV4 visitor(m_iteratorType, stackFrame, m_alpha);
+		Visitor visitor(m_iteratorType, stackFrame, m_alpha);
 
 		auto value = visitor
 			.visit<Node *>(expression);
@@ -404,18 +404,18 @@ antlrcpp::Any VisitorV4::visitBlock(dzParser::BlockContext *context)
 	return static_cast<Node *>(result);
 }
 
-antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
+antlrcpp::Any Visitor::visitBinary(dzParser::BinaryContext *context)
 {
 	auto binary = new BinaryNode(m_alpha
 		, context->OP()->getText()
 		);
 
-	VisitorV4 leftVisitor(m_iteratorType, binary, nullptr);
+	Visitor leftVisitor(m_iteratorType, binary, nullptr);
 
 	auto left = leftVisitor
 		.visit<Node *>(context->left);
 
-	VisitorV4 rightVisitor(m_iteratorType, left, nullptr);
+	Visitor rightVisitor(m_iteratorType, left, nullptr);
 
 	auto right = rightVisitor
 		.visit<Node *>(context->right);
@@ -423,7 +423,7 @@ antlrcpp::Any VisitorV4::visitBinary(dzParser::BinaryContext *context)
 	return right;
 }
 
-antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
+antlrcpp::Any Visitor::visitCall(dzParser::CallContext *context)
 {
 	auto expression = context->expression();
 	auto name = context->ID()->getText();
@@ -436,7 +436,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 	{
 		auto sink = new ReferenceSinkNode(TerminatorNode::instance());
 
-		VisitorV4 visitor(m_iteratorType, sink, nullptr);
+		Visitor visitor(m_iteratorType, sink, nullptr);
 
 		return visitor
 			.visit<Node *>(parameter);
@@ -449,7 +449,7 @@ antlrcpp::Any VisitorV4::visitCall(dzParser::CallContext *context)
 	return static_cast<Node *>(proxy);
 }
 
-antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)
+antlrcpp::Any Visitor::visitWith(dzParser::WithContext *context)
 {
 	auto assignments = context->assignment();
 
@@ -467,14 +467,14 @@ antlrcpp::Any VisitorV4::visitWith(dzParser::WithContext *context)
 
 	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, dzParser::AssignmentContext *assignment)
 	{
-		VisitorV4 visitor(m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_iteratorType, consumer, nullptr);
 
 		return visitor
 			.visit<Node *>(assignment->expression());
 	});
 }
 
-antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
+antlrcpp::Any Visitor::visitMember(dzParser::MemberContext *context)
 {
 	auto access = context->ID();
 
@@ -500,7 +500,7 @@ antlrcpp::Any VisitorV4::visitMember(dzParser::MemberContext *context)
 	return static_cast<Node *>(member);
 }
 
-antlrcpp::Any VisitorV4::visitInt32Literal(dzParser::Int32LiteralContext *context)
+antlrcpp::Any Visitor::visitInt32Literal(dzParser::Int32LiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::int32()
@@ -510,7 +510,7 @@ antlrcpp::Any VisitorV4::visitInt32Literal(dzParser::Int32LiteralContext *contex
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any VisitorV4::visitInt64Literal(dzParser::Int64LiteralContext *context)
+antlrcpp::Any Visitor::visitInt64Literal(dzParser::Int64LiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::int64()
@@ -520,7 +520,7 @@ antlrcpp::Any VisitorV4::visitInt64Literal(dzParser::Int64LiteralContext *contex
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any VisitorV4::visitBoolLiteral(dzParser::BoolLiteralContext *context)
+antlrcpp::Any Visitor::visitBoolLiteral(dzParser::BoolLiteralContext *context)
 {
 	auto constant = new BooleanLiteralNode(m_alpha
 		, context->BOOL()->getText()
@@ -529,7 +529,7 @@ antlrcpp::Any VisitorV4::visitBoolLiteral(dzParser::BoolLiteralContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any VisitorV4::visitStringLiteral(dzParser::StringLiteralContext *context)
+antlrcpp::Any Visitor::visitStringLiteral(dzParser::StringLiteralContext *context)
 {
 	auto constant = new StringLiteralNode(m_alpha
 		, context->STRING()->getText()
@@ -538,7 +538,7 @@ antlrcpp::Any VisitorV4::visitStringLiteral(dzParser::StringLiteralContext *cont
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any VisitorV4::visitUint32Literal(dzParser::Uint32LiteralContext *context)
+antlrcpp::Any Visitor::visitUint32Literal(dzParser::Uint32LiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::uint32()
@@ -548,7 +548,7 @@ antlrcpp::Any VisitorV4::visitUint32Literal(dzParser::Uint32LiteralContext *cont
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
+antlrcpp::Any Visitor::visitStructure(dzParser::StructureContext *context)
 {
 	auto name = context->name->getText();
 	auto inputFields = context->field();
@@ -568,7 +568,7 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 
 		if (field->expression())
 		{
-			VisitorV4 visitor(m_iteratorType, TerminatorNode::instance(), nullptr);
+			Visitor visitor(m_iteratorType, TerminatorNode::instance(), nullptr);
 
 			auto defaultValue = visitor
 				.visit<Node *>(field->expression());
@@ -591,7 +591,7 @@ antlrcpp::Any VisitorV4::visitStructure(dzParser::StructureContext *context)
 	return new Prototype(name, fields, parentTypes);
 }
 
-antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *context)
+antlrcpp::Any Visitor::visitInstantiation(dzParser::InstantiationContext *context)
 {
 	auto assignments = context->assignment();
 
@@ -612,23 +612,23 @@ antlrcpp::Any VisitorV4::visitInstantiation(dzParser::InstantiationContext *cont
 
 	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, dzParser::AssignmentContext *assignment)
 	{
-		VisitorV4 visitor(m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_iteratorType, consumer, nullptr);
 
 		return visitor
 			.visit<Node *>(assignment->expression());
 	});
 }
 
-antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
+antlrcpp::Any Visitor::visitConditional(dzParser::ConditionalContext *context)
 {
-	VisitorV4 blockVisitor(m_iteratorType, m_beta, nullptr);
+	Visitor blockVisitor(m_iteratorType, m_beta, nullptr);
 
 	auto block = blockVisitor
 		.visit<Node *, BlockInstructionNode *>(context->block());
 
 	auto conditional = new ConditionalNode(m_alpha, block);
 
-	VisitorV4 expressionVisitor(m_iteratorType, conditional, nullptr);
+	Visitor expressionVisitor(m_iteratorType, conditional, nullptr);
 
 	auto condition = expressionVisitor
 		.visit<Node *>(context->expression());
@@ -640,11 +640,11 @@ antlrcpp::Any VisitorV4::visitConditional(dzParser::ConditionalContext *context)
 	return static_cast<Node *>(instruction);
 }
 
-antlrcpp::Any VisitorV4::visitGlobal(dzParser::GlobalContext *context)
+antlrcpp::Any Visitor::visitGlobal(dzParser::GlobalContext *context)
 {
 	auto name = context->ID()->getText();
 
-	VisitorV4 visitor(m_iteratorType, TerminatorNode::instance(), nullptr);
+	Visitor visitor(m_iteratorType, TerminatorNode::instance(), nullptr);
 
 	auto literal = visitor
 		.visit<Node *>(context->expression());
@@ -652,7 +652,7 @@ antlrcpp::Any VisitorV4::visitGlobal(dzParser::GlobalContext *context)
 	return new GlobalNode(literal, name);
 }
 
-antlrcpp::Any VisitorV4::visitNothing(dzParser::NothingContext *context)
+antlrcpp::Any Visitor::visitNothing(dzParser::NothingContext *context)
 {
 	UNUSED(context);
 
@@ -664,22 +664,22 @@ antlrcpp::Any VisitorV4::visitNothing(dzParser::NothingContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any VisitorV4::visitGroup(dzParser::GroupContext *context)
+antlrcpp::Any Visitor::visitGroup(dzParser::GroupContext *context)
 {
 	return visit<Node *>(context->expression());
 }
 
-antlrcpp::Any VisitorV4::visitExpansion(dzParser::ExpansionContext *context)
+antlrcpp::Any Visitor::visitExpansion(dzParser::ExpansionContext *context)
 {
 	auto expansion = new ExpansionNode(m_alpha);
 
-	VisitorV4 visitor(m_iteratorType, expansion, nullptr);
+	Visitor visitor(m_iteratorType, expansion, nullptr);
 
 	return visitor
 		.visit<Node *>(context->expression());
 }
 
-antlrcpp::Any VisitorV4::visitContinuation(dzParser::ContinuationContext *context)
+antlrcpp::Any Visitor::visitContinuation(dzParser::ContinuationContext *context)
 {
 	auto continuation = new ContinuationNode();
 
@@ -687,7 +687,7 @@ antlrcpp::Any VisitorV4::visitContinuation(dzParser::ContinuationContext *contex
 
 	return std::accumulate(begin(expressions), end(expressions), static_cast<Node *>(continuation), [this](Node *consumer, dzParser::ExpressionContext *parameter)
 	{
-		VisitorV4 visitor(m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_iteratorType, consumer, nullptr);
 
 		auto result = visitor
 			.visit<Node *>(parameter);
@@ -696,7 +696,7 @@ antlrcpp::Any VisitorV4::visitContinuation(dzParser::ContinuationContext *contex
 	});
 }
 
-antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
+antlrcpp::Any Visitor::visitArray(dzParser::ArrayContext *context)
 {
 	auto expressions = context->expression();
 
@@ -726,7 +726,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 		auto k = new IndexSinkNode(expression.index, next);
 		auto sink = new ReferenceSinkNode(k);
 
-		VisitorV4 visitor(m_iteratorType, sink, nullptr);
+		Visitor visitor(m_iteratorType, sink, nullptr);
 
 		return visitor
 			.visit<Node *>(expression.value);
@@ -741,7 +741,7 @@ antlrcpp::Any VisitorV4::visitArray(dzParser::ArrayContext *context)
 	return static_cast<Node *>(lazySink);
 }
 
-antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)
+antlrcpp::Any Visitor::visitCharLiteral(dzParser::CharLiteralContext *context)
 {
 	auto value = new CharacterLiteralNode(m_alpha
 		, context->CHARACTER()->getText()
@@ -750,7 +750,7 @@ antlrcpp::Any VisitorV4::visitCharLiteral(dzParser::CharLiteralContext *context)
 	return static_cast<Node *>(value);
 }
 
-antlrcpp::Any VisitorV4::visitByteLiteral(dzParser::ByteLiteralContext *context)
+antlrcpp::Any Visitor::visitByteLiteral(dzParser::ByteLiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::byte()
@@ -760,23 +760,23 @@ antlrcpp::Any VisitorV4::visitByteLiteral(dzParser::ByteLiteralContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any VisitorV4::visitLocal(dzParser::LocalContext *context)
+antlrcpp::Any Visitor::visitLocal(dzParser::LocalContext *context)
 {
 	auto local = new LocalNode(m_alpha
 		, context->ID()->getText()
 		);
 
-	VisitorV4 visitor(m_iteratorType, local, nullptr);
+	Visitor visitor(m_iteratorType, local, nullptr);
 
 	return visitor.visit<Node *>(context->expression());
 }
 
-antlrcpp::Any VisitorV4::visitInstruction(dzParser::InstructionContext *context)
+antlrcpp::Any Visitor::visitInstruction(dzParser::InstructionContext *context)
 {
 	return visitChildren(context);
 }
 
-antlrcpp::Any VisitorV4::visitNs(dzParser::NsContext *context)
+antlrcpp::Any Visitor::visitNs(dzParser::NsContext *context)
 {
 	auto instructions = context->instruction();
 

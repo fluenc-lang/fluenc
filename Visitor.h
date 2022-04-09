@@ -1,5 +1,5 @@
-#ifndef VISITORV4_H
-#define VISITORV4_H
+#ifndef VISITOR_H
+#define VISITOR_H
 
 #include <llvm/IR/Module.h>
 
@@ -46,10 +46,10 @@ class ModuleInfo
 
 class Type;
 
-class VisitorV4 : public dzBaseVisitor
+class Visitor : public dzBaseVisitor
 {
 	public:
-		VisitorV4(const Type *iteratorType, Node *alpha, Node *beta);
+		Visitor(const Type *iteratorType, Node *alpha, Node *beta);
 
 		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
@@ -104,4 +104,4 @@ class VisitorV4 : public dzBaseVisitor
 		Node *m_beta;
 };
 
-#endif // VISITORV4_H
+#endif // VISITOR_H

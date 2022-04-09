@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+			Visitor visitor(nullptr, nullptr, nullptr);
 
 			auto moduleInfo = visitor
 				.visit<ModuleInfo *>(program);

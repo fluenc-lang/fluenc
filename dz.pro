@@ -4,6 +4,7 @@ CONFIG += DEBUG c++17
 
 SOURCES += \
 	AllIterator.cpp \
+	Visitor.cpp \
 	exceptions/InvalidArgumentTypeException.cpp \
 	exceptions/InvalidFunctionPointerTypeException.cpp \
 	exceptions/MissingTypeDeclarationException.cpp \
@@ -59,8 +60,6 @@ SOURCES += \
 	exceptions/UnknownTypeException.cpp \
 	Utility.cpp \
 	ValueHelper.cpp \
-	VisitorV1.cpp \
-	VisitorV4.cpp \
 	WithPrototypeProvider.cpp \
 	main.cpp \
 	antlr4-runtime/dzBaseVisitor.cpp \
@@ -108,6 +107,7 @@ SOURCES += \
 
 HEADERS += \
 	AllIterator.h \
+	Visitor.h \
 	exceptions/InvalidArgumentTypeException.h \
 	exceptions/InvalidFunctionPointerTypeException.h \
 	exceptions/MissingTypeDeclarationException.h \
@@ -171,7 +171,6 @@ HEADERS += \
 	exceptions/UnknownTypeException.h \
 	Utility.h \
 	ValueHelper.h \
-	VisitorV4.h \
 	VoidIterator.h \
 	WithPrototypeProvider.h \
 	ZipIterator.h \
