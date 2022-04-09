@@ -11,7 +11,6 @@
 
 #include "values/ScalarValue.h"
 #include "values/TupleValue.h"
-#include "values/TaintedValue.h"
 #include "values/UserTypeValue.h"
 #include "values/ExpandableValue.h"
 #include "values/NamedValue.h"
@@ -76,9 +75,6 @@ std::vector<DzResult> JunctionNode::build(const EntryPoint &entryPoint, Stack va
 
 const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult> &range, const EntryPoint &entryPoint) const
 {
-	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
-
 	auto function = entryPoint.function();
 
 	auto [_, first] = *range.begin();
@@ -113,8 +109,6 @@ const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult
 		auto type = templateValue->type();
 
 		auto alloc = entryPoint.alloc(type);
-
-		auto dataLayout = module->getDataLayout();
 
 		for (auto &[resultEntryPoint, value] : range)
 		{
@@ -163,24 +157,6 @@ const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult
 
 		return new UserTypeValue(templateValue->prototype(), joinedFieldValues);
 	}
-	else if (auto templateValue = dynamic_cast<const TaintedValue *>(first))
-	{
-		std::vector<SingleResult> values;
-
-		std::transform(begin(range), end(range), std::back_inserter(values), [](auto result) -> SingleResult
-		{
-			auto [resultEntryPoint, value] = result;
-
-			auto taintedValue = static_cast<const TaintedValue *>(value);
-
-			return { resultEntryPoint, taintedValue->subject() };
-		});
-
-		auto joinedValue = join(values, entryPoint);
-
-		return new TaintedValue(joinedValue);
-
-	}
 	else if (auto templateValue = dynamic_cast<const TupleValue *>(first))
 	{
 		std::vector<const BaseValue *> joinedElementValues;
@@ -206,7 +182,7 @@ const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult
 			joinedElementValues.push_back(joinedElementValue);
 		}
 
-		return new TupleValue(templateValue->iteratorType(), joinedElementValues);
+		return new TupleValue(joinedElementValues);
 	}
 	else if (auto expandableValue = dynamic_cast<const ExpandableValue *>(first))
 	{

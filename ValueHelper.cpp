@@ -10,17 +10,19 @@
 #include "values/LazyValue.h"
 #include "values/NamedValue.h"
 #include "values/ScalarValue.h"
+#include "values/ExpandedValue.h"
+#include "values/TupleValue.h"
 
 EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *value
 	, const BaseValue *storage
 	)
 {
-	if (auto typedValue = dynamic_cast<const ScalarValue *>(value))
+	if (auto scalarValue = dynamic_cast<const ScalarValue *>(value))
 	{
 		IRBuilderEx builder(entryPoint);
 
-		builder.createStore(typedValue, dynamic_cast<const ReferenceValue *>(storage));
+		builder.createStore(scalarValue, dynamic_cast<const ReferenceValue *>(storage));
 	}
 	else if (auto reference = dynamic_cast<const ReferenceValue *>(value))
 	{
@@ -63,6 +65,25 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 		auto lazyStorage = dynamic_cast<const LazyValue *>(storage);
 
 		return lazyStorage->assignFrom(entryPoint, lazyValue);
+	}
+	else if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
+	{
+		auto tupleStorage = dynamic_cast<const TupleValue *>(storage);
+
+		auto valueElements = tupleValue->values();
+		auto storageElements = tupleStorage->values();
+
+		auto zipped = zip(valueElements, storageElements);
+
+		return std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto elements)
+		{
+			auto [valueElement, storageElement] = elements;
+
+			return transferValue(accumulatedEntryPoint
+				, valueElement
+				, storageElement
+				);
+		});
 	}
 
 	return entryPoint;

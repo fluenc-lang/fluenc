@@ -59,8 +59,9 @@ std::vector<DzResult> ReturnNode::build(const EntryPoint &entryPoint, Stack valu
 
 	if (m_chained)
 	{
-		auto continuation = new ExpandableValue(m_iteratorType, entryPoint, m_chained);
-		auto tuple = new TupleValue(m_iteratorType, { continuation, value });
+		auto expandable = new ExpandableValue(m_iteratorType, entryPoint, m_chained);
+
+		auto tuple = new TupleValue({ expandable, value });
 
 		values.push(tuple);
 

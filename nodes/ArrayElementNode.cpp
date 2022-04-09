@@ -12,7 +12,6 @@
 #include "values/ReferenceValue.h"
 #include "values/ExpandableValue.h"
 #include "values/TupleValue.h"
-#include "values/TaintedValue.h"
 #include "values/IndexedValue.h"
 #include "values/ScalarValue.h"
 
@@ -69,14 +68,10 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 
 		valuesIfFalse.push(index);
 
-		auto continuation = new ExpandableValue(m_iteratorType
-			, entryPoint
-			, new ArrayContinuationNode(index)
-			);
+		auto continuation = new ArrayContinuationNode(index);
+		auto expandable = new ExpandableValue(m_iteratorType, entryPoint, continuation);
 
-		auto tuple = new TupleValue(m_iteratorType
-			, { continuation, value->subject() }
-			);
+		auto tuple = new TupleValue({ expandable, value->subject() });
 
 		valuesIfTrue.push(tuple);
 

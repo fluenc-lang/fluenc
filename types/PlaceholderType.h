@@ -1,17 +1,11 @@
-#ifndef ITERATORTYPE_H
-#define ITERATORTYPE_H
-
-#include <sstream>
+#ifndef PLACEHOLDERTYPE_H
+#define PLACEHOLDERTYPE_H
 
 #include "Type.h"
-#include "Utility.h"
-#include "TupleType.h"
 
-class IteratorType : public Type
+class PlaceholderType : public Type
 {
 	public:
-		static Type *instance();
-
 		std::string name() const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
@@ -19,4 +13,4 @@ class IteratorType : public Type
 		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
 };
 
-#endif // ITERATORTYPE_H
+#endif // PLACEHOLDERTYPE_H

@@ -1,14 +1,14 @@
-#ifndef DEPENDENTVALUE_H
-#define DEPENDENTVALUE_H
+#ifndef EXPANDEDVALUE_H
+#define EXPANDEDVALUE_H
 
 #include "BaseValue.h"
 
 class IteratorType;
 
-class DependentValue : public BaseValue
+class ExpandedValue : public BaseValue
 {
 	public:
-		DependentValue(const Type *iteratorType, const EntryPoint *provider);
+		ExpandedValue(const Type *iteratorType, const EntryPoint *provider);
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
@@ -20,4 +20,4 @@ class DependentValue : public BaseValue
 		const EntryPoint *m_provider;
 };
 
-#endif // DEPENDENTVALUE_H
+#endif // EXPANDEDVALUE_H

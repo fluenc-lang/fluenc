@@ -1,54 +1,52 @@
 #include <numeric>
 
-#include <llvm/IR/Instructions.h>
-
 #include "ContinuationNode.h"
-#include "Type.h"
 #include "IndexIterator.h"
+#include "ValueHelper.h"
 
-#include "values/ScalarValue.h"
-#include "values/DependentValue.h"
+#include "values/ExpandedValue.h"
+#include "values/TupleValue.h"
 
-std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stack values) const
+template<typename Container>
+const EntryPoint findTailCallTarget(const EntryPoint &candidate, Container container)
 {
-	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
-
-	auto block = entryPoint.block();
-
-	auto dataLayout = module->getDataLayout();
-
-	auto numberOfArguments = values.size();
-	auto tailCallValues = entryPoint.values();
-
-	auto tailCallTarget = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), &entryPoint, [&](const EntryPoint *target, size_t)
+	return std::accumulate(container.rbegin(), container.rend(), candidate, [&](auto target, auto value)
 	{
-		auto value = values.pop();
-		auto storage = tailCallValues.pop();
-
-		if (auto computedValue = dynamic_cast<const ScalarValue *>(value))
+		if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
 		{
-			auto valueType = storage->type();
-			auto valueStorageType = valueType->storageType(*context);
-
-			auto valueAlign = dataLayout.getABITypeAlign(valueStorageType);
-
-			auto store = new llvm::StoreInst(*computedValue, *static_cast<const ScalarValue *>(storage), false, valueAlign, block);
-
-			UNUSED(store);
+			return findTailCallTarget(target
+				, tupleValue->values()
+				);
 		}
-		else if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
-		{
-			auto provider = dependentValue->provider();
 
-			if (provider->depth() < target->depth())
+		if (auto expandedValue = dynamic_cast<const ExpandedValue *>(value))
+		{
+			auto provider = expandedValue->provider();
+
+			if (provider->depth() < target.depth())
 			{
-				return provider;
+				return *provider;
 			}
 		}
 
 		return target;
 	});
+}
 
-	return {{ *tailCallTarget, Stack() }};
+std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stack values) const
+{
+	auto numberOfArguments = values.size();
+
+	auto inputValues = values;
+	auto tailCallValues = entryPoint.values();
+
+	auto tailCallTarget = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), entryPoint, [&](auto target, size_t)
+	{
+		return ValueHelper::transferValue(target
+			, inputValues.pop()
+			, tailCallValues.pop()
+			);
+	});
+
+	return {{ findTailCallTarget(tailCallTarget, values), Stack() }};
 }

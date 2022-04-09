@@ -21,5 +21,5 @@ Type *DzTupleArgument::type(const EntryPoint &entryPoint) const
 		return arguments->type(entryPoint);
 	});
 
-	return TupleType::get(nullptr, types);
+	return TupleType::get(types);
 }

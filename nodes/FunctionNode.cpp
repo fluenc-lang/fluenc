@@ -21,7 +21,6 @@
 #include "values/BaseValue.h"
 #include "values/UserTypeValue.h"
 #include "values/NamedValue.h"
-#include "values/TaintedValue.h"
 
 FunctionNode::FunctionNode(FunctionAttribute attribute
 	, const std::string &name
@@ -113,11 +112,6 @@ std::vector<DzResult> FunctionNode::build(const EntryPoint &entryPoint, Stack va
 
 std::vector<FunctionNode::Argument> FunctionNode::handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const
 {
-	if (auto tainted = dynamic_cast<const TaintedValue *>(value))
-	{
-		return handleArgument(argument, entryPoint, tainted->subject());
-	}
-
 	if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
 	{
 		auto name = standardArgument->name();

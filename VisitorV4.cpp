@@ -18,7 +18,6 @@
 
 #include "nodes/TerminatorNode.h"
 #include "nodes/StringLiteralNode.h"
-#include "nodes/TaintedSinkNode.h"
 #include "nodes/ReturnNode.h"
 #include "nodes/StackSegmentNode.h"
 #include "nodes/MemberAccessNode.h"
@@ -55,7 +54,6 @@
 #include "values/ScalarValue.h"
 #include "values/ReferenceValue.h"
 #include "values/IteratorValue.h"
-#include "values/TaintedValue.h"
 #include "values/ArrayValue.h"
 #include "values/IndexedValue.h"
 

@@ -5,13 +5,10 @@
 #include "Utility.h"
 #include "AllIterator.h"
 
-#include "types/IteratorType.h"
-
 #include "iterators/ExtremitiesIterator.h"
 
-TupleType::TupleType(const Type *iteratorType, const std::vector<const Type *> types)
-	: m_iteratorType(iteratorType)
-	, m_types(types)
+TupleType::TupleType(const std::vector<const Type *> types)
+	: m_types(types)
 {
 }
 
@@ -71,18 +68,8 @@ llvm::Type *TupleType::storageType(llvm::LLVMContext &context) const
 
 int8_t TupleType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
-	if (type == m_iteratorType)
-	{
-		return 0;
-	}
-
 	if (auto tuple = dynamic_cast<const TupleType *>(type))
 	{
-		if (tuple->m_iteratorType == m_iteratorType)
-		{
-			return 0;
-		}
-
 		if (m_types.size() != tuple->m_types.size())
 		{
 			return -1;
@@ -107,7 +94,7 @@ int8_t TupleType::compatibility(const Type *type, const EntryPoint &entryPoint) 
 	return -1;
 }
 
-TupleType *TupleType::get(const Type *iteratorType, const std::vector<const Type *> &types)
+TupleType *TupleType::get(const std::vector<const Type *> &types)
 {
 	static std::unordered_map<size_t, TupleType> cache;
 
@@ -116,7 +103,7 @@ TupleType *TupleType::get(const Type *iteratorType, const std::vector<const Type
 		return (accumulator ^ (size_t)type) * 1099511628211;
 	});
 
-	auto [iterator, _] = cache.try_emplace(hash, TupleType { iteratorType, types });
+	auto [iterator, _] = cache.try_emplace(hash, types);
 
 	return &iterator->second;
 }

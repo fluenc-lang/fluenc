@@ -54,7 +54,6 @@ SOURCES += \
 	Node.cpp \
 	Stack.cpp \
 	nodes/StringLiteralNode.cpp \
-	nodes/TaintedSinkNode.cpp \
 	Type.cpp \
 	UndeclaredIdentifierException.cpp \
 	exceptions/UnknownTypeException.cpp \
@@ -76,6 +75,8 @@ SOURCES += \
 	types/FunctionType.cpp \
 	types/Int32Type.cpp \
 	types/Int64Type.cpp \
+	types/IteratorType.cpp \
+	types/PlaceholderType.cpp \
 	types/Prototype.cpp \
 	types/PrototypeField.cpp \
 	types/PrototypeFieldEmbryo.cpp \
@@ -90,16 +91,16 @@ SOURCES += \
 	types/WithoutType.cpp \
 	values/ArrayValue.cpp \
 	values/ArrayValueGenerator.cpp \
-	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/ExpandedValue.cpp \
 	values/FunctionValue.cpp \
 	values/IteratorValue.cpp \
 	values/IteratorValueGenerator.cpp \
 	values/LazyValue.cpp \
 	values/NamedValue.cpp \
+	values/PlaceholderValue.cpp \
 	values/ReferenceValue.cpp \
 	values/ScalarValue.cpp \
-	values/TaintedValue.cpp \
 	values/TupleValue.cpp \
 	values/IndexedValue.cpp \
 	values/UserTypeValue.cpp \
@@ -165,7 +166,6 @@ HEADERS += \
 	Node.h \
 	Stack.h \
 	nodes/StringLiteralNode.h \
-	nodes/TaintedSinkNode.h \
 	Tests.h \
 	UndeclaredIdentifierException.h \
 	exceptions/UnknownTypeException.h \
@@ -190,6 +190,7 @@ HEADERS += \
 	types/Int32Type.h \
 	types/Int64Type.h \
 	types/IteratorType.h \
+	types/PlaceholderType.h \
 	types/Prototype.h \
 	types/PrototypeField.h \
 	types/PrototypeFieldEmbryo.h \
@@ -206,8 +207,8 @@ HEADERS += \
 	values/ArrayValue.h \
 	values/ArrayValueGenerator.h \
 	values/BaseValue.h \
-	values/DependentValue.h \
 	values/ExpandableValue.h \
+	values/ExpandedValue.h \
 	values/FunctionValue.h \
 	values/IIteratable.h \
 	values/ILazyValueGenerator.h \
@@ -216,9 +217,9 @@ HEADERS += \
 	values/IteratorValueGenerator.h \
 	values/LazyValue.h \
 	values/NamedValue.h \
+	values/PlaceholderValue.h \
 	values/ReferenceValue.h \
 	values/ScalarValue.h \
-	values/TaintedValue.h \
 	values/TupleValue.h \
 	values/UserTypeValue.h \
 	values/WithoutValue.h \

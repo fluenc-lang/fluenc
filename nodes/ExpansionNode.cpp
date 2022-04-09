@@ -1,7 +1,9 @@
 #include "ExpansionNode.h"
 
 #include "values/ExpandableValue.h"
-#include "values/DependentValue.h"
+#include "values/ExpandedValue.h"
+#include "values/TupleValue.h"
+#include "values/PlaceholderValue.h"
 
 ExpansionNode::ExpansionNode(Node *consumer)
 	: m_consumer(consumer)
@@ -22,11 +24,13 @@ std::vector<DzResult> ExpansionNode::build(const EntryPoint &entryPoint, Stack v
 
 	for (auto &[targetEntryPoint, _] : result)
 	{
-		auto value = new DependentValue(iterator->type()
+		auto value = new ExpandedValue(iterator->type()
 			, new EntryPoint(targetEntryPoint)
 			);
 
-		values.push(value);
+		auto tuple = new TupleValue({ value, PlaceholderValue::instance() });
+
+		values.push(tuple);
 
 		return m_consumer->build(entryPoint, values);
 	}
