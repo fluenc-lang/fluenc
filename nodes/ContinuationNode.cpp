@@ -40,7 +40,7 @@ std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stac
 	auto inputValues = values;
 	auto tailCallValues = entryPoint.values();
 
-	auto tailCallTarget = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), entryPoint, [&](auto target, size_t)
+	auto tailCallCandidate = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), entryPoint, [&](auto target, size_t)
 	{
 		return ValueHelper::transferValue(target
 			, inputValues.pop()
@@ -48,5 +48,5 @@ std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stac
 			);
 	});
 
-	return {{ findTailCallTarget(tailCallTarget, values), Stack() }};
+	return {{ findTailCallTarget(tailCallCandidate, values), Stack() }};
 }
