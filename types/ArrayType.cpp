@@ -58,8 +58,17 @@ llvm::Type *ArrayType::storageType(llvm::LLVMContext &context) const
 
 int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
-	UNUSED(type);
 	UNUSED(entryPoint);
+
+	if (auto other = dynamic_cast<const ArrayType *>(type))
+	{
+		if (other == this)
+		{
+			return 0;
+		}
+
+		return -1;
+	}
 
 	return 0;
 }

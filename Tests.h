@@ -2649,7 +2649,7 @@ class Tests : public QObject
 		W_SLOT(compatibility)
 		W_SLOT(scenario70)
 		W_SLOT(arrayType_1)
-//		W_SLOT(arrayType_2)
+		W_SLOT(arrayType_2)
 
 	private:
 		CallableNode *compileFunction(std::string source)
