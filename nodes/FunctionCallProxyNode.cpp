@@ -1,5 +1,6 @@
 #include "FunctionCallProxyNode.h"
 #include "AllIterator.h"
+#include "JunctionNode.h"
 
 #include "nodes/CallableNode.h"
 
@@ -29,7 +30,7 @@ std::vector<DzResult> FunctionCallProxyNode::regularCall(const EntryPoint &entry
 		// Naive. Really naive.
 		if (function->attribute() == FunctionAttribute::Iterator)
 		{
-			auto generator = new IteratorValueGenerator(m_subject, entryPoint);
+			auto generator = new IteratorValueGenerator(new IteratorType(), m_subject, entryPoint);
 			auto lazy = new LazyValue(generator);
 
 			values.push(lazy);
@@ -40,7 +41,9 @@ std::vector<DzResult> FunctionCallProxyNode::regularCall(const EntryPoint &entry
 
 	std::vector<DzResult> results;
 
-	for (auto &[subjectEntryPoint, subjectValues] : m_subject->build(entryPoint, values))
+	auto junction = new JunctionNode(m_subject);
+
+	for (auto &[subjectEntryPoint, subjectValues] : junction->build(entryPoint, values))
 	{
 		for (auto &consumerResult : m_consumer->build(subjectEntryPoint, subjectValues))
 		{

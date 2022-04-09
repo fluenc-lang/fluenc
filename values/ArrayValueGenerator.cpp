@@ -52,3 +52,22 @@ const Type *ArrayValueGenerator::type() const
 
 	return IteratorType::instance();
 }
+
+const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoint) const
+{
+	if (m_values.size() == 1)
+	{
+		auto [inputEntryPoint, inputValues] = m_values[0];
+
+		std::vector<const BaseValue *> clonedValues;
+
+		std::transform(inputValues.begin(), inputValues.end(), std::back_inserter(clonedValues), [&](auto value)
+		{
+			return value->clone(entryPoint);
+		});
+
+		return new ArrayValueGenerator({{ inputEntryPoint, clonedValues }}, m_id, m_size);
+	}
+
+	throw new std::exception();
+}

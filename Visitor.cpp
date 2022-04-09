@@ -725,7 +725,6 @@ antlrcpp::Any Visitor::visitArray(dzParser::ArrayContext *context)
 			.visit<Node *>(expression.value);
 	});
 
-//	auto junction = new Junction(firstValue);
 //	auto taintedSink = new TaintedSink(firstValue);
 	auto lazySink = new ArraySinkNode(expressions.size(), m_alpha, firstValue);
 

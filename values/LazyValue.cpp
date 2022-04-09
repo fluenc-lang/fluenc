@@ -9,7 +9,7 @@
 
 #include "types/IteratorType.h"
 
-LazyValue::LazyValue(ILazyValueGenerator *generator)
+LazyValue::LazyValue(const ILazyValueGenerator *generator)
 	: m_generator(generator)
 {
 }
@@ -21,9 +21,9 @@ const Type *LazyValue::type() const
 
 const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const
 {
-	UNUSED(entryPoint);
+	auto cloned = m_generator->clone(entryPoint);
 
-	return this;
+	return new LazyValue(cloned);
 }
 
 const IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
