@@ -700,6 +700,13 @@ antlrcpp::Any Visitor::visitArray(dzParser::ArrayContext *context)
 {
 	auto expressions = context->expression();
 
+	if (expressions.empty())
+	{
+		auto empty = new EmptyArrayNode(TerminatorNode::instance());
+
+		return static_cast<Node *>(empty);
+	}
+
 	std::vector<Indexed<dzParser::ExpressionContext *>> indexed;
 
 	std::transform(begin(expressions), end(expressions), index_iterator(0u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<dzParser::ExpressionContext *>
@@ -707,36 +714,20 @@ antlrcpp::Any Visitor::visitArray(dzParser::ArrayContext *context)
 		return { y, x };
 	});
 
-	auto iteratorType = new IteratorType();
-
-	auto firstElement = std::accumulate(begin(indexed), end(indexed), (Node *)nullptr, [&](auto next, auto)
-	{
-		return new ArrayElementNode(iteratorType, next);
-	});
-
-	if (!firstElement)
-	{
-		auto empty = new EmptyArrayNode(TerminatorNode::instance());
-
-		return static_cast<Node *>(empty);
-	}
-
 	auto firstValue = std::accumulate(begin(indexed), end(indexed), (Node *)TerminatorNode::instance(), [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
 	{
-		auto k = new IndexSinkNode(expression.index, next);
-		auto sink = new ReferenceSinkNode(k);
+		auto indexSink = new IndexSinkNode(expression.index, next);
+		auto referenceSink = new ReferenceSinkNode(indexSink);
 
-		Visitor visitor(m_iteratorType, sink, nullptr);
+		Visitor visitor(m_iteratorType, referenceSink, nullptr);
 
 		return visitor
 			.visit<Node *>(expression.value);
 	});
 
-//	auto init = new DzArrayInit(firstElement, firstValue);
-
 //	auto junction = new Junction(firstValue);
 //	auto taintedSink = new TaintedSink(firstValue);
-	auto lazySink = new ArraySinkNode(iteratorType, m_alpha, firstElement, firstValue);
+	auto lazySink = new ArraySinkNode(expressions.size(), m_alpha, firstValue);
 
 	return static_cast<Node *>(lazySink);
 }

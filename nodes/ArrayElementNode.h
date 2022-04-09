@@ -1,6 +1,8 @@
 #ifndef ARRAYELEMENTNODE_H
 #define ARRAYELEMENTNODE_H
 
+#include <numeric>
+
 #include "Node.h"
 
 class Type;
@@ -17,4 +19,5 @@ class ArrayElementNode : public Node
 
 		const Node *m_next;
 };
+
 #endif // ARRAYELEMENTNODE_H
