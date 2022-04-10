@@ -2835,6 +2835,8 @@ class Tests : public QObject
 
 			if (!jit)
 			{
+				auto error = jit.takeError();
+
 				return -1;
 			}
 

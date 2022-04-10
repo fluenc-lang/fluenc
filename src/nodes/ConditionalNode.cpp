@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iostream>
 #include <unordered_map>
 
 #include <llvm/IR/IRBuilder.h>
@@ -60,7 +61,7 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 	immediateResults.insert(end(immediateResults), begin(resultsIfTrue), end(resultsIfTrue));
 	immediateResults.insert(end(immediateResults), begin(resultsIfFalse), end(resultsIfFalse));
 
-	std::unordered_multimap<const Type *, SingleResult> groupedResults;
+	std::multimap<const Type *, SingleResult> groupedResults;
 
 	for (auto &result : immediateResults)
 	{
