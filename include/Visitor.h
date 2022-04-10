@@ -3,7 +3,7 @@
 
 #include <llvm/IR/Module.h>
 
-#include "antlr4-runtime/dzBaseVisitor.h"
+#include "antlr4-runtime/fluencBaseVisitor.h"
 
 #include "EntryPoint.h"
 
@@ -46,47 +46,47 @@ class ModuleInfo
 
 class Type;
 
-class Visitor : public dzBaseVisitor
+class Visitor : public fluencBaseVisitor
 {
 	public:
 		Visitor(const Type *iteratorType, Node *alpha, Node *beta);
 
-		antlrcpp::Any visitProgram(dzParser::ProgramContext *context) override;
-		antlrcpp::Any visitFunction(dzParser::FunctionContext *context) override;
-		antlrcpp::Any visitRegularType(dzParser::RegularTypeContext *context) override;
-		antlrcpp::Any visitFunctionType(dzParser::FunctionTypeContext *context) override;
-		antlrcpp::Any visitStandardArgument(dzParser::StandardArgumentContext *context) override;
-		antlrcpp::Any visitTupleArgument(dzParser::TupleArgumentContext *context) override;
-		antlrcpp::Any visitRet(dzParser::RetContext *context) override;
-		antlrcpp::Any visitBlock(dzParser::BlockContext *context) override;
-		antlrcpp::Any visitBinary(dzParser::BinaryContext *context) override;
-		antlrcpp::Any visitCall(dzParser::CallContext *context) override;
-		antlrcpp::Any visitWith(dzParser::WithContext *context) override;
-		antlrcpp::Any visitMember(dzParser::MemberContext *context) override;
-		antlrcpp::Any visitInt32Literal(dzParser::Int32LiteralContext *context) override;
-		antlrcpp::Any visitInt64Literal(dzParser::Int64LiteralContext *context) override;
-		antlrcpp::Any visitBoolLiteral(dzParser::BoolLiteralContext *context) override;
-		antlrcpp::Any visitStringLiteral(dzParser::StringLiteralContext *context) override;
-		antlrcpp::Any visitUint32Literal(dzParser::Uint32LiteralContext *context) override;
-		antlrcpp::Any visitStructure(dzParser::StructureContext *context) override;
-		antlrcpp::Any visitInstantiation(dzParser::InstantiationContext *context) override;
-		antlrcpp::Any visitConditional(dzParser::ConditionalContext *context) override;
-		antlrcpp::Any visitGlobal(dzParser::GlobalContext *context) override;
-		antlrcpp::Any visitNothing(dzParser::NothingContext *context) override;
-		antlrcpp::Any visitGroup(dzParser::GroupContext *context) override;
-		antlrcpp::Any visitExpansion(dzParser::ExpansionContext *context) override;
-		antlrcpp::Any visitContinuation(dzParser::ContinuationContext *context) override;
-		antlrcpp::Any visitArray(dzParser::ArrayContext *context) override;
-		antlrcpp::Any visitCharLiteral(dzParser::CharLiteralContext *context) override;
-		antlrcpp::Any visitByteLiteral(dzParser::ByteLiteralContext *context) override;
-		antlrcpp::Any visitLocal(dzParser::LocalContext *context) override;
-		antlrcpp::Any visitInstruction(dzParser::InstructionContext *context) override;
-		antlrcpp::Any visitNs(dzParser::NsContext *context) override;
+		antlrcpp::Any visitProgram(fluencParser::ProgramContext *context) override;
+		antlrcpp::Any visitFunction(fluencParser::FunctionContext *context) override;
+		antlrcpp::Any visitRegularType(fluencParser::RegularTypeContext *context) override;
+		antlrcpp::Any visitFunctionType(fluencParser::FunctionTypeContext *context) override;
+		antlrcpp::Any visitStandardArgument(fluencParser::StandardArgumentContext *context) override;
+		antlrcpp::Any visitTupleArgument(fluencParser::TupleArgumentContext *context) override;
+		antlrcpp::Any visitRet(fluencParser::RetContext *context) override;
+		antlrcpp::Any visitBlock(fluencParser::BlockContext *context) override;
+		antlrcpp::Any visitBinary(fluencParser::BinaryContext *context) override;
+		antlrcpp::Any visitCall(fluencParser::CallContext *context) override;
+		antlrcpp::Any visitWith(fluencParser::WithContext *context) override;
+		antlrcpp::Any visitMember(fluencParser::MemberContext *context) override;
+		antlrcpp::Any visitInt32Literal(fluencParser::Int32LiteralContext *context) override;
+		antlrcpp::Any visitInt64Literal(fluencParser::Int64LiteralContext *context) override;
+		antlrcpp::Any visitBoolLiteral(fluencParser::BoolLiteralContext *context) override;
+		antlrcpp::Any visitStringLiteral(fluencParser::StringLiteralContext *context) override;
+		antlrcpp::Any visitUint32Literal(fluencParser::Uint32LiteralContext *context) override;
+		antlrcpp::Any visitStructure(fluencParser::StructureContext *context) override;
+		antlrcpp::Any visitInstantiation(fluencParser::InstantiationContext *context) override;
+		antlrcpp::Any visitConditional(fluencParser::ConditionalContext *context) override;
+		antlrcpp::Any visitGlobal(fluencParser::GlobalContext *context) override;
+		antlrcpp::Any visitNothing(fluencParser::NothingContext *context) override;
+		antlrcpp::Any visitGroup(fluencParser::GroupContext *context) override;
+		antlrcpp::Any visitExpansion(fluencParser::ExpansionContext *context) override;
+		antlrcpp::Any visitContinuation(fluencParser::ContinuationContext *context) override;
+		antlrcpp::Any visitArray(fluencParser::ArrayContext *context) override;
+		antlrcpp::Any visitCharLiteral(fluencParser::CharLiteralContext *context) override;
+		antlrcpp::Any visitByteLiteral(fluencParser::ByteLiteralContext *context) override;
+		antlrcpp::Any visitLocal(fluencParser::LocalContext *context) override;
+		antlrcpp::Any visitInstruction(fluencParser::InstructionContext *context) override;
+		antlrcpp::Any visitNs(fluencParser::NsContext *context) override;
 
 		template<typename T>
 		T visit(antlr4::tree::ParseTree *tree)
 		{
-			auto result = dzBaseVisitor::visit(tree);
+			auto result = fluencBaseVisitor::visit(tree);
 
 			return result.as<T>();
 		}

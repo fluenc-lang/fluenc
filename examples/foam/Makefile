@@ -1,7 +1,7 @@
 OBJ = main.o sdl.o
 
 %.o: %.dz
-	../../dz $<
+	../../fcc $<
 
 %.o: %.c
 	gcc -c $<

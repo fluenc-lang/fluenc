@@ -139,7 +139,7 @@ void populateInstructions(const std::vector<std::string> &namespaces
 	}
 }
 
-antlrcpp::Any Visitor::visitProgram(dzParser::ProgramContext *context)
+antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
 {
 	auto llvmContext = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
@@ -156,7 +156,7 @@ antlrcpp::Any Visitor::visitProgram(dzParser::ProgramContext *context)
 
 	std::transform(begin(instructions), end(instructions), std::back_inserter(results), [this](auto instruction)
 	{
-		return dzBaseVisitor::visit(instruction);
+		return fluencBaseVisitor::visit(instruction);
 	});
 
 	populateInstructions(std::vector<std::string>()
@@ -208,7 +208,7 @@ antlrcpp::Any Visitor::visitProgram(dzParser::ProgramContext *context)
 		);
 }
 
-FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
+FunctionAttribute getAttribute(fluencParser::FunctionContext *ctx)
 {
 	if (ctx->attribute)
 	{
@@ -233,7 +233,7 @@ FunctionAttribute getAttribute(dzParser::FunctionContext *ctx)
 	return FunctionAttribute::None;
 }
 
-antlrcpp::Any Visitor::visitFunction(dzParser::FunctionContext *context)
+antlrcpp::Any Visitor::visitFunction(fluencParser::FunctionContext *context)
 {
 	std::vector<DzBaseArgument *> arguments;
 
@@ -294,7 +294,7 @@ antlrcpp::Any Visitor::visitFunction(dzParser::FunctionContext *context)
 	return static_cast<CallableNode *>(function);
 }
 
-antlrcpp::Any Visitor::visitRegularType(dzParser::RegularTypeContext *context)
+antlrcpp::Any Visitor::visitRegularType(fluencParser::RegularTypeContext *context)
 {
 	return static_cast<ITypeName *>(
 		new DzTypeName(context
@@ -303,7 +303,7 @@ antlrcpp::Any Visitor::visitRegularType(dzParser::RegularTypeContext *context)
 	);
 }
 
-antlrcpp::Any Visitor::visitFunctionType(dzParser::FunctionTypeContext *context)
+antlrcpp::Any Visitor::visitFunctionType(fluencParser::FunctionTypeContext *context)
 {
 	auto parameterTypes = context->typeName();
 
@@ -319,7 +319,7 @@ antlrcpp::Any Visitor::visitFunctionType(dzParser::FunctionTypeContext *context)
 		);
 }
 
-antlrcpp::Any Visitor::visitStandardArgument(dzParser::StandardArgumentContext *context)
+antlrcpp::Any Visitor::visitStandardArgument(fluencParser::StandardArgumentContext *context)
 {
 	auto argument = new DzArgument(context->ID()->getText()
 		, visit<ITypeName *>(context->typeName())
@@ -328,13 +328,13 @@ antlrcpp::Any Visitor::visitStandardArgument(dzParser::StandardArgumentContext *
 	return static_cast<DzBaseArgument *>(argument);
 }
 
-antlrcpp::Any Visitor::visitTupleArgument(dzParser::TupleArgumentContext *context)
+antlrcpp::Any Visitor::visitTupleArgument(fluencParser::TupleArgumentContext *context)
 {
 	auto arguments = context->argument();
 
 	std::vector<DzBaseArgument *> tupleArguments;
 
-	std::transform(begin(arguments), end(arguments), std::back_insert_iterator(tupleArguments), [this](dzParser::ArgumentContext *argument)
+	std::transform(begin(arguments), end(arguments), std::back_insert_iterator(tupleArguments), [this](fluencParser::ArgumentContext *argument)
 	{
 		return visit<DzBaseArgument *>(argument);
 	});
@@ -344,7 +344,7 @@ antlrcpp::Any Visitor::visitTupleArgument(dzParser::TupleArgumentContext *contex
 	return static_cast<DzBaseArgument *>(argument);
 }
 
-antlrcpp::Any Visitor::visitRet(dzParser::RetContext *context)
+antlrcpp::Any Visitor::visitRet(fluencParser::RetContext *context)
 {
 	if (context->chained)
 	{
@@ -374,13 +374,13 @@ antlrcpp::Any Visitor::visitRet(dzParser::RetContext *context)
 	return static_cast<Node *>(instruction);
 }
 
-antlrcpp::Any Visitor::visitBlock(dzParser::BlockContext *context)
+antlrcpp::Any Visitor::visitBlock(fluencParser::BlockContext *context)
 {
 	auto expressions = context->expression();
 
 	auto ret = visit<Node *, BlockInstructionNode *>(context->ret());
 
-	auto result = std::accumulate(rbegin(expressions), rend(expressions), ret, [this](BlockInstructionNode *consumer, dzParser::ExpressionContext *expression)
+	auto result = std::accumulate(rbegin(expressions), rend(expressions), ret, [this](BlockInstructionNode *consumer, fluencParser::ExpressionContext *expression)
 	{
 		auto stackFrame = new BlockStackFrameNode(consumer);
 
@@ -404,7 +404,7 @@ antlrcpp::Any Visitor::visitBlock(dzParser::BlockContext *context)
 	return static_cast<Node *>(result);
 }
 
-antlrcpp::Any Visitor::visitBinary(dzParser::BinaryContext *context)
+antlrcpp::Any Visitor::visitBinary(fluencParser::BinaryContext *context)
 {
 	auto binary = new BinaryNode(m_alpha
 		, context->OP()->getText()
@@ -423,7 +423,7 @@ antlrcpp::Any Visitor::visitBinary(dzParser::BinaryContext *context)
 	return right;
 }
 
-antlrcpp::Any Visitor::visitCall(dzParser::CallContext *context)
+antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 {
 	auto expression = context->expression();
 	auto name = context->ID()->getText();
@@ -432,7 +432,7 @@ antlrcpp::Any Visitor::visitCall(dzParser::CallContext *context)
 
 	std::vector<Node *> values;
 
-	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [this](dzParser::ExpressionContext *parameter)
+	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [this](fluencParser::ExpressionContext *parameter)
 	{
 		auto sink = new ReferenceSinkNode(TerminatorNode::instance());
 
@@ -449,13 +449,13 @@ antlrcpp::Any Visitor::visitCall(dzParser::CallContext *context)
 	return static_cast<Node *>(proxy);
 }
 
-antlrcpp::Any Visitor::visitWith(dzParser::WithContext *context)
+antlrcpp::Any Visitor::visitWith(fluencParser::WithContext *context)
 {
 	auto assignments = context->assignment();
 
 	std::vector<std::string> fields;
 
-	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](dzParser::AssignmentContext *assignment)
+	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](fluencParser::AssignmentContext *assignment)
 	{
 		return assignment->field()->ID()->getText();
 	});
@@ -465,7 +465,7 @@ antlrcpp::Any Visitor::visitWith(dzParser::WithContext *context)
 		, fields
 		);
 
-	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, dzParser::AssignmentContext *assignment)
+	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
 	{
 		Visitor visitor(m_iteratorType, consumer, nullptr);
 
@@ -474,7 +474,7 @@ antlrcpp::Any Visitor::visitWith(dzParser::WithContext *context)
 	});
 }
 
-antlrcpp::Any Visitor::visitMember(dzParser::MemberContext *context)
+antlrcpp::Any Visitor::visitMember(fluencParser::MemberContext *context)
 {
 	auto access = context->ID();
 
@@ -500,7 +500,7 @@ antlrcpp::Any Visitor::visitMember(dzParser::MemberContext *context)
 	return static_cast<Node *>(member);
 }
 
-antlrcpp::Any Visitor::visitInt32Literal(dzParser::Int32LiteralContext *context)
+antlrcpp::Any Visitor::visitInt32Literal(fluencParser::Int32LiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::int32()
@@ -510,7 +510,7 @@ antlrcpp::Any Visitor::visitInt32Literal(dzParser::Int32LiteralContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any Visitor::visitInt64Literal(dzParser::Int64LiteralContext *context)
+antlrcpp::Any Visitor::visitInt64Literal(fluencParser::Int64LiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::int64()
@@ -520,7 +520,7 @@ antlrcpp::Any Visitor::visitInt64Literal(dzParser::Int64LiteralContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any Visitor::visitBoolLiteral(dzParser::BoolLiteralContext *context)
+antlrcpp::Any Visitor::visitBoolLiteral(fluencParser::BoolLiteralContext *context)
 {
 	auto constant = new BooleanLiteralNode(m_alpha
 		, context->BOOL()->getText()
@@ -529,7 +529,7 @@ antlrcpp::Any Visitor::visitBoolLiteral(dzParser::BoolLiteralContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any Visitor::visitStringLiteral(dzParser::StringLiteralContext *context)
+antlrcpp::Any Visitor::visitStringLiteral(fluencParser::StringLiteralContext *context)
 {
 	auto constant = new StringLiteralNode(m_alpha
 		, context->STRING()->getText()
@@ -538,7 +538,7 @@ antlrcpp::Any Visitor::visitStringLiteral(dzParser::StringLiteralContext *contex
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any Visitor::visitUint32Literal(dzParser::Uint32LiteralContext *context)
+antlrcpp::Any Visitor::visitUint32Literal(fluencParser::Uint32LiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::uint32()
@@ -548,14 +548,14 @@ antlrcpp::Any Visitor::visitUint32Literal(dzParser::Uint32LiteralContext *contex
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any Visitor::visitStructure(dzParser::StructureContext *context)
+antlrcpp::Any Visitor::visitStructure(fluencParser::StructureContext *context)
 {
 	auto name = context->name->getText();
 	auto inputFields = context->field();
 
 	std::vector<PrototypeFieldEmbryo> fields;
 
-	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [this](dzParser::FieldContext *field) -> PrototypeFieldEmbryo
+	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [this](fluencParser::FieldContext *field) -> PrototypeFieldEmbryo
 	{
 		auto name = field->ID()->getText();
 
@@ -583,7 +583,7 @@ antlrcpp::Any Visitor::visitStructure(dzParser::StructureContext *context)
 
 	auto parentTypeNames = context->typeName();
 
-	std::transform(begin(parentTypeNames), end(parentTypeNames), std::back_insert_iterator(parentTypes), [this](dzParser::TypeNameContext *typeName) -> ITypeName *
+	std::transform(begin(parentTypeNames), end(parentTypeNames), std::back_insert_iterator(parentTypes), [this](fluencParser::TypeNameContext *typeName) -> ITypeName *
 	{
 		return visit<ITypeName *>(typeName);
 	});
@@ -591,13 +591,13 @@ antlrcpp::Any Visitor::visitStructure(dzParser::StructureContext *context)
 	return new Prototype(name, fields, parentTypes);
 }
 
-antlrcpp::Any Visitor::visitInstantiation(dzParser::InstantiationContext *context)
+antlrcpp::Any Visitor::visitInstantiation(fluencParser::InstantiationContext *context)
 {
 	auto assignments = context->assignment();
 
 	std::vector<std::string> fields;
 
-	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](dzParser::AssignmentContext *assignment)
+	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](fluencParser::AssignmentContext *assignment)
 	{
 		return assignment->field()->ID()->getText();
 	});
@@ -610,7 +610,7 @@ antlrcpp::Any Visitor::visitInstantiation(dzParser::InstantiationContext *contex
 		, fields
 		);
 
-	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, dzParser::AssignmentContext *assignment)
+	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
 	{
 		Visitor visitor(m_iteratorType, consumer, nullptr);
 
@@ -619,7 +619,7 @@ antlrcpp::Any Visitor::visitInstantiation(dzParser::InstantiationContext *contex
 	});
 }
 
-antlrcpp::Any Visitor::visitConditional(dzParser::ConditionalContext *context)
+antlrcpp::Any Visitor::visitConditional(fluencParser::ConditionalContext *context)
 {
 	Visitor blockVisitor(m_iteratorType, m_beta, nullptr);
 
@@ -640,7 +640,7 @@ antlrcpp::Any Visitor::visitConditional(dzParser::ConditionalContext *context)
 	return static_cast<Node *>(instruction);
 }
 
-antlrcpp::Any Visitor::visitGlobal(dzParser::GlobalContext *context)
+antlrcpp::Any Visitor::visitGlobal(fluencParser::GlobalContext *context)
 {
 	auto name = context->ID()->getText();
 
@@ -652,7 +652,7 @@ antlrcpp::Any Visitor::visitGlobal(dzParser::GlobalContext *context)
 	return new GlobalNode(literal, name);
 }
 
-antlrcpp::Any Visitor::visitNothing(dzParser::NothingContext *context)
+antlrcpp::Any Visitor::visitNothing(fluencParser::NothingContext *context)
 {
 	UNUSED(context);
 
@@ -664,12 +664,12 @@ antlrcpp::Any Visitor::visitNothing(dzParser::NothingContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any Visitor::visitGroup(dzParser::GroupContext *context)
+antlrcpp::Any Visitor::visitGroup(fluencParser::GroupContext *context)
 {
 	return visit<Node *>(context->expression());
 }
 
-antlrcpp::Any Visitor::visitExpansion(dzParser::ExpansionContext *context)
+antlrcpp::Any Visitor::visitExpansion(fluencParser::ExpansionContext *context)
 {
 	auto expansion = new ExpansionNode(m_alpha);
 
@@ -679,13 +679,13 @@ antlrcpp::Any Visitor::visitExpansion(dzParser::ExpansionContext *context)
 		.visit<Node *>(context->expression());
 }
 
-antlrcpp::Any Visitor::visitContinuation(dzParser::ContinuationContext *context)
+antlrcpp::Any Visitor::visitContinuation(fluencParser::ContinuationContext *context)
 {
 	auto continuation = new ContinuationNode();
 
 	auto expressions = context->expression();
 
-	return std::accumulate(begin(expressions), end(expressions), static_cast<Node *>(continuation), [this](Node *consumer, dzParser::ExpressionContext *parameter)
+	return std::accumulate(begin(expressions), end(expressions), static_cast<Node *>(continuation), [this](Node *consumer, fluencParser::ExpressionContext *parameter)
 	{
 		Visitor visitor(m_iteratorType, consumer, nullptr);
 
@@ -696,7 +696,7 @@ antlrcpp::Any Visitor::visitContinuation(dzParser::ContinuationContext *context)
 	});
 }
 
-antlrcpp::Any Visitor::visitArray(dzParser::ArrayContext *context)
+antlrcpp::Any Visitor::visitArray(fluencParser::ArrayContext *context)
 {
 	auto expressions = context->expression();
 
@@ -707,14 +707,14 @@ antlrcpp::Any Visitor::visitArray(dzParser::ArrayContext *context)
 		return static_cast<Node *>(empty);
 	}
 
-	std::vector<Indexed<dzParser::ExpressionContext *>> indexed;
+	std::vector<Indexed<fluencParser::ExpressionContext *>> indexed;
 
-	std::transform(begin(expressions), end(expressions), index_iterator(0u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<dzParser::ExpressionContext *>
+	std::transform(begin(expressions), end(expressions), index_iterator(0u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<fluencParser::ExpressionContext *>
 	{
 		return { y, x };
 	});
 
-	auto firstValue = std::accumulate(begin(indexed), end(indexed), (Node *)TerminatorNode::instance(), [&](auto next, Indexed<dzParser::ExpressionContext *> expression)
+	auto firstValue = std::accumulate(begin(indexed), end(indexed), (Node *)TerminatorNode::instance(), [&](auto next, Indexed<fluencParser::ExpressionContext *> expression)
 	{
 		auto indexSink = new IndexSinkNode(expression.index, next);
 		auto referenceSink = new ReferenceSinkNode(indexSink);
@@ -731,7 +731,7 @@ antlrcpp::Any Visitor::visitArray(dzParser::ArrayContext *context)
 	return static_cast<Node *>(lazySink);
 }
 
-antlrcpp::Any Visitor::visitCharLiteral(dzParser::CharLiteralContext *context)
+antlrcpp::Any Visitor::visitCharLiteral(fluencParser::CharLiteralContext *context)
 {
 	auto value = new CharacterLiteralNode(m_alpha
 		, context->CHARACTER()->getText()
@@ -740,7 +740,7 @@ antlrcpp::Any Visitor::visitCharLiteral(dzParser::CharLiteralContext *context)
 	return static_cast<Node *>(value);
 }
 
-antlrcpp::Any Visitor::visitByteLiteral(dzParser::ByteLiteralContext *context)
+antlrcpp::Any Visitor::visitByteLiteral(fluencParser::ByteLiteralContext *context)
 {
 	auto constant = new IntegralLiteralNode(m_alpha
 		, DzTypeName::byte()
@@ -750,7 +750,7 @@ antlrcpp::Any Visitor::visitByteLiteral(dzParser::ByteLiteralContext *context)
 	return static_cast<Node *>(constant);
 }
 
-antlrcpp::Any Visitor::visitLocal(dzParser::LocalContext *context)
+antlrcpp::Any Visitor::visitLocal(fluencParser::LocalContext *context)
 {
 	auto local = new LocalNode(m_alpha
 		, context->ID()->getText()
@@ -761,12 +761,12 @@ antlrcpp::Any Visitor::visitLocal(dzParser::LocalContext *context)
 	return visitor.visit<Node *>(context->expression());
 }
 
-antlrcpp::Any Visitor::visitInstruction(dzParser::InstructionContext *context)
+antlrcpp::Any Visitor::visitInstruction(fluencParser::InstructionContext *context)
 {
 	return visitChildren(context);
 }
 
-antlrcpp::Any Visitor::visitNs(dzParser::NsContext *context)
+antlrcpp::Any Visitor::visitNs(fluencParser::NsContext *context)
 {
 	auto instructions = context->instruction();
 
@@ -774,7 +774,7 @@ antlrcpp::Any Visitor::visitNs(dzParser::NsContext *context)
 
 	std::transform(begin(instructions), end(instructions), std::back_inserter(children), [this ](auto instruction)
 	{
-		return dzBaseVisitor::visit(instruction);
+		return fluencBaseVisitor::visit(instruction);
 	});
 
 	return new Namespace(children

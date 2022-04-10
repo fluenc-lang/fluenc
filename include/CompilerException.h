@@ -3,9 +3,9 @@
 
 #include <exception>
 
-#include "antlr4-runtime/dzBaseVisitor.h"
-#include "antlr4-runtime/dzLexer.h"
-#include "antlr4-runtime/dzParser.h"
+#include "antlr4-runtime/fluencBaseVisitor.h"
+#include "antlr4-runtime/fluencLexer.h"
+#include "antlr4-runtime/fluencParser.h"
 
 using namespace antlr4;
 

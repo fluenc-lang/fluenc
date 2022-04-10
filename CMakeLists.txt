@@ -1,23 +1,23 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(dz LANGUAGES CXX)
+project(fluenc LANGUAGES CXX)
 
-option(DZ_BUILD_TESTS "Build the tests for the project" OFF)
-option(DZ_BUILD_COMPILER "Build the compiler" ON)
-option(DZ_BUILD_SANITIZERS "Build the compiler with ASan and UBSan support" OFF)
-option(DZ_BUILD_EXAMPLES "Copy the examples to the build output" OFF)
+option(FLUENC_BUILD_TESTS "Build the tests for the project" OFF)
+option(FLUENC_BUILD_COMPILER "Build the compiler" ON)
+option(FLUENC_BUILD_SANITIZERS "Build the compiler with ASan and UBSan support" OFF)
+option(FLUENC_BUILD_EXAMPLES "Copy the examples to the build output" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_compile_options(-Wall -Wextra -Wpedantic -O3)
 
-if(${DZ_BUILD_SANITIZERS})
+if(${FLUENC_BUILD_SANITIZERS})
     add_compile_options(-fsanitize=address,undefined)
     add_link_options(-fsanitize=address,undefined)
 endif()
 
-if(${DZ_BUILD_EXAMPLES})
+if(${FLUENC_BUILD_EXAMPLES})
 	execute_process(COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR}/examples)
 endif()
 
@@ -41,21 +41,21 @@ include(cmake/files.cmake)
 
 
 execute_process(COMMAND ./tools/build.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-add_library(dz-lang OBJECT ${LIB_SOURCE_FILES} ${LIB_HEADER_FILES})
-target_link_libraries(dz-lang antlr4-runtime LLVM-13)
+add_library(fluenc-lang OBJECT ${LIB_SOURCE_FILES} ${LIB_HEADER_FILES})
+target_link_libraries(fluenc-lang antlr4-runtime LLVM-13)
 
 
-if (${DZ_BUILD_TESTS})
+if (${FLUENC_BUILD_TESTS})
     find_package(Boost 1.67 REQUIRED COMPONENTS unit_test_framework)
 
     add_executable(test ${TEST_SOURCE_FILES} ${TEST_HEADER_FILES})
-    target_link_libraries(test dz-lang antlr4-runtime LLVM-13)
+    target_link_libraries(test fluenc-lang antlr4-runtime LLVM-13)
     target_include_directories(test PUBLIC ${PROJECT_TEST_DIR})
 endif ()
 
-if (${DZ_BUILD_COMPILER})
-    add_executable(dz ${COMPILER_SOURCE_FILES} ${COMPILER_HEADER_FILES})
-    target_link_libraries(dz dz-lang antlr4-runtime LLVM-13)
+if (${FLUENC_BUILD_COMPILER})
+    add_executable(fcc ${COMPILER_SOURCE_FILES} ${COMPILER_HEADER_FILES})
+    target_link_libraries(fcc fluenc-lang antlr4-runtime LLVM-13)
 endif ()
 
 

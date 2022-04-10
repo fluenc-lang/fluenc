@@ -213,18 +213,18 @@ set(LIB_SOURCE_FILES
 
 set(LIB_HEADER_FILES
     ${LIB_HEADER_FILES}
-    "${PROJECT_ANTLR_DIR}/dzBaseVisitor.h"
-    "${PROJECT_ANTLR_DIR}/dzLexer.h"
-    "${PROJECT_ANTLR_DIR}/dzParser.h"
-    "${PROJECT_ANTLR_DIR}/dzVisitor.h"
+    "${PROJECT_ANTLR_DIR}/fluencBaseVisitor.h"
+    "${PROJECT_ANTLR_DIR}/fluencLexer.h"
+    "${PROJECT_ANTLR_DIR}/fluencParser.h"
+    "${PROJECT_ANTLR_DIR}/fluencVisitor.h"
 )
 
 set(LIB_SOURCE_FILES
     ${LIB_SOURCE_FILES}
-    "${PROJECT_ANTLR_DIR}/dzBaseVisitor.cpp"
-    "${PROJECT_ANTLR_DIR}/dzLexer.cpp"
-    "${PROJECT_ANTLR_DIR}/dzParser.cpp"
-    "${PROJECT_ANTLR_DIR}/dzVisitor.cpp"
+    "${PROJECT_ANTLR_DIR}/fluencBaseVisitor.cpp"
+    "${PROJECT_ANTLR_DIR}/fluencLexer.cpp"
+    "${PROJECT_ANTLR_DIR}/fluencParser.cpp"
+    "${PROJECT_ANTLR_DIR}/fluencVisitor.cpp"
 )
 
 set(COMPILER_HEADER_FILES

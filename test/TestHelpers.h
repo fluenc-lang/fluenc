@@ -10,9 +10,9 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
 
-#include "antlr4-runtime/dzBaseVisitor.h"
-#include "antlr4-runtime/dzLexer.h"
-#include "antlr4-runtime/dzParser.h"
+#include "antlr4-runtime/fluencBaseVisitor.h"
+#include "antlr4-runtime/fluencLexer.h"
+#include "antlr4-runtime/fluencParser.h"
 
 #include "KaleidoscopeJIT.h"
 #include "Visitor.h"
@@ -27,9 +27,9 @@ CallableNode *compileFunction(std::string source)
 	std::stringstream stream(source);
 
 	antlr4::ANTLRInputStream input(stream);
-	dzLexer lexer(&input);
+	fluencLexer lexer(&input);
 	antlr4::CommonTokenStream tokens(&lexer);
-	dzParser parser(&tokens);
+	fluencParser parser(&tokens);
 
 	auto program = parser.program();
 
@@ -51,9 +51,9 @@ const BaseValue *compileValue(std::string source)
 	stream << ";";
 
 	antlr4::ANTLRInputStream input(stream);
-	dzLexer lexer(&input);
+	fluencLexer lexer(&input);
 	antlr4::CommonTokenStream tokens(&lexer);
-	dzParser parser(&tokens);
+	fluencParser parser(&tokens);
 
 	auto program = parser.program();
 
@@ -104,9 +104,9 @@ EntryPoint compile(std::string source)
 	std::stringstream stream(source);
 
 	antlr4::ANTLRInputStream input(stream);
-	dzLexer lexer(&input);
+	fluencLexer lexer(&input);
 	antlr4::CommonTokenStream tokens(&lexer);
-	dzParser parser(&tokens);
+	fluencParser parser(&tokens);
 
 	auto program = parser.program();
 
@@ -150,9 +150,9 @@ int exec(std::string source)
 	std::stringstream stream(source);
 
 	antlr4::ANTLRInputStream input(stream);
-	dzLexer lexer(&input);
+	fluencLexer lexer(&input);
 	antlr4::CommonTokenStream tokens(&lexer);
-	dzParser parser(&tokens);
+	fluencParser parser(&tokens);
 
 	auto program = parser.program();
 

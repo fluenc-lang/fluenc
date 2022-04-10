@@ -45,9 +45,9 @@ int main(int argc, char **argv)
 		try
 		{
 			antlr4::ANTLRInputStream input(stream);
-			dzLexer lexer(&input);
+			fluencLexer lexer(&input);
 			antlr4::CommonTokenStream tokens(&lexer);
-			dzParser parser(&tokens);
+			fluencParser parser(&tokens);
 
 			auto program = parser.program();
 

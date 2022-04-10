@@ -1,7 +1,7 @@
 OBJ = main.o print.o
 
 %.o: %.dz
-	../../../dz $<
+	../../../fcc $<
 
 %.o: %.c
 	gcc -c $<
