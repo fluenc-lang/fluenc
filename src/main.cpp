@@ -2,162 +2,164 @@
 
 #include <string_view>
 
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Analysis/CFGPrinter.h>
 #include <llvm/Transforms/Scalar/SimplifyCFG.h>
 #include <llvm/Passes/PassBuilder.h>
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetOptions.h>
+
+#include <llvm/Support/Host.h>
+#include <llvm/Target/TargetMachine.h>
 
 #include "CompilerException.h"
-#include "Tests.h"
+#include "VisitorV4.h"
 
-#include <QTest>
 
 extern "C" int putz(char *str)
 {
-	return puts(str);
+    return puts(str);
 }
 
 int main(int argc, char **argv)
 {
-	llvm::InitializeAllTargetInfos();
-	llvm::InitializeAllTargets();
-	llvm::InitializeAllTargetMCs();
-	llvm::InitializeAllAsmParsers();
-	llvm::InitializeAllAsmPrinters();
+    llvm::InitializeAllTargetInfos();
+    llvm::InitializeAllTargets();
+    llvm::InitializeAllTargetMCs();
+    llvm::InitializeAllAsmParsers();
+    llvm::InitializeAllAsmPrinters();
 
-	if (argc > 1)
-	{
-		std::string_view inputFileName(*(argv + 1));
+    if (argc > 1)
+    {
+        std::string_view inputFileName(*(argv + 1));
 
-		std::ostringstream outputFileName;
-		outputFileName << inputFileName.substr(0, inputFileName.size() - 3);
-		outputFileName << ".o";
+        std::ostringstream outputFileName;
+        outputFileName << inputFileName.substr(0, inputFileName.size() - 3);
+        outputFileName << ".o";
 
-		std::ifstream stream;
-		stream.open(inputFileName.data());
+        std::ifstream stream;
+        stream.open(inputFileName.data());
 
-		try
-		{
-			antlr4::ANTLRInputStream input(stream);
-			dzLexer lexer(&input);
-			antlr4::CommonTokenStream tokens(&lexer);
-			dzParser parser(&tokens);
+        try
+        {
+            antlr4::ANTLRInputStream input(stream);
+            dzLexer lexer(&input);
+            antlr4::CommonTokenStream tokens(&lexer);
+            dzParser parser(&tokens);
 
-			auto program = parser.program();
+            auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+            VisitorV4 visitor(nullptr, nullptr, nullptr);
 
-			auto moduleInfo = visitor
-				.visit<ModuleInfo *>(program);
+            auto moduleInfo = visitor
+                .visit<ModuleInfo *>(program);
 
-			auto &module = moduleInfo->module();
+            auto &module = moduleInfo->module();
 
-			llvm::legacy::PassManager pm;
+            llvm::legacy::PassManager pm;
 
-			if (argc > 2)
-			{
-				if (!strcmp(argv[2], "-dot-cfg"))
-				{
-					auto fp = llvm::createCFGPrinterLegacyPassPass();
+            if (argc > 2)
+            {
+                if (!strcmp(argv[2], "-dot-cfg"))
+                {
+                    auto fp = llvm::createCFGPrinterLegacyPassPass();
 
-					pm.add(fp);
-					pm.run(*module);
-				}
+                    pm.add(fp);
+                    pm.run(*module);
+                }
 
-				return 0;
-			}
-			else
-			{
-				std::string errors;
+                return 0;
+            }
+            else
+            {
+                std::string errors;
 
-				auto targetTriple = llvm::sys::getDefaultTargetTriple();
-				auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
+                auto targetTriple = llvm::sys::getDefaultTargetTriple();
+                auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
 
-				if (!target)
-				{
-					llvm::errs() << errors;
+                if (!target)
+                {
+                    llvm::errs() << errors;
 
-					return 1;
-				}
+                    return 1;
+                }
 
-				auto relocModel = llvm::Optional<llvm::Reloc::Model>();
-				auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
+                auto relocModel = llvm::Optional<llvm::Reloc::Model>();
+                auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
 
-				module->setDataLayout(targetMachine->createDataLayout());
+                module->setDataLayout(targetMachine->createDataLayout());
 
-				std::error_code EC;
-				llvm::raw_fd_ostream dest(outputFileName.str(), EC, llvm::sys::fs::OF_None);
+                std::error_code EC;
+                llvm::raw_fd_ostream dest(outputFileName.str(), EC, llvm::sys::fs::OF_None);
 
-				targetMachine->addPassesToEmitFile(pm, dest, nullptr, llvm::CGFT_ObjectFile);
+                targetMachine->addPassesToEmitFile(pm, dest, nullptr, llvm::CGFT_ObjectFile);
 
-				pm.run(*module);
+                pm.run(*module);
 
-				dest.flush();
-			}
+                dest.flush();
+            }
 
-			return 0;
-		}
-		catch (CompilerException *exception)
-		{
-			std::cout << inputFileName << ":" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
-			std::cout << std::setw(5) << exception->row() << " | ";
+            return 0;
+        }
+        catch (CompilerException *exception)
+        {
+            std::cout << inputFileName << ":" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
+            std::cout << std::setw(5) << exception->row() << " | ";
 
-			stream.seekg(0);
+            stream.seekg(0);
 
-			std::string line;
+            std::string line;
 
-			for (int i = 0; i < exception->row(); i++)
-			{
-				std::getline(stream, line);
-			}
+            for (int i = 0; i < exception->row(); i++)
+            {
+                std::getline(stream, line);
+            }
 
-			auto trimmed = std::find_if(begin(line), end(line), [](unsigned char ch)
-			{
-				return !std::isspace(ch);
-			});
+            auto trimmed = std::find_if(begin(line), end(line), [](unsigned char ch)
+            {
+                return !std::isspace(ch);
+            });
 
-			for (auto i = trimmed; i != end(line); i++)
-			{
-				std::cout << *i;
-			}
+            for (auto i = trimmed; i != end(line); i++)
+            {
+                std::cout << *i;
+            }
 
-			std::cout << std::endl;
-			std::cout << std::setw(8) << "| ";
+            std::cout << std::endl;
+            std::cout << std::setw(8) << "| ";
 
-			for (auto i = trimmed; i != end(line); i++)
-			{
-				auto tokenSelector = [&]
-				{
-					if (i == begin(line) + exception->column())
-					{
-						return "^";
-					}
+            for (auto i = trimmed; i != end(line); i++)
+            {
+                auto tokenSelector = [&]
+                {
+                    if (i == begin(line) + exception->column())
+                    {
+                        return "^";
+                    }
 
-					if (i < begin(line) + exception->column())
-					{
-						return " ";
-					}
+                    if (i < begin(line) + exception->column())
+                    {
+                        return " ";
+                    }
 
-					if (i > begin(line) + exception->column() + exception->length())
-					{
-						return " ";
-					}
+                    if (i > begin(line) + exception->column() + exception->length())
+                    {
+                        return " ";
+                    }
 
-					return "~";
-				};
+                    return "~";
+                };
 
-				std::cout << tokenSelector();
-			}
+                std::cout << tokenSelector();
+            }
 
-			std::cout << std::endl;
+            std::cout << std::endl;
 
-			return 1;
-		}
-	}
-
-	Tests tests;
-
-	QTest::qExec(&tests);
+            return 1;
+        }
+    }
 
 //	module.print(llvm::errs(), nullptr);
 
@@ -189,6 +191,6 @@ int main(int argc, char **argv)
 
 //	dest.flush();
 
-	return 0;
+    return 0;
 
 }
