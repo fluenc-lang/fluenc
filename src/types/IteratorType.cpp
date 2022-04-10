@@ -1,5 +1,5 @@
-#include "IteratorType.h"
-#include "ArrayType.h"
+#include "types/IteratorType.h"
+#include "types/ArrayType.h"
 
 Type *IteratorType::instance()
 {

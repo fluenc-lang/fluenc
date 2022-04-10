@@ -1,6 +1,6 @@
 #include "nodes/FunctionCallProxyNode.h"
 #include "AllIterator.h"
-#include "JunctionNode.h"
+#include "nodes/JunctionNode.h"
 
 #include "nodes/CallableNode.h"
 
