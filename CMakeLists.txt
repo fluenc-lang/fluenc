@@ -18,7 +18,7 @@ if(${DZ_BUILD_SANITIZERS})
 endif()
 
 if(${DZ_BUILD_EXAMPLES})
-	execute_process(COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR})
+	execute_process(COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR}/examples)
 endif()
 
 set(PROJECT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
