@@ -2,8 +2,14 @@
 
 #include <QTest>
 
-int main(int argc, char **argv)
+int main()
 {
+    llvm::InitializeAllTargetInfos();
+    llvm::InitializeAllTargets();
+    llvm::InitializeAllTargetMCs();
+    llvm::InitializeAllAsmParsers();
+    llvm::InitializeAllAsmPrinters();
+
     Tests tests;
 
     QTest::qExec(&tests);
