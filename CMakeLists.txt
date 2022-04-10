@@ -37,7 +37,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories("/usr/include/antlr4-runtime")
 include_directories("/usr/include/llvm-13")
 include_directories("/usr/include/llvm-c-13")
-include_directories(${PROJECT_TEST_DIR})
 
 include(cmake/files.cmake)
 
