@@ -2,13 +2,19 @@ cmake_minimum_required(VERSION 3.10)
 
 project(dz LANGUAGES CXX)
 
+option(DZ_BUILD_TESTS "Build the tests for the project" OFF)
+option(DZ_BUILD_COMPILER "Build the compiler" ON)
+option(DZ_BUILD_SANITIZERS "Build the compiler with ASan and UBSan support" OFF)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_options(-Wall -Wextra -Wpedantic -Wshadow -O3)
+add_compile_options(-Wall -Wextra -Wpedantic -O3)
 
-option(DZ_BUILD_TESTS "Build the tests for the project" OFF)
-option(DZ_BUILD_COMPILER "Build the compiler" ON)
+if(${SZ_BUILD_SANITIZERS})
+    add_compile_options(-fsanitize=address,undefined)
+    add_link_options(-fsanitize=address,undefined)
+endif()
 
 
 set(PROJECT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
