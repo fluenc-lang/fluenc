@@ -1,6 +1,6 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include "ExportedFunctionTerminatorNode.h"
+#include "nodes/ExportedFunctionTerminatorNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 

@@ -1,4 +1,4 @@
-#include "InvalidArgumentTypeException.h"
+#include "exceptions/InvalidArgumentTypeException.h"
 
 InvalidArgumentTypeException::InvalidArgumentTypeException(ParserRuleContext *context)
 	: CompilerException(context)

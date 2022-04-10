@@ -1,5 +1,5 @@
-#include "UserTypeValue.h"
-#include "NamedValue.h"
+#include "values/UserTypeValue.h"
+#include "values/NamedValue.h"
 
 #include "types/UserType.h"
 #include "types/Prototype.h"

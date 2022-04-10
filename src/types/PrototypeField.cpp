@@ -1,4 +1,4 @@
-#include "PrototypeField.h"
+#include "types/PrototypeField.h"
 
 PrototypeField::PrototypeField(const std::string &name
 	, const BaseValue *defaultValue

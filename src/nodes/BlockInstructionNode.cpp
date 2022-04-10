@@ -1,4 +1,4 @@
-#include "BlockInstructionNode.h"
+#include "nodes/BlockInstructionNode.h"
 
 BlockInstructionNode::BlockInstructionNode(const Node *subject, bool containsIterator)
 	: m_subject(subject)

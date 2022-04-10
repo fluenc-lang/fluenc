@@ -1,4 +1,4 @@
-#include "VoidType.h"
+#include "types/VoidType.h"
 #include "Utility.h"
 
 std::string VoidType::name() const

@@ -1,4 +1,4 @@
-#include "ReferenceSinkNode.h"
+#include "nodes/ReferenceSinkNode.h"
 #include "IRBuilderEx.h"
 
 #include "values/TupleValue.h"

@@ -5,7 +5,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "FunctionCallNode.h"
+#include "nodes/FunctionCallNode.h"
 #include "EntryPoint.h"
 #include "Type.h"
 #include "IndexIterator.h"

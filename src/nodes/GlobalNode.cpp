@@ -1,6 +1,6 @@
 #include <llvm/IR/Constants.h>
 
-#include "GlobalNode.h"
+#include "nodes/GlobalNode.h"
 #include "Type.h"
 
 GlobalNode::GlobalNode(Node *value, const std::string &name)

@@ -1,9 +1,9 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Instructions.h>
 
-#include "ArrayValueGenerator.h"
-#include "ArrayValue.h"
-#include "ReferenceValue.h"
+#include "values/ArrayValueGenerator.h"
+#include "values/ArrayValue.h"
+#include "values/ReferenceValue.h"
 #include "IteratorStorage.h"
 
 #include "types/Int64Type.h"

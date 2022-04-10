@@ -1,4 +1,4 @@
-#include "ProxyType.h"
+#include "types/ProxyType.h"
 #include "Utility.h"
 
 ProxyType::ProxyType(llvm::Type *type)

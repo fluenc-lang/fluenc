@@ -1,4 +1,4 @@
-#include "ExpansionNode.h"
+#include "nodes/ExpansionNode.h"
 
 #include "values/ExpandableValue.h"
 #include "values/DependentValue.h"

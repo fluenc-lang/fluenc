@@ -1,4 +1,4 @@
-#include "IndexedValue.h"
+#include "values/IndexedValue.h"
 
 IndexedValue::IndexedValue(size_t index, const BaseValue *subject)
 	: m_index(index)

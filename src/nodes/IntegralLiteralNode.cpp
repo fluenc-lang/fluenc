@@ -2,7 +2,7 @@
 
 #include <regex>
 
-#include "IntegralLiteralNode.h"
+#include "nodes/IntegralLiteralNode.h"
 #include "DzTypeName.h"
 #include "EntryPoint.h"
 #include "Type.h"

@@ -1,4 +1,4 @@
-#include "WithPrototype.h"
+#include "types/WithPrototype.h"
 
 #include "values/ScalarValue.h"
 #include "values/NamedValue.h"

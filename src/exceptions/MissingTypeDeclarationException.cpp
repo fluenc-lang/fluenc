@@ -1,4 +1,4 @@
-#include "MissingTypeDeclarationException.h"
+#include "exceptions/MissingTypeDeclarationException.h"
 
 MissingTypeDeclarationException::MissingTypeDeclarationException(ParserRuleContext *context
 	, const std::string &typeName

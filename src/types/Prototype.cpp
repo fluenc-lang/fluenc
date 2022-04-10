@@ -1,9 +1,9 @@
 #include <numeric>
 
-#include "Prototype.h"
+#include "types/Prototype.h"
 #include "DzTypeName.h"
 #include "Node.h"
-#include "AnyType.h"
+#include "types/AnyType.h"
 
 Prototype::Prototype(const std::string &tag
 	, const std::vector<PrototypeFieldEmbryo> &fields

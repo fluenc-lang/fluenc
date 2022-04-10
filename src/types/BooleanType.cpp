@@ -1,4 +1,4 @@
-#include "BooleanType.h"
+#include "types/BooleanType.h"
 #include "Utility.h"
 
 std::string BooleanType::name() const

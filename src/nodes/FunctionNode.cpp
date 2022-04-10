@@ -6,7 +6,7 @@
 #include <llvm/IR/Type.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "FunctionNode.h"
+#include "nodes/FunctionNode.h"
 #include "DzArgument.h"
 #include "DzTypeName.h"
 #include "EntryPoint.h"

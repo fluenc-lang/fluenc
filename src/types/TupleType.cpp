@@ -1,7 +1,7 @@
 #include <sstream>
 #include <numeric>
 
-#include "TupleType.h"
+#include "types/TupleType.h"
 #include "Utility.h"
 #include "AllIterator.h"
 

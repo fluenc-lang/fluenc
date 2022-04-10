@@ -3,7 +3,7 @@
 
 #include <llvm/IR/IRBuilder.h>
 
-#include "ConditionalNode.h"
+#include "nodes/ConditionalNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 

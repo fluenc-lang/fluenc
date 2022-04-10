@@ -3,7 +3,7 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "InstantiationNode.h"
+#include "nodes/InstantiationNode.h"
 #include "DzTypeName.h"
 #include "IndexIterator.h"
 #include "IPrototypeProvider.h"

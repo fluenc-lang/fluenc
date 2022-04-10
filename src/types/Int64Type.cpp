@@ -1,4 +1,4 @@
-#include "Int64Type.h"
+#include "types/Int64Type.h"
 #include "Utility.h"
 
 std::string Int64Type::name() const

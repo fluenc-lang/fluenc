@@ -1,7 +1,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Instructions.h>
 
-#include "MemberAccessNode.h"
+#include "nodes/MemberAccessNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 #include "Type.h"

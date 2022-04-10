@@ -1,6 +1,6 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include "BinaryNode.h"
+#include "nodes/BinaryNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 

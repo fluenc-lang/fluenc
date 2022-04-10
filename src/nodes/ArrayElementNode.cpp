@@ -2,7 +2,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ArrayElementNode.h"
+#include "nodes/ArrayElementNode.h"
 #include "IRBuilderEx.h"
 
 #include "nodes/ArrayContinuationNode.h"

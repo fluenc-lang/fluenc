@@ -1,8 +1,8 @@
 #include <sstream>
 #include <numeric>
 
-#include "AnyType.h"
-#include "UserType.h"
+#include "types/AnyType.h"
+#include "types/UserType.h"
 #include "Utility.h"
 
 #include "iterators/ExtremitiesIterator.h"

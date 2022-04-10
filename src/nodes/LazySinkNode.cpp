@@ -1,4 +1,4 @@
-#include "LazySinkNode.h"
+#include "nodes/LazySinkNode.h"
 
 #include "values/LazyValue.h"
 #include "values/IteratorValueGenerator.h"

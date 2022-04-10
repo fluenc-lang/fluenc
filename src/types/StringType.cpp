@@ -1,4 +1,4 @@
-#include "StringType.h"
+#include "types/StringType.h"
 #include "Utility.h"
 
 std::string StringType::name() const

@@ -1,5 +1,5 @@
-#include "IteratorValueGenerator.h"
-#include "IteratorValue.h"
+#include "values/IteratorValueGenerator.h"
+#include "values/IteratorValue.h"
 
 #include "types/IteratorType.h"
 

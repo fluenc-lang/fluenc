@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#include "StackSegmentNode.h"
+#include "nodes/StackSegmentNode.h"
 #include "Type.h"
 #include "IndexIterator.h"
 #include "Indexed.h"

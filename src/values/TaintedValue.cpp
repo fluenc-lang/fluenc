@@ -1,4 +1,4 @@
-#include "TaintedValue.h"
+#include "values/TaintedValue.h"
 
 TaintedValue::TaintedValue(const BaseValue *subject)
 	: m_subject(subject)

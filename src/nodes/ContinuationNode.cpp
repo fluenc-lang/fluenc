@@ -2,7 +2,7 @@
 
 #include <llvm/IR/Instructions.h>
 
-#include "ContinuationNode.h"
+#include "nodes/ContinuationNode.h"
 #include "Type.h"
 #include "IndexIterator.h"
 

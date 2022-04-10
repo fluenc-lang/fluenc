@@ -1,4 +1,4 @@
-#include "TaintedSinkNode.h"
+#include "nodes/TaintedSinkNode.h"
 
 #include "values/TaintedValue.h"
 

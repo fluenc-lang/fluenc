@@ -1,4 +1,4 @@
-#include "InvalidFunctionPointerTypeException.h"
+#include "exceptions/InvalidFunctionPointerTypeException.h"
 
 InvalidFunctionPointerTypeException::InvalidFunctionPointerTypeException(ParserRuleContext *context, const std::string &name)
 	: CompilerException(context)

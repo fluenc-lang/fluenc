@@ -1,5 +1,5 @@
 #include "IteratorStorage.h"
-#include "LazyEvaluationNode.h"
+#include "nodes/LazyEvaluationNode.h"
 
 #include "values/IteratorValue.h"
 #include "values/ArrayValue.h"

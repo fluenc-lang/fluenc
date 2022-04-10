@@ -1,6 +1,6 @@
 #include <llvm/IR/Constant.h>
 
-#include "ScalarValue.h"
+#include "values/ScalarValue.h"
 #include "Utility.h"
 
 ScalarValue::ScalarValue(const Type *type, llvm::Value *value)

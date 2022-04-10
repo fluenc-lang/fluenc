@@ -3,7 +3,7 @@
 #include <llvm/IR/Instructions.h>
 
 #include "IRBuilderEx.h"
-#include "JunctionNode.h"
+#include "nodes/JunctionNode.h"
 #include "Type.h"
 
 #include "types/BuiltinType.h"

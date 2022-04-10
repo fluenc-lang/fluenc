@@ -1,4 +1,4 @@
-#include "FunctionCallProxyNode.h"
+#include "nodes/FunctionCallProxyNode.h"
 #include "AllIterator.h"
 
 #include "nodes/CallableNode.h"

@@ -1,4 +1,4 @@
-#include "ByteType.h"
+#include "types/ByteType.h"
 
 std::string ByteType::name() const
 {

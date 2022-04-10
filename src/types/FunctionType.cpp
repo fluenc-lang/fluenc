@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include "FunctionType.h"
+#include "types/FunctionType.h"
 #include "AllIterator.h"
 
 #include "iterators/ExtremitiesIterator.h"

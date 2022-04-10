@@ -1,6 +1,6 @@
 #include <llvm/IR/Constants.h>
 
-#include "BooleanLiteralNode.h"
+#include "nodes/BooleanLiteralNode.h"
 
 #include "types/BooleanType.h"
 #include "values/ScalarValue.h"

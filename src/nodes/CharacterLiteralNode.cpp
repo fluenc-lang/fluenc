@@ -2,7 +2,7 @@
 
 #include <llvm/IR/Constants.h>
 
-#include "CharacterLiteralNode.h"
+#include "nodes/CharacterLiteralNode.h"
 
 #include "values/ScalarValue.h"
 

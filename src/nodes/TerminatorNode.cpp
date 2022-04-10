@@ -3,7 +3,7 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "TerminatorNode.h"
+#include "nodes/TerminatorNode.h"
 #include "EntryPoint.h"
 
 TerminatorNode::TerminatorNode(const std::string &name, FunctionAttribute attribute)

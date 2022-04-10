@@ -1,4 +1,4 @@
-#include "Int32Type.h"
+#include "types/Int32Type.h"
 #include "Utility.h"
 
 std::string Int32Type::name() const

@@ -1,4 +1,4 @@
-#include "UnknownTypeException.h"
+#include "exceptions/UnknownTypeException.h"
 
 UnknownTypeException::UnknownTypeException(ParserRuleContext *context, const std::string &typeName)
 	: CompilerException(context)

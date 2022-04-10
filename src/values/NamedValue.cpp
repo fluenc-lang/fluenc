@@ -1,6 +1,6 @@
 #include <llvm/IR/Instructions.h>
 
-#include "NamedValue.h"
+#include "values/NamedValue.h"
 #include "EntryPoint.h"
 #include "DzTypeName.h"
 

@@ -7,7 +7,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ExportedFunctionNode.h"
+#include "nodes/ExportedFunctionNode.h"
 #include "DzTypeName.h"
 #include "EntryPoint.h"
 #include "Type.h"

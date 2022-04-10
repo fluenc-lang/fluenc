@@ -1,6 +1,6 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include "StringLiteralNode.h"
+#include "nodes/StringLiteralNode.h"
 #include "IRBuilderEx.h"
 
 #include "types/StringType.h"

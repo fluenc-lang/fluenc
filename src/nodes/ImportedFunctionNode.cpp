@@ -1,6 +1,6 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include "ImportedFunctionNode.h"
+#include "nodes/ImportedFunctionNode.h"
 #include "DzTypeName.h"
 #include "DzArgument.h"
 #include "AllIterator.h"

@@ -1,7 +1,7 @@
 #include <sstream>
 #include <numeric>
 
-#include "ArrayType.h"
+#include "types/ArrayType.h"
 #include "Utility.h"
 
 ArrayType::ArrayType(std::vector<const Type *> types)

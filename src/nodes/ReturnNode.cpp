@@ -4,10 +4,10 @@
 #include <llvm/IR/Type.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ReturnNode.h"
+#include "nodes/ReturnNode.h"
 #include "EntryPoint.h"
 #include "Type.h"
-#include "TerminatorNode.h"
+#include "nodes/TerminatorNode.h"
 #include "IRBuilderEx.h"
 
 #include "nodes/ExportedFunctionTerminatorNode.h"
