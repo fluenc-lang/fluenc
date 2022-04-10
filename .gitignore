@@ -4,6 +4,7 @@ a.out
 examples/sdl_basic/hello_world
 
 # Qt
+*.user
 *.pro.user
 moc_*
 
