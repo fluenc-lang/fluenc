@@ -9,6 +9,7 @@ class ILazyValueGenerator
 {
 	public:
 		virtual const IIteratable *generate(const EntryPoint &entryPoint) const = 0;
+		virtual const ILazyValueGenerator *clone(const EntryPoint &entryPoint) const = 0;
 
 		virtual const Type *type() const = 0;
 };

@@ -15,7 +15,7 @@
 #include <llvm/Target/TargetMachine.h>
 
 #include "CompilerException.h"
-#include "VisitorV4.h"
+#include "Visitor.h"
 
 
 extern "C" int putz(char *str)
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
             auto program = parser.program();
 
-            VisitorV4 visitor(nullptr, nullptr, nullptr);
+            Visitor visitor(nullptr, nullptr, nullptr);
 
             auto moduleInfo = visitor
                 .visit<ModuleInfo *>(program);

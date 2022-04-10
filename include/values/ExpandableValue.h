@@ -15,7 +15,10 @@ class IteratorType;
 class ExpandableValue : public BaseValue
 {
 	public:
-		ExpandableValue(const Type *iteratorType, const EntryPoint &provider, const Node *chain);
+		ExpandableValue(const Type *iteratorType
+			, const EntryPoint &provider
+			, const Node *chain
+			);
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;

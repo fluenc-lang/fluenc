@@ -1,22 +1,21 @@
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/Instructions.h>
+#include <numeric>
 
 #include "values/ArrayValueGenerator.h"
 #include "values/ArrayValue.h"
 #include "values/ReferenceValue.h"
 #include "IteratorStorage.h"
+#include "IndexIterator.h"
+
+#include "nodes/ArrayElementNode.h"
 
 #include "types/Int64Type.h"
 #include "types/ArrayType.h"
 #include "types/IteratorType.h"
 
-ArrayValueGenerator::ArrayValueGenerator(size_t id
-	, const Node *iterator
-	, const std::vector<DzResult> &values
-	)
-	: m_id(id)
-	, m_iterator(iterator)
-	, m_values(values)
+ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult> &values, size_t id, size_t size)
+	: m_values(values)
+	, m_id(id)
+	, m_size(size)
 {
 }
 
@@ -27,7 +26,12 @@ const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint) c
 
 	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
 
-	return new ArrayValue(index, m_iterator, m_values);
+	auto iterator = std::accumulate(index_iterator(0u), index_iterator(m_size), (Node *)nullptr, [&](auto next, auto)
+	{
+		return new ArrayElementNode(type(), next);
+	});
+
+	return new ArrayValue(index, iterator, m_values);
 }
 
 const Type *ArrayValueGenerator::type() const
@@ -47,4 +51,23 @@ const Type *ArrayValueGenerator::type() const
 	}
 
 	return IteratorType::instance();
+}
+
+const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoint) const
+{
+	if (m_values.size() == 1)
+	{
+		auto [inputEntryPoint, inputValues] = m_values[0];
+
+		std::vector<const BaseValue *> clonedValues;
+
+		std::transform(inputValues.begin(), inputValues.end(), std::back_inserter(clonedValues), [&](auto value)
+		{
+			return value->clone(entryPoint);
+		});
+
+		return new ArrayValueGenerator({{ inputEntryPoint, clonedValues }}, m_id, m_size);
+	}
+
+	throw new std::exception();
 }

@@ -54,9 +54,7 @@ std::vector<DzResult> LazyEvaluationNode::digestDepth(const EntryPoint &entryPoi
 
 			for (auto &[digestedEntryPoint, digestedValues] : digestedResults)
 			{
-				auto digestedTuple = new TupleValue(tuple->iteratorType()
-					, { digestedValues.begin(), digestedValues.end() }
-					);
+				auto digestedTuple = new TupleValue({ digestedValues.begin(), digestedValues.end() });
 
 				for (auto &[resultEntryPoint, resultValues] : digestDepth(digestedEntryPoint, values))
 				{

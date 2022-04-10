@@ -6,8 +6,8 @@
 #include "Node.h"
 
 #include "values/UserTypeValue.h"
-#include "values/DependentValue.h"
-#include "values/TaintedValue.h"
+#include "values/ExpandedValue.h"
+#include "values/TupleValue.h"
 
 class FunctionCallNode : public Node
 {
@@ -45,19 +45,21 @@ class FunctionCallNode : public Node
 					return findTailCallTarget(target, values);
 				}
 
-				if (auto dependentValue = dynamic_cast<const DependentValue *>(value))
+				if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
 				{
-					auto provider = dependentValue->provider();
+					return findTailCallTarget(target
+						, tupleValue->values()
+						);
+				}
+
+				if (auto expandedValue = dynamic_cast<const ExpandedValue *>(value))
+				{
+					auto provider = expandedValue->provider();
 
 					if (provider->depth() < target->depth())
 					{
 						return provider->entry();
 					}
-				}
-
-				if (auto tainted = dynamic_cast<const TaintedValue *>(value))
-				{
-					return nullptr;
 				}
 
 				return target;

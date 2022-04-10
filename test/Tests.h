@@ -15,7 +15,7 @@
 #include "antlr4-runtime/dzParser.h"
 
 #include "KaleidoscopeJIT.h"
-#include "VisitorV4.h"
+#include "Visitor.h"
 #include "Utility.h"
 #include "EntryPoint.h"
 
@@ -23,6 +23,7 @@
 #include "nodes/GlobalNode.h"
 
 #include "values/LazyValue.h"
+#include "values/TupleValue.h"
 
 #include "types/AnyType.h"
 #include "types/Prototype.h"
@@ -602,7 +603,7 @@ class Tests : public QObject
 
 		void scenario23()
 		{
-			auto result = compile(R"(
+			compile(R"(
 				function foo(long renderer)
 				{
 					return 2;
@@ -620,8 +621,6 @@ class Tests : public QObject
 					return mainLoop(0, 1L);
 				}
 			)");
-
-			QVERIFY(result);
 		}
 
 		void scenario24()
@@ -2455,7 +2454,7 @@ class Tests : public QObject
 
 		void compatibility()
 		{
-			auto module = compile(R"(
+			auto entryPoint = compile(R"(
 				struct Unrelated
 				{
 					x: 0
@@ -2482,7 +2481,6 @@ class Tests : public QObject
 				}
 			)");
 
-			auto entryPoint = module->entryPoint();
 			auto types = entryPoint.types();
 
 			auto unrelatedType = types["Unrelated"];
@@ -2574,6 +2572,42 @@ class Tests : public QObject
 			QCOMPARE(value2->type()->compatibility(value1->type(), EntryPoint()), -1);
 		}
 
+		void arrayTypePropagation()
+		{
+			auto entryPoint = compile(R"(
+				function foo((int value, ...values))
+				{
+					return value -> foo(...values);
+				}
+
+				function foo(int value)
+				{
+					return value;
+				}
+
+				function bar()
+				{
+					return foo([1, 2]);
+				}
+			)");
+
+			auto functions = entryPoint.functions();
+
+			auto [_1, function] = *functions.find("bar");
+
+			auto functionResults = function->build(entryPoint, Stack());
+
+			QCOMPARE(functionResults.size(), 1);
+
+			auto [_2, functionValues] = functionResults[0];
+
+			QCOMPARE(functionValues.size(), 1);
+
+			auto lazy = functionValues.require<LazyValue>();
+
+			QCOMPARE(lazy->type()->name(), "[int, int]");
+		}
+
 		W_SLOT(scenario1)
 		W_SLOT(scenario2)
 		W_SLOT(scenario3)
@@ -2649,7 +2683,8 @@ class Tests : public QObject
 		W_SLOT(compatibility)
 		W_SLOT(scenario70)
 		W_SLOT(arrayType_1)
-//		W_SLOT(arrayType_2)
+		W_SLOT(arrayType_2)
+//		W_SLOT(arrayTypePropagation)
 
 	private:
 		CallableNode *compileFunction(std::string source)
@@ -2663,7 +2698,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+			Visitor visitor(nullptr, nullptr, nullptr);
 
 			for (auto instruction : program->instruction())
 			{
@@ -2687,7 +2722,7 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+			Visitor visitor(nullptr, nullptr, nullptr);
 
 			for (auto instruction : program->instruction())
 			{
@@ -2699,12 +2734,10 @@ class Tests : public QObject
 				auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(*context), false);
 				auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module.get());
 
-				UNUSED(function);
-
 				auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
 				auto block = llvm::BasicBlock::Create(*context, "block", function);
 
-				EntryPoint ep(0
+				EntryPoint entryPoint(0
 					, nullptr
 					, nullptr
 					, block
@@ -2722,7 +2755,7 @@ class Tests : public QObject
 					, nullptr
 					);
 
-				for (auto &[_, values] : global->build(ep, Stack()))
+				for (auto &[_, values] : global->build(entryPoint, Stack()))
 				{
 					return *values.begin();
 				}
@@ -2731,7 +2764,7 @@ class Tests : public QObject
 			return nullptr;
 		}
 
-		ModuleInfo *compile(std::string source)
+		EntryPoint compile(std::string source)
 		{
 			std::stringstream stream(source);
 
@@ -2742,15 +2775,56 @@ class Tests : public QObject
 
 			auto program = parser.program();
 
-			VisitorV4 visitor(nullptr, nullptr, nullptr);
+			Visitor visitor(nullptr, nullptr, nullptr);
 
-			return visitor
+			auto info = visitor
 				.visit<ModuleInfo *>(program);
+
+			auto entryPoint = info->entryPoint();
+
+			auto &context = info->context();
+			auto &module = info->module();
+
+			auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(*context), false);
+			auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module.get());
+
+			auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
+			auto block = llvm::BasicBlock::Create(*context, "block", function);
+
+			return EntryPoint(0
+				, nullptr
+				, nullptr
+				, block
+				, alloc
+				, function
+				, nullptr
+				, &module
+				, &context
+				, "entry"
+				, entryPoint.functions()
+				, entryPoint.locals()
+				, entryPoint.globals()
+				, entryPoint.types()
+				, Stack()
+				, nullptr
+				);
 		}
 
 		int exec(std::string source)
 		{
-			auto moduleInfo = compile(source);
+			std::stringstream stream(source);
+
+			antlr4::ANTLRInputStream input(stream);
+			dzLexer lexer(&input);
+			antlr4::CommonTokenStream tokens(&lexer);
+			dzParser parser(&tokens);
+
+			auto program = parser.program();
+
+			Visitor visitor(nullptr, nullptr, nullptr);
+
+			auto moduleInfo = visitor
+				.visit<ModuleInfo *>(program);
 
 			auto threadSafeModule = llvm::orc::ThreadSafeModule(
 				std::move(moduleInfo->module()),

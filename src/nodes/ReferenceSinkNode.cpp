@@ -51,7 +51,7 @@ const BaseValue *ReferenceSinkNode::makeReference(const BaseValue *value, const 
 			return makeReference(value, entryPoint);
 		});
 
-		return new TupleValue(tupleValue->iteratorType(), values);
+		return new TupleValue(values);
 	}
 
 	if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))

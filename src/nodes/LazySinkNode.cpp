@@ -15,7 +15,7 @@ LazySinkNode::LazySinkNode(const Type *iteratorType
 
 std::vector<DzResult> LazySinkNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto generator = new IteratorValueGenerator(m_subject, entryPoint);
+	auto generator = new IteratorValueGenerator(m_iteratorType, m_subject, entryPoint);
 	auto lazy = new LazyValue(generator);
 
 	values.push(lazy);

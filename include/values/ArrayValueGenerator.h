@@ -9,21 +9,18 @@ class Node;
 class ArrayValueGenerator : public ILazyValueGenerator
 {
 	public:
-		ArrayValueGenerator(size_t id
-			, const Node *iterator
-			, const std::vector<DzResult> &values
-			);
+		ArrayValueGenerator(const std::vector<DzResult> &values, size_t id, size_t size);
 
 		const IIteratable *generate(const EntryPoint &entryPoint) const override;
+		const ILazyValueGenerator *clone(const EntryPoint &entryPoint) const override;
 
 		const Type *type() const override;
 
 	private:
-		size_t m_id;
-
-		const Node *m_iterator;
-
 		const std::vector<DzResult> m_values;
+
+		size_t m_id;
+		size_t m_size;
 };
 
 #endif // ARRAYVALUEGENERATOR_H

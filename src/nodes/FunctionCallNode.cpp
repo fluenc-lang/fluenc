@@ -17,10 +17,9 @@
 
 #include "nodes/FunctionNode.h"
 
-#include "values/DependentValue.h"
+#include "values/ExpandedValue.h"
 #include "values/ScalarValue.h"
 #include "values/ReferenceValue.h"
-#include "values/TaintedValue.h"
 #include "values/UserTypeValue.h"
 #include "values/NamedValue.h"
 #include "values/ArrayValue.h"

@@ -4,6 +4,7 @@ CONFIG += DEBUG c++17
 
 SOURCES += \
 	AllIterator.cpp \
+	Visitor.cpp \
 	exceptions/InvalidArgumentTypeException.cpp \
 	exceptions/InvalidFunctionPointerTypeException.cpp \
 	exceptions/MissingTypeDeclarationException.cpp \
@@ -54,14 +55,11 @@ SOURCES += \
 	Node.cpp \
 	Stack.cpp \
 	nodes/StringLiteralNode.cpp \
-	nodes/TaintedSinkNode.cpp \
 	Type.cpp \
 	UndeclaredIdentifierException.cpp \
 	exceptions/UnknownTypeException.cpp \
 	Utility.cpp \
 	ValueHelper.cpp \
-	VisitorV1.cpp \
-	VisitorV4.cpp \
 	WithPrototypeProvider.cpp \
 	main.cpp \
 	antlr4-runtime/dzBaseVisitor.cpp \
@@ -76,6 +74,8 @@ SOURCES += \
 	types/FunctionType.cpp \
 	types/Int32Type.cpp \
 	types/Int64Type.cpp \
+	types/IteratorType.cpp \
+	types/PlaceholderType.cpp \
 	types/Prototype.cpp \
 	types/PrototypeField.cpp \
 	types/PrototypeFieldEmbryo.cpp \
@@ -90,16 +90,16 @@ SOURCES += \
 	types/WithoutType.cpp \
 	values/ArrayValue.cpp \
 	values/ArrayValueGenerator.cpp \
-	values/DependentValue.cpp \
 	values/ExpandableValue.cpp \
+	values/ExpandedValue.cpp \
 	values/FunctionValue.cpp \
 	values/IteratorValue.cpp \
 	values/IteratorValueGenerator.cpp \
 	values/LazyValue.cpp \
 	values/NamedValue.cpp \
+	values/PlaceholderValue.cpp \
 	values/ReferenceValue.cpp \
 	values/ScalarValue.cpp \
-	values/TaintedValue.cpp \
 	values/TupleValue.cpp \
 	values/IndexedValue.cpp \
 	values/UserTypeValue.cpp \
@@ -107,6 +107,7 @@ SOURCES += \
 
 HEADERS += \
 	AllIterator.h \
+	Visitor.h \
 	exceptions/InvalidArgumentTypeException.h \
 	exceptions/InvalidFunctionPointerTypeException.h \
 	exceptions/MissingTypeDeclarationException.h \
@@ -165,13 +166,11 @@ HEADERS += \
 	Node.h \
 	Stack.h \
 	nodes/StringLiteralNode.h \
-	nodes/TaintedSinkNode.h \
 	Tests.h \
 	UndeclaredIdentifierException.h \
 	exceptions/UnknownTypeException.h \
 	Utility.h \
 	ValueHelper.h \
-	VisitorV4.h \
 	VoidIterator.h \
 	WithPrototypeProvider.h \
 	ZipIterator.h \
@@ -190,6 +189,7 @@ HEADERS += \
 	types/Int32Type.h \
 	types/Int64Type.h \
 	types/IteratorType.h \
+	types/PlaceholderType.h \
 	types/Prototype.h \
 	types/PrototypeField.h \
 	types/PrototypeFieldEmbryo.h \
@@ -206,8 +206,8 @@ HEADERS += \
 	values/ArrayValue.h \
 	values/ArrayValueGenerator.h \
 	values/BaseValue.h \
-	values/DependentValue.h \
 	values/ExpandableValue.h \
+	values/ExpandedValue.h \
 	values/FunctionValue.h \
 	values/IIteratable.h \
 	values/ILazyValueGenerator.h \
@@ -216,9 +216,9 @@ HEADERS += \
 	values/IteratorValueGenerator.h \
 	values/LazyValue.h \
 	values/NamedValue.h \
+	values/PlaceholderValue.h \
 	values/ReferenceValue.h \
 	values/ScalarValue.h \
-	values/TaintedValue.h \
 	values/TupleValue.h \
 	values/UserTypeValue.h \
 	values/WithoutValue.h \
