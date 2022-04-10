@@ -5,6 +5,7 @@ project(dz LANGUAGES CXX)
 option(DZ_BUILD_TESTS "Build the tests for the project" OFF)
 option(DZ_BUILD_COMPILER "Build the compiler" ON)
 option(DZ_BUILD_SANITIZERS "Build the compiler with ASan and UBSan support" OFF)
+option(DZ_BUILD_EXAMPLES "Copy the examples to the build output" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,6 +17,9 @@ if(${DZ_BUILD_SANITIZERS})
     add_link_options(-fsanitize=address,undefined)
 endif()
 
+if(${DZ_BUILD_EXAMPLES})
+	execute_process(COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 set(PROJECT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(PROJECT_HEADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
