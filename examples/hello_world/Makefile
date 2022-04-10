@@ -1,6 +1,6 @@
 OBJ = main.o
 
-%.o: %.dz
+%.o: %.fc
 	../../fcc $<
 
 hello_world: $(OBJ)

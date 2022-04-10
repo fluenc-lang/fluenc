@@ -1,6 +1,6 @@
 OBJ = main.o print.o
 
-%.o: %.dz
+%.o: %.fc
 	../../../fcc $<
 
 %.o: %.c

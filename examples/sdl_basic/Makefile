@@ -1,6 +1,6 @@
 OBJ = main.o sdl.o
 
-%.o: %.dz
+%.o: %.fc
 	../../fcc $<
 
 %.o: %.c
