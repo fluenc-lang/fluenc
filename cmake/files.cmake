@@ -18,7 +18,6 @@ set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/iterators"
     "${PROJECT_HEADER_DIR}/IteratorStorage.h"
     "${PROJECT_HEADER_DIR}/ITypeName.h"
-    "${PROJECT_HEADER_DIR}/KaleidoscopeJIT.h"
     "${PROJECT_HEADER_DIR}/Namespace.h"
     "${PROJECT_HEADER_DIR}/Node.h"
     "${PROJECT_HEADER_DIR}/Stack.h"
@@ -236,9 +235,8 @@ set(COMPILER_SOURCE_FILES
     )
 
 set(TEST_HEADER_FILES
-    "${PROJECT_TEST_DIR}/Tests.h"
-    "${PROJECT_TEST_DIR}/wobjectdefs.h"
-    "${PROJECT_TEST_DIR}/wobjectimpl.h"
+	"${PROJECT_TEST_DIR}/TestHelpers.h"
+    "${PROJECT_TEST_DIR}/KaleidoscopeJIT.h"
     )
 
 set(TEST_SOURCE_FILES
