@@ -27,7 +27,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5Core REQUIRED)
 find_library(LLVM13 LLVM-13 REQUIRED)
 find_library(ANTLR4 antlr4-runtime REQUIRED)
 
@@ -43,20 +42,20 @@ include(cmake/files.cmake)
 
 execute_process(COMMAND ./tools/build.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(dz-lang OBJECT ${LIB_SOURCE_FILES} ${LIB_HEADER_FILES})
-target_link_libraries(dz-lang Qt5::Core antlr4-runtime LLVM-13)
+target_link_libraries(dz-lang antlr4-runtime LLVM-13)
 
 
 if (${DZ_BUILD_TESTS})
-    find_package(Qt5Test REQUIRED)
+    find_package(Qt5 REQUIRED COMPONENTS Test Core)
 
     add_executable(test ${TEST_SOURCE_FILES} ${TEST_HEADER_FILES})
-    target_link_libraries(test dz-lang  Qt5::Core Qt5::Test  antlr4-runtime LLVM-13)
+    target_link_libraries(test dz-lang Qt5::Core Qt5::Test antlr4-runtime LLVM-13)
     target_include_directories(test PUBLIC ${PROJECT_TEST_DIR})
 endif ()
 
 if (${DZ_BUILD_COMPILER})
     add_executable(dz ${COMPILER_SOURCE_FILES} ${COMPILER_HEADER_FILES})
-    target_link_libraries(dz dz-lang Qt5::Core  antlr4-runtime LLVM-13)
+    target_link_libraries(dz dz-lang antlr4-runtime LLVM-13)
 endif ()
 
 
