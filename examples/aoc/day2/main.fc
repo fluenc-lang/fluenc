@@ -1,0 +1,166 @@
+global O_RDONLY: 0;
+
+import int printNumber(int number);
+import int open(string apathname, int flags);
+import int getc(long stream);
+
+import long fdopen(int fildes, string mode);
+
+function readChar(long file)
+{
+    return getc(file) -> (file);
+}
+
+function sum(int product, int value)
+{
+    return product + value;
+}
+
+function sum(int product, (int value, ...values))
+{
+    return sum(product + value, ...values);
+}
+
+// Types
+global None: 0;
+global Forward: 757;
+global Down: 440;
+global Up: 229;
+
+// Modes
+global Type: 0;
+global Value: 1;
+
+struct Instruction
+{
+    type: None,
+    value: 0
+};
+
+function instruction(int type, int value)
+{
+    return Instruction
+    {
+        type: type,
+        value: value
+    };
+}
+
+function nextInstruction(int mode, int type, int value, (int char, ...chars))
+{
+    if (char == '\n') // New line
+    {
+        return instruction(type, value) -> (Type, None, 0, ...chars);
+    }
+
+    if (char < 0) // EOF
+    {
+        return nothing;
+    }
+
+    if (char == ' ') // Space
+    {
+        return nextInstruction(Value, type, value, ...chars);
+    }
+
+    if (mode == Type)
+    {
+        return nextInstruction(mode, type + char, value, ...chars);
+    }
+
+    return nextInstruction(mode, type, (value * 10) + (char - '0'), ...chars);
+}
+
+function part1(int x, int y, without instruction)
+{
+    return x * y;
+}
+
+function part1(int x, int y, (Instruction instruction, ...instructions))
+{
+    if (instruction.type == Forward)
+    {
+        return part1(x + instruction.value, y, ...instructions);
+    }
+
+    if (instruction.type == Up)
+    {
+        return part1(x, y - instruction.value, ...instructions);
+    }
+
+    if (instruction.type == Down)
+    {
+        return part1(x, y + instruction.value, ...instructions);
+    }
+
+    return part1(x, y, ...instructions);
+}
+
+function part2(int x, int y, int aim, without instruction)
+{
+    return x * y;
+}
+
+function part2(int x, int y, int aim, (Instruction instruction, ...instructions))
+{
+    if (instruction.type == Forward)
+    {
+        return part2(x + instruction.value
+            , y + (aim * instruction.value)
+            , aim
+            , ...instructions
+            );
+    }
+
+    if (instruction.type == Up)
+    {
+        return part2(x, y, aim - instruction.value, ...instructions);
+    }
+
+    if (instruction.type == Down)
+    {
+        return part2(x, y, aim + instruction.value, ...instructions);
+    }
+
+    return part2(x, y, aim, ...instructions);
+}
+
+function bind(int result1, int result2)
+{
+    return [result1, result2];
+}
+
+function run()
+{
+    return bind(
+        part1(0, 0
+            , nextInstruction(Type
+                , 0, 0
+                , readChar(fdopen(open("input", O_RDONLY), "r"))
+                )
+            ),
+        part2(0, 0, 0
+            , nextInstruction(Type
+                , 0, 0
+                , readChar(fdopen(open("input", O_RDONLY), "r"))
+                )
+            )
+    );
+}
+
+function printNumbers(int number)
+{
+    return printNumber(number);
+}
+
+function printNumbers((int number, ...numbers))
+{
+    printNumber(number);
+
+    return printNumbers(...numbers);
+}
+
+export int main()
+{
+    return printNumbers(run());
+}

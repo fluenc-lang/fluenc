@@ -1,0 +1,19 @@
+import int puts(string str);
+
+function printHelloWorld(int i, int count, int t)
+{
+    if (i >= count)
+    {
+        return 0;
+    }
+
+    return printHelloWorld(i + 1
+        , count
+        , puts("Hello world!")
+        );
+}
+
+export int main()
+{
+    return printHelloWorld(0, 5, 0);
+}
