@@ -15,7 +15,7 @@ export int main()
 
 # Memory management
 
-Perhaps the biggest difference between FluenC and other languages is the fact that the memory model of FluenC is so simple. The language is designed in such a way that memory is never allocated in runtime, be it stack allocation or heap allocation. Instead, each function parameter and return value has a fixed memory address, with storage being allocated upfront at application startup. This makes the memory usage of a basic FluenC program very predictable.
+Perhaps the biggest difference between FluenC and other languages is the fact that the memory model of FluenC is so simple. The language is designed in such a way that memory is never allocated in runtime, be it stack allocation or heap allocation. Instead, each function parameter and return value has a fixed memory address, with storage being allocated upfront at application startup, or even in the data section of the binary in the future. This makes the memory usage of a basic FluenC program very predictable.
 
 It's still possible to perform dynamic memory allocation by utilizing the C interop facilities of the language, which can be useful when extending the core libraries for example.
 
