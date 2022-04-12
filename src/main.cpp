@@ -104,7 +104,7 @@ bool isStale(std::unordered_set<std::string> &processed
 	, const std::unordered_map<std::string, CompilerJob> jobs
 	)
 {
-//	std::cout << job.sourceFile << " depends on " << current.sourceFile << std::endl;
+	std::cout << job.sourceFile << " depends on " << current.sourceFile << std::endl;
 
 	auto [_, success] = processed.insert(current.sourceFile);
 
@@ -115,7 +115,7 @@ bool isStale(std::unordered_set<std::string> &processed
 
 	if (current.sourceFileTime > job.objectFileTime)
 	{
-//		std::cout << current.sourceFile << " is more recent than " << job.sourceFile << std::endl;
+		std::cout << current.sourceFile << " is more recent than " << job.sourceFile << std::endl;
 
 		return true;
 	}
@@ -145,7 +145,7 @@ bool isStale(const CompilerJob &job
 {
 	if (job.objectFileTime.time_since_epoch() == std::filesystem::file_time_type::duration::zero())
 	{
-//		std::cout << "No output found for " << job.sourceFile << std::endl;
+		std::cout << "No output found for " << job.sourceFile << std::endl;
 
 		return true;
 	}
@@ -160,7 +160,7 @@ ModuleInfo processUses(std::unordered_set<std::string> &processed
 	, const std::unordered_map<std::string, CompilerJob> jobs
 	)
 {
-//	std::cout << "Adding info from " << job.sourceFile << std::endl;
+	std::cout << "Adding info from " << job.sourceFile << std::endl;
 
 	auto [_, success] = processed.insert(job.sourceFile);
 
@@ -241,8 +241,12 @@ int main(int argc, char **argv)
 
 		if (path.extension() != ".fc")
 		{
+			std::cout << "Skipping file " << path << std::endl;
+
 			continue;
 		}
+
+		std::cout << "Adding file " << path << std::endl;
 
 		auto relative = std::filesystem::relative(path);
 
@@ -262,6 +266,8 @@ int main(int argc, char **argv)
 
 		if (job.module.roots.empty())
 		{
+			std::cout << "File " << job.sourceFile << " has no roots, skipping" << std::endl;
+
 			return result;
 		}
 

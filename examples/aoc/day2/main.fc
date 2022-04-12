@@ -8,7 +8,7 @@ import long fdopen(int fildes, string mode);
 
 function readChar(long file)
 {
-    return getc(file) -> (file);
+    return getc(file) -> readChar(file);
 }
 
 function sum(int product, int value)
@@ -50,7 +50,7 @@ function nextInstruction(int mode, int type, int value, (int char, ...chars))
 {
     if (char == '\n') // New line
     {
-        return instruction(type, value) -> (Type, None, 0, ...chars);
+        return instruction(type, value) -> nextInstruction(Type, None, 0, ...chars);
     }
 
     if (char < 0) // EOF

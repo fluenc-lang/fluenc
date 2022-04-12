@@ -1,13 +1,11 @@
-OBJ = main.o sdl.o
-
-%.o: %.fc
-	../../fcc $<
+OBJ = sdl.o
 
 %.o: %.c
 	gcc -c $<
 
-foam: $(OBJ)
-	ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/crt1.o /usr/lib/crti.o $^ -lc /usr/lib/crtn.o -lSDL2 -o $@
+target: $(OBJ)
+	../../fcc
 
 clean:
 	rm -f *.o
+	rm tic-tac-toe

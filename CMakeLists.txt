@@ -18,7 +18,7 @@ if(${FLUENC_BUILD_SANITIZERS})
 endif()
 
 if(${FLUENC_BUILD_EXAMPLES})
-	execute_process(COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR}/examples)
+	execute_process(COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR}/examples)
 endif()
 
 set(PROJECT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")

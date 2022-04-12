@@ -410,7 +410,7 @@ function update(ApplicationState state, Button button)
 
 function update(ApplicationState state, (Button button, ...controls))
 {
-    return updateButton(state.events, button) -> (state, ...controls);
+    return updateButton(state.events, button) -> update(state, ...controls);
 }
 
 function process(ApplicationState state, Rectangle rectangle)
