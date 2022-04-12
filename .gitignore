@@ -13,3 +13,4 @@ moc_*
 
 # Build
 /Makefile
+build/
