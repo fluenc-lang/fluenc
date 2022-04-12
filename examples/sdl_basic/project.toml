@@ -1,0 +1,2 @@
+target = "sdl_basic"
+libs = [ "sdl.o", "-lSDL2" ]

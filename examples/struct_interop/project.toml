@@ -1,0 +1,2 @@
+target = "struct_interop"
+libs = [ "utils.o" ]

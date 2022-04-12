@@ -1,0 +1,2 @@
+target = "foam"
+libs = [ "sdl.o", "-lSDL2" ]

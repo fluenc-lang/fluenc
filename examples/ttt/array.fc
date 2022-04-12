@@ -1,0 +1,42 @@
+namespace Array
+{
+    function elementAt(any item, int index, int i)
+    {
+        if (i == index)
+        {
+            return item;
+        }
+
+        return nothing;
+    }
+
+    function elementAt((any item, ...items), int index, int i)
+    {
+        if (i == index)
+        {
+            return item;
+        }
+
+        return elementAt(...items, index, i + 1);
+    }
+
+    function set((int value, ...values), int index, int result, int i)
+    {
+        if (i == index)
+        {
+            return result -> set(...values, index, result, i + 1);
+        }
+
+        return value -> set(...values, index, result, i + 1);
+    }
+
+    function set(int value, int index, int result, int i)
+    {
+        if (i == index)
+        {
+            return result;
+        }
+
+        return value;
+    }
+}

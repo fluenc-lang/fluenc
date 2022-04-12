@@ -1,0 +1,2 @@
+target = "tic-tac-toe"
+libs = [ "sdl.o", "-lSDL2" ]
