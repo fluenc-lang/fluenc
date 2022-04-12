@@ -2,6 +2,17 @@
 
 FluenC is a C-inspired, functional-first language, with a focus on simplicity.
 
+# Hello world in FluenC
+
+```js
+import int puts(string str);
+
+export int main()
+{
+    return puts("Hello world!");
+}
+```
+
 # Memory management
 
 Perhaps the biggest difference between FluenC and other languages is the fact that the memory model of FluenC is so simple. The language is designed in such a way that memory is never allocated in runtime, be it stack allocation or heap allocation. Instead, each function parameter and return value has a fixed memory address, with storage being allocated upfront at application startup. This makes the memory usage of a basic FluenC program very predictable.
