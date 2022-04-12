@@ -2,6 +2,7 @@
 #define MEMBERACCESSNODE_H
 
 #include "Node.h"
+#include "TokenInfo.h"
 
 class MemberAccessNode : public Node
 {
@@ -11,7 +12,7 @@ class MemberAccessNode : public Node
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		antlr4::ParserRuleContext *m_context;
+		TokenInfo m_token;
 
 		Node * m_consumer;
 

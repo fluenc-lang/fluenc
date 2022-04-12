@@ -18,6 +18,7 @@
 #include "Visitor.h"
 #include "Utility.h"
 #include "EntryPoint.h"
+#include "ModuleInfo.h"
 
 #include "nodes/CallableNode.h"
 #include "nodes/GlobalNode.h"
@@ -78,7 +79,6 @@ const BaseValue *compileValue(std::string source)
 			, block
 			, alloc
 			, nullptr
-			, nullptr
 			, &module
 			, &context
 			, "entry"
@@ -112,13 +112,11 @@ EntryPoint compile(std::string source)
 
 	Visitor visitor(nullptr, nullptr, nullptr);
 
-	auto info = visitor
-		.visit<ModuleInfo *>(program);
+	auto moduleInfo = visitor
+		.visit<ModuleInfo>(program);
 
-	auto entryPoint = info->entryPoint();
-
-	auto &context = info->context();
-	auto &module = info->module();
+	auto context = std::make_unique<llvm::LLVMContext>();
+	auto module = std::make_unique<llvm::Module>("dz", *context);
 
 	auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(*context), false);
 	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module.get());
@@ -132,14 +130,13 @@ EntryPoint compile(std::string source)
 		, block
 		, alloc
 		, function
-		, nullptr
 		, &module
 		, &context
 		, "entry"
-		, entryPoint.functions()
-		, entryPoint.locals()
-		, entryPoint.globals()
-		, entryPoint.types()
+		, moduleInfo.functions
+		, moduleInfo.locals
+		, moduleInfo.globals
+		, moduleInfo.types
 		, Stack()
 		, nullptr
 		);
@@ -158,12 +155,37 @@ int exec(std::string source)
 
 	Visitor visitor(nullptr, nullptr, nullptr);
 
+	auto llvmContext = std::make_unique<llvm::LLVMContext>();
+	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
+
 	auto moduleInfo = visitor
-		.visit<ModuleInfo *>(program);
+		.visit<ModuleInfo>(program);
+
+	EntryPoint entryPoint(0
+		, nullptr
+		, nullptr
+		, nullptr
+		, nullptr
+		, nullptr
+		, &module
+		, &llvmContext
+		, "entry"
+		, moduleInfo.functions
+		, moduleInfo.locals
+		, moduleInfo.globals
+		, moduleInfo.types
+		, Stack()
+		, nullptr
+		);
+
+	for (auto root : moduleInfo.roots)
+	{
+		root->build(entryPoint, Stack());
+	}
 
 	auto threadSafeModule = llvm::orc::ThreadSafeModule(
-		std::move(moduleInfo->module()),
-		std::move(moduleInfo->context())
+		std::move(module),
+		std::move(llvmContext)
 		);
 
 	auto jit = llvm::orc::KaleidoscopeJIT::Create();

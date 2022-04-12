@@ -9,7 +9,7 @@ class EntryPoint;
 class AmbiguousFunctionException : public CompilerException
 {
 	public:
-		AmbiguousFunctionException(ParserRuleContext *context
+		AmbiguousFunctionException(const TokenInfo &token
 			, const std::vector<CallableNode *> &functions
 			, const EntryPoint &entryPoint
 			);

@@ -8,7 +8,7 @@ import long fdopen(int fildes, string mode);
 
 function readChar(long file)
 {
-    return getc(file) -> (file);
+    return getc(file) -> readChar(file);
 }
 
 global Base: 2;
@@ -17,7 +17,7 @@ function nextLine(int number, (int char, ...chars))
 {
     if (char == '\n') // New line
     {
-        return number -> (0, ...chars);
+        return number -> nextLine(0, ...chars);
     }
 
     if (char < 0) // EOF
@@ -217,57 +217,57 @@ function yield(int i, Row row)
 {
     if (i == 11)
     {
-        return row.c12 -> (i - 1, row);
+        return row.c12 -> yield(i - 1, row);
     }
 
     if (i == 10)
     {
-        return row.c11 -> (i - 1, row);
+        return row.c11 -> yield(i - 1, row);
     }
 
     if (i == 9)
     {
-        return row.c10 -> (i - 1, row);
+        return row.c10 -> yield(i - 1, row);
     }
 
     if (i == 8)
     {
-        return row.c9 -> (i - 1, row);
+        return row.c9 -> yield(i - 1, row);
     }
 
     if (i == 7)
     {
-        return row.c8 -> (i - 1, row);
+        return row.c8 -> yield(i - 1, row);
     }
 
     if (i == 6)
     {
-        return row.c7 -> (i - 1, row);
+        return row.c7 -> yield(i - 1, row);
     }
 
     if (i == 5)
     {
-        return row.c6 -> (i - 1, row);
+        return row.c6 -> yield(i - 1, row);
     }
 
     if (i == 4)
     {
-        return row.c5 -> (i - 1, row);
+        return row.c5 -> yield(i - 1, row);
     }
 
     if (i == 3)
     {
-        return row.c4 -> (i - 1, row);
+        return row.c4 -> yield(i - 1, row);
     }
 
     if (i == 2)
     {
-        return row.c3 -> (i - 1, row);
+        return row.c3 -> yield(i - 1, row);
     }
 
     if (i == 1)
     {
-        return row.c2 -> (i - 1, row);
+        return row.c2 -> yield(i - 1, row);
     }
 
     return row.c1;

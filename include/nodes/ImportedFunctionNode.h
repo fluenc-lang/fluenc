@@ -3,6 +3,8 @@
 
 #include "nodes/CallableNode.h"
 
+#include "TokenInfo.h"
+
 class DzBaseArgument;
 class ITypeName;
 
@@ -25,7 +27,7 @@ class ImportedFunctionNode : public CallableNode
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		antlr4::ParserRuleContext *m_context;
+		TokenInfo m_token;
 
 		std::string m_name;
 		std::vector<DzBaseArgument *> m_arguments;

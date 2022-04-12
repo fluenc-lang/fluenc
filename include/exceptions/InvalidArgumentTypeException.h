@@ -6,7 +6,7 @@
 class InvalidArgumentTypeException : public CompilerException
 {
 	public:
-		InvalidArgumentTypeException(ParserRuleContext *context);
+		InvalidArgumentTypeException(const TokenInfo &token);
 
 		std::string message() const override;
 };

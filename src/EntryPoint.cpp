@@ -11,7 +11,6 @@ EntryPoint::EntryPoint(int depth
 	, llvm::BasicBlock *block
 	, llvm::BasicBlock *alloc
 	, llvm::Function *function
-	, llvm::Value *returnValueAddress
 	, std::unique_ptr<llvm::Module> *module
 	, std::unique_ptr<llvm::LLVMContext> *context
 	, const std::string &name
@@ -28,7 +27,6 @@ EntryPoint::EntryPoint(int depth
 	, m_block(block)
 	, m_alloc(alloc)
 	, m_function(function)
-	, m_returnValueAddress(returnValueAddress)
 	, m_module(module)
 	, m_context(context)
 	, m_name(name)
@@ -64,11 +62,6 @@ const EntryPoint *EntryPoint::entry() const
 llvm::Function *EntryPoint::function() const
 {
 	return m_function;
-}
-
-llvm::Value *EntryPoint::returnValueAddress() const
-{
-	return m_returnValueAddress;
 }
 
 const ReferenceValue *EntryPoint::alloc(const Type *type) const
@@ -150,7 +143,6 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, block
 		, m_alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, m_name
@@ -171,7 +163,6 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		, m_block
 		, alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, m_name
@@ -192,7 +183,6 @@ EntryPoint EntryPoint::withIteratorStorage(IteratorStorage *iteratorStorage) con
 		, m_block
 		, m_alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, m_name
@@ -213,7 +203,6 @@ EntryPoint EntryPoint::markEntry() const
 		, m_block
 		, m_alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, m_name
@@ -234,7 +223,6 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, m_block
 		, m_alloc
 		, function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, m_name
@@ -255,7 +243,6 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *>
 		, m_block
 		, m_alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, m_name
@@ -276,31 +263,9 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		, m_block
 		, m_alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, name
-		, m_functions
-		, m_locals
-		, m_globals
-		, m_types
-		, m_values
-		, m_iteratorStorage
-		);
-}
-
-EntryPoint EntryPoint::withReturnValueAddress(llvm::Value *address) const
-{
-	return EntryPoint(m_depth + 1
-		, m_parent
-		, m_entry
-		, m_block
-		, m_alloc
-		, m_function
-		, address
-		, m_module
-		, m_context
-		, m_name
 		, m_functions
 		, m_locals
 		, m_globals
@@ -318,7 +283,6 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 		, m_block
 		, m_alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
 		, m_context
 		, m_name
@@ -339,8 +303,27 @@ EntryPoint EntryPoint::withDepth(int depth) const
 		, m_block
 		, m_alloc
 		, m_function
-		, m_returnValueAddress
 		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, m_globals
+		, m_types
+		, m_values
+		, m_iteratorStorage
+		);
+}
+
+EntryPoint EntryPoint::withModule(std::unique_ptr<llvm::Module> *module) const
+{
+	return EntryPoint(m_depth + 1
+		, m_parent
+		, m_entry
+		, m_block
+		, m_alloc
+		, m_function
+		, module
 		, m_context
 		, m_name
 		, m_functions

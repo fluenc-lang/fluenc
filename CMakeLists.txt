@@ -18,7 +18,7 @@ if(${FLUENC_BUILD_SANITIZERS})
 endif()
 
 if(${FLUENC_BUILD_EXAMPLES})
-	execute_process(COMMAND ln -s ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR}/examples)
+	execute_process(COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/examples ${CMAKE_CURRENT_BINARY_DIR}/examples)
 endif()
 
 set(PROJECT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -29,6 +29,8 @@ set(PROJECT_ANTLR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/antlr4-runtime")
 
 find_library(LLVM13 LLVM-13 REQUIRED)
 find_library(ANTLR4 antlr4-runtime REQUIRED)
+
+find_package(LLD REQUIRED)
 
 
 include_directories(${PROJECT_HEADER_DIR})
@@ -55,7 +57,7 @@ endif ()
 
 if (${FLUENC_BUILD_COMPILER})
     add_executable(fcc ${COMPILER_SOURCE_FILES} ${COMPILER_HEADER_FILES})
-    target_link_libraries(fcc fluenc-lang antlr4-runtime LLVM-13)
+    target_link_libraries(fcc fluenc-lang antlr4-runtime LLVM-13 lldELF)
 endif ()
 
 

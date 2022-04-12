@@ -4,11 +4,11 @@
 
 #include "values/BaseValue.h"
 
-FunctionNotFoundException::FunctionNotFoundException(ParserRuleContext *context
+FunctionNotFoundException::FunctionNotFoundException(const TokenInfo &token
 	, const std::string &name
 	, const Stack &values
 	)
-	: CompilerException(context)
+	: CompilerException(token)
 	, m_name(name)
 	, m_values(values)
 {

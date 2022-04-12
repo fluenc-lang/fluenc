@@ -6,7 +6,7 @@
 class InvalidFunctionPointerTypeException : public CompilerException
 {
 	public:
-		InvalidFunctionPointerTypeException(ParserRuleContext *context, const std::string &name);
+		InvalidFunctionPointerTypeException(const TokenInfo &token, const std::string &name);
 
 		std::string message() const override;
 

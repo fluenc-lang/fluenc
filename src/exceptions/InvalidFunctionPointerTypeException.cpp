@@ -1,7 +1,7 @@
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 
-InvalidFunctionPointerTypeException::InvalidFunctionPointerTypeException(ParserRuleContext *context, const std::string &name)
-	: CompilerException(context)
+InvalidFunctionPointerTypeException::InvalidFunctionPointerTypeException(const TokenInfo &token, const std::string &name)
+	: CompilerException(token)
 	, m_name(name)
 {
 }

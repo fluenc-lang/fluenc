@@ -1,49 +1,9 @@
 #ifndef VISITOR_H
 #define VISITOR_H
 
-#include <llvm/IR/Module.h>
-
 #include "antlr4-runtime/fluencBaseVisitor.h"
 
-#include "EntryPoint.h"
-
 class Node;
-
-class ModuleInfo
-{
-	public:
-		ModuleInfo(const EntryPoint &entryPoint
-			, std::unique_ptr<llvm::Module> module
-			, std::unique_ptr<llvm::LLVMContext> context
-			)
-			: m_entryPoint(entryPoint)
-			, m_module(std::move(module))
-			, m_context(std::move(context))
-		{
-		}
-
-		EntryPoint entryPoint()
-		{
-			return m_entryPoint;
-		}
-
-		std::unique_ptr<llvm::Module> &module()
-		{
-			return m_module;
-		}
-
-		std::unique_ptr<llvm::LLVMContext> &context()
-		{
-			return m_context;
-		}
-
-	private:
-		EntryPoint m_entryPoint;
-
-		std::unique_ptr<llvm::Module> m_module;
-		std::unique_ptr<llvm::LLVMContext> m_context;
-};
-
 class Type;
 
 class Visitor : public fluencBaseVisitor
@@ -82,6 +42,7 @@ class Visitor : public fluencBaseVisitor
 		antlrcpp::Any visitLocal(fluencParser::LocalContext *context) override;
 		antlrcpp::Any visitInstruction(fluencParser::InstructionContext *context) override;
 		antlrcpp::Any visitNs(fluencParser::NsContext *context) override;
+		antlrcpp::Any visitUse(fluencParser::UseContext *context) override;
 
 		template<typename T>
 		T visit(antlr4::tree::ParseTree *tree)

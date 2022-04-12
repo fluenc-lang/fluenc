@@ -1,10 +1,10 @@
 #include "exceptions/MissingTypeDeclarationException.h"
 
-MissingTypeDeclarationException::MissingTypeDeclarationException(ParserRuleContext *context
+MissingTypeDeclarationException::MissingTypeDeclarationException(const TokenInfo &token
 	, const std::string &typeName
 	, const std::string &fieldName
 	)
-	: CompilerException(context)
+	: CompilerException(token)
 	, m_typeName(typeName)
 	, m_fieldName(fieldName)
 {

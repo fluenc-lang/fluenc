@@ -8,14 +8,14 @@ import long fdopen(int fildes, string mode);
 
 function readChar(long file)
 {
-    return getc(file) -> (file);
+    return getc(file) -> readChar(file);
 }
 
 function nextNumber(int accumulation, (int char, ...chars))
 {
     if (char == '\n') // New line
     {
-        return accumulation -> (0, ...chars);
+        return accumulation -> nextNumber(0, ...chars);
     }
 
     if (char < 0) // EOF
