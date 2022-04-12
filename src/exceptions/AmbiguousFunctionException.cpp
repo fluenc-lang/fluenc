@@ -4,11 +4,11 @@
 
 #include "nodes/CallableNode.h"
 
-AmbiguousFunctionException::AmbiguousFunctionException(ParserRuleContext *context
+AmbiguousFunctionException::AmbiguousFunctionException(const TokenInfo &token
 	, const std::vector<CallableNode *> &functions
 	, const EntryPoint &entryPoint
 	)
-	: CompilerException(context)
+	: CompilerException(token)
 	, m_functions(functions)
 	, m_entryPoint(new EntryPoint(entryPoint))
 {

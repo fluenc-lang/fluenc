@@ -2,6 +2,7 @@
 #define DZTYPENAME_H
 
 #include "ITypeName.h"
+#include "TokenInfo.h"
 
 class EntryPoint;
 class Type;
@@ -27,7 +28,7 @@ class DzTypeName : public ITypeName
 		static DzTypeName *without();
 
 	private:
-		antlr4::ParserRuleContext *m_context;
+		TokenInfo m_token;
 
 		std::string m_name;
 };

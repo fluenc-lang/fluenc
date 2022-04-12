@@ -6,7 +6,7 @@
 class UnknownTypeException : public CompilerException
 {
 	public:
-		UnknownTypeException(ParserRuleContext *context, const std::string &typeName);
+		UnknownTypeException(const TokenInfo &token, const std::string &typeName);
 
 		std::string message() const override;
 

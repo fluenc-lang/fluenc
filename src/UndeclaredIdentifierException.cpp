@@ -1,7 +1,7 @@
 #include "UndeclaredIdentifierException.h"
 
-UndeclaredIdentifierException::UndeclaredIdentifierException(ParserRuleContext *context, const std::string &identifier)
-	: CompilerException(context)
+UndeclaredIdentifierException::UndeclaredIdentifierException(const TokenInfo &token, const std::string &identifier)
+	: CompilerException(token)
 	, m_identifier(identifier)
 {
 }

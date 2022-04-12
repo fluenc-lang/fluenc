@@ -1,7 +1,7 @@
 #include "exceptions/InvalidArgumentTypeException.h"
 
-InvalidArgumentTypeException::InvalidArgumentTypeException(ParserRuleContext *context)
-	: CompilerException(context)
+InvalidArgumentTypeException::InvalidArgumentTypeException(const TokenInfo &token)
+	: CompilerException(token)
 {
 }
 

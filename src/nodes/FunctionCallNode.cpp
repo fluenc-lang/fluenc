@@ -35,7 +35,7 @@
 #include "iterators/ExtremitiesIterator.h"
 
 FunctionCallNode::FunctionCallNode(antlr4::ParserRuleContext *context, const std::string &name)
-	: m_context(context)
+	: m_token(TokenInfo::fromContext(context))
 	, m_name(name)
 {
 }
@@ -130,7 +130,7 @@ const CallableNode *FunctionCallNode::findFunction(const EntryPoint &entryPoint,
 
 		if (!value)
 		{
-			throw new InvalidFunctionPointerTypeException(m_context, m_name);
+			throw new InvalidFunctionPointerTypeException(m_token, m_name);
 		}
 
 		return value->function();
@@ -155,7 +155,7 @@ const CallableNode *FunctionCallNode::findFunction(const EntryPoint &entryPoint,
 		{
 			std::vector<CallableNode *> functions = { candidate->second, function };
 
-			throw new AmbiguousFunctionException(m_context
+			throw new AmbiguousFunctionException(m_token
 				, functions
 				, entryPoint
 				);
@@ -219,5 +219,5 @@ std::vector<DzResult> FunctionCallNode::regularCall(const EntryPoint &entryPoint
 		return result;
 	}
 
-	throw new FunctionNotFoundException(m_context, m_name, values);
+	throw new FunctionNotFoundException(m_token, m_name, values);
 }

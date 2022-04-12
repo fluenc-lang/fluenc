@@ -7,7 +7,7 @@
 class FunctionNotFoundException : public CompilerException
 {
 	public:
-		FunctionNotFoundException(ParserRuleContext *context
+		FunctionNotFoundException(const TokenInfo &token
 			, const std::string &name
 			, const Stack &values
 			);

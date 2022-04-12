@@ -1,5 +1,6 @@
 set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/AllIterator.h"
+	"${PROJECT_HEADER_DIR}/BuildConfiguration.h"
     "${PROJECT_HEADER_DIR}/CompilerException.h"
     "${PROJECT_HEADER_DIR}/DefaultPrototypeProvider.h"
     "${PROJECT_HEADER_DIR}/DzArgument.h"
@@ -18,11 +19,14 @@ set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/iterators"
     "${PROJECT_HEADER_DIR}/IteratorStorage.h"
     "${PROJECT_HEADER_DIR}/ITypeName.h"
+	"${PROJECT_HEADER_DIR}/ModuleInfo.h"
     "${PROJECT_HEADER_DIR}/Namespace.h"
     "${PROJECT_HEADER_DIR}/Node.h"
     "${PROJECT_HEADER_DIR}/Stack.h"
+    "${PROJECT_HEADER_DIR}/TokenInfo.h"
     "${PROJECT_HEADER_DIR}/Type.h"
     "${PROJECT_HEADER_DIR}/UndeclaredIdentifierException.h"
+	"${PROJECT_HEADER_DIR}/Use.h"
     "${PROJECT_HEADER_DIR}/Utility.h"
     "${PROJECT_HEADER_DIR}/ValueHelper.h"
     "${PROJECT_HEADER_DIR}/Visitor.h"
@@ -129,8 +133,10 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/Namespace.cpp"
     "${PROJECT_SRC_DIR}/Node.cpp"
     "${PROJECT_SRC_DIR}/Stack.cpp"
+	"${PROJECT_SRC_DIR}/TokenInfo.cpp"
     "${PROJECT_SRC_DIR}/Type.cpp"
     "${PROJECT_SRC_DIR}/UndeclaredIdentifierException.cpp"
+	"${PROJECT_SRC_DIR}/Use.cpp"
     "${PROJECT_SRC_DIR}/Utility.cpp"
     "${PROJECT_SRC_DIR}/ValueHelper.cpp"
     "${PROJECT_SRC_DIR}/Visitor.cpp"
@@ -228,10 +234,12 @@ set(LIB_SOURCE_FILES
 )
 
 set(COMPILER_HEADER_FILES
+	"${PROJECT_SRC_DIR}/ProjectFileParser.h"
     )
 
 set(COMPILER_SOURCE_FILES
     "${PROJECT_SRC_DIR}/main.cpp"
+    "${PROJECT_SRC_DIR}/ProjectFileParser.cpp"
     )
 
 set(TEST_HEADER_FILES

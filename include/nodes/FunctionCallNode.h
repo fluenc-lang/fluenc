@@ -4,6 +4,7 @@
 #include <numeric>
 
 #include "Node.h"
+#include "TokenInfo.h"
 
 #include "values/UserTypeValue.h"
 #include "values/ExpandedValue.h"
@@ -68,7 +69,7 @@ class FunctionCallNode : public Node
 
 		std::vector<DzResult> regularCall(const EntryPoint &entryPoint, Stack values) const;
 
-		antlr4::ParserRuleContext *m_context;
+		TokenInfo m_token;
 
 		std::string m_name;
 };

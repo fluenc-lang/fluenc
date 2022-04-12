@@ -25,7 +25,7 @@ ImportedFunctionNode::ImportedFunctionNode(antlr4::ParserRuleContext *context
 	, const std::vector<DzBaseArgument *> &arguments
 	, ITypeName *returnType
 	)
-	: m_context(context)
+	: m_token(TokenInfo::fromContext(context))
 	, m_name(name)
 	, m_arguments(arguments)
 	, m_returnType(returnType)
@@ -118,7 +118,7 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 		}
 		else
 		{
-			throw new InvalidArgumentTypeException(m_context);
+			throw new InvalidArgumentTypeException(m_token);
 		}
 	}
 
@@ -130,7 +130,7 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 
 	if (returnType != VoidType::instance())
 	{
-		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint, m_context);
+		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint, m_token);
 
 		values.push(returnValue);
 	}

@@ -7,11 +7,7 @@ class BaseValue;
 class Type;
 class EntryPoint;
 class UserTypeValue;
-
-namespace antlr4
-{
-	class ParserRuleContext;
-};
+class TokenInfo;
 
 class InteropHelper
 {
@@ -19,7 +15,7 @@ class InteropHelper
 		static const BaseValue *createReadProxy(llvm::Value *value
 			, const Type *type
 			, const EntryPoint &entryPoint
-			, antlr4::ParserRuleContext *token
+			, const TokenInfo &token
 			);
 
 		static llvm::Value *createWriteProxy(const UserTypeValue *userTypeValue, const EntryPoint &entryPoint);

@@ -21,7 +21,7 @@
 const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 	, const Type *type
 	, const EntryPoint &entryPoint
-	, antlr4::ParserRuleContext *token
+	, const TokenInfo &token
 	)
 {
 	auto &context = entryPoint.context();

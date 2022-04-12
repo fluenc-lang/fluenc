@@ -25,7 +25,6 @@ class EntryPoint
 			, llvm::BasicBlock *block
 			, llvm::BasicBlock *alloc
 			, llvm::Function *function
-			, llvm::Value *returnValueAddress
 			, std::unique_ptr<llvm::Module> *module
 			, std::unique_ptr<llvm::LLVMContext> *context
 			, const std::string &name
@@ -45,7 +44,6 @@ class EntryPoint
 		llvm::BasicBlock *block() const;
 
 		llvm::Function *function() const;
-		llvm::Value *returnValueAddress() const;
 
 		const ReferenceValue *alloc(const Type *type) const;
 
@@ -77,6 +75,7 @@ class EntryPoint
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
 		EntryPoint withValues(const Stack &values) const;
 		EntryPoint withDepth(int depth) const;
+		EntryPoint withModule(std::unique_ptr<llvm::Module> *module) const;
 
 	private:
 		int m_depth;
@@ -88,7 +87,6 @@ class EntryPoint
 		llvm::BasicBlock *m_alloc;
 
 		llvm::Function *m_function;
-		llvm::Value *m_returnValueAddress;
 
 		std::unique_ptr<llvm::Module> *m_module;
 		std::unique_ptr<llvm::LLVMContext> *m_context;

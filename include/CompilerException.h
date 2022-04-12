@@ -3,23 +3,12 @@
 
 #include <exception>
 
-#include "antlr4-runtime/fluencBaseVisitor.h"
-#include "antlr4-runtime/fluencLexer.h"
-#include "antlr4-runtime/fluencParser.h"
-
-using namespace antlr4;
-
-struct TokenInfo
-{
-	size_t row;
-	size_t column;
-	size_t length;
-};
+#include "TokenInfo.h"
 
 class CompilerException : public std::exception
 {
 	public:
-		CompilerException(ParserRuleContext *context);
+		CompilerException(const TokenInfo &token);
 
 		size_t row() const;
 		size_t column() const;
@@ -28,7 +17,7 @@ class CompilerException : public std::exception
 		virtual std::string message() const = 0;
 
 	private:
-		TokenInfo m_tokenInfo;
+		TokenInfo m_token;
 };
 
 #endif // COMPILEREXCEPTION_H

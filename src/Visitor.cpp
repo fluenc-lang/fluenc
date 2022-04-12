@@ -1,8 +1,5 @@
 #include <numeric>
 
-#include <llvm/IR/Instructions.h>
-#include <llvm/IR/Verifier.h>
-
 #include "Visitor.h"
 #include "EntryPoint.h"
 #include "DzArgument.h"
@@ -15,6 +12,8 @@
 #include "IRBuilderEx.h"
 #include "FunctionTypeName.h"
 #include "Namespace.h"
+#include "Use.h"
+#include "ModuleInfo.h"
 
 #include "nodes/TerminatorNode.h"
 #include "nodes/StringLiteralNode.h"
@@ -66,13 +65,12 @@ Visitor::Visitor(const Type *iteratorType, Node *alpha, Node *beta)
 
 void populateInstructions(const std::vector<std::string> &namespaces
 	, const std::vector<antlrcpp::Any> &instructions
-	, std::unique_ptr<llvm::Module> *module
-	, std::unique_ptr<llvm::LLVMContext> *context
 	, std::vector<CallableNode *> &roots
 	, std::multimap<std::string, CallableNode *> &functions
 	, std::map<std::string, const BaseValue *> &locals
 	, std::map<std::string, const Node *> &globals
 	, std::map<std::string, Prototype *> &types
+	, std::unordered_set<std::string> &uses
 	)
 {
 	for (auto &instruction : instructions)
@@ -87,13 +85,12 @@ void populateInstructions(const std::vector<std::string> &namespaces
 
 			populateInstructions(nestedNamespaces
 				, _namespace->children()
-				, module
-				, context
 				, roots
 				, functions
 				, locals
 				, globals
 				, types
+				, uses
 				);
 		}
 		else
@@ -135,20 +132,24 @@ void populateInstructions(const std::vector<std::string> &namespaces
 
 				globals.insert({ qualifiedName.str(), global });
 			}
+			else if (instruction.is<Use *>())
+			{
+				auto use = instruction.as<Use *>();
+
+				uses.insert(use->fileName());
+			}
 		}
 	}
 }
 
 antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
 {
-	auto llvmContext = std::make_unique<llvm::LLVMContext>();
-	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
-
 	std::vector<CallableNode *> roots;
 	std::multimap<std::string, CallableNode *> functions;
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, const Node *> globals;
 	std::map<std::string, Prototype *> types;
+	std::unordered_set<std::string> uses;
 
 	auto instructions = context->instruction();
 
@@ -161,51 +162,23 @@ antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
 
 	populateInstructions(std::vector<std::string>()
 		, results
-		, &module
-		, &llvmContext
 		, roots
 		, functions
 		, locals
 		, globals
 		, types
+		, uses
 		);
 
-	Stack values;
-
-	EntryPoint entryPoint(0
-		, nullptr
-		, nullptr
-		, nullptr
-		, nullptr
-		, nullptr
-		, nullptr
-		, &module
-		, &llvmContext
-		, "term"
-		, functions
-		, locals
-		, globals
-		, types
-		, values
-		, nullptr
-		);
-
-	for (auto root : roots)
+	return ModuleInfo
 	{
-		root->build(entryPoint, values);
-	}
-
-	module->print(llvm::errs(), nullptr);
-
-	if (verifyModule(*module, &llvm::errs()))
-	{
-		throw new std::exception();
-	}
-
-	return new ModuleInfo(entryPoint
-		, std::move(module)
-		, std::move(llvmContext)
-		);
+		roots,
+		functions,
+		locals,
+		globals,
+		types,
+		uses,
+	};
 }
 
 FunctionAttribute getAttribute(fluencParser::FunctionContext *ctx)
@@ -725,7 +698,6 @@ antlrcpp::Any Visitor::visitArray(fluencParser::ArrayContext *context)
 			.visit<Node *>(expression.value);
 	});
 
-//	auto taintedSink = new TaintedSink(firstValue);
 	auto lazySink = new ArraySinkNode(expressions.size(), m_alpha, firstValue);
 
 	return static_cast<Node *>(lazySink);
@@ -780,4 +752,9 @@ antlrcpp::Any Visitor::visitNs(fluencParser::NsContext *context)
 	return new Namespace(children
 		, context->ID()->getText()
 		);
+}
+
+antlrcpp::Any Visitor::visitUse(fluencParser::UseContext *context)
+{
+	return new Use(context->STRING()->getText());
 }

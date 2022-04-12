@@ -15,7 +15,7 @@
 #include "exceptions/UnknownTypeException.h"
 
 DzTypeName::DzTypeName(antlr4::ParserRuleContext *context, const std::string &name)
-	: m_context(context)
+	: m_token(TokenInfo::fromContext(context))
 	, m_name(name)
 {
 }
@@ -78,7 +78,7 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 
 	if (iterator == types.end())
 	{
-		throw new UnknownTypeException(m_context, m_name);
+		throw new UnknownTypeException(m_token, m_name);
 	}
 
 	return iterator->second;

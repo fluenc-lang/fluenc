@@ -6,7 +6,7 @@
 class MissingTypeDeclarationException : public CompilerException
 {
 	public:
-		MissingTypeDeclarationException(ParserRuleContext *context
+		MissingTypeDeclarationException(const TokenInfo &token
 			, const std::string &typeName
 			, const std::string &fieldName
 			);

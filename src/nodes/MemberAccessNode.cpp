@@ -14,7 +14,7 @@
 #include "values/FunctionValue.h"
 
 MemberAccessNode::MemberAccessNode(antlr4::ParserRuleContext *context, Node *consumer, const std::string &name)
-	: m_context(context)
+	: m_token(TokenInfo::fromContext(context))
 	, m_consumer(consumer)
 	, m_name(name)
 {
@@ -74,5 +74,5 @@ std::vector<DzResult> MemberAccessNode::build(const EntryPoint &entryPoint, Stac
 		return results;
 	}
 
-	throw new UndeclaredIdentifierException(m_context, m_name);
+	throw new UndeclaredIdentifierException(m_token, m_name);
 }

@@ -6,7 +6,7 @@
 class UndeclaredIdentifierException : public CompilerException
 {
 	public:
-		UndeclaredIdentifierException(ParserRuleContext *context, const std::string &identifier);
+		UndeclaredIdentifierException(const TokenInfo &token, const std::string &identifier);
 
 		std::string message() const override;
 
