@@ -21,6 +21,12 @@ No garbage collectors, no manual allocation or deallocation, no borrow checker. 
 
 It's still possible to perform dynamic memory allocation by utilizing the C interop facilities of the language, which can be useful when extending the core libraries for example.
 
+# Generically typed
+
+FluenC is a generically typed language. What does this mean?
+
+If you come from a C++ background, the easiest way of thinking about the type system in FluenC is to imagine that every single value is a template. 
+
 # Iterators
 
 Since there are no allocations, consumption of arrays and similar structures works slightly different from other languages. You only ever work with one element at a time, making the memory model predictable.
