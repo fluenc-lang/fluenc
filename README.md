@@ -90,7 +90,7 @@ export int main()
     
     let value2 = Foo
     {
-        value: "foo" // type is inferred as long
+        value: "foo" // type is inferred as string
     };
     
     return calculate(value1, value2); // Will return 43
