@@ -46,7 +46,7 @@ struct Foo
 };
 ```
 
-Any member without an explicit type will need to be initialized when instantiating the struct type. A member can also have a default value, in which case a value does not need to be specified, and the type will be inferred from the expression.
+Any member without an explicit type will need to be initialized when instantiating the struct type. A member can also have a default value, in which case a value does not need to be specified at the time of instantiation, and the type will be inferred from the expression.
 
 ```js
 struct Foo
