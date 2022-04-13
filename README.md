@@ -56,6 +56,47 @@ struct Foo
 };
 ```
 
+## Pattern matching
+
+Pattern matching is performed using function overloads in FluenC. This works in perfect symbiosis with the generic type system. The correct overload will be selected based on the actual type of the value.
+
+```js
+struct Foo
+{
+    value
+};
+
+function processValue(int value)
+{
+    return value;
+}
+
+function processValue(string value)
+{
+    return 42;
+}
+
+function calculate(Foo left, Foo right)
+{
+    return processValue(left.value) + processValue(right.value);
+}
+
+export int main()
+{
+    let value1 = Foo
+    {
+        value: 1 // type is inferred as int
+    };
+    
+    let value2 = Foo
+    {
+        value: "foo" // type is inferred as long
+    };
+    
+    return calculate(value1, value2); // Will return 43
+}
+```
+
 ## Iterators
 
 Since there are no allocations, consumption of arrays and similar structures works slightly different from other languages. You only ever work with one element at a time, making the memory model predictable.
