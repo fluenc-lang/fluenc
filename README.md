@@ -25,7 +25,36 @@ It's still possible to perform dynamic memory allocation by utilizing the C inte
 
 FluenC is a generically typed language. What does this mean?
 
-If you come from a C++ background, the easiest way of thinking about the type system in FluenC is to imagine that every single value is a template. 
+If you come from a C++ background, the easiest way of thinking about the type system in FluenC is to imagine that every single value is a template. The structs in FluenC have no types for their members by default, and might look a bit alien.
+
+```c
+struct Foo
+{
+    member1,
+    member2
+};
+```
+
+This corresponds to the following code in C++:
+
+```cpp
+template<typename T1, typename T2>
+struct Foo
+{
+    T1 member1,
+    T2 member2
+};
+```
+
+Any member without an explicit type will need to be initialized when instantiating the struct type. A member can also have a default value, in which case a value does not need to be specified, and the type will be inferred from the expression.
+
+```js
+struct Foo
+{
+    member1: 1,
+    member2: "foo"
+};
+```
 
 ## Iterators
 
