@@ -11,7 +11,69 @@ LazyEvaluationNode::LazyEvaluationNode(const Node *consumer)
 {
 }
 
-std::vector<DzResult> LazyEvaluationNode::digestDepth(const EntryPoint &entryPoint, Stack values) const
+LazyEvaluationNode::IDigestionNode *LazyEvaluationNode::processValue(IDigestionNode *node, const BaseValue *value) const
+{
+	if (auto groupNode = dynamic_cast<const GroupDigestionNode *>(node))
+	{
+		std::vector<IDigestionNode *> children;
+
+		for (auto &child : groupNode->children())
+		{
+			auto processed = processValue(child, value);
+
+			children.push_back(processed);
+		}
+
+		return new GroupDigestionNode(groupNode->type(), children);
+	}
+
+	if (auto valueNode = dynamic_cast<const ValueDigestionNode *>(node))
+	{
+		auto [resultEntryPoint, resultValues] = valueNode->result();
+
+		std::vector<const BaseValue *> forwardedValues;
+
+		for (auto resultValue : resultValues)
+		{
+			forwardedValues.push_back(resultValue);
+		}
+
+		forwardedValues.push_back(value);
+
+		return new ValueDigestionNode({ resultEntryPoint, forwardedValues });
+	}
+
+	throw new std::exception();
+}
+
+LazyEvaluationNode::IDigestionNode *LazyEvaluationNode::processTuple(IDigestionNode *node, const Stack &values) const
+{
+	if (auto groupNode = dynamic_cast<const GroupDigestionNode *>(node))
+	{
+		std::vector<IDigestionNode *> children;
+
+		for (auto &child : groupNode->children())
+		{
+			children.push_back(processTuple(child, values));
+		}
+
+		return new GroupDigestionNode(groupNode->type(), children);
+	}
+
+	if (auto valueNode = dynamic_cast<const ValueDigestionNode *>(node))
+	{
+		auto [digestedEntryPoint, digestedValues] = valueNode->result();
+
+		auto digestedTuple = new TupleValue({ digestedValues.begin(), digestedValues.end() });
+		auto digestedNode = digest(digestedEntryPoint, values);
+
+		return processValue(digestedNode, digestedTuple);
+	}
+
+	throw new std::exception();
+}
+
+LazyEvaluationNode::IDigestionNode *LazyEvaluationNode::digest(const EntryPoint &entryPoint, Stack values) const
 {
 	for (auto i = 0u; i < values.size(); i++)
 	{
@@ -21,7 +83,7 @@ std::vector<DzResult> LazyEvaluationNode::digestDepth(const EntryPoint &entryPoi
 		{
 			auto iteratable = lazy->generate(entryPoint);
 
-			std::vector<DzResult> results;
+			std::vector<IDigestionNode *> results;
 
 			for (auto &[resultEntryPoint, resultValues] : iteratable->build(entryPoint))
 			{
@@ -35,65 +97,29 @@ std::vector<DzResult> LazyEvaluationNode::digestDepth(const EntryPoint &entryPoi
 				auto forwardedEntryPoint = resultEntryPoint
 					.withIteratorStorage(entryPoint.iteratorStorage());
 
-				for (auto &result : digestDepth(forwardedEntryPoint, forwardedValues))
-				{
-					results.push_back(result);
-				}
+				auto digestedNode = digest(forwardedEntryPoint, forwardedValues);
+
+				results.push_back(digestedNode);
 			}
 
-			return results;
+			return new GroupDigestionNode(Operator::And, results);
 		}
 
 		if (auto tuple = dynamic_cast<const TupleValue *>(value))
 		{
-			std::vector<DzResult> results;
-
-			auto digestedResults = digestDepth(entryPoint
+			auto digestedNode = digest(entryPoint
 				, tuple->values()
 				);
 
-			for (auto &[digestedEntryPoint, digestedValues] : digestedResults)
-			{
-				auto digestedTuple = new TupleValue({ digestedValues.begin(), digestedValues.end() });
-
-				for (auto &[resultEntryPoint, resultValues] : digestDepth(digestedEntryPoint, values))
-				{
-					std::vector<const BaseValue *> forwardedValues;
-
-					for (auto resultValue : resultValues)
-					{
-						forwardedValues.push_back(resultValue);
-					}
-
-					forwardedValues.push_back(digestedTuple);
-
-					results.push_back({ resultEntryPoint, forwardedValues });
-				}
-			}
-
-			return results;
+			return processTuple(digestedNode, values);
 		}
 
-		std::vector<DzResult> results;
+		auto digestedNode = digest(entryPoint, values);
 
-		for (auto &[resultEntryPoint, resultValues] : digestDepth(entryPoint, values))
-		{
-			std::vector<const BaseValue *> forwardedValues;
-
-			for (auto resultValue : resultValues)
-			{
-				forwardedValues.push_back(resultValue);
-			}
-
-			forwardedValues.push_back(value);
-
-			results.push_back({ resultEntryPoint, forwardedValues });
-		}
-
-		return results;
+		return processValue(digestedNode, value);
 	}
 
-	return {{ entryPoint, values }};
+	return new ValueDigestionNode({ entryPoint, values });
 }
 
 EntryPoint tryForkEntryPoint(const EntryPoint &entryPoint)
@@ -107,22 +133,74 @@ EntryPoint tryForkEntryPoint(const EntryPoint &entryPoint)
 		.withIteratorStorage(new IteratorStorage());
 }
 
+std::vector<DzResult> LazyEvaluationNode::execute(const std::vector<IDigestionNode *> &nodes, IteratorStorage *iteratorStorage, Operator type) const
+{
+	std::vector<DzResult> results;
+
+	auto nodeIterator = [&](auto pair, auto node) -> std::pair<bool, std::exception *>
+	{
+		if (auto groupNode = dynamic_cast<const GroupDigestionNode *>(node))
+		{
+			for (auto &result : execute(groupNode->children(), iteratorStorage, groupNode->type()))
+			{
+				results.push_back(result);
+			}
+		}
+
+		if (auto valueNode = dynamic_cast<const ValueDigestionNode *>(node))
+		{
+			auto [atLeastOneSucceeded, ex] = pair;
+
+			try
+			{
+				auto [resultEntryPoint, resultValues] = valueNode->result();
+
+				auto consumerEntryPoint = resultEntryPoint
+					.withIteratorStorage(iteratorStorage);
+
+				for (auto &result : m_consumer->build(consumerEntryPoint, resultValues))
+				{
+					results.push_back(result);
+				}
+
+				return { true, nullptr };
+			}
+			catch (std::exception *exception)
+			{
+				if (type == Operator::And)
+				{
+					throw exception;
+				}
+
+				return { atLeastOneSucceeded, exception };
+			}
+		}
+
+		return pair;
+	};
+
+	auto input = std::make_pair<bool, std::exception *>(false, nullptr);
+
+	auto [atLeastOneSucceeded, exception] = std::accumulate(begin(nodes), end(nodes), input, nodeIterator);
+
+	if (type == Operator::And)
+	{
+		return results;
+	}
+
+	if (atLeastOneSucceeded)
+	{
+		return results;
+	}
+
+	throw exception;
+}
+
 std::vector<DzResult> LazyEvaluationNode::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto forkedEntryPoint = tryForkEntryPoint(entryPoint);
 
-	std::vector<DzResult> results;
+	auto digestedNode = digest(forkedEntryPoint, values);
 
-	for (auto &[resultEntryPoint, resultValues] : digestDepth(forkedEntryPoint, values))
-	{
-		auto consumerEntryPoint = resultEntryPoint
-			.withIteratorStorage(entryPoint.iteratorStorage());
-
-		for (auto &result : m_consumer->build(consumerEntryPoint, resultValues))
-		{
-			results.push_back(result);
-		}
-	}
-
-	return results;
+	return execute({ digestedNode }, entryPoint.iteratorStorage(), Operator::And);
 }

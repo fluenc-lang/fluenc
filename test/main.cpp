@@ -2581,6 +2581,28 @@ BOOST_AUTO_TEST_CASE (arrayType_2)
 //	BOOST_TEST(lazy->type()->name() == "[int, int]");
 //}
 
+BOOST_AUTO_TEST_CASE (scenario71)
+{
+	auto result = exec(R"(
+		function count(int product, int c)
+		{
+			return product + 1;
+		}
+
+		function count(int product, (int c, ...characters))
+		{
+			return count(product + 1, ...characters);
+		}
+
+		export int main()
+		{
+			return count(0, "foobar");
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
@@ -2588,6 +2610,8 @@ test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 	llvm::InitializeAllTargetMCs();
 	llvm::InitializeAllAsmParsers();
 	llvm::InitializeAllAsmPrinters();
+
+	scenario71();
 
 	return 0;
 }
