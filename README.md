@@ -1,6 +1,10 @@
 # FluenC
 
-FluenC is a C-inspired, functional-first language, with a focus on simplicity.
+FluenC is a C-inspired, functional-first language, with a focus on simplicity. 
+
+It's hard to know where to start explaining what FluenC is, and how it works, since the language uses many unique features that works in symbiosis to produce the end result: A language as easy as JavaScript, and as performant as C.
+
+For now, let's start with with some code!
 
 ## Hello world in FluenC
 
