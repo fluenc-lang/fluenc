@@ -1,6 +1,8 @@
 #ifndef ITERATORSTORAGE_H
 #define ITERATORSTORAGE_H
 
+#include <unordered_map>
+
 #include <llvm/IR/Value.h>
 
 class EntryPoint;

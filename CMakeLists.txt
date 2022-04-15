@@ -26,38 +26,45 @@ set(PROJECT_HEADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(PROJECT_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 set(PROJECT_ANTLR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/antlr4-runtime")
 
+find_package(LLVM REQUIRED CONFIG)
+find_package(LLD REQUIRED CONFIG)
 
-find_library(LLVM13 LLVM-13 REQUIRED)
 find_library(ANTLR4 antlr4-runtime REQUIRED)
-
-find_package(LLD REQUIRED)
-
+find_path(ANTLR4_BASE_INCLUDE_DIR antlr4-runtime/antlr4-runtime.h
+    PATHS
+      /usr/include
+      /usr/local/opt/antlr4-cpp-runtime/include
+  )
 
 include_directories(${PROJECT_HEADER_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories("/usr/include/antlr4-runtime")
-include_directories("/usr/include/llvm-13")
+include_directories(${ANTLR4_BASE_INCLUDE_DIR})
+include_directories(${ANTLR4_BASE_INCLUDE_DIR}/antlr4-runtime)
+include_directories(${LLVM_INCLUDE_DIR})
+include_directories(${LLD_INCLUDE_DIRS})
 include_directories("/usr/include/llvm-c-13")
+
+link_directories(${LLVM_LIBRARY_DIR})
 
 include(cmake/files.cmake)
 
 
 execute_process(COMMAND ./tools/build.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(fluenc-lang OBJECT ${LIB_SOURCE_FILES} ${LIB_HEADER_FILES})
-target_link_libraries(fluenc-lang antlr4-runtime LLVM-13)
+target_link_libraries(fluenc-lang ${ANTLR4} LLVM)
 
 
 if (${FLUENC_BUILD_TESTS})
     find_package(Boost 1.67 REQUIRED COMPONENTS unit_test_framework)
 
     add_executable(test ${TEST_SOURCE_FILES} ${TEST_HEADER_FILES})
-    target_link_libraries(test fluenc-lang antlr4-runtime LLVM-13)
+    target_link_libraries(test fluenc-lang ${ANTLR4} LLVM)
     target_include_directories(test PUBLIC ${PROJECT_TEST_DIR})
 endif ()
 
 if (${FLUENC_BUILD_COMPILER})
     add_executable(fcc ${COMPILER_SOURCE_FILES} ${COMPILER_HEADER_FILES})
-    target_link_libraries(fcc fluenc-lang antlr4-runtime LLVM-13 lldELF)
+    target_link_libraries(fcc fluenc-lang ${ANTLR4} LLVM lldELF)
 endif ()
 
 
