@@ -75,7 +75,7 @@ ModuleInfo analyze(const std::string &file)
 
 	stream.open(file);
 
-	Visitor visitor(nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	antlr4::ANTLRInputStream input(stream);
 	fluencLexer lexer(&input);

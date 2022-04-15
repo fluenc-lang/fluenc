@@ -132,7 +132,7 @@ WS
 	;
 
 ID
-	: CHAR (CHAR | DIGIT | '::')*
+	: '::'? CHAR (CHAR | DIGIT | '::')*
 	;
 
 fragment CHAR

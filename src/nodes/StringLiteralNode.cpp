@@ -4,7 +4,7 @@
 
 #include "values/StringValue.h"
 
-StringLiteralNode::StringLiteralNode(Node *consumer, const std::string &value)
+StringLiteralNode::StringLiteralNode(const Node *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
 {

@@ -12,7 +12,7 @@ WithPrototypeProvider *WithPrototypeProvider::instance()
 	return &instance;
 }
 
-IPrototype *WithPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &values)
+IPrototype *WithPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &values) const
 {
 	UNUSED(entryPoint);
 

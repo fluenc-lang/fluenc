@@ -2605,6 +2605,106 @@ BOOST_AUTO_TEST_CASE (scenario71)
 	BOOST_TEST(result == 6);
 }
 
+BOOST_AUTO_TEST_CASE (scenario72)
+{
+	auto result = exec(R"(
+		namespace Foo
+		{
+			function someFunc()
+			{
+				return 13 + ::noNamespace();
+			}
+
+			function otherFunc()
+			{
+				return someFunc();
+			}
+		}
+
+		function noNamespace()
+		{
+			return 10;
+		}
+
+		export int main()
+		{
+			return Foo::otherFunc();
+		}
+	)");
+
+	BOOST_TEST(result == 23);
+}
+
+BOOST_AUTO_TEST_CASE (scenario73)
+{
+	auto result = exec(R"(
+		namespace Foo
+		{
+			function someFunc()
+			{
+				return 13 + noNamespace();
+			}
+
+			function noNamespace()
+			{
+				return 2;
+			}
+
+			function otherFunc()
+			{
+				return someFunc();
+			}
+		}
+
+		function noNamespace()
+		{
+			return 10;
+		}
+
+		export int main()
+		{
+			return Foo::otherFunc();
+		}
+	)");
+
+	BOOST_TEST(result == 15);
+}
+
+BOOST_AUTO_TEST_CASE (scenario74)
+{
+	auto result = exec(R"(
+		namespace Foo
+		{
+			function someFunc()
+			{
+				return 13 + ::noNamespace();
+			}
+
+			function noNamespace()
+			{
+				return 2;
+			}
+
+			function otherFunc()
+			{
+				return someFunc();
+			}
+		}
+
+		function noNamespace()
+		{
+			return 10;
+		}
+
+		export int main()
+		{
+			return Foo::otherFunc();
+		}
+	)");
+
+	BOOST_TEST(result == 23);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

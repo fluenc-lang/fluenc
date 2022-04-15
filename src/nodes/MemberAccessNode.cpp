@@ -13,7 +13,7 @@
 #include "values/ArrayValue.h"
 #include "values/FunctionValue.h"
 
-MemberAccessNode::MemberAccessNode(antlr4::ParserRuleContext *context, Node *consumer, const std::string &name)
+MemberAccessNode::MemberAccessNode(antlr4::ParserRuleContext *context, const Node *consumer, const std::string &name)
 	: m_token(TokenInfo::fromContext(context))
 	, m_consumer(consumer)
 	, m_name(name)

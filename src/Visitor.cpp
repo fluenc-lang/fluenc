@@ -56,11 +56,34 @@
 #include "values/ArrayValue.h"
 #include "values/IndexedValue.h"
 
-Visitor::Visitor(const Type *iteratorType, Node *alpha, Node *beta)
-	: m_iteratorType(iteratorType)
+Visitor::Visitor(const std::vector<std::string> &namespaces
+	, const Type *iteratorType
+	, const Node *alpha
+	, const Node *beta
+	)
+	: m_namespaces(namespaces)
+	, m_iteratorType(iteratorType)
 	, m_alpha(alpha)
 	, m_beta(beta)
 {
+}
+
+std::string qualifiedName(const std::vector<std::string> &namespaces, const std::string &name)
+{
+	if (name.rfind("::") == 0)
+	{
+		return name.substr(2);
+	}
+
+	std::ostringstream qualifiedName;
+
+	std::copy(begin(namespaces), end(namespaces)
+		, std::ostream_iterator<std::string>(qualifiedName, "::")
+		);
+
+	qualifiedName << name;
+
+	return qualifiedName.str();
 }
 
 void populateInstructions(const std::vector<std::string> &namespaces
@@ -95,12 +118,6 @@ void populateInstructions(const std::vector<std::string> &namespaces
 		}
 		else
 		{
-			std::ostringstream qualifiedName;
-
-			std::copy(begin(namespaces), end(namespaces)
-				, std::ostream_iterator<std::string>(qualifiedName, "::")
-				);
-
 			if (instruction.is<CallableNode *>())
 			{
 				auto callable = instruction.as<CallableNode *>();
@@ -111,26 +128,32 @@ void populateInstructions(const std::vector<std::string> &namespaces
 				}
 				else
 				{
-					qualifiedName << callable->name();
+					auto name = qualifiedName(namespaces
+						, callable->name()
+						);
 
-					functions.insert({ qualifiedName.str(), callable });
+					functions.insert({ name, callable });
 				}
 			}
 			else if (instruction.is<Prototype *>())
 			{
 				auto prototype = instruction.as<Prototype *>();
 
-				qualifiedName << prototype->name();
+				auto name = qualifiedName(namespaces
+					, prototype->name()
+					);
 
-				types.insert({ qualifiedName.str(), prototype });
+				types.insert({ name, prototype });
 			}
 			else if (instruction.is<GlobalNode *>())
 			{
 				auto global = instruction.as<GlobalNode *>();
 
-				qualifiedName << global->name();
+				auto name = qualifiedName(namespaces
+					, global->name()
+					);
 
-				globals.insert({ qualifiedName.str(), global });
+				globals.insert({ name, global });
 			}
 			else if (instruction.is<Use *>())
 			{
@@ -235,7 +258,7 @@ antlrcpp::Any Visitor::visitFunction(fluencParser::FunctionContext *context)
 	{
 		auto terminator = new ExportedFunctionTerminatorNode();
 
-		Visitor visitor(nullptr, terminator, nullptr);
+		Visitor visitor(m_namespaces, nullptr, terminator, nullptr);
 
 		auto entryPoint = new ExportedFunctionNode(name
 			, visitor.visit<Node *>(block)
@@ -249,7 +272,7 @@ antlrcpp::Any Visitor::visitFunction(fluencParser::FunctionContext *context)
 
 	auto terminator = new TerminatorNode(name, attribute);
 
-	Visitor visitor(iteratorType, terminator, nullptr);
+	Visitor visitor(m_namespaces, iteratorType, terminator, nullptr);
 
 	auto content = visitor.visit<Node *, BlockInstructionNode *>(block);
 
@@ -325,7 +348,7 @@ antlrcpp::Any Visitor::visitRet(fluencParser::RetContext *context)
 
 		auto ret = new ReturnNode(m_iteratorType, m_alpha, continuation);
 
-		Visitor visitor(nullptr, ret, nullptr);
+		Visitor visitor(m_namespaces, nullptr, ret, nullptr);
 
 		auto value = visitor
 			.visit<Node *>(context->value);
@@ -337,7 +360,7 @@ antlrcpp::Any Visitor::visitRet(fluencParser::RetContext *context)
 
 	auto ret = new ReturnNode(m_iteratorType, m_alpha, nullptr);
 
-	Visitor visitor(nullptr, ret, nullptr);
+	Visitor visitor(m_namespaces, nullptr, ret, nullptr);
 
 	auto value = visitor
 		.visit<Node *>(context->value);
@@ -357,7 +380,7 @@ antlrcpp::Any Visitor::visitBlock(fluencParser::BlockContext *context)
 	{
 		auto stackFrame = new BlockStackFrameNode(consumer);
 
-		Visitor visitor(m_iteratorType, stackFrame, m_alpha);
+		Visitor visitor(m_namespaces, m_iteratorType, stackFrame, m_alpha);
 
 		auto value = visitor
 			.visit<Node *>(expression);
@@ -383,12 +406,12 @@ antlrcpp::Any Visitor::visitBinary(fluencParser::BinaryContext *context)
 		, context->OP()->getText()
 		);
 
-	Visitor leftVisitor(m_iteratorType, binary, nullptr);
+	Visitor leftVisitor(m_namespaces, m_iteratorType, binary, nullptr);
 
 	auto left = leftVisitor
 		.visit<Node *>(context->left);
 
-	Visitor rightVisitor(m_iteratorType, left, nullptr);
+	Visitor rightVisitor(m_namespaces, m_iteratorType, left, nullptr);
 
 	auto right = rightVisitor
 		.visit<Node *>(context->right);
@@ -399,7 +422,10 @@ antlrcpp::Any Visitor::visitBinary(fluencParser::BinaryContext *context)
 antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 {
 	auto expression = context->expression();
-	auto name = context->ID()->getText();
+
+	auto name = qualifiedName(m_namespaces
+		, context->ID()->getText()
+		);
 
 	auto call = new FunctionCallNode(context, name);
 
@@ -409,7 +435,7 @@ antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 	{
 		auto sink = new ReferenceSinkNode(TerminatorNode::instance());
 
-		Visitor visitor(m_iteratorType, sink, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
 
 		return visitor
 			.visit<Node *>(parameter);
@@ -434,14 +460,14 @@ antlrcpp::Any Visitor::visitWith(fluencParser::WithContext *context)
 		return assignment->field()->ID()->getText();
 	});
 
-	auto instantiation = new InstantiationNode(m_alpha
+	auto instantiation = new InstantiationNode(fields
 		, WithPrototypeProvider::instance()
-		, fields
+		, m_alpha
 		);
 
 	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
 	{
-		Visitor visitor(m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
 
 		return visitor
 			.visit<Node *>(assignment->expression());
@@ -542,7 +568,7 @@ antlrcpp::Any Visitor::visitStructure(fluencParser::StructureContext *context)
 
 		if (field->expression())
 		{
-			Visitor visitor(m_iteratorType, TerminatorNode::instance(), nullptr);
+			Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
 
 			auto defaultValue = visitor
 				.visit<Node *>(field->expression());
@@ -579,14 +605,14 @@ antlrcpp::Any Visitor::visitInstantiation(fluencParser::InstantiationContext *co
 	auto typeName = visit<ITypeName *>(context->typeName());
 
 	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
-	auto instantiation = new InstantiationNode(m_alpha
+	auto instantiation = new InstantiationNode(fields
 		, prototypeProvider
-		, fields
+		, m_alpha
 		);
 
 	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
 	{
-		Visitor visitor(m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
 
 		return visitor
 			.visit<Node *>(assignment->expression());
@@ -595,14 +621,14 @@ antlrcpp::Any Visitor::visitInstantiation(fluencParser::InstantiationContext *co
 
 antlrcpp::Any Visitor::visitConditional(fluencParser::ConditionalContext *context)
 {
-	Visitor blockVisitor(m_iteratorType, m_beta, nullptr);
+	Visitor blockVisitor(m_namespaces, m_iteratorType, m_beta, nullptr);
 
 	auto block = blockVisitor
 		.visit<Node *, BlockInstructionNode *>(context->block());
 
 	auto conditional = new ConditionalNode(m_alpha, block);
 
-	Visitor expressionVisitor(m_iteratorType, conditional, nullptr);
+	Visitor expressionVisitor(m_namespaces, m_iteratorType, conditional, nullptr);
 
 	auto condition = expressionVisitor
 		.visit<Node *>(context->expression());
@@ -618,7 +644,7 @@ antlrcpp::Any Visitor::visitGlobal(fluencParser::GlobalContext *context)
 {
 	auto name = context->ID()->getText();
 
-	Visitor visitor(m_iteratorType, TerminatorNode::instance(), nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
 
 	auto literal = visitor
 		.visit<Node *>(context->expression());
@@ -647,7 +673,7 @@ antlrcpp::Any Visitor::visitExpansion(fluencParser::ExpansionContext *context)
 {
 	auto expansion = new ExpansionNode(m_alpha);
 
-	Visitor visitor(m_iteratorType, expansion, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, expansion, nullptr);
 
 	return visitor
 		.visit<Node *>(context->expression());
@@ -661,7 +687,7 @@ antlrcpp::Any Visitor::visitContinuation(fluencParser::ContinuationContext *cont
 
 	return std::accumulate(begin(expressions), end(expressions), static_cast<Node *>(continuation), [this](Node *consumer, fluencParser::ExpressionContext *parameter)
 	{
-		Visitor visitor(m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
 
 		auto result = visitor
 			.visit<Node *>(parameter);
@@ -693,7 +719,7 @@ antlrcpp::Any Visitor::visitArray(fluencParser::ArrayContext *context)
 		auto indexSink = new IndexSinkNode(expression.index, next);
 		auto referenceSink = new ReferenceSinkNode(indexSink);
 
-		Visitor visitor(m_iteratorType, referenceSink, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, referenceSink, nullptr);
 
 		return visitor
 			.visit<Node *>(expression.value);
@@ -729,7 +755,7 @@ antlrcpp::Any Visitor::visitLocal(fluencParser::LocalContext *context)
 		, context->ID()->getText()
 		);
 
-	Visitor visitor(m_iteratorType, local, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, local, nullptr);
 
 	return visitor.visit<Node *>(context->expression());
 }
@@ -742,17 +768,26 @@ antlrcpp::Any Visitor::visitInstruction(fluencParser::InstructionContext *contex
 antlrcpp::Any Visitor::visitNs(fluencParser::NsContext *context)
 {
 	auto instructions = context->instruction();
+	auto name = context->ID()->getText();
+
+	auto namespaces = m_namespaces;
+
+	namespaces.push_back(name);
+
+	Visitor visitor(namespaces
+		, m_iteratorType
+		, m_alpha
+		, m_beta
+		);
 
 	std::vector<antlrcpp::Any> children;
 
-	std::transform(begin(instructions), end(instructions), std::back_inserter(children), [this ](auto instruction)
+	std::transform(begin(instructions), end(instructions), std::back_inserter(children), [&](auto instruction)
 	{
-		return fluencBaseVisitor::visit(instruction);
+		return visitor.visitAny(instruction);
 	});
 
-	return new Namespace(children
-		, context->ID()->getText()
-		);
+	return new Namespace(children, name);
 }
 
 antlrcpp::Any Visitor::visitUse(fluencParser::UseContext *context)

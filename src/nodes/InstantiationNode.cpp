@@ -16,13 +16,13 @@
 #include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
 
-InstantiationNode::InstantiationNode(Node *consumer
-	, IPrototypeProvider *prototypeProvider
-	, const std::vector<std::string> &fields
+InstantiationNode::InstantiationNode(const std::vector<std::string> &fields
+	, const IPrototypeProvider *prototypeProvider
+	, const Node *consumer
 	)
-	: m_consumer(consumer)
+	: m_fields(fields)
 	, m_prototypeProvider(prototypeProvider)
-	, m_fields(fields)
+	, m_consumer(consumer)
 {
 }
 

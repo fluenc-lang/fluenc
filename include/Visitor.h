@@ -9,7 +9,11 @@ class Type;
 class Visitor : public fluencBaseVisitor
 {
 	public:
-		Visitor(const Type *iteratorType, Node *alpha, Node *beta);
+		Visitor(const std::vector<std::string> &namespaces
+			, const Type *iteratorType
+			, const Node *alpha
+			, const Node *beta
+			);
 
 		antlrcpp::Any visitProgram(fluencParser::ProgramContext *context) override;
 		antlrcpp::Any visitFunction(fluencParser::FunctionContext *context) override;
@@ -44,6 +48,11 @@ class Visitor : public fluencBaseVisitor
 		antlrcpp::Any visitNs(fluencParser::NsContext *context) override;
 		antlrcpp::Any visitUse(fluencParser::UseContext *context) override;
 
+		antlrcpp::Any visitAny(antlr4::tree::ParseTree *tree)
+		{
+			return fluencBaseVisitor::visit(tree);
+		}
+
 		template<typename T>
 		T visit(antlr4::tree::ParseTree *tree)
 		{
@@ -59,10 +68,12 @@ class Visitor : public fluencBaseVisitor
 		}
 
 	private:
+		std::vector<std::string> m_namespaces;
+
 		const Type *m_iteratorType;
 
-		Node *m_alpha;
-		Node *m_beta;
+		const Node *m_alpha;
+		const Node *m_beta;
 };
 
 #endif // VISITOR_H

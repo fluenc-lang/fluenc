@@ -14,18 +14,18 @@ class IPrototypeProvider;
 class InstantiationNode : public Node
 {
 	public:
-		InstantiationNode(Node *consumer
-			, IPrototypeProvider *prototypeProvider
-			, const std::vector<std::string> &fields
+		InstantiationNode(const std::vector<std::string> &fields
+			, const IPrototypeProvider *prototypeProvider
+			, const Node *consumer
 			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		Node *m_consumer;
-		IPrototypeProvider *m_prototypeProvider;
-
 		std::vector<std::string> m_fields;
+
+		const IPrototypeProvider *m_prototypeProvider;
+		const Node *m_consumer;
 };
 
 #endif // INSTANTIATIONNODE_H

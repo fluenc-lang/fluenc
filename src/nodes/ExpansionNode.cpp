@@ -5,7 +5,7 @@
 #include "values/TupleValue.h"
 #include "values/PlaceholderValue.h"
 
-ExpansionNode::ExpansionNode(Node *consumer)
+ExpansionNode::ExpansionNode(const Node *consumer)
 	: m_consumer(consumer)
 {
 }
