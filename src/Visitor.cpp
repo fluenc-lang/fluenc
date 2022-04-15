@@ -416,8 +416,9 @@ antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 	});
 
 	auto evaluation = new LazyEvaluationNode(call);
-	auto segment = new StackSegmentNode(values, evaluation, TerminatorNode::instance());
-	auto proxy = new FunctionCallProxyNode(name, m_alpha, segment);
+	auto withEvaluation = new StackSegmentNode(values, evaluation, TerminatorNode::instance());
+	auto withoutEvaluation = new StackSegmentNode(values, call, TerminatorNode::instance());
+	auto proxy = new FunctionCallProxyNode(name, m_alpha, withEvaluation, withoutEvaluation);
 
 	return static_cast<Node *>(proxy);
 }

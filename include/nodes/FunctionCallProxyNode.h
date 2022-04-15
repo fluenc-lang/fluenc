@@ -6,7 +6,11 @@
 class FunctionCallProxyNode : public Node
 {
 	public:
-		FunctionCallProxyNode(const std::string name, const Node *consumer, const Node *candidate);
+		FunctionCallProxyNode(const std::string name
+			, const Node *consumer
+			, const Node *withEvaluation
+			, const Node *withoutEvaluation
+			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
@@ -16,7 +20,8 @@ class FunctionCallProxyNode : public Node
 		std::string m_name;
 
 		const Node *m_consumer;
-		const Node *m_subject;
+		const Node *m_withEvaluation;
+		const Node *m_withoutEvaluation;
 };
 
 #endif // FUNCTIONCALLPROXYNODE_H

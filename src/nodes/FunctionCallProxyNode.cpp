@@ -12,10 +12,15 @@
 #include "iterators/ExtremitiesIterator.h"
 
 // TODO Could this be moved into StackSegment instead?
-FunctionCallProxyNode::FunctionCallProxyNode(const std::string name, const Node *consumer, const Node *candidate)
+FunctionCallProxyNode::FunctionCallProxyNode(const std::string name
+	, const Node *consumer
+	, const Node *withEvaluation
+	, const Node *withoutEvaluation
+	)
 	: m_name(name)
 	, m_consumer(consumer)
-	, m_subject(candidate)
+	, m_withEvaluation(withEvaluation)
+	, m_withoutEvaluation(withoutEvaluation)
 {
 }
 
@@ -30,18 +35,35 @@ std::vector<DzResult> FunctionCallProxyNode::regularCall(const EntryPoint &entry
 		// Naive. Really naive.
 		if (function->attribute() == FunctionAttribute::Iterator)
 		{
-			auto generator = new IteratorValueGenerator(new IteratorType(), m_subject, entryPoint);
+			auto generator = new IteratorValueGenerator(new IteratorType(), m_withEvaluation, entryPoint);
 			auto lazy = new LazyValue(generator);
 
 			values.push(lazy);
 
 			return m_consumer->build(entryPoint, values);
 		}
+
+		if (function->attribute() == FunctionAttribute::Import)
+		{
+			std::vector<DzResult> results;
+
+			auto junction = new JunctionNode(m_withoutEvaluation);
+
+			for (auto &[subjectEntryPoint, subjectValues] : junction->build(entryPoint, values))
+			{
+				for (auto &consumerResult : m_consumer->build(subjectEntryPoint, subjectValues))
+				{
+					results.push_back(consumerResult);
+				}
+			}
+
+			return results;
+		}
 	}
 
 	std::vector<DzResult> results;
 
-	auto junction = new JunctionNode(m_subject);
+	auto junction = new JunctionNode(m_withEvaluation);
 
 	for (auto &[subjectEntryPoint, subjectValues] : junction->build(entryPoint, values))
 	{
@@ -90,5 +112,5 @@ std::vector<DzResult> FunctionCallProxyNode::build(const EntryPoint &entryPoint,
 
 	// Tail call
 
-	return m_subject->build(entryPoint, values);
+	return m_withEvaluation->build(entryPoint, values);
 }

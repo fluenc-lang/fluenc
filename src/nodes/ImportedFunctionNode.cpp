@@ -15,6 +15,7 @@
 #include "values/ScalarValue.h"
 #include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
+#include "values/StringValue.h"
 
 #include "exceptions/InvalidArgumentTypeException.h"
 
@@ -108,6 +109,12 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 				auto load = builder.createLoad(addressOfArgument, name);
 
 				argumentValues.push_back(*load);
+			}
+			else if (auto stringValue = dynamic_cast<const StringValue *>(value))
+			{
+				auto scalar = stringValue->scalar();
+
+				argumentValues.push_back(*scalar);
 			}
 			else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 			{

@@ -183,6 +183,8 @@ int exec(std::string source)
 		root->build(entryPoint, Stack());
 	}
 
+	module->print(llvm::errs(), nullptr);
+
 	auto threadSafeModule = llvm::orc::ThreadSafeModule(
 		std::move(module),
 		std::move(llvmContext)

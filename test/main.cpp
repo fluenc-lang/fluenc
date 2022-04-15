@@ -448,18 +448,15 @@ BOOST_AUTO_TEST_CASE (scenario18)
 BOOST_AUTO_TEST_CASE (scenario19)
 {
 	auto result = exec(R"(
-		function func(string v)
-		{
-			return 1;
-		}
+		import int puts(string s);
 
 		export int main()
 		{
-			return func("foo");
+			return puts("foo");
 		}
 	)");
 
-	BOOST_TEST(result == 1);
+	BOOST_TEST(result == 4);
 }
 
 BOOST_AUTO_TEST_CASE (scenario20)
@@ -860,7 +857,12 @@ BOOST_AUTO_TEST_CASE (scenario33)
 			};
 		}
 
-		function bar(string s)
+		function bar(int c)
+		{
+			return -1;
+		}
+
+		function bar((int c, ...s))
 		{
 			return 30;
 		}
@@ -2611,7 +2613,7 @@ test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 	llvm::InitializeAllAsmParsers();
 	llvm::InitializeAllAsmPrinters();
 
-	scenario71();
+	scenario33();
 
 	return 0;
 }

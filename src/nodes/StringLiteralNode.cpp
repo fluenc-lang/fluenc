@@ -1,10 +1,8 @@
-#include <llvm/IR/IRBuilder.h>
-
-#include "nodes/StringLiteralNode.h"
 #include "IRBuilderEx.h"
 
-#include "types/StringType.h"
-#include "values/ScalarValue.h"
+#include "nodes/StringLiteralNode.h"
+
+#include "values/StringValue.h"
 
 StringLiteralNode::StringLiteralNode(Node *consumer, const std::string &value)
 	: m_consumer(consumer)
@@ -21,7 +19,7 @@ std::vector<DzResult> StringLiteralNode::build(const EntryPoint &entryPoint, Sta
 
 	auto address = builder.createGlobalStringPtr(string, "string");
 
-	values.push(new ScalarValue { StringType::instance(), address });
+	values.push(new StringValue(address, id(), string.size()));
 
 	return m_consumer->build(entryPoint, values);
 }
