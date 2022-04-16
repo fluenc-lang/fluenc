@@ -34,9 +34,9 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
-FunctionCallNode::FunctionCallNode(antlr4::ParserRuleContext *context, const std::string &name)
+FunctionCallNode::FunctionCallNode(antlr4::ParserRuleContext *context, const std::vector<std::string> &names)
 	: m_token(TokenInfo::fromContext(context))
-	, m_name(name)
+	, m_names(names)
 {
 }
 
@@ -44,13 +44,16 @@ int FunctionCallNode::order(const EntryPoint &entryPoint) const
 {
 	auto functions = entryPoint.functions();
 
-	auto iterator = functions.find(m_name);
-
-	if (iterator != functions.end())
+	for (auto &name : m_names)
 	{
-		if (iterator->second->attribute() == FunctionAttribute::Iterator)
+		auto iterator = functions.find(name);
+
+		if (iterator != functions.end())
 		{
-			return 1;
+			if (iterator->second->attribute() == FunctionAttribute::Iterator)
+			{
+				return 1;
+			}
 		}
 	}
 
@@ -64,57 +67,62 @@ std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stac
 
 	insertBlock(block, function);
 
-	auto tailCallCandidate = entryPoint
-		.byName(m_name);
-
-	if (!tailCallCandidate)
+	for (auto &name : m_names)
 	{
-		return regularCall(entryPoint, values);
+		auto tailCallCandidate = entryPoint
+			.byName(name);
+
+		if (!tailCallCandidate)
+		{
+			continue;
+		}
+
+		auto targetValues = tailCallCandidate->values();
+		auto inputValues = values;
+
+		if (targetValues.size() != inputValues.size())
+		{
+			continue;
+		}
+
+		int8_t min = 0;
+		int8_t max = 0;
+
+		std::transform(targetValues.begin(), targetValues.end(), inputValues.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
+		{
+			auto storageType = storage->type();
+			auto valueType = value->type();
+
+			return valueType->compatibility(storageType, entryPoint);
+		});
+
+		if (min < 0 || max > 0)
+		{
+			continue;
+		}
+
+		auto tailCallTarget = findTailCallTarget(tailCallCandidate, inputValues);
+
+		if (!tailCallTarget)
+		{
+			continue;
+		}
+
+		auto zipped = zip(inputValues, targetValues);
+
+		auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto result)
+		{
+			auto [value, storage] = result;
+
+			return ValueHelper::transferValue(accumulatedEntryPoint, value, storage);
+		});
+
+		linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
+
+		return std::vector<DzResult>();
 	}
 
-	auto targetValues = tailCallCandidate->values();
-	auto inputValues = values;
-
-	if (targetValues.size() != inputValues.size())
-	{
-		return regularCall(entryPoint, values);
-	}
-
-	int8_t min = 0;
-	int8_t max = 0;
-
-	std::transform(targetValues.begin(), targetValues.end(), inputValues.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
-	{
-		auto storageType = storage->type();
-		auto valueType = value->type();
-
-		return valueType->compatibility(storageType, entryPoint);
-	});
-
-	if (min < 0 || max > 0)
-	{
-		return regularCall(entryPoint, values);
-	}
-
-	auto tailCallTarget = findTailCallTarget(tailCallCandidate, inputValues);
-
-	if (!tailCallTarget)
-	{
-		return regularCall(entryPoint, values);
-	}
-
-	auto zipped = zip(inputValues, targetValues);
-
-	auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto result)
-	{
-		auto [value, storage] = result;
-
-		return ValueHelper::transferValue(accumulatedEntryPoint, value, storage);
-	});
-
-	linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
-
-	return std::vector<DzResult>();
+	return regularCall(entryPoint, values);
 }
 
 const CallableNode *FunctionCallNode::findFunction(const EntryPoint &entryPoint, Stack values) const
@@ -122,53 +130,56 @@ const CallableNode *FunctionCallNode::findFunction(const EntryPoint &entryPoint,
 	auto functions = entryPoint.functions();
 	auto locals = entryPoint.locals();
 
-	auto local = locals.find(m_name);
-
-	if (local != locals.end())
+	for (auto &name : m_names)
 	{
-		auto value = dynamic_cast<const FunctionValue *>(local->second);
+		auto local = locals.find(name);
 
-		if (!value)
+		if (local != locals.end())
 		{
-			throw new InvalidFunctionPointerTypeException(m_token, m_name);
+			auto value = dynamic_cast<const FunctionValue *>(local->second);
+
+			if (!value)
+			{
+				throw new InvalidFunctionPointerTypeException(m_token, name);
+			}
+
+			return value->function();
 		}
 
-		return value->function();
-	}
+		std::map<int8_t, CallableNode *> candidates;
 
-	std::map<int8_t, CallableNode *> candidates;
-
-	for (auto [i, end] = functions.equal_range(m_name); i != end; i++)
-	{
-		auto function = i->second;
-
-		auto score = function->signatureCompatibility(entryPoint, values);
-
-		if (score < 0)
+		for (auto [i, end] = functions.equal_range(name); i != end; i++)
 		{
-			continue;
+			auto function = i->second;
+
+			auto score = function->signatureCompatibility(entryPoint, values);
+
+			if (score < 0)
+			{
+				continue;
+			}
+
+			auto candidate = candidates.find(score);
+
+			if (candidate != candidates.end())
+			{
+				std::vector<CallableNode *> functions = { candidate->second, function };
+
+				throw new AmbiguousFunctionException(m_token
+					, functions
+					, entryPoint
+					);
+			}
+
+			candidates[score] = function;
 		}
 
-		auto candidate = candidates.find(score);
-
-		if (candidate != candidates.end())
+		if (candidates.size() > 0)
 		{
-			std::vector<CallableNode *> functions = { candidate->second, function };
+			auto [_, function] = *candidates.begin();
 
-			throw new AmbiguousFunctionException(m_token
-				, functions
-				, entryPoint
-				);
+			return function;
 		}
-
-		candidates[score] = function;
-	}
-
-	if (candidates.size() > 0)
-	{
-		auto [_, function] = *candidates.begin();
-
-		return function;
 	}
 
 	return nullptr;
@@ -219,5 +230,5 @@ std::vector<DzResult> FunctionCallNode::regularCall(const EntryPoint &entryPoint
 		return result;
 	}
 
-	throw new FunctionNotFoundException(m_token, m_name, values);
+	throw new FunctionNotFoundException(m_token, m_names[0], values);
 }

@@ -8,7 +8,7 @@
 
 #include "types/Int32Type.h"
 
-CharacterLiteralNode::CharacterLiteralNode(Node *consumer, const std::string &value)
+CharacterLiteralNode::CharacterLiteralNode(const Node *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
 {

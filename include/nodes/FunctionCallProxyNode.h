@@ -6,7 +6,7 @@
 class FunctionCallProxyNode : public Node
 {
 	public:
-		FunctionCallProxyNode(const std::string name
+		FunctionCallProxyNode(const std::vector<std::string> &names
 			, const Node *consumer
 			, const Node *withEvaluation
 			, const Node *withoutEvaluation
@@ -17,7 +17,7 @@ class FunctionCallProxyNode : public Node
 	private:
 		std::vector<DzResult> regularCall(const EntryPoint &entryPoint, Stack values) const;
 
-		std::string m_name;
+		std::vector<std::string> m_names;
 
 		const Node *m_consumer;
 		const Node *m_withEvaluation;

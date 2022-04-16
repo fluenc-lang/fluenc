@@ -6,12 +6,12 @@
 class StringLiteralNode : public Node
 {
 	public:
-		StringLiteralNode(Node *consumer, const std::string &value);
+		StringLiteralNode(const Node *consumer, const std::string &value);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		Node *m_consumer;
+		const Node *m_consumer;
 
 		std::string m_value;
 };

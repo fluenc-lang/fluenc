@@ -7,7 +7,8 @@ class BaseValue;
 class Type;
 class EntryPoint;
 class UserTypeValue;
-class TokenInfo;
+
+struct TokenInfo;
 
 class InteropHelper
 {

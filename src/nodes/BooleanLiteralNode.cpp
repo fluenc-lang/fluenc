@@ -5,7 +5,7 @@
 #include "types/BooleanType.h"
 #include "values/ScalarValue.h"
 
-BooleanLiteralNode::BooleanLiteralNode(Node *consumer, const std::string &value)
+BooleanLiteralNode::BooleanLiteralNode(const Node *consumer, const std::string &value)
 	: m_consumer(consumer)
 	, m_value(value)
 {

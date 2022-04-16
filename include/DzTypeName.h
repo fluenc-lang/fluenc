@@ -15,7 +15,7 @@ namespace antlr4
 class DzTypeName : public ITypeName
 {
 	public:
-		DzTypeName(antlr4::ParserRuleContext *context, const std::string &name);
+		DzTypeName(antlr4::ParserRuleContext *context, const std::vector<std::string> &names);
 
 		Type *resolve(const EntryPoint &entryPoint) const override;
 
@@ -30,7 +30,7 @@ class DzTypeName : public ITypeName
 	private:
 		TokenInfo m_token;
 
-		std::string m_name;
+		std::vector<std::string> m_names;
 };
 
 #endif // DZTYPENAME_H

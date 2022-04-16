@@ -7,7 +7,7 @@
 #include "types/BooleanType.h"
 #include "values/ScalarValue.h"
 
-BinaryNode::BinaryNode(Node *consumer, const std::string &op)
+BinaryNode::BinaryNode(const Node *consumer, const std::string &op)
 	: m_consumer(consumer)
 	, m_op(op)
 {

@@ -6,12 +6,12 @@
 class ExpansionNode : public Node
 {
 	public:
-		ExpansionNode(Node *consumer);
+		ExpansionNode(const Node *consumer);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		Node *m_consumer;
+		const Node *m_consumer;
 };
 
 #endif // EXPANSIONNODE_H
