@@ -7,9 +7,11 @@
 
 #include "values/BaseValue.h"
 
+#include "metadata/ScalarValueMetadata.h"
+
 class Type;
 
-class ScalarValue : public BaseValue
+class ScalarValue : public BaseValueWithMetadata<ScalarValueMetadata>
 {
 	public:
 		ScalarValue(const Type *type, llvm::Value *value);

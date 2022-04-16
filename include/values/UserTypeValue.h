@@ -3,10 +3,12 @@
 
 #include "BaseValue.h"
 
+#include "metadata/UserTypeValueMetadata.h"
+
 class NamedValue;
 class IPrototype;
 
-class UserTypeValue : public BaseValue
+class UserTypeValue : public BaseValueWithMetadata<UserTypeValueMetadata>
 {
 	public:
 		UserTypeValue(const IPrototype *type, const std::vector<const NamedValue *> &values);

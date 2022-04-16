@@ -5,7 +5,9 @@
 
 #include "BaseValue.h"
 
-class ReferenceValue : public BaseValue
+#include "metadata/ReferenceValueMetadata.h"
+
+class ReferenceValue : public BaseValueWithMetadata<ReferenceValueMetadata>
 {
 	public:
 		ReferenceValue(const Type *type, llvm::Value *value);

@@ -677,7 +677,7 @@ antlrcpp::Any Visitor::visitGroup(fluencParser::GroupContext *context)
 
 antlrcpp::Any Visitor::visitExpansion(fluencParser::ExpansionContext *context)
 {
-	auto expansion = new ExpansionNode(m_alpha);
+	auto expansion = new ExpansionNode(context, m_alpha);
 
 	Visitor visitor(m_namespaces, m_iteratorType, expansion, nullptr);
 

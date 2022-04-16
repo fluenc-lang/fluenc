@@ -3,10 +3,12 @@
 
 #include "BaseValue.h"
 
+#include "metadata/StringValueMetadata.h"
+
 class ScalarValue;
 class LazyValue;
 
-class StringValue : public BaseValue
+class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 {
 	public:
 		StringValue(llvm::Value *address, size_t id, size_t length);

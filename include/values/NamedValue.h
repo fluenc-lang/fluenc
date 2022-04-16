@@ -6,9 +6,11 @@
 #include "BaseValue.h"
 #include "Node.h"
 
+#include "metadata/NamedValueMetadata.h"
+
 class ITypeName;
 
-class NamedValue : public BaseValue
+class NamedValue : public BaseValueWithMetadata<NamedValueMetadata>
 {
 	public:
 		NamedValue(const std::string &name, const BaseValue *value);

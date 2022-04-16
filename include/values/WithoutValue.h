@@ -3,7 +3,9 @@
 
 #include "BaseValue.h"
 
-class WithoutValue : public BaseValue
+#include "metadata/WithoutValueMetadata.h"
+
+class WithoutValue : public BaseValueWithMetadata<WithoutValueMetadata>
 {
 	public:
 		static const WithoutValue *instance();

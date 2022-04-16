@@ -3,10 +3,12 @@
 
 #include "BaseValue.h"
 
+#include "metadata/FunctionValueMetadata.h"
+
 class CallableNode;
 class EntryPoint;
 
-class FunctionValue : public BaseValue
+class FunctionValue : public BaseValueWithMetadata<FunctionValueMetadata>
 {
 	public:
 		FunctionValue(const CallableNode *function, const EntryPoint &entryPoint);

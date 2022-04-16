@@ -6,7 +6,9 @@
 #include <stack>
 #include <vector>
 
-class BaseValue;
+#include "exceptions/InvalidTypeException.h"
+
+#include "values/BaseValue.h"
 
 class Stack
 {
@@ -37,7 +39,7 @@ class Stack
 		}
 
 		template<typename T>
-		const T *require()
+		const T *require(const TokenInfo &token)
 		{
 			auto value = pop();
 
@@ -46,7 +48,13 @@ class Stack
 				return casted;
 			}
 
-			throw new std::exception();
+			auto &expectedMetadata = T::staticMetadata();
+			auto &actualMetadata = value->metadata();
+
+			throw new InvalidTypeException(token
+				, expectedMetadata.name()
+				, actualMetadata.name()
+				);
 		}
 
 		template<typename T>

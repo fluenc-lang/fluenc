@@ -33,8 +33,8 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 
 	auto dataLayout = module->getDataLayout();
 
-	auto index = values.require<ReferenceValue>();
-	auto value = values.require<IndexedValue>();
+	auto index = values.require<ReferenceValue>(TokenInfo());
+	auto value = values.require<IndexedValue>(TokenInfo());
 
 	if (m_next)
 	{

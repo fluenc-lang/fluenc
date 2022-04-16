@@ -3,7 +3,9 @@
 
 #include "BaseValue.h"
 
-class PlaceholderValue : public BaseValue
+#include "metadata/PlaceholderValueMetadata.h"
+
+class PlaceholderValue : public BaseValueWithMetadata<PlaceholderValueMetadata>
 {
 	public:
 		static PlaceholderValue *instance();

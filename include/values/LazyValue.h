@@ -4,10 +4,12 @@
 #include "BaseValue.h"
 #include "Node.h"
 
+#include "metadata/LazyValueMetadata.h"
+
 class ILazyValueGenerator;
 class IIteratable;
 
-class LazyValue : public BaseValue
+class LazyValue : public BaseValueWithMetadata<LazyValueMetadata>
 {
 	public:
 		LazyValue(const ILazyValueGenerator *generator);

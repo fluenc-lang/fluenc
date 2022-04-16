@@ -7,12 +7,14 @@
 
 #include "values/BaseValue.h"
 
+#include "metadata/ExpandableValueMetadata.h"
+
 class Type;
 class EntryPoint;
 class Node;
 class IteratorType;
 
-class ExpandableValue : public BaseValue
+class ExpandableValue : public BaseValueWithMetadata<ExpandableValueMetadata>
 {
 	public:
 		ExpandableValue(const Type *iteratorType

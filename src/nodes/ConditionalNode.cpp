@@ -43,7 +43,7 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 
 	IRBuilderEx builder(entryPoint);
 
-	builder.createCondBr(values.require<ScalarValue>(), ifTrue, ifFalse);
+	builder.createCondBr(values.require<ScalarValue>(TokenInfo()), ifTrue, ifFalse);
 
 	auto epIfFalse = entryPoint
 		.withName("ifFalse")

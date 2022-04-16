@@ -22,7 +22,7 @@ std::vector<DzResult> ExportedFunctionTerminatorNode::build(const EntryPoint &en
 	auto ep = entryPoint
 		.withBlock(block);
 
-	auto returnValue = values.require<ScalarValue>();
+	auto returnValue = values.require<ScalarValue>(TokenInfo());
 
 	IRBuilderEx builder(ep);
 	builder.createRet(*returnValue);

@@ -3,9 +3,11 @@
 
 #include "BaseValue.h"
 
+#include "metadata/ExpandedValueMetadata.h"
+
 class IteratorType;
 
-class ExpandedValue : public BaseValue
+class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 {
 	public:
 		ExpandedValue(const Type *iteratorType, const EntryPoint *provider);

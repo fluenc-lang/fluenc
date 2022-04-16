@@ -4,9 +4,11 @@
 #include "values/ExpandedValue.h"
 #include "values/TupleValue.h"
 #include "values/PlaceholderValue.h"
+#include "values/BaseValue.h"
 
-ExpansionNode::ExpansionNode(const Node *consumer)
-	: m_consumer(consumer)
+ExpansionNode::ExpansionNode(antlr4::ParserRuleContext *context, const Node *consumer)
+	: m_token(TokenInfo::fromContext(context))
+	, m_consumer(consumer)
 {
 }
 
@@ -14,17 +16,17 @@ std::vector<DzResult> ExpansionNode::build(const EntryPoint &entryPoint, Stack v
 {
 	auto block = entryPoint.block();
 
-	auto iterator = values.require<ExpandableValue>();
+	auto expandable = values.require<ExpandableValue>(m_token);
 
-	auto continuation = iterator->chain();
-	auto provider = iterator->provider();
+	auto continuation = expandable->chain();
+	auto provider = expandable->provider();
 	auto continuationEntryPoint = provider->withBlock(block);
 
 	auto result = continuation->build(continuationEntryPoint, Stack());
 
 	for (auto &[targetEntryPoint, _] : result)
 	{
-		auto value = new ExpandedValue(iterator->type()
+		auto value = new ExpandedValue(expandable->type()
 			, new EntryPoint(targetEntryPoint)
 			);
 

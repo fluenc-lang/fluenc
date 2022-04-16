@@ -3,7 +3,9 @@
 
 #include "BaseValue.h"
 
-class IndexedValue : public BaseValue
+#include "metadata/IndexedValueMetadata.h"
+
+class IndexedValue : public BaseValueWithMetadata<IndexedValueMetadata>
 {
 	public:
 		IndexedValue(size_t index, const BaseValue *subject);

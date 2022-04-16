@@ -10,7 +10,9 @@
 
 #include "types/TupleType.h"
 
-class TupleValue : public BaseValue
+#include "metadata/TupleValueMetadata.h"
+
+class TupleValue : public BaseValueWithMetadata<TupleValueMetadata>
 {
 	public:
 		TupleValue(const std::vector<const BaseValue *> &values);
