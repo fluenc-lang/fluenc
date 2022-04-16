@@ -7,7 +7,7 @@
 class MemberAccessNode : public Node
 {
 	public:
-		MemberAccessNode(antlr4::ParserRuleContext *context, const Node *consumer, const std::string &name);
+		MemberAccessNode(antlr4::ParserRuleContext *context, const Node *consumer, const std::vector<std::string> &names);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
@@ -16,7 +16,7 @@ class MemberAccessNode : public Node
 
 		const Node * m_consumer;
 
-		std::string m_name;
+		std::vector<std::string> m_names;
 };
 
 #endif // MEMBERACCESSNODE_H

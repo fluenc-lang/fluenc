@@ -13,10 +13,10 @@
 #include "values/ArrayValue.h"
 #include "values/FunctionValue.h"
 
-MemberAccessNode::MemberAccessNode(antlr4::ParserRuleContext *context, const Node *consumer, const std::string &name)
+MemberAccessNode::MemberAccessNode(antlr4::ParserRuleContext *context, const Node *consumer, const std::vector<std::string> &names)
 	: m_token(TokenInfo::fromContext(context))
 	, m_consumer(consumer)
-	, m_name(name)
+	, m_names(names)
 {
 }
 
@@ -26,53 +26,56 @@ std::vector<DzResult> MemberAccessNode::build(const EntryPoint &entryPoint, Stac
 	auto functions = entryPoint.functions();
 	auto globals = entryPoint.globals();
 
-	auto localsIterator = locals.find(m_name);
-
-	if (localsIterator != locals.end())
+	for (auto &name : m_names)
 	{
-		if (auto value = dynamic_cast<const ReferenceValue *>(localsIterator->second))
+		auto localsIterator = locals.find(name);
+
+		if (localsIterator != locals.end())
 		{
-			IRBuilderEx builder(entryPoint);
-
-			auto load = builder.createLoad(value, m_name);
-
-			values.push(load);
-		}
-		else if (localsIterator->second)
-		{
-			values.push(localsIterator->second);
-		}
-
-		return m_consumer->build(entryPoint, values);
-	}
-
-	auto functionsIterator = functions.find(m_name);
-
-	if (functionsIterator != functions.end())
-	{
-		auto value = new FunctionValue(functionsIterator->second, entryPoint);
-
-		values.push(value);
-
-		return m_consumer->build(entryPoint, values);
-	}
-
-	auto globalsIterator = globals.find(m_name);
-
-	if (globalsIterator != globals.end())
-	{
-		std::vector<DzResult> results;
-
-		for (auto &[resultEntryPoint, resultValues] : globalsIterator->second->build(entryPoint, values))
-		{
-			for (auto &result : m_consumer->build(resultEntryPoint, resultValues))
+			if (auto value = dynamic_cast<const ReferenceValue *>(localsIterator->second))
 			{
-				results.push_back(result);
+				IRBuilderEx builder(entryPoint);
+
+				auto load = builder.createLoad(value, name);
+
+				values.push(load);
 			}
+			else if (localsIterator->second)
+			{
+				values.push(localsIterator->second);
+			}
+
+			return m_consumer->build(entryPoint, values);
 		}
 
-		return results;
+		auto functionsIterator = functions.find(name);
+
+		if (functionsIterator != functions.end())
+		{
+			auto value = new FunctionValue(functionsIterator->second, entryPoint);
+
+			values.push(value);
+
+			return m_consumer->build(entryPoint, values);
+		}
+
+		auto globalsIterator = globals.find(name);
+
+		if (globalsIterator != globals.end())
+		{
+			std::vector<DzResult> results;
+
+			for (auto &[resultEntryPoint, resultValues] : globalsIterator->second->build(entryPoint, values))
+			{
+				for (auto &result : m_consumer->build(resultEntryPoint, resultValues))
+				{
+					results.push_back(result);
+				}
+			}
+
+			return results;
+		}
 	}
 
-	throw new UndeclaredIdentifierException(m_token, m_name);
+	throw new UndeclaredIdentifierException(m_token, m_names[0]);
 }

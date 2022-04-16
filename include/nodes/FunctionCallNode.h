@@ -13,7 +13,7 @@
 class FunctionCallNode : public Node
 {
 	public:
-		FunctionCallNode(antlr4::ParserRuleContext *context, const std::string &name);
+		FunctionCallNode(antlr4::ParserRuleContext *context, const std::vector<std::string> &names);
 
 		int order(const EntryPoint &entryPoint) const override;
 
@@ -71,7 +71,7 @@ class FunctionCallNode : public Node
 
 		TokenInfo m_token;
 
-		std::string m_name;
+		std::vector<std::string> m_names;
 };
 
 #endif // FUNCTIONCALLNODE_H

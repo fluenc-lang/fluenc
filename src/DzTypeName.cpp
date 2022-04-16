@@ -14,121 +14,124 @@
 
 #include "exceptions/UnknownTypeException.h"
 
-DzTypeName::DzTypeName(antlr4::ParserRuleContext *context, const std::string &name)
+DzTypeName::DzTypeName(antlr4::ParserRuleContext *context, const std::vector<std::string> &names)
 	: m_token(TokenInfo::fromContext(context))
-	, m_name(name)
+	, m_names(names)
 {
 }
 
 Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 {
-	if (m_name == "int")
+	for (auto &name : m_names)
 	{
-		return Int32Type::instance();
+		if (name == "int")
+		{
+			return Int32Type::instance();
+		}
+
+		if (name == "long")
+		{
+			return Int64Type::instance();
+		}
+
+		if (name == "uint")
+		{
+			return Uint32Type::instance();
+		}
+
+		if (name == "byte")
+		{
+			return ByteType::instance();
+		}
+
+		if (name == "bool")
+		{
+			return BooleanType::instance();
+		}
+
+		if (name == "string")
+		{
+			return StringType::instance();
+		}
+
+		if (name == "void")
+		{
+			return VoidType::instance();
+		}
+
+		if (name == "without")
+		{
+			return WithoutType::instance();
+		}
+
+		if (name == "any")
+		{
+			return AnyType::instance();
+		}
+
+		if (name == "...")
+		{
+			return IteratorType::instance();
+		}
+
+		auto types = entryPoint.types();
+
+		auto iterator = types.find(name);
+
+		if (iterator != types.end())
+		{
+			return iterator->second;
+		}
 	}
 
-	if (m_name == "long")
-	{
-		return Int64Type::instance();
-	}
-
-	if (m_name == "uint")
-	{
-		return Uint32Type::instance();
-	}
-
-	if (m_name == "byte")
-	{
-		return ByteType::instance();
-	}
-
-	if (m_name == "bool")
-	{
-		return BooleanType::instance();
-	}
-
-	if (m_name == "string")
-	{
-		return StringType::instance();
-	}
-
-	if (m_name == "void")
-	{
-		return VoidType::instance();
-	}
-
-	if (m_name == "without")
-	{
-		return WithoutType::instance();
-	}
-
-	if (m_name == "any")
-	{
-		return AnyType::instance();
-	}
-
-	if (m_name == "...")
-	{
-		return IteratorType::instance();
-	}
-
-	auto types = entryPoint.types();
-
-	auto iterator = types.find(m_name);
-
-	if (iterator == types.end())
-	{
-		throw new UnknownTypeException(m_token, m_name);
-	}
-
-	return iterator->second;
+	throw new UnknownTypeException(m_token, m_names[0]);
 }
 
 DzTypeName *DzTypeName::int32()
 {
-	static DzTypeName typeName(nullptr, "int");
+	static DzTypeName typeName(nullptr, { "int" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::int64()
 {
-	static DzTypeName typeName(nullptr, "long");
+	static DzTypeName typeName(nullptr, { "long" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::uint32()
 {
-	static DzTypeName typeName(nullptr, "uint");
+	static DzTypeName typeName(nullptr, { "uint" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::byte()
 {
-	static DzTypeName typeName(nullptr, "byte");
+	static DzTypeName typeName(nullptr, { "byte" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::boolean()
 {
-	static DzTypeName typeName(nullptr, "bool");
+	static DzTypeName typeName(nullptr, { "bool" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::string()
 {
-	static DzTypeName typeName(nullptr, "string");
+	static DzTypeName typeName(nullptr, { "string" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::without()
 {
-	static DzTypeName typeName(nullptr, "without");
+	static DzTypeName typeName(nullptr, { "without" });
 
 	return &typeName;
 }

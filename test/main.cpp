@@ -2612,7 +2612,7 @@ BOOST_AUTO_TEST_CASE (scenario72)
 		{
 			function someFunc()
 			{
-				return 13 + ::noNamespace();
+				return 13 + noNamespace();
 			}
 
 			function otherFunc()
@@ -2703,6 +2703,176 @@ BOOST_AUTO_TEST_CASE (scenario74)
 	)");
 
 	BOOST_TEST(result == 23);
+}
+
+BOOST_AUTO_TEST_CASE (scenario75)
+{
+	auto result = exec(R"(
+		global MyGlobal: 16
+
+		namespace Foo
+		{
+			global MyGlobal: 33
+
+			function otherFunc()
+			{
+				return MyGlobal;
+			}
+		}
+
+		export int main()
+		{
+			return Foo::otherFunc();
+		}
+	)");
+
+	BOOST_TEST(result == 33);
+}
+
+BOOST_AUTO_TEST_CASE (scenario76)
+{
+	auto result = exec(R"(
+		global MyGlobal: 33
+
+		namespace Foo
+		{
+			function otherFunc()
+			{
+				return MyGlobal;
+			}
+		}
+
+		export int main()
+		{
+			return Foo::otherFunc();
+		}
+	)");
+
+	BOOST_TEST(result == 33);
+}
+
+BOOST_AUTO_TEST_CASE (scenario77)
+{
+	auto result = exec(R"(
+		global MyGlobal: 16
+
+		namespace Foo
+		{
+			global MyGlobal: 33
+
+			function otherFunc()
+			{
+				return ::MyGlobal;
+			}
+		}
+
+		export int main()
+		{
+			return Foo::otherFunc();
+		}
+	)");
+
+	BOOST_TEST(result == 16);
+}
+
+BOOST_AUTO_TEST_CASE (scenario78)
+{
+	auto result = exec(R"(
+		struct MyStruct
+		{
+			x: 13
+		}
+
+		namespace Foo
+		{
+			struct MyStruct
+			{
+				x: 33
+			}
+
+			function otherFunc()
+			{
+				return MyStruct {};
+			}
+		}
+
+		function printX(Foo::MyStruct s)
+		{
+			return s.x;
+		}
+
+		export int main()
+		{
+			return printX(Foo::otherFunc());
+		}
+	)");
+
+	BOOST_TEST(result == 33);
+}
+
+BOOST_AUTO_TEST_CASE (scenario79)
+{
+	auto result = exec(R"(
+		struct MyStruct
+		{
+			x: 13
+		}
+
+		namespace Foo
+		{
+			function otherFunc()
+			{
+				return MyStruct {};
+			}
+		}
+
+		function printX(MyStruct s)
+		{
+			return s.x;
+		}
+
+		export int main()
+		{
+			return printX(Foo::otherFunc());
+		}
+	)");
+
+	BOOST_TEST(result == 13);
+}
+
+BOOST_AUTO_TEST_CASE (scenario80)
+{
+	auto result = exec(R"(
+		struct MyStruct
+		{
+			x: 13
+		}
+
+		namespace Foo
+		{
+			struct MyStruct
+			{
+				x: 33
+			}
+
+			function otherFunc()
+			{
+				return ::MyStruct {};
+			}
+		}
+
+		function printX(MyStruct s)
+		{
+			return s.x;
+		}
+
+		export int main()
+		{
+			return printX(Foo::otherFunc());
+		}
+	)");
+
+	BOOST_TEST(result == 13);
 }
 
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )

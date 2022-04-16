@@ -68,11 +68,11 @@ Visitor::Visitor(const std::vector<std::string> &namespaces
 {
 }
 
-std::string qualifiedName(const std::vector<std::string> &namespaces, const std::string &name)
+std::vector<std::string> qualifiedNames(const std::vector<std::string> &namespaces, const std::string &name)
 {
 	if (name.rfind("::") == 0)
 	{
-		return name.substr(2);
+		return { name.substr(2) };
 	}
 
 	std::ostringstream qualifiedName;
@@ -83,7 +83,7 @@ std::string qualifiedName(const std::vector<std::string> &namespaces, const std:
 
 	qualifiedName << name;
 
-	return qualifiedName.str();
+	return { qualifiedName.str(), name };
 }
 
 void populateInstructions(const std::vector<std::string> &namespaces
@@ -128,32 +128,32 @@ void populateInstructions(const std::vector<std::string> &namespaces
 				}
 				else
 				{
-					auto name = qualifiedName(namespaces
+					auto name = qualifiedNames(namespaces
 						, callable->name()
 						);
 
-					functions.insert({ name, callable });
+					functions.insert({ name[0], callable });
 				}
 			}
 			else if (instruction.is<Prototype *>())
 			{
 				auto prototype = instruction.as<Prototype *>();
 
-				auto name = qualifiedName(namespaces
+				auto name = qualifiedNames(namespaces
 					, prototype->name()
 					);
 
-				types.insert({ name, prototype });
+				types.insert({ name[0], prototype });
 			}
 			else if (instruction.is<GlobalNode *>())
 			{
 				auto global = instruction.as<GlobalNode *>();
 
-				auto name = qualifiedName(namespaces
+				auto name = qualifiedNames(namespaces
 					, global->name()
 					);
 
-				globals.insert({ name, global });
+				globals.insert({ name[0], global });
 			}
 			else if (instruction.is<Use *>())
 			{
@@ -292,9 +292,13 @@ antlrcpp::Any Visitor::visitFunction(fluencParser::FunctionContext *context)
 
 antlrcpp::Any Visitor::visitRegularType(fluencParser::RegularTypeContext *context)
 {
+	auto qualifiedName = qualifiedNames(m_namespaces
+		, context->getText()
+		);
+
 	return static_cast<ITypeName *>(
 		new DzTypeName(context
-			, context->getText()
+			, qualifiedName
 		)
 	);
 }
@@ -423,11 +427,11 @@ antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 {
 	auto expression = context->expression();
 
-	auto name = qualifiedName(m_namespaces
+	auto names = qualifiedNames(m_namespaces
 		, context->ID()->getText()
 		);
 
-	auto call = new FunctionCallNode(context, name);
+	auto call = new FunctionCallNode(context, names);
 
 	std::vector<Node *> values;
 
@@ -444,7 +448,7 @@ antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 	auto evaluation = new LazyEvaluationNode(call);
 	auto withEvaluation = new StackSegmentNode(values, evaluation, TerminatorNode::instance());
 	auto withoutEvaluation = new StackSegmentNode(values, call, TerminatorNode::instance());
-	auto proxy = new FunctionCallProxyNode(name, m_alpha, withEvaluation, withoutEvaluation);
+	auto proxy = new FunctionCallProxyNode(names, m_alpha, withEvaluation, withoutEvaluation);
 
 	return static_cast<Node *>(proxy);
 }
@@ -486,16 +490,18 @@ antlrcpp::Any Visitor::visitMember(fluencParser::MemberContext *context)
 		return ss.str();
 	});
 
+	auto qualifiedPath = qualifiedNames(m_namespaces, path);
+
 	auto with = context->with();
 
 	if (with)
 	{
-		auto member = new MemberAccessNode(context, visit<Node *>(with), path);
+		auto member = new MemberAccessNode(context, visit<Node *>(with), qualifiedPath);
 
 		return static_cast<Node *>(member);
 	}
 
-	auto member = new MemberAccessNode(context, m_alpha, path);
+	auto member = new MemberAccessNode(context, m_alpha, qualifiedPath);
 
 	return static_cast<Node *>(member);
 }
