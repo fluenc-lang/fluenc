@@ -15,6 +15,8 @@ class FunctionType : public Type
 
 		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
 
+		static FunctionType *get(const std::vector<const Type *> &types);
+
 	private:
 		std::vector<const Type *> m_types;
 };

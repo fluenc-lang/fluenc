@@ -1,9 +1,10 @@
 #include <sstream>
 #include <numeric>
 
+#include "Utility.h"
+
 #include "types/AnyType.h"
 #include "types/UserType.h"
-#include "Utility.h"
 
 #include "iterators/ExtremitiesIterator.h"
 

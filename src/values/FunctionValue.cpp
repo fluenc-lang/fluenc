@@ -23,7 +23,7 @@ const Type *FunctionValue::type() const
 		return argument->type(*m_entryPoint);
 	});
 
-	return new FunctionType(types);
+	return FunctionType::get(types);
 }
 
 const BaseValue *FunctionValue::clone(const EntryPoint &entryPoint) const

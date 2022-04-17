@@ -27,11 +27,6 @@ class FunctionCallNode : public Node
 		{
 			return std::accumulate(container.begin(), container.end(), candidate, [&](const EntryPoint *target, auto value) -> const EntryPoint *
 			{
-				if (!target)
-				{
-					return nullptr;
-				}
-
 				if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 				{
 					auto fields = userTypeValue->fields();

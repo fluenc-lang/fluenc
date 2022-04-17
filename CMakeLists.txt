@@ -10,7 +10,7 @@ option(FLUENC_BUILD_EXAMPLES "Copy the examples to the build output" OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_options(-Wall -Wextra -Wpedantic -O3)
+add_compile_options(-Wall -Wextra -Wpedantic)
 
 if(${FLUENC_BUILD_SANITIZERS})
     add_compile_options(-fsanitize=address,undefined)

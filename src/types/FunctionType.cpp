@@ -1,4 +1,5 @@
 #include <sstream>
+#include <numeric>
 
 #include "types/FunctionType.h"
 #include "AllIterator.h"
@@ -59,6 +60,11 @@ llvm::Type *FunctionType::storageType(llvm::LLVMContext &context) const
 
 int8_t FunctionType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
+	if (type == this)
+	{
+		return 0;
+	}
+
 	auto other = dynamic_cast<const FunctionType *>(type);
 
 	if (!other)
@@ -85,4 +91,18 @@ int8_t FunctionType::compatibility(const Type *type, const EntryPoint &entryPoin
 	}
 
 	return max;
+}
+
+FunctionType *FunctionType::get(const std::vector<const Type *> &types)
+{
+	static std::unordered_map<size_t, FunctionType> cache;
+
+	auto hash = std::accumulate(begin(types), end(types), 14695981039346656037u, [](auto accumulator, auto type)
+	{
+		return (accumulator ^ (size_t)type) * 1099511628211;
+	});
+
+	auto [iterator, _] = cache.try_emplace(hash, types);
+
+	return &iterator->second;
 }
