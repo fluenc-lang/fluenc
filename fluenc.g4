@@ -17,7 +17,7 @@ ns
 	;
 
 structure
-	: 'struct' name=ID (':' typeName (',' typeName)*)? '{' field (',' field)* '}'
+	: 'struct' name=ID (':' typeName (',' typeName)*)? '{' field (',' field)* ','? '}'
 	| 'struct' name=ID (':' typeName (',' typeName)*)?
 	;
 
@@ -55,16 +55,16 @@ with
 	;
 	
 expression
-	: ID '(' (expression (',' expression)*)? ')'		#call
-	| literal											#constant
-	| left=expression op=OP right=expression			#binary
-	| ID ('.' ID)* with?								#member
-	| typeName '{' assignment? (',' assignment)* '}'	#instantiation
-	| 'if' '(' expression ')' block						#conditional
-	| '[' expression? (',' expression)* ']'				#array
-	| '(' expression ')'								#group
-	| '...' expression									#expansion
-	| 'let' ID '=' expression							#local
+	: ID '(' (expression (',' expression)*)? ')'			#call
+	| literal												#constant
+	| left=expression op=OP right=expression				#binary
+	| ID ('.' ID)* with?									#member
+	| typeName '{' assignment? (',' assignment)* ','? '}'	#instantiation
+	| 'if' '(' expression ')' block							#conditional
+	| '[' expression? (',' expression)* ']'					#array
+	| '(' expression ')'									#group
+	| '...' expression										#expansion
+	| 'let' ID '=' expression								#local
 	;
 
 continuation

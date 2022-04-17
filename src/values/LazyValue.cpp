@@ -44,7 +44,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 	auto dataLayout = module->getDataLayout();
 
-	auto exitBlock = llvm::BasicBlock::Create(*context);
+	auto exitBlock = llvm::BasicBlock::Create(*context, "exit");
 
 	IteratorStorage iteratorStorage;
 
@@ -83,10 +83,12 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 					auto targetTupleValues = targetTupleValue->values();
 					auto sourceTupleValues = sourceTupleValue->values();
 
-					ValueHelper::transferValue(targetEntryPoint
+					auto resultEntryPoint = ValueHelper::transferValue(targetEntryPoint
 						, sourceTupleValues.pop()
 						, targetTupleValues.pop()
 						);
+
+					auto resultBlock = resultEntryPoint.block();
 
 					auto targetContinuation = targetTupleValues.require<ExpandableValue>(TokenInfo());
 					auto sourceContinuation = sourceTupleValues.require<ExpandableValue>(TokenInfo());
@@ -97,8 +99,8 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 					auto sourceProvider = sourceContinuation->provider();
 					auto targetProvider = targetContinuation->provider();
 
-					auto sourceContinuationEntryPoint = sourceProvider->withBlock(targetBlock);
-					auto targetContinuationEntryPoint = targetProvider->withBlock(targetBlock);
+					auto sourceContinuationEntryPoint = sourceProvider->withBlock(resultBlock);
+					auto targetContinuationEntryPoint = targetProvider->withBlock(resultBlock);
 
 					targetChain->build(targetContinuationEntryPoint, Stack());
 
@@ -106,7 +108,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 					{
 						auto loopTarget = chainEntryPoint.entry();
 
-						linkBlocks(targetBlock, loopTarget->block());
+						linkBlocks(resultBlock, loopTarget->block());
 					}
 				}
 			}
@@ -132,9 +134,9 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 			}
 			else
 			{
-				ValueHelper::transferValue(targetEntryPoint, sourceValue, targetValue);
+				auto resultEntryPoint = ValueHelper::transferValue(targetEntryPoint, sourceValue, targetValue);
 
-				linkBlocks(targetBlock, exitBlock);
+				linkBlocks(resultEntryPoint.block(), exitBlock);
 			}
 		}
 	}
