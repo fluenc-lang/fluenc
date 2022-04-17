@@ -1,13 +1,12 @@
-#include <llvm/IR/IRBuilder.h>
-
 #include <sstream>
 #include <unordered_map>
 
-#include "nodes/InstantiationNode.h"
 #include "DzTypeName.h"
 #include "IndexIterator.h"
 #include "IPrototypeProvider.h"
 #include "IRBuilderEx.h"
+
+#include "nodes/InstantiationNode.h"
 
 #include "types/Prototype.h"
 
@@ -16,11 +15,15 @@
 #include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
 
-InstantiationNode::InstantiationNode(const std::vector<std::string> &fields
+#include "exceptions/MissingDefaultValueException.h"
+
+InstantiationNode::InstantiationNode(antlr4::ParserRuleContext *context
+	, const std::vector<std::string> &fields
 	, const IPrototypeProvider *prototypeProvider
 	, const Node *consumer
 	)
-	: m_fields(fields)
+	: m_token(TokenInfo::fromContext(context))
+	, m_fields(fields)
 	, m_prototypeProvider(prototypeProvider)
 	, m_consumer(consumer)
 {
@@ -82,7 +85,7 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 
 		if (!field.defaultValue())
 		{
-			throw new std::exception();
+			throw new MissingDefaultValueException(m_token, field.name());
 		}
 
 		return new NamedValue { field.name(), field.defaultValue() };

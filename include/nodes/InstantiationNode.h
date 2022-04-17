@@ -14,7 +14,8 @@ class IPrototypeProvider;
 class InstantiationNode : public Node
 {
 	public:
-		InstantiationNode(const std::vector<std::string> &fields
+		InstantiationNode(ParserRuleContext *context
+			, const std::vector<std::string> &fields
 			, const IPrototypeProvider *prototypeProvider
 			, const Node *consumer
 			);
@@ -22,6 +23,8 @@ class InstantiationNode : public Node
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		TokenInfo m_token;
+
 		std::vector<std::string> m_fields;
 
 		const IPrototypeProvider *m_prototypeProvider;

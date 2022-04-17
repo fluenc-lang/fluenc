@@ -464,7 +464,8 @@ antlrcpp::Any Visitor::visitWith(fluencParser::WithContext *context)
 		return assignment->field()->ID()->getText();
 	});
 
-	auto instantiation = new InstantiationNode(fields
+	auto instantiation = new InstantiationNode(context
+		, fields
 		, WithPrototypeProvider::instance()
 		, m_alpha
 		);
@@ -611,7 +612,8 @@ antlrcpp::Any Visitor::visitInstantiation(fluencParser::InstantiationContext *co
 	auto typeName = visit<ITypeName *>(context->typeName());
 
 	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
-	auto instantiation = new InstantiationNode(fields
+	auto instantiation = new InstantiationNode(context
+		, fields
 		, prototypeProvider
 		, m_alpha
 		);
