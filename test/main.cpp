@@ -9,6 +9,9 @@
 #include "types/Prototype.h"
 #include "types/Int32Type.h"
 #include "types/Int64Type.h"
+#include "types/UserType.h"
+#include "types/ArrayType.h"
+#include "types/WithoutType.h"
 
 using namespace boost::unit_test;
 
@@ -2908,6 +2911,98 @@ BOOST_AUTO_TEST_CASE (scenario81)
 			}
 
 			return mainLoop(count + 1, state);
+		}
+
+		export int main()
+		{
+			let state = ApplicationState
+			{
+				ui: application()
+			};
+
+			return mainLoop(0, state);
+		}
+	)");
+
+	BOOST_TEST(result == 12);
+}
+
+BOOST_AUTO_TEST_CASE (compatibility_3)
+{
+	auto result = compile(R"(
+		struct Item
+		{
+			children: []
+		}
+	)");
+
+	auto types = result.types();
+
+	auto itemType = types["Item"];
+
+	auto userType1 = UserType::get(itemType, { ArrayType::get({ itemType }) });
+	auto userType2 = UserType::get(itemType, { WithoutType::instance() });
+
+	// Both have the same tag
+	BOOST_TEST(userType1->compatibility(userType2, result) == 1);
+}
+
+BOOST_AUTO_TEST_CASE (scenario82)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			children: []
+		}
+
+		struct ApplicationState
+		{
+			ui
+		}
+
+		function application()
+		{
+			return [
+				Item
+				{
+					children: [
+						Item {},
+					]
+				}
+			];
+		}
+
+		function update(without item)
+		{
+			return nothing;
+		}
+
+		function update((Item item, ...items))
+		{
+			return update(item) -> update(...items);
+		}
+
+		function update(Item item)
+		{
+			return item with
+			{
+				children: update(item.children),
+			};
+		}
+
+		function mainLoop(int count, ApplicationState state)
+		{
+			if (count > 0)
+			{
+				return 12;
+			}
+
+			let as = state with
+			{
+				ui: update(state.ui),
+			};
+
+			return mainLoop(count + 1, as);
 		}
 
 		export int main()

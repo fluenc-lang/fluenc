@@ -60,6 +60,71 @@ int FunctionCallNode::order(const EntryPoint &entryPoint) const
 	return -1;
 }
 
+int8_t FunctionCallNode::tryCreateTailCall(const EntryPoint &entryPoint
+	, const Stack &values
+	, const std::vector<std::string>::const_iterator &name
+	, const std::vector<std::string>::const_iterator &end
+	) const
+{
+	if (name == end)
+	{
+		return -1;
+	}
+
+	auto tailCallCandidate = entryPoint
+		.byName(*name);
+
+	if (!tailCallCandidate)
+	{
+		return tryCreateTailCall(entryPoint, values, name + 1, end);
+	}
+
+	auto targetValues = tailCallCandidate->values();
+
+	if (targetValues.size() != values.size())
+	{
+		return tryCreateTailCall(entryPoint, values, name + 1, end);
+	}
+
+	int8_t min = 0;
+	int8_t max = 0;
+
+	std::transform(targetValues.begin(), targetValues.end(), values.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
+	{
+		auto storageType = storage->type();
+		auto valueType = value->type();
+
+		return valueType->compatibility(storageType, entryPoint);
+	});
+
+	if (min < 0 || max > 0)
+	{
+		return std::min(max
+			, tryCreateTailCall(entryPoint, values, name + 1, end)
+			);
+	}
+
+	auto tailCallTarget = findTailCallTarget(tailCallCandidate, values);
+
+	if (!tailCallTarget)
+	{
+		return tryCreateTailCall(entryPoint, values, name + 1, end);
+	}
+
+	auto zipped = zip(values, targetValues);
+
+	auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto result)
+	{
+		auto [value, storage] = result;
+
+		return ValueHelper::transferValue(accumulatedEntryPoint, value, storage);
+	});
+
+	linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
+
+	return 0;
+}
+
 std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stack values) const
 {
 	auto function = entryPoint.function();
@@ -67,59 +132,16 @@ std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stac
 
 	insertBlock(block, function);
 
-	for (auto &name : m_names)
+	auto score = tryCreateTailCall(entryPoint, values, begin(m_names), end(m_names));
+
+	if (score == 0)
 	{
-		auto tailCallCandidate = entryPoint
-			.byName(name);
-
-		if (!tailCallCandidate)
-		{
-			continue;
-		}
-
-		auto targetValues = tailCallCandidate->values();
-		auto inputValues = values;
-
-		if (targetValues.size() != inputValues.size())
-		{
-			continue;
-		}
-
-		int8_t min = 0;
-		int8_t max = 0;
-
-		std::transform(targetValues.begin(), targetValues.end(), inputValues.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
-		{
-			auto storageType = storage->type();
-			auto valueType = value->type();
-
-			return valueType->compatibility(storageType, entryPoint);
-		});
-
-		if (min < 0 || max > 0)
-		{
-			continue;
-		}
-
-		auto tailCallTarget = findTailCallTarget(tailCallCandidate, inputValues);
-
-		if (!tailCallTarget)
-		{
-			continue;
-		}
-
-		auto zipped = zip(inputValues, targetValues);
-
-		auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto result)
-		{
-			auto [value, storage] = result;
-
-			return ValueHelper::transferValue(accumulatedEntryPoint, value, storage);
-		});
-
-		linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
-
 		return std::vector<DzResult>();
+	}
+
+	if (score == 1)
+	{
+		throw new std::exception(); // TODO
 	}
 
 	return regularCall(entryPoint, values);
@@ -191,6 +213,7 @@ std::vector<DzResult> FunctionCallNode::regularCall(const EntryPoint &entryPoint
 
 	auto functions = entryPoint.functions();
 	auto locals = entryPoint.locals();
+	auto parent = entryPoint.function();
 
 	auto block = entryPoint.block();
 
@@ -216,6 +239,8 @@ std::vector<DzResult> FunctionCallNode::regularCall(const EntryPoint &entryPoint
 
 		for (const auto &[lastEntryPoint, returnValue] : functionResults)
 		{
+			insertBlock(lastEntryPoint.block(), parent);
+
 			auto consumerBlock = llvm::BasicBlock::Create(*context);
 
 			linkBlocks(lastEntryPoint.block(), consumerBlock);

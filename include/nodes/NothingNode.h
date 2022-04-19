@@ -1,12 +1,12 @@
-#ifndef EMPTYARRAYNODE_H
-#define EMPTYARRAYNODE_H
+#ifndef NOTHINGNODE_H
+#define NOTHINGNODE_H
 
 #include "Node.h"
 
-class EmptyArrayNode : public Node
+class NothingNode : public Node
 {
 	public:
-		EmptyArrayNode(const Node *consumer);
+		NothingNode(const Node *consumer);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
@@ -14,4 +14,4 @@ class EmptyArrayNode : public Node
 		const Node *m_consumer;
 };
 
-#endif // EMPTYARRAYNODE_H
+#endif // NOTHINGNODE_H

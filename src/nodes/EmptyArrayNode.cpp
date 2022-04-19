@@ -2,7 +2,7 @@
 
 #include "values/WithoutValue.h"
 
-EmptyArrayNode::EmptyArrayNode(Node *consumer)
+EmptyArrayNode::EmptyArrayNode(const Node *consumer)
 	: m_consumer(consumer)
 {
 }

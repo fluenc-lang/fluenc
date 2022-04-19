@@ -46,6 +46,7 @@
 #include "nodes/BinaryNode.h"
 #include "nodes/ArraySinkNode.h"
 #include "nodes/ArrayElementNode.h"
+#include "nodes/NothingNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -664,10 +665,7 @@ antlrcpp::Any Visitor::visitNothing(fluencParser::NothingContext *context)
 {
 	UNUSED(context);
 
-	auto constant = new IntegralLiteralNode(m_alpha
-		, DzTypeName::without()
-		, "0"
-		);
+	auto constant = new NothingNode(m_alpha);
 
 	return static_cast<Node *>(constant);
 }

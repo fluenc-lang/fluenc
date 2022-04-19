@@ -20,6 +20,12 @@ class FunctionCallNode : public Node
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
+		int8_t tryCreateTailCall(const EntryPoint &entryPoint
+			, const Stack &values
+			, const std::vector<std::string>::const_iterator &name
+			, const std::vector<std::string>::const_iterator &end
+			) const;
+
 		const CallableNode *findFunction(const EntryPoint &entryPoint, Stack values) const;
 
 		template<typename Container>

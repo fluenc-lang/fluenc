@@ -20,9 +20,20 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 {
 	if (auto scalarValue = dynamic_cast<const ScalarValue *>(value))
 	{
+		auto referenceStorage = dynamic_cast<const ReferenceValue *>(storage);
+
+		if (!referenceStorage)
+		{
+			// TODO: This will be fixed when array transfer is O(N).
+			// Right now, we will always create branches for all possible values.
+			// This *can* include "without", for example.
+
+			return entryPoint;
+		}
+
 		IRBuilderEx builder(entryPoint);
 
-		builder.createStore(scalarValue, dynamic_cast<const ReferenceValue *>(storage));
+		builder.createStore(scalarValue, referenceStorage);
 	}
 	else if (auto reference = dynamic_cast<const ReferenceValue *>(value))
 	{

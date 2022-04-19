@@ -1,8 +1,10 @@
 #include <sstream>
 #include <numeric>
 
-#include "types/ArrayType.h"
 #include "Utility.h"
+
+#include "types/ArrayType.h"
+#include "types/IteratorType.h"
 
 ArrayType::ArrayType(std::vector<const Type *> types)
 	: m_types(types)
@@ -70,7 +72,12 @@ int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) 
 		return -1;
 	}
 
-	return 0;
+	if (auto iterator = dynamic_cast<const IteratorType *>(type))
+	{
+		return 0;
+	}
+
+	return -1;
 }
 
 ArrayType *ArrayType::get(const std::vector<const Type *> &types)
