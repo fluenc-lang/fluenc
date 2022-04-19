@@ -51,7 +51,7 @@ literal
 	;
 
 with
-	: 'with' '{' assignment (',' assignment)* '}'
+	: 'with' '{' assignment (',' assignment)* ','? '}'
 	;
 	
 expression
@@ -61,7 +61,7 @@ expression
 	| ID ('.' ID)* with?									#member
 	| typeName '{' assignment? (',' assignment)* ','? '}'	#instantiation
 	| 'if' '(' expression ')' block							#conditional
-	| '[' expression? (',' expression)* ']'					#array
+	| '[' expression? (',' expression)* ','? ']'			#array
 	| '(' expression ')'									#group
 	| '...' expression										#expansion
 	| 'let' ID '=' expression								#local
