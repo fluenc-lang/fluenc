@@ -3123,6 +3123,97 @@ BOOST_AUTO_TEST_CASE (scenario84)
 	);
 }
 
+BOOST_AUTO_TEST_CASE (scenario85)
+{
+	auto result = exec(R"(
+		global Normal: 0;
+		global MouseOver: 1;
+		global Pressed: 2;
+
+		struct ControlTemplate
+		{
+			normal,
+			mouseOver,
+			pressed
+		};
+
+		struct Item
+		{
+			state: 0,
+			children: []
+		}
+
+		struct Rectangle : Item;
+		struct Button : Item;
+
+		function defaultTemplate(Button button)
+		{
+			return ControlTemplate
+			{
+				normal: Rectangle
+				{
+					children: [
+						Rectangle {}
+					]
+				},
+				mouseOver: Rectangle
+				{
+					children: [
+						Rectangle {}
+					]
+				},
+				pressed: Rectangle {}
+			};
+		}
+
+		function selectTemplate(ControlTemplate template, Button item)
+		{
+			if (item.state == MouseOver)
+			{
+				return template.mouseOver;
+			}
+
+			if (item.state == Pressed)
+			{
+				return template.pressed;
+			}
+
+			return template.normal;
+		}
+
+		function draw(without item)
+		{
+			return nothing;
+		}
+
+		function draw(Rectangle rectangle)
+		{
+			return draw(rectangle.children);
+		}
+
+		function draw(Button button)
+		{
+			return draw(selectTemplate(defaultTemplate(button), button));
+		}
+
+		function draw((any item, ...controls))
+		{
+			return draw(...controls);
+		}
+
+		export int main()
+		{
+			let button = Button {};
+
+			draw(selectTemplate(defaultTemplate(button), button));
+
+			return 12;
+		}
+	)");
+
+	BOOST_TEST(result == 12);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

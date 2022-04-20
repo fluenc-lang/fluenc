@@ -221,6 +221,13 @@ JunctionNode::SingleResult JunctionNode::join(const std::vector<JunctionNode::Si
 	}
 	else if (auto withoutValue = dynamic_cast<const WithoutValue *>(first))
 	{
+		for (auto &[resultEntryPoint, value] : range)
+		{
+			auto resultBlock = resultEntryPoint.block();
+
+			insertBlock(resultBlock, function);
+		}
+
 		return { entryPoint, withoutValue };
 	}
 	else if (auto lazyValue = dynamic_cast<const LazyValue *>(first))
