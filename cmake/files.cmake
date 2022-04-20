@@ -132,6 +132,7 @@ set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/exceptions/InvalidFunctionPointerTypeException.h"
 	"${PROJECT_HEADER_DIR}/exceptions/InvalidTypeException.h"
 	"${PROJECT_HEADER_DIR}/exceptions/MissingDefaultValueException.h"
+	"${PROJECT_HEADER_DIR}/exceptions/MissingFieldException.h"
     "${PROJECT_HEADER_DIR}/exceptions/MissingTypeDeclarationException.h"
     "${PROJECT_HEADER_DIR}/exceptions/UnknownTypeException.h"
     )
@@ -252,6 +253,7 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/exceptions/InvalidFunctionPointerTypeException.cpp"
 	"${PROJECT_SRC_DIR}/exceptions/InvalidTypeException.cpp"
 	"${PROJECT_SRC_DIR}/exceptions/MissingDefaultValueException.cpp"
+	"${PROJECT_SRC_DIR}/exceptions/MissingFieldException.cpp"
     "${PROJECT_SRC_DIR}/exceptions/MissingTypeDeclarationException.cpp"
     "${PROJECT_SRC_DIR}/exceptions/UnknownTypeException.cpp"
     )

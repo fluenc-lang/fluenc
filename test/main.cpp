@@ -13,6 +13,8 @@
 #include "types/ArrayType.h"
 #include "types/WithoutType.h"
 
+#include "exceptions/MissingFieldException.h"
+
 using namespace boost::unit_test;
 
 BOOST_AUTO_TEST_CASE (scenario1)
@@ -3098,6 +3100,27 @@ BOOST_AUTO_TEST_CASE (scenario83)
 	)");
 
 	BOOST_TEST(result == 12);
+}
+
+BOOST_AUTO_TEST_CASE (scenario84)
+{
+	BOOST_REQUIRE_THROW(exec(R"(
+		struct Item;
+
+		export int main()
+		{
+			let item = Item
+			{
+				does: 1,
+				not: 2,
+				exist: "foo",
+			};
+
+			return 12;
+		}
+	)")
+	, MissingFieldException *
+	);
 }
 
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )

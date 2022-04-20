@@ -16,6 +16,7 @@
 #include "values/ReferenceValue.h"
 
 #include "exceptions/MissingDefaultValueException.h"
+#include "exceptions/MissingFieldException.h"
 
 InstantiationNode::InstantiationNode(antlr4::ParserRuleContext *context
 	, const std::vector<std::string> &fields
@@ -59,6 +60,8 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 		{
 			auto value = valueByName->second;
 
+			valuesByName.erase(valueByName);
+
 			if (auto reference = dynamic_cast<const ReferenceValue *>(field.defaultValue()))
 			{
 				if (reference->type() != value->type())
@@ -90,6 +93,11 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 
 		return new NamedValue { field.name(), field.defaultValue() };
 	});
+
+	for (auto &[name, _] : valuesByName)
+	{
+		throw new MissingFieldException(m_token, prototype->name(), name);
+	}
 
 	IRBuilderEx builder(entryPoint);
 
