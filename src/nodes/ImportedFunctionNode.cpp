@@ -112,9 +112,9 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 			}
 			else if (auto stringValue = dynamic_cast<const StringValue *>(value))
 			{
-				auto scalar = stringValue->scalar();
+				auto reference = stringValue->reference();
 
-				argumentValues.push_back(*scalar);
+				argumentValues.push_back(*reference);
 			}
 			else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
 			{

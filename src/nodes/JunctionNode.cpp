@@ -19,6 +19,7 @@
 #include "values/IteratorValue.h"
 #include "values/WithoutValue.h"
 #include "values/LazyValue.h"
+#include "values/StringValue.h"
 
 JunctionNode::JunctionNode(const Node *subject)
 	: m_subject(subject)
@@ -125,6 +126,29 @@ JunctionNode::SingleResult JunctionNode::join(const std::vector<JunctionNode::Si
 			auto load = resultBuilder.createLoad(referenceValue, "load");
 
 			resultBuilder.createStore(load, alloc);
+		}
+
+		return { entryPoint, alloc };
+	}
+	if (auto templateValue = dynamic_cast<const StringValue *>(first))
+	{
+		auto alloc = (StringValue *)templateValue->clone(entryPoint);
+
+		for (auto &[resultEntryPoint, value] : range)
+		{
+			auto stringValue = dynamic_cast<const StringValue *>(value);
+
+			auto resultBlock = resultEntryPoint.block();
+
+			insertBlock(resultBlock, function);
+
+			IRBuilderEx resultBuilder(resultEntryPoint);
+
+			auto addressOf = new ScalarValue(stringValue->type()
+				, *stringValue->reference()
+				);
+
+			resultBuilder.createStore(addressOf, alloc->reference());
 		}
 
 		return { entryPoint, alloc };

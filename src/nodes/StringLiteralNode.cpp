@@ -3,6 +3,9 @@
 #include "nodes/StringLiteralNode.h"
 
 #include "values/StringValue.h"
+#include "values/ReferenceValue.h"
+
+#include "types/StringType.h"
 
 StringLiteralNode::StringLiteralNode(const Node *consumer, const std::string &value)
 	: m_consumer(consumer)
@@ -17,7 +20,9 @@ std::vector<DzResult> StringLiteralNode::build(const EntryPoint &entryPoint, Sta
 	// I hate ANTLR... Wish I could do this in the grammar file instead.
 	auto string = m_value.substr(1, m_value.size() - 2);
 
-	auto address = builder.createGlobalStringPtr(string, "string");
+	auto address = new ReferenceValue(StringType::instance()
+		, builder.createGlobalStringPtr(string, "string")
+		);
 
 	values.push(new StringValue(address, id(), string.size()));
 

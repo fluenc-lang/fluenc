@@ -5,22 +5,22 @@
 
 #include "metadata/StringValueMetadata.h"
 
-class ScalarValue;
+class ReferenceValue;
 class LazyValue;
 
 class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 {
 	public:
-		StringValue(llvm::Value *address, size_t id, size_t length);
+		StringValue(const ReferenceValue *address, size_t id, size_t length);
 
-		const ScalarValue *scalar() const;
+		const ReferenceValue *reference() const;
 		const LazyValue *iterator() const;
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
 	private:
-		llvm::Value *m_address;
+		const ReferenceValue *m_address;
 
 		size_t m_id;
 		size_t m_length;
