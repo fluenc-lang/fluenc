@@ -47,3 +47,8 @@ jobs:
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{runner.os}}-fcc
+        path: ${{github.workspace}}/build/fcc
