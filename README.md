@@ -259,3 +259,31 @@ export int main()
     return handleInput(getValue(fd));
 }
 ```
+
+## Immutable
+
+Since FluenC is a functional-first language, it makes sense that it's also 100% immutable. Variables can only be declared and initialized, not reassigned. Struct fields can also not be modified. Instead, copies can be made with a given mutation using the `with`-keyword.
+
+```js
+struct Foo
+{
+    x
+};
+
+export int main()
+{
+    let var1 = Foo
+    {
+        x: 1
+    };
+    
+    let var2 = var1 with
+    {
+        x: 2
+    };
+    
+    return var2.x;
+}
+```
+
+Since there is no mutable state, loops have to be implemented using recursion. Of course, the language has full support for tail call recursion.
