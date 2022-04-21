@@ -156,11 +156,71 @@ In FluenC, function overloads are resolved based on the real type of the value. 
 
 Take the following example:
 
-(to be written)
+```js
+struct Foo;
+
+function consumer(int value)
+{
+    return value * 10;
+}
+
+function consumer(Foo value)
+{
+    return 32;
+}
+
+function producer(int value)
+{
+    if (value > 2)
+    {
+        return value;
+    }
+    
+    return Foo {};
+}
+```
 
 Here different overloads of "consumer" will be selected depending on which if-statement we return from.
 
 The secret behind this is the fact that FluenC inverts the standard invocation model. The innermost function will produce N number of results, which will then result in N number of branches being generated.
+
+Arrays work the same way, with each array element producing one branch, allowing us to do things like these:
+
+```js
+struct Foo;
+
+function consumer((int value, ...values))
+{
+    return 1 -> consumer(...values);
+}
+
+function consumer((long value, ...values))
+{
+    return 2 -> consumer(...values);
+}
+
+function consumer(Foo value)
+{
+    return 3;
+}
+
+function sum(int product, int value)
+{
+    return product + value;
+}
+
+function sum(int product, (int value, ...values))
+{
+    return sum(product + value, ...values);
+}
+
+export int main()
+{
+    let array = [1, 2L, Foo {}];
+    
+    return sum(0, consumer(array)); // Will return 5
+}
+```
 
 ## No "null" value
 
