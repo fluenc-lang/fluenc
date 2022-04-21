@@ -75,7 +75,7 @@ function processValue(int value)
     return value;
 }
 
-function processValue(string value)
+function processValue(long value)
 {
     return 42;
 }
@@ -94,7 +94,7 @@ export int main()
     
     let value2 = Foo
     {
-        value: "foo" // type is inferred as string
+        value: 2L // type is inferred as long
     };
     
     return calculate(value1, value2); // Will return 43
@@ -106,6 +106,44 @@ export int main()
 Since there are no allocations, consumption of arrays and similar structures works slightly different from other languages. You only ever work with one element at a time, making the memory model predictable.
 
 A function returning a value can hint that another element is available, creating an iterator, allowing the consumer to request further iteration. Iterators can be stacked, creating a very powerful strategy for working with ranges of values.
+
+```js
+function generator(int i, int count)
+{
+    if (i < count)
+    {
+        // Yield the value of i, and provide an instruction for fetching the next value.
+        return i -> generator(i + 1, count);
+    }
+    
+    return i; // No more values available
+}
+
+function add(int addend, int value)
+{
+    return value + addend;
+}
+
+function add(int addend, (int value, ...values))
+{
+    return value + addend -> add(addend, ...values);
+}
+
+function sum(int product, int value)
+{
+    return product + value;
+}
+
+function sum(int product, (int value, ...values))
+{
+    return sum(product + value, ...values);
+}
+
+export int main()
+{
+    return sum(0, add(10, [1, 2, 3])); // Will return 36
+}
+```
 
 ## Double dispatch
 
