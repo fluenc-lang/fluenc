@@ -141,7 +141,7 @@ function sum(int product, (int value, ...values))
 
 export int main()
 {
-    return sum(0, add(10, [1, 2, 3])); // Will return 36
+    return sum(0, add(10, generator(1, 3))); // Will return 36
 }
 ```
 
