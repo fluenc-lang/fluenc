@@ -141,9 +141,14 @@ function sum(int product, (int value, ...values))
 
 export int main()
 {
-    return sum(0, add(10, generator(1, 3))); // Will return 36
+    let fromIterator = sum(0, add(10, generator(1, 3)));
+    let fromArray = sum(0, add(10, [1, 2, 3]));
+    
+    return fromIterator + fromArray; // Will return 72
 }
 ```
+
+Both strings and arrays are exposed as iterators.
 
 ## Double dispatch
 
