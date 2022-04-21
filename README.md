@@ -225,3 +225,37 @@ export int main()
 ## No "null" value
 
 There are no null values in FluenC. A function may choose to return "nothing", but in contrast to many other languages, the constant value of "nothing" actually has a type - "without". This means that a branch returning "nothing" will need to have a consumer accepting a parameter of type "without". That way we make sure that the scenario where an empty value is returned needs to be handled explicitly.
+
+```js
+import int open(string apathname, int flags);
+import int getc(long stream);
+
+import long fdopen(int fildes, string mode);
+
+function getValue(long stream)
+{
+    if (getc(stream) > 0)
+    {
+        return 12;
+    }
+    
+    return nothing;
+}
+
+function handleInput(int value)
+{
+    return value;
+}
+
+function handleInput(without value)
+{
+    return 0;
+}
+
+export int main()
+{
+    let fd = fdopen(open("input.txt", O_RDONLY), "r");
+
+    return handleInput(getValue(fd));
+}
+```
