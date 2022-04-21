@@ -78,7 +78,7 @@ std::vector<DzResult> JunctionNode::build(const EntryPoint &entryPoint, Stack va
 	return outputResults;
 }
 
-JunctionNode::SingleResult JunctionNode::join(const std::vector<JunctionNode::SingleResult> &range, const EntryPoint &entryPoint) const
+const BaseValue *JunctionNode::join(const std::vector<JunctionNode::SingleResult> &range, const EntryPoint &entryPoint) const
 {
 	auto function = entryPoint.function();
 
@@ -92,157 +92,28 @@ JunctionNode::SingleResult JunctionNode::join(const std::vector<JunctionNode::Si
 
 		for (auto &[resultEntryPoint, value] : range)
 		{
-			auto typedValue = dynamic_cast<const ScalarValue *>(value);
+			auto transferEntryPoint = ValueHelper::transferValue(resultEntryPoint, value, alloc);
 
-			auto resultBlock = resultEntryPoint.block();
-
-			insertBlock(resultBlock, function);
-
-			IRBuilderEx resultBuilder(resultEntryPoint);
-
-			resultBuilder.createStore(typedValue, alloc);
+			insertBlock(transferEntryPoint.block(), function);
+			linkBlocks(transferEntryPoint.block(), entryPoint.block());
 		}
 
 		IRBuilderEx junctionBuilder(entryPoint);
 
-		return { entryPoint, junctionBuilder.createLoad(alloc, "junctionLoad") };
+		return junctionBuilder.createLoad(alloc, "junctionLoad");
 	}
-	if (auto templateValue = dynamic_cast<const ReferenceValue *>(first))
+
+	auto alloc = first->clone(entryPoint);
+
+	for (auto &[resultEntryPoint, value] : range)
 	{
-		auto type = templateValue->type();
+		auto transferEntryPoint = ValueHelper::transferValue(resultEntryPoint, value, alloc);
 
-		auto alloc = entryPoint.alloc(type);
-
-		for (auto &[resultEntryPoint, value] : range)
-		{
-			auto referenceValue = dynamic_cast<const ReferenceValue *>(value);
-
-			auto resultBlock = resultEntryPoint.block();
-
-			insertBlock(resultBlock, function);
-
-			IRBuilderEx resultBuilder(resultEntryPoint);
-
-			auto load = resultBuilder.createLoad(referenceValue, "load");
-
-			resultBuilder.createStore(load, alloc);
-		}
-
-		return { entryPoint, alloc };
-	}
-	if (auto templateValue = dynamic_cast<const StringValue *>(first))
-	{
-		auto alloc = (StringValue *)templateValue->clone(entryPoint);
-
-		for (auto &[resultEntryPoint, value] : range)
-		{
-			auto stringValue = dynamic_cast<const StringValue *>(value);
-
-			auto resultBlock = resultEntryPoint.block();
-
-			insertBlock(resultBlock, function);
-
-			IRBuilderEx resultBuilder(resultEntryPoint);
-
-			auto addressOf = new ScalarValue(stringValue->type()
-				, *stringValue->reference()
-				);
-
-			resultBuilder.createStore(addressOf, alloc->reference());
-		}
-
-		return { entryPoint, alloc };
-	}
-	else if (auto templateValue = dynamic_cast<const UserTypeValue *>(first))
-	{
-		std::vector<const NamedValue *> joinedFieldValues;
-
-		auto fields = templateValue->fields();
-
-		auto ep = entryPoint;
-
-		for (auto i = 0u; i < fields.size(); i++)
-		{
-			std::vector<SingleResult> values;
-
-			std::transform(begin(range), end(range), std::back_inserter(values), [=](auto result) -> SingleResult
-			{
-				auto [resultEntryPoint, value] = result;
-
-				auto instance = dynamic_cast<const UserTypeValue *>(value);
-
-				auto instanceFields = instance->fields();
-				auto instanceField = instanceFields.begin() + i;
-
-				return { resultEntryPoint, *instanceField };
-			});
-
-			auto [joinedFieldEntryPoint, joinedFieldValue] = join(values, ep);
-			auto joinedNamedValue = dynamic_cast<const NamedValue *>(joinedFieldValue);
-
-			joinedFieldValues.push_back(joinedNamedValue);
-
-			ep = joinedFieldEntryPoint;
-		}
-
-		return { ep, new UserTypeValue(templateValue->prototype(), joinedFieldValues) };
-	}
-	else if (auto templateValue = dynamic_cast<const TupleValue *>(first))
-	{
-		auto storage = first->clone(entryPoint);
-
-		auto resultEntryPoint = std::accumulate(begin(range), end(range), entryPoint, [&](auto accumulatedEntryPoint, auto result)
-		{
-			return ValueHelper::transferValue(accumulatedEntryPoint, result.value, storage);
-		});
-
-		return { resultEntryPoint, storage };
-	}
-	else if (auto expandableValue = dynamic_cast<const ExpandableValue *>(first))
-	{
-		return { entryPoint, expandableValue };
-	}
-	else if (auto templateValue = dynamic_cast<const NamedValue *>(first))
-	{
-		std::vector<SingleResult> values;
-
-		std::transform(begin(range), end(range), std::back_inserter(values), [](auto result) -> SingleResult
-		{
-			auto [resultEntryPoint, value] = result;
-
-			auto namedValue = dynamic_cast<const NamedValue *>(value);
-
-			return { resultEntryPoint, namedValue->value() };
-		});
-
-		auto [joinedEntryPoint, joinedValue] = join(values, entryPoint);
-
-		return { joinedEntryPoint, new NamedValue(templateValue->name(), joinedValue) };
-	}
-	else if (auto withoutValue = dynamic_cast<const WithoutValue *>(first))
-	{
-		for (auto &[resultEntryPoint, value] : range)
-		{
-			auto resultBlock = resultEntryPoint.block();
-
-			insertBlock(resultBlock, function);
-		}
-
-		return { entryPoint, withoutValue };
-	}
-	else if (auto lazyValue = dynamic_cast<const LazyValue *>(first))
-	{
-		auto storage = lazyValue->clone(entryPoint);
-
-		auto resultEntryPoint = std::accumulate(begin(range), end(range), entryPoint, [&](auto accumulatedEntryPoint, auto result)
-		{
-			return ValueHelper::transferValue(accumulatedEntryPoint, result.value, storage);
-		});
-
-		return { resultEntryPoint, storage };
+		insertBlock(transferEntryPoint.block(), function);
+		linkBlocks(transferEntryPoint.block(), entryPoint.block());
 	}
 
-	throw new std::exception();
+	return alloc;
 }
 
 JunctionNode::SingleResult JunctionNode::tryJoin(const std::vector<JunctionNode::SingleResult> &values, const EntryPoint &entryPoint) const
@@ -258,12 +129,7 @@ JunctionNode::SingleResult JunctionNode::tryJoin(const std::vector<JunctionNode:
 
 		auto joined = join(values, junctionEntryPoint);
 
-		for (auto &[valueEntryPoint, _] : values)
-		{
-			linkBlocks(valueEntryPoint.block(), junctionBlock);
-		}
-
-		return joined;
+		return { junctionEntryPoint, joined };
 	}
 
 	return values[0];

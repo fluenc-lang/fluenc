@@ -12,6 +12,7 @@
 #include "values/ScalarValue.h"
 #include "values/ExpandedValue.h"
 #include "values/TupleValue.h"
+#include "values/StringValue.h"
 
 EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *value
@@ -95,6 +96,18 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 				, storageElement
 				);
 		});
+	}
+	else if(auto stringValue = dynamic_cast<const StringValue *>(value))
+	{
+		auto stringStorage = dynamic_cast<const StringValue *>(stringValue);
+
+		auto addressOf = new ScalarValue(stringValue->type()
+			, *stringValue->reference()
+			);
+
+		IRBuilderEx builder(entryPoint);
+
+		builder.createStore(addressOf, stringStorage->reference());
 	}
 
 	return entryPoint;
