@@ -88,7 +88,7 @@ std::vector<std::string> qualifiedNames(const std::vector<std::string> &namespac
 }
 
 void populateInstructions(const std::vector<std::string> &namespaces
-	, const std::vector<antlrcpp::Any> &instructions
+	, const std::vector<std::any> &instructions
 	, std::vector<CallableNode *> &roots
 	, std::multimap<std::string, CallableNode *> &functions
 	, std::map<std::string, const BaseValue *> &locals
@@ -97,73 +97,73 @@ void populateInstructions(const std::vector<std::string> &namespaces
 	, std::unordered_set<std::string> &uses
 	)
 {
-	for (auto &instruction : instructions)
-	{
-		if (instruction.is<Namespace *>())
-		{
-			auto _namespace = instruction.as<Namespace *>();
+//	for (auto &instruction : instructions)
+//	{
+//		if (instruction.is<Namespace *>())
+//		{
+//			auto _namespace = instruction.as<Namespace *>();
 
-			std::vector<std::string> nestedNamespaces(namespaces);
+//			std::vector<std::string> nestedNamespaces(namespaces);
 
-			nestedNamespaces.push_back(_namespace->name());
+//			nestedNamespaces.push_back(_namespace->name());
 
-			populateInstructions(nestedNamespaces
-				, _namespace->children()
-				, roots
-				, functions
-				, locals
-				, globals
-				, types
-				, uses
-				);
-		}
-		else
-		{
-			if (instruction.is<CallableNode *>())
-			{
-				auto callable = instruction.as<CallableNode *>();
+//			populateInstructions(nestedNamespaces
+//				, _namespace->children()
+//				, roots
+//				, functions
+//				, locals
+//				, globals
+//				, types
+//				, uses
+//				);
+//		}
+//		else
+//		{
+//			if (instruction.is<CallableNode *>())
+//			{
+//				auto callable = instruction.as<CallableNode *>();
 
-				if (callable->attribute() == FunctionAttribute::Export)
-				{
-					roots.push_back(callable);
-				}
-				else
-				{
-					auto name = qualifiedNames(namespaces
-						, callable->name()
-						);
+//				if (callable->attribute() == FunctionAttribute::Export)
+//				{
+//					roots.push_back(callable);
+//				}
+//				else
+//				{
+//					auto name = qualifiedNames(namespaces
+//						, callable->name()
+//						);
 
-					functions.insert({ name[0], callable });
-				}
-			}
-			else if (instruction.is<Prototype *>())
-			{
-				auto prototype = instruction.as<Prototype *>();
+//					functions.insert({ name[0], callable });
+//				}
+//			}
+//			else if (instruction.is<Prototype *>())
+//			{
+//				auto prototype = instruction.as<Prototype *>();
 
-				auto name = qualifiedNames(namespaces
-					, prototype->name()
-					);
+//				auto name = qualifiedNames(namespaces
+//					, prototype->name()
+//					);
 
-				types.insert({ name[0], prototype });
-			}
-			else if (instruction.is<GlobalNode *>())
-			{
-				auto global = instruction.as<GlobalNode *>();
+//				types.insert({ name[0], prototype });
+//			}
+//			else if (instruction.is<GlobalNode *>())
+//			{
+//				auto global = instruction.as<GlobalNode *>();
 
-				auto name = qualifiedNames(namespaces
-					, global->name()
-					);
+//				auto name = qualifiedNames(namespaces
+//					, global->name()
+//					);
 
-				globals.insert({ name[0], global });
-			}
-			else if (instruction.is<Use *>())
-			{
-				auto use = instruction.as<Use *>();
+//				globals.insert({ name[0], global });
+//			}
+//			else if (instruction.is<Use *>())
+//			{
+//				auto use = instruction.as<Use *>();
 
-				uses.insert(use->fileName());
-			}
-		}
-	}
+//				uses.insert(use->fileName());
+//			}
+//		}
+//	}
 }
 
 antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
@@ -177,12 +177,12 @@ antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
 
 	auto instructions = context->instruction();
 
-	std::vector<antlrcpp::Any> results;
+	std::vector<std::any> results;
 
-	std::transform(begin(instructions), end(instructions), std::back_inserter(results), [this](auto instruction)
-	{
-		return fluencBaseVisitor::visit(instruction);
-	});
+//	std::transform(begin(instructions), end(instructions), std::back_inserter(results), [this](auto instruction)
+//	{
+//		return fluencBaseVisitor::visit(instruction);
+//	});
 
 	populateInstructions(std::vector<std::string>()
 		, results
@@ -786,12 +786,12 @@ antlrcpp::Any Visitor::visitNs(fluencParser::NsContext *context)
 		, m_beta
 		);
 
-	std::vector<antlrcpp::Any> children;
+	std::vector<std::any> children;
 
-	std::transform(begin(instructions), end(instructions), std::back_inserter(children), [&](auto instruction)
-	{
-		return visitor.visitAny(instruction);
-	});
+//	std::transform(begin(instructions), end(instructions), std::back_inserter(children), [&](auto instruction)
+//	{
+//		return visitor.visitAny(instruction);
+//	});
 
 	return new Namespace(children, name);
 }

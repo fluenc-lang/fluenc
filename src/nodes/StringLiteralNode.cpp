@@ -17,14 +17,11 @@ std::vector<DzResult> StringLiteralNode::build(const EntryPoint &entryPoint, Sta
 {
 	IRBuilderEx builder(entryPoint);
 
-	// I hate ANTLR... Wish I could do this in the grammar file instead.
-	auto string = m_value.substr(1, m_value.size() - 2);
-
 	auto address = new ReferenceValue(StringType::instance()
-		, builder.createGlobalStringPtr(string, "string")
+		, builder.createGlobalStringPtr(m_value, "string")
 		);
 
-	values.push(new StringValue(address, id(), string.size()));
+	values.push(new StringValue(address, id(), m_value.size()));
 
 	return m_consumer->build(entryPoint, values);
 }

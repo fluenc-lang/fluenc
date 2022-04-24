@@ -305,7 +305,7 @@ int main(int argc, char **argv)
 					root->build(entryPoint, values);
 				}
 
-//				llvmModule->print(llvm::errs(), nullptr);
+				llvmModule->print(llvm::errs(), nullptr);
 				llvmModule->setDataLayout(dataLayout);
 
 				if (verifyModule(*llvmModule, &llvm::errs()))

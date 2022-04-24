@@ -40,10 +40,7 @@ llvm::ConstantInt *CharacterLiteralNode::getValue(llvm::Type *storageType) const
 		{ "\\0", "\0" },
 	};
 
-	// I hate ANTLR... Wish I could do this in the grammar file instead.
-	auto string = m_value.substr(1, m_value.size() - 2);
-
-	auto iterator = sequences.find(string);
+	auto iterator = sequences.find(m_value);
 
 	if (iterator != sequences.end())
 	{
@@ -53,6 +50,6 @@ llvm::ConstantInt *CharacterLiteralNode::getValue(llvm::Type *storageType) const
 	}
 
 	return llvm::ConstantInt::get((llvm::IntegerType *)storageType
-		, *string.begin()
+		, *m_value.begin()
 		);
 }

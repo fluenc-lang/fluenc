@@ -1,0 +1,81 @@
+Program             <- Instruction*
+Instruction         <- Function / Structure / Global / Namespace / Use
+
+# Instructions
+Function            <- RegularFunction / ImportedFunction / ExportedFunction
+Structure           <- 'struct' Id TypeList FieldList
+Global              <- 'global' Id ':' Expression
+Namespace           <- 'namespace' Id '{' Instruction* '}'
+Use                 <- 'use' String
+
+# Constructs
+Block               <- '{' (Local / Call / Conditional)* Return '}'
+Field               <- DecoratedField / StandardField
+Return              <- 'return' Expression ('->' Continuation)?
+Continuation        <- Id '(' List(Expression)? ')'
+Argument            <- StandardArgument / TupleArgument
+TypeName            <- FunctionType / RegularType
+Expression          <- Binary / Instantiation / Literal / Group / Call / Expansion / Member / Conditional / Array / Local
+Comment             <- '//' [^\r\n]*
+Assignment          <- Id ':' Expression
+With                <- 'with' '{' AssignmentList '}'
+
+# Lists
+TypeList            <- (':' List(TypeName))?
+FieldList           <- ('{' List(Field) ','? '}')?
+ArgumentList        <- List(Argument)?
+ExpressionList      <- List(Expression)?
+AssignmentList      <- (List(Assignment) ','?)?
+IdList              <- Id ('.' Id)*
+
+# Types
+RegularType         <- Id
+FunctionType        <- 'function' '(' List(RegularType)? ')'
+
+# Fields
+DecoratedField      <- TypeName Id (':' Expression)?
+StandardField       <- Id (':' Expression)?
+
+# Arguments
+StandardArgument    <- TypeName Id
+TupleArgument       <- '(' StandardArgument (',' StandardArgument)* ')'
+
+# Functions
+RegularFunction     <- 'function' Id '(' ArgumentList ')' Block
+ImportedFunction    <- 'import' TypeName Id '(' ArgumentList ')'
+ExportedFunction    <- 'export' TypeName Id '(' ArgumentList ')' Block
+
+# Expressions
+Literal             <- Uint32Literal / Int64Literal / Int32Literal / BooleanLiteral / StringLiteral / CharLiteral / ByteLiteral / NothingLiteral
+Binary              <- (Group Operator Expression) / (Literal Operator Expression) / (Member Operator Expression) / (Call Operator Expression)
+Member              <- IdList With?
+Call                <- Id '(' ExpressionList ')'
+Instantiation       <- TypeName '{' AssignmentList '}'
+Conditional         <- 'if' '(' Expression ')' Block
+Array               <- '[' (List(Expression) ','?)? ']'
+Group               <- '(' Expression ')'
+Expansion           <- '...' Expression
+Local               <- 'let' Id '=' Expression
+
+# Literals
+Int32Literal        <- Integer
+Int64Literal        <- Integer 'L'
+BooleanLiteral      <- < 'true' | 'false' >
+StringLiteral       <- String
+Uint32Literal       <- Integer 'u'
+CharLiteral         <- < '\'' < [^\']+ > '\'' >
+ByteLiteral         <- Integer 'u8'
+NothingLiteral      <- 'nothing'
+
+# Primitives
+Operator            <- '<=' | '>=' | '==' | '!=' | '&&' | '||' | '-' | '+' | '/' | '*' | '%' | '<' | '>'
+Integer             <- < ('0x'[0-9A-F]+) / ('-'?[0-9]+) >
+String              <- < '"' < [^"]* > '"' >
+Keyword             <- 'return' | 'if' | 'let'
+Id                  <- < (!Keyword '::'? Char (Char / Digit / '::')*) / '...' >
+Char                <- [a-zA-Z_]
+Digit               <- [0-9]
+List(T)             <- T (',' T)*
+
+
+%whitespace         <- (Comment / [ \t\r\n;])*
