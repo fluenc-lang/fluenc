@@ -1,4 +1,5 @@
 #include "WithPrototypeProvider.h"
+#include "Utility.h"
 
 #include "types/WithPrototype.h"
 
@@ -16,7 +17,7 @@ IPrototype *WithPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &
 {
 	UNUSED(entryPoint);
 
-	auto addressOfValue = values.require<UserTypeValue>(TokenInfo());
+	auto addressOfValue = values.require<UserTypeValue>(nullptr);
 
 	return new WithPrototype(addressOfValue);
 }

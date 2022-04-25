@@ -7,14 +7,14 @@
 class ExpansionNode : public Node
 {
 	public:
-		ExpansionNode(antlr4::ParserRuleContext *context, const Node *consumer);
+		ExpansionNode(const Node *consumer, const std::shared_ptr<peg::Ast> &ast);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		TokenInfo m_token;
-
 		const Node *m_consumer;
+
+		std::shared_ptr<peg::Ast> m_ast;
 };
 
 #endif // EXPANSIONNODE_H

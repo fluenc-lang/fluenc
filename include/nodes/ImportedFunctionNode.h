@@ -11,10 +11,10 @@ class ITypeName;
 class ImportedFunctionNode : public CallableNode
 {
 	public:
-		ImportedFunctionNode(antlr4::ParserRuleContext *context
+		ImportedFunctionNode(ITypeName *returnType
 			, const std::string &name
+			, const std::shared_ptr<peg::Ast> &ast
 			, const std::vector<DzBaseArgument *> &arguments
-			, ITypeName *returnType
 			);
 
 		std::string name() const override;
@@ -27,12 +27,11 @@ class ImportedFunctionNode : public CallableNode
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		TokenInfo m_token;
+		ITypeName *m_returnType;
 
 		std::string m_name;
+		std::shared_ptr<peg::Ast> m_ast;
 		std::vector<DzBaseArgument *> m_arguments;
-
-		ITypeName *m_returnType;
 };
 
 #endif // IMPORTEDFUNCTIONNODE_H

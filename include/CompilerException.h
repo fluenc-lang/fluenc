@@ -2,13 +2,14 @@
 #define COMPILEREXCEPTION_H
 
 #include <exception>
+#include <memory>
 
 #include "TokenInfo.h"
 
 class CompilerException : public std::exception
 {
 	public:
-		CompilerException(const TokenInfo &token);
+		CompilerException(const std::shared_ptr<peg::Ast> &ast);
 
 		size_t row() const;
 		size_t column() const;
@@ -17,7 +18,7 @@ class CompilerException : public std::exception
 		virtual std::string message() const = 0;
 
 	private:
-		TokenInfo m_token;
+		std::shared_ptr<peg::Ast> m_ast;
 };
 
 #endif // COMPILEREXCEPTION_H

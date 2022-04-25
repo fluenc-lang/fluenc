@@ -6,7 +6,7 @@
 class InvalidArgumentTypeException : public CompilerException
 {
 	public:
-		InvalidArgumentTypeException(const TokenInfo &token);
+		InvalidArgumentTypeException(const std::shared_ptr<peg::Ast> &ast);
 
 		std::string message() const override;
 };

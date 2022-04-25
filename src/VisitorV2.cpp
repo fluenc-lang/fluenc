@@ -247,18 +247,6 @@ std::string VisitorV2::visitString(const std::shared_ptr<peg::Ast> &ast) const
 	return ast->token_to_string();
 }
 
-std::vector<DzBaseArgument *> VisitorV2::visitArgumentList(const std::shared_ptr<peg::Ast> &ast) const
-{
-	std::vector<DzBaseArgument *> results;
-
-	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto node)
-	{
-		return visitArgument(node);
-	});
-
-	return results;
-}
-
 std::vector<ITypeName *> VisitorV2::visitTypeList(const std::shared_ptr<peg::Ast> &ast) const
 {
 	std::vector<ITypeName *> results;
@@ -278,30 +266,6 @@ std::vector<PrototypeFieldEmbryo> VisitorV2::visitFieldList(const std::shared_pt
 	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto node)
 	{
 		return visitField(node);
-	});
-
-	return results;
-}
-
-std::vector<Node *> VisitorV2::visitExpressionList(const std::shared_ptr<peg::Ast> &ast) const
-{
-	std::vector<Node *> results;
-
-	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto node)
-	{
-		return visitExpression(node);
-	});
-
-	return results;
-}
-
-std::vector<Assignment> VisitorV2::visitAssignmentList(const std::shared_ptr<peg::Ast> &ast) const
-{
-	std::vector<Assignment> results;
-
-	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto node)
-	{
-		return visitAssignment(node);
 	});
 
 	return results;
@@ -430,7 +394,7 @@ Node *VisitorV2::visitByteLiteral(const std::shared_ptr<peg::Ast> &ast) const
 {
 	return new IntegralLiteralNode(m_alpha
 		, DzTypeName::byte()
-		, visitInteger(ast)
+		, visitInteger(ast->nodes[0])
 		);
 }
 
@@ -478,10 +442,10 @@ Node *VisitorV2::visitMember(const std::shared_ptr<peg::Ast> &ast) const
 	{
 		auto with = visitWith(ast->nodes[1]);
 
-		return new MemberAccessNode(nullptr, with, qualifiedPath);
+		return new MemberAccessNode(with, ast, qualifiedPath);
 	}
 
-	return new MemberAccessNode(nullptr, m_alpha, qualifiedPath);
+	return new MemberAccessNode(m_alpha, ast, qualifiedPath);
 }
 
 Node *VisitorV2::visitCall(const std::shared_ptr<peg::Ast> &ast) const
@@ -490,12 +454,17 @@ Node *VisitorV2::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[0])
 		);
 
-	auto call = new FunctionCallNode(nullptr, names);
+	auto call = new FunctionCallNode(ast, names);
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
 
 	VisitorV2 visitor(m_namespaces, m_iteratorType, sink, nullptr);
 
-	auto values = visitor.visitExpressionList(ast->nodes[1]);
+	std::vector<Node *> values;
+
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes), std::back_inserter(values), [&](auto node)
+	{
+		return visitor.visitExpression(node);
+	});
 
 	auto evaluation = new LazyEvaluationNode(call);
 	auto withEvaluation = new StackSegmentNode(values, evaluation, TerminatorNode::instance());
@@ -508,28 +477,27 @@ Node *VisitorV2::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 Node *VisitorV2::visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto typeName = visitTypeName(ast->nodes[0]);
-	auto assignments = visitAssignmentList(ast->nodes[1]);
 
 	std::vector<std::string> fields;
 
-	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](Assignment assignment)
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes), std::back_insert_iterator(fields), [this](auto assignment)
 	{
-		return assignment.name;
+		return visitId(assignment->nodes[0]);
 	});
 
 	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
-	auto instantiation = new InstantiationNode(nullptr
-		, fields
+	auto instantiation = new InstantiationNode(m_alpha
 		, prototypeProvider
-		, m_alpha
+		, ast
+		, fields
 		);
 
-	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, Assignment assignment)
+	return std::accumulate(begin(ast->nodes) + 1, end(ast->nodes), static_cast<Node *>(instantiation), [this](auto consumer, auto assignment)
 	{
 		VisitorV2 visitor(m_namespaces, m_iteratorType, consumer, nullptr);
 
 		return visitor
-			.visitExpression(assignment.expression);
+			.visitExpression(assignment->nodes[1]);
 	});
 }
 
@@ -589,7 +557,7 @@ Node *VisitorV2::visitGroup(const std::shared_ptr<peg::Ast> &ast) const
 
 Node *VisitorV2::visitExpansion(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto expansion = new ExpansionNode(nullptr, m_alpha);
+	auto expansion = new ExpansionNode(m_alpha, ast);
 
 	VisitorV2 visitor(m_namespaces, m_iteratorType, expansion, nullptr);
 
@@ -625,27 +593,25 @@ Node *VisitorV2::visitContinuation(const std::shared_ptr<peg::Ast> &ast) const
 
 Node *VisitorV2::visitWith(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto assignments = visitAssignmentList(ast->nodes[0]);
-
 	std::vector<std::string> fields;
 
-	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](Assignment assignment)
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_insert_iterator(fields), [this](auto assignment)
 	{
-		return assignment.name;
+		return visitId(assignment->nodes[0]);
 	});
 
-	auto instantiation = new InstantiationNode(nullptr
-		, fields
+	auto instantiation = new InstantiationNode(m_alpha
 		, WithPrototypeProvider::instance()
-		, m_alpha
+		, ast
+		, fields
 		);
 
-	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, Assignment assignment)
+	return std::accumulate(begin(ast->nodes), end(ast->nodes), static_cast<Node *>(instantiation), [this](auto consumer, auto assignment)
 	{
 		VisitorV2 visitor(m_namespaces, m_iteratorType, consumer, nullptr);
 
 		return visitor
-			.visitExpression(assignment.expression);
+			.visitExpression(assignment->nodes[1]);
 	});
 }
 
@@ -670,51 +636,56 @@ CallableNode *VisitorV2::visitFunction(const std::shared_ptr<peg::Ast> &ast) con
 
 CallableNode *VisitorV2::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast) const
 {
+	auto name = visitId(ast->nodes[0]);
+
+	std::vector<DzBaseArgument *> arguments;
+
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes) - 1, std::back_inserter(arguments), [this](auto argument)
+	{
+		return visitArgument(argument);
+	});
+
 	auto iteratorType = new IteratorType();
 
 	VisitorV2 visitor(m_namespaces, iteratorType, TerminatorNode::instance(), nullptr);
 
-	auto name = visitor.visitId(ast->nodes[0]);
-	auto arguments = visitor.visitArgumentList(ast->nodes[1]);
-	auto block = visitor.visitBlock(ast->nodes[2]);
+	auto block = visitor.visitBlock(*ast->nodes.rbegin());
 
 	if (block->containsIterator())
 	{
-		return new FunctionNode(FunctionAttribute::Iterator
-			, name
-			, arguments
-			, block
-			);
+		return new FunctionNode(FunctionAttribute::Iterator, name, arguments, block);
 	}
 
-	return new FunctionNode(FunctionAttribute::None
-		, name
-		, arguments
-		, block
-		);
+	return new FunctionNode(FunctionAttribute::None, name, arguments, block);
 }
 
 CallableNode *VisitorV2::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const
 {
+	auto returnType = visitTypeName(ast->nodes[0]);
 	auto name = visitId(ast->nodes[1]);
 
 	auto terminator = new ExportedFunctionTerminatorNode();
 
 	VisitorV2 visitor(m_namespaces, nullptr, terminator, nullptr);
 
-	return new ExportedFunctionNode(name
-		, visitor.visitBlock(ast->nodes[3])
-		, visitor.visitTypeName(ast->nodes[0])
-		);
+	auto block = visitor.visitBlock(*ast->nodes.rbegin());
+
+	return new ExportedFunctionNode(name, block, returnType);
 }
 
 CallableNode *VisitorV2::visitImportedFunction(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return new ImportedFunctionNode(nullptr
-		, visitId(ast->nodes[1])
-		, visitArgumentList(ast->nodes[2])
-		, visitTypeName(ast->nodes[0])
-		);
+	auto returnType = visitTypeName(ast->nodes[0]);
+	auto name = visitId(ast->nodes[1]);
+
+	std::vector<DzBaseArgument *> arguments;
+
+	std::transform(begin(ast->nodes) + 2, end(ast->nodes), std::back_inserter(arguments), [this](auto argument)
+	{
+		return visitArgument(argument);
+	});
+
+	return new ImportedFunctionNode(returnType, name, ast, arguments);
 }
 
 DzBaseArgument *VisitorV2::visitArgument(const std::shared_ptr<peg::Ast> &ast) const
@@ -800,7 +771,7 @@ Namespace *VisitorV2::visitNamespace(const std::shared_ptr<peg::Ast> &ast) const
 
 Use *VisitorV2::visitUse(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return new Use(ast->token_to_string());
+	return new Use(visitString(ast->nodes[0]));
 }
 
 BlockInstructionNode *VisitorV2::visitReturn(const std::shared_ptr<peg::Ast> &ast) const
@@ -880,7 +851,7 @@ ITypeName *VisitorV2::visitRegularType(const std::shared_ptr<peg::Ast> &ast) con
 		, visitId(ast->nodes[0])
 		);
 
-	return new DzTypeName(nullptr, qualifiedName);
+	return new DzTypeName(ast, qualifiedName);
 }
 
 ITypeName *VisitorV2::visitFunctionType(const std::shared_ptr<peg::Ast> &ast) const
@@ -945,9 +916,4 @@ PrototypeFieldEmbryo VisitorV2::visitDecoratedField(const std::shared_ptr<peg::A
 	}
 
 	return { name, nullptr, type };
-}
-
-Assignment VisitorV2::visitAssignment(const std::shared_ptr<peg::Ast> &ast) const
-{
-	return { visitId(ast->nodes[0]), ast->nodes[1] };
 }

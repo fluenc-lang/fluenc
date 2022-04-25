@@ -1,7 +1,9 @@
+#include <sstream>
+
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 
-InvalidFunctionPointerTypeException::InvalidFunctionPointerTypeException(const TokenInfo &token, const std::string &name)
-	: CompilerException(token)
+InvalidFunctionPointerTypeException::InvalidFunctionPointerTypeException(const std::shared_ptr<peg::Ast> &ast, const std::string &name)
+	: CompilerException(ast)
 	, m_name(name)
 {
 }

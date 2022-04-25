@@ -1,16 +1,9 @@
 #ifndef DZVALUE_H
 #define DZVALUE_H
 
-#include <llvm/IR/Value.h>
-
 #include "Stack.h"
-#include "Utility.h"
 #include "EntryPoint.h"
-
-namespace antlr4
-{
-	class ParserRuleContext;
-}
+#include "TokenInfo.h"
 
 struct DzResult
 {

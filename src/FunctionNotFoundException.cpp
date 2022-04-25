@@ -4,11 +4,11 @@
 
 #include "values/BaseValue.h"
 
-FunctionNotFoundException::FunctionNotFoundException(const TokenInfo &token
+FunctionNotFoundException::FunctionNotFoundException(const std::shared_ptr<peg::Ast> &ast
 	, const std::string &name
 	, const Stack &values
 	)
-	: CompilerException(token)
+	: CompilerException(ast)
 	, m_name(name)
 	, m_values(values)
 {

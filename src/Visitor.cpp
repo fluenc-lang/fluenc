@@ -246,10 +246,10 @@ antlrcpp::Any Visitor::visitFunction(fluencParser::FunctionContext *context)
 
 	if (attribute == FunctionAttribute::Import)
 	{
-		auto import = new ImportedFunctionNode(context
+		auto import = new ImportedFunctionNode(visit<ITypeName *>(context->typeName())
 			, name
+			, nullptr
 			, arguments
-			, visit<ITypeName *>(context->typeName())
 			);
 
 		return static_cast<CallableNode *>(import);
@@ -298,7 +298,7 @@ antlrcpp::Any Visitor::visitRegularType(fluencParser::RegularTypeContext *contex
 		);
 
 	return static_cast<ITypeName *>(
-		new DzTypeName(context
+		new DzTypeName(nullptr
 			, qualifiedName
 		)
 	);
@@ -432,7 +432,7 @@ antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 		, context->ID()->getText()
 		);
 
-	auto call = new FunctionCallNode(context, names);
+	auto call = new FunctionCallNode(nullptr, names);
 
 	std::vector<Node *> values;
 
@@ -465,10 +465,10 @@ antlrcpp::Any Visitor::visitWith(fluencParser::WithContext *context)
 		return assignment->field()->ID()->getText();
 	});
 
-	auto instantiation = new InstantiationNode(context
-		, fields
+	auto instantiation = new InstantiationNode(m_alpha
 		, WithPrototypeProvider::instance()
-		, m_alpha
+		, nullptr
+		, fields
 		);
 
 	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
@@ -498,12 +498,12 @@ antlrcpp::Any Visitor::visitMember(fluencParser::MemberContext *context)
 
 	if (with)
 	{
-		auto member = new MemberAccessNode(context, visit<Node *>(with), qualifiedPath);
+		auto member = new MemberAccessNode(visit<Node *>(with), nullptr, qualifiedPath);
 
 		return static_cast<Node *>(member);
 	}
 
-	auto member = new MemberAccessNode(context, m_alpha, qualifiedPath);
+	auto member = new MemberAccessNode(m_alpha, nullptr, qualifiedPath);
 
 	return static_cast<Node *>(member);
 }
@@ -613,10 +613,10 @@ antlrcpp::Any Visitor::visitInstantiation(fluencParser::InstantiationContext *co
 	auto typeName = visit<ITypeName *>(context->typeName());
 
 	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
-	auto instantiation = new InstantiationNode(context
-		, fields
+	auto instantiation = new InstantiationNode(m_alpha
 		, prototypeProvider
-		, m_alpha
+		, nullptr
+		, fields
 		);
 
 	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
@@ -677,7 +677,7 @@ antlrcpp::Any Visitor::visitGroup(fluencParser::GroupContext *context)
 
 antlrcpp::Any Visitor::visitExpansion(fluencParser::ExpansionContext *context)
 {
-	auto expansion = new ExpansionNode(context, m_alpha);
+	auto expansion = new ExpansionNode(m_alpha, nullptr);
 
 	Visitor visitor(m_namespaces, m_iteratorType, expansion, nullptr);
 

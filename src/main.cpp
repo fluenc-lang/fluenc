@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <filesystem>
+#include <fstream>
 
 #include <lld/Common/Driver.h>
 
@@ -19,12 +20,17 @@
 #include <llvm/Support/Host.h>
 #include <llvm/Target/TargetMachine.h>
 
+#include "peglib.h"
+#include "incbin.h"
+
 #include "ProjectFileParser.h"
 #include "CompilerException.h"
-#include "Visitor.h"
+#include "VisitorV2.h"
 #include "ModuleInfo.h"
 
 #include "nodes/CallableNode.h"
+
+INCTXT(Grammar, "fluenc.peg");
 
 struct CompilerJob
 {
@@ -69,23 +75,20 @@ CompilerJob createJob(const ModuleInfo &module, const std::filesystem::path &ste
 	};
 }
 
-ModuleInfo analyze(const std::string &file)
+ModuleInfo analyze(const std::string &file, peg::parser &parser)
 {
-	std::ifstream stream;
+	std::ifstream stream(file);
+	std::stringstream buffer;
+	buffer << stream.rdbuf();
 
-	stream.open(file);
+	std::shared_ptr<peg::Ast> ast;
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	parser.parse(buffer.str(), ast);
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
-
-	auto program = parser.program();
+	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor
-		.visit<ModuleInfo>(program);
+		.visit(ast);
 
 	return moduleInfo;
 }
@@ -227,9 +230,19 @@ int main(int argc, char **argv)
 	auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
 	auto dataLayout = targetMachine->createDataLayout();
 
-	ProjectFileParser parser;
+	ProjectFileParser projectFileParser;
 
-	auto configuration = parser.parse("project.toml");
+	auto configuration = projectFileParser.parse("project.toml");
+
+	peg::parser parser(gGrammarData);
+
+	parser.log = [](size_t line, size_t col, const std::string &msg)
+	{
+		std::cerr << line << ":" << col << ": " << msg << "\n";
+	};
+
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
 	std::unordered_map<std::string, CompilerJob> jobs;
 
@@ -252,7 +265,7 @@ int main(int argc, char **argv)
 
 		auto relativeStem = relative.parent_path() / relative.stem();
 
-		auto module = analyze(relative);
+		auto module = analyze(relative, parser);
 		auto job = createJob(module, relativeStem);
 
 		jobs.insert({ job.sourceFile, job});

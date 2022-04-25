@@ -1,12 +1,14 @@
 #ifndef UNDECLAREDIDENTIFIEREXCEPTION_H
 #define UNDECLAREDIDENTIFIEREXCEPTION_H
 
+#include <string>
+
 #include "CompilerException.h"
 
 class UndeclaredIdentifierException : public CompilerException
 {
 	public:
-		UndeclaredIdentifierException(const TokenInfo &token, const std::string &identifier);
+		UndeclaredIdentifierException(const std::shared_ptr<peg::Ast> &ast, const std::string &identifier);
 
 		std::string message() const override;
 

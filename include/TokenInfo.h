@@ -1,19 +1,14 @@
 #ifndef TOKENINFO_H
 #define TOKENINFO_H
 
-#include "antlr4-runtime/fluencBaseVisitor.h"
-#include "antlr4-runtime/fluencLexer.h"
-#include "antlr4-runtime/fluencParser.h"
-
-using namespace antlr4;
-
-struct TokenInfo
+namespace peg
 {
-	size_t row;
-	size_t column;
-	size_t length;
+	template <typename Annotation>
+	struct AstBase;
 
-	static TokenInfo fromContext(ParserRuleContext *context);
-};
+	struct EmptyType;
+
+	using Ast = AstBase<EmptyType>;
+}
 
 #endif // TOKENINFO_H

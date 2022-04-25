@@ -3,6 +3,8 @@
 
 #include <llvm/IR/Value.h>
 
+#include "TokenInfo.h"
+
 class BaseValue;
 class Type;
 class EntryPoint;
@@ -16,7 +18,7 @@ class InteropHelper
 		static const BaseValue *createReadProxy(llvm::Value *value
 			, const Type *type
 			, const EntryPoint &entryPoint
-			, const TokenInfo &token
+			, const std::shared_ptr<peg::Ast> &ast
 			);
 
 		static llvm::Value *createWriteProxy(const UserTypeValue *userTypeValue, const EntryPoint &entryPoint);

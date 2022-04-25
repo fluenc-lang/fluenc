@@ -6,9 +6,9 @@
 #include "values/PlaceholderValue.h"
 #include "values/BaseValue.h"
 
-ExpansionNode::ExpansionNode(antlr4::ParserRuleContext *context, const Node *consumer)
-	: m_token(TokenInfo::fromContext(context))
-	, m_consumer(consumer)
+ExpansionNode::ExpansionNode(const Node *consumer, const std::shared_ptr<peg::Ast> &ast)
+	: m_consumer(consumer)
+	, m_ast(ast)
 {
 }
 
@@ -16,7 +16,7 @@ std::vector<DzResult> ExpansionNode::build(const EntryPoint &entryPoint, Stack v
 {
 	auto block = entryPoint.block();
 
-	auto expandable = values.require<ExpandableValue>(m_token);
+	auto expandable = values.require<ExpandableValue>(m_ast);
 
 	auto continuation = expandable->chain();
 	auto provider = expandable->provider();

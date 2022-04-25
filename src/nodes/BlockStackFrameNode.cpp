@@ -1,3 +1,5 @@
+#include "Utility.h"
+
 #include "nodes/BlockStackFrameNode.h"
 
 BlockStackFrameNode::BlockStackFrameNode(Node *consumer)

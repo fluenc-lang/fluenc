@@ -14,21 +14,20 @@ class IPrototypeProvider;
 class InstantiationNode : public Node
 {
 	public:
-		InstantiationNode(ParserRuleContext *context
-			, const std::vector<std::string> &fields
+		InstantiationNode(const Node *consumer
 			, const IPrototypeProvider *prototypeProvider
-			, const Node *consumer
+			, const std::shared_ptr<peg::Ast> &ast
+			, const std::vector<std::string> &fields
 			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		TokenInfo m_token;
-
-		std::vector<std::string> m_fields;
-
-		const IPrototypeProvider *m_prototypeProvider;
 		const Node *m_consumer;
+		const IPrototypeProvider *m_prototypeProvider;
+
+		std::shared_ptr<peg::Ast> m_ast;
+		std::vector<std::string> m_fields;
 };
 
 #endif // INSTANTIATIONNODE_H

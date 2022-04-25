@@ -1,14 +1,17 @@
-#include "exceptions/AmbiguousFunctionException.h"
+#include <sstream>
+
 #include "DzBaseArgument.h"
 #include "Type.h"
 
+#include "exceptions/AmbiguousFunctionException.h"
+
 #include "nodes/CallableNode.h"
 
-AmbiguousFunctionException::AmbiguousFunctionException(const TokenInfo &token
+AmbiguousFunctionException::AmbiguousFunctionException(const std::shared_ptr<peg::Ast> &ast
 	, const std::vector<CallableNode *> &functions
 	, const EntryPoint &entryPoint
 	)
-	: CompilerException(token)
+	: CompilerException(ast)
 	, m_functions(functions)
 	, m_entryPoint(new EntryPoint(entryPoint))
 {

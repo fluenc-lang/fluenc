@@ -1,6 +1,8 @@
-#include "values/FunctionValue.h"
 #include "EntryPoint.h"
 #include "DzBaseArgument.h"
+#include "Utility.h"
+
+#include "values/FunctionValue.h"
 
 #include "nodes/CallableNode.h"
 

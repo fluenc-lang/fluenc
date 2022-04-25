@@ -1,4 +1,5 @@
 #include "Node.h"
+#include "Utility.h"
 
 static size_t s_id;
 

@@ -15,8 +15,8 @@ BinaryNode::BinaryNode(const Node *consumer, const std::string &op)
 
 std::vector<DzResult> BinaryNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto left = values.require<ScalarValue>(TokenInfo());
-	auto right = values.require<ScalarValue>(TokenInfo());
+	auto left = values.require<ScalarValue>(nullptr);
+	auto right = values.require<ScalarValue>(nullptr);
 
 	auto value = resolveOp(entryPoint, left, right);
 

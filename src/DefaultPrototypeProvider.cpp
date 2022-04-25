@@ -1,5 +1,6 @@
 #include "DefaultPrototypeProvider.h"
 #include "DzTypeName.h"
+#include "Utility.h"
 
 DefaultPrototypeProvider::DefaultPrototypeProvider(ITypeName *type)
 	: m_type(type)

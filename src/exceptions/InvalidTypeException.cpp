@@ -1,7 +1,12 @@
+#include <sstream>
+
 #include "exceptions/InvalidTypeException.h"
 
-InvalidTypeException::InvalidTypeException(const TokenInfo &token, const std::string &expectedType, const std::string &actualType)
-	: CompilerException(token)
+InvalidTypeException::InvalidTypeException(const std::shared_ptr<peg::Ast> &ast
+	, const std::string &expectedType
+	, const std::string &actualType
+	)
+	: CompilerException(ast)
 	, m_expectedType(expectedType)
 	, m_actualType(actualType)
 {

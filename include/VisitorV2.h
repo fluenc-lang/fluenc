@@ -29,13 +29,6 @@ class BlockInstructionNode;
 class ContinuationNode;
 class ITypeName;
 
-struct Assignment
-{
-	std::string name;
-
-	std::shared_ptr<peg::Ast> expression;
-};
-
 class VisitorV2
 {
 	public:
@@ -54,11 +47,8 @@ class VisitorV2
 		std::string visitInteger(const std::shared_ptr<peg::Ast> &ast) const;
 		std::string visitString(const std::shared_ptr<peg::Ast> &ast) const;
 
-		std::vector<DzBaseArgument *> visitArgumentList(const std::shared_ptr<peg::Ast> &ast) const;
 		std::vector<ITypeName *> visitTypeList(const std::shared_ptr<peg::Ast> &ast) const;
 		std::vector<PrototypeFieldEmbryo> visitFieldList(const std::shared_ptr<peg::Ast> &ast) const;
-		std::vector<Node *> visitExpressionList(const std::shared_ptr<peg::Ast> &ast) const;
-		std::vector<Assignment> visitAssignmentList(const std::shared_ptr<peg::Ast> &ast) const;
 		std::vector<std::string> visitIdList(const std::shared_ptr<peg::Ast> &ast) const;
 
 		Node *visitExpression(const std::shared_ptr<peg::Ast> &ast) const;
@@ -107,8 +97,6 @@ class VisitorV2
 		PrototypeFieldEmbryo visitField(const std::shared_ptr<peg::Ast> &ast) const;
 		PrototypeFieldEmbryo visitStandardField(const std::shared_ptr<peg::Ast> &ast) const;
 		PrototypeFieldEmbryo visitDecoratedField(const std::shared_ptr<peg::Ast> &ast) const;
-
-		Assignment visitAssignment(const std::shared_ptr<peg::Ast> &ast) const;
 
 		std::vector<std::string> m_namespaces;
 

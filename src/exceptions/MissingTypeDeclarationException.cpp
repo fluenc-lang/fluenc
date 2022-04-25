@@ -1,10 +1,12 @@
+#include <sstream>
+
 #include "exceptions/MissingTypeDeclarationException.h"
 
-MissingTypeDeclarationException::MissingTypeDeclarationException(const TokenInfo &token
+MissingTypeDeclarationException::MissingTypeDeclarationException(const std::shared_ptr<peg::Ast> &ast
 	, const std::string &typeName
 	, const std::string &fieldName
 	)
-	: CompilerException(token)
+	: CompilerException(ast)
 	, m_typeName(typeName)
 	, m_fieldName(fieldName)
 {

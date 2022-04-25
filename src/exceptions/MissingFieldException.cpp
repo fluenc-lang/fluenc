@@ -1,7 +1,12 @@
+#include <sstream>
+
 #include "include/exceptions/MissingFieldException.h"
 
-MissingFieldException::MissingFieldException(const TokenInfo &token, const std::string &typeName, const std::string &fieldName)
-	: CompilerException(token)
+MissingFieldException::MissingFieldException(const std::shared_ptr<peg::Ast> &ast
+	, const std::string &typeName
+	, const std::string &fieldName
+	)
+	: CompilerException(ast)
 	, m_typeName(typeName)
 	, m_fieldName(fieldName)
 {

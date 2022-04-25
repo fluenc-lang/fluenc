@@ -18,14 +18,11 @@ TypeName            <- FunctionType / RegularType
 Expression          <- Binary / Instantiation / Literal / Group / Call / Expansion / Member / Conditional / Array / Local
 Comment             <- '//' [^\r\n]*
 Assignment          <- Id ':' Expression
-With                <- 'with' '{' AssignmentList '}'
+With                <- 'with' '{' List(Assignment) ','? '}'
 
 # Lists
 TypeList            <- (':' List(TypeName))?
 FieldList           <- ('{' List(Field) ','? '}')?
-ArgumentList        <- List(Argument)?
-ExpressionList      <- List(Expression)?
-AssignmentList      <- (List(Assignment) ','?)?
 IdList              <- Id ('.' Id)*
 
 # Types
@@ -41,16 +38,16 @@ StandardArgument    <- TypeName Id
 TupleArgument       <- '(' StandardArgument (',' StandardArgument)* ')'
 
 # Functions
-RegularFunction     <- 'function' Id '(' ArgumentList ')' Block
-ImportedFunction    <- 'import' TypeName Id '(' ArgumentList ')'
-ExportedFunction    <- 'export' TypeName Id '(' ArgumentList ')' Block
+RegularFunction     <- 'function' Id '(' List(Argument)? ')' Block
+ImportedFunction    <- 'import' TypeName Id '(' List(Argument)? ')'
+ExportedFunction    <- 'export' TypeName Id '(' List(Argument)? ')' Block
 
 # Expressions
-Literal             <- Uint32Literal / Int64Literal / Int32Literal / BooleanLiteral / StringLiteral / CharLiteral / ByteLiteral / NothingLiteral
+Literal             <- ByteLiteral / Uint32Literal / Int64Literal / Int32Literal / BooleanLiteral / StringLiteral / CharLiteral / NothingLiteral
 Binary              <- (Group Operator Expression) / (Literal Operator Expression) / (Member Operator Expression) / (Call Operator Expression)
 Member              <- IdList With?
-Call                <- Id '(' ExpressionList ')'
-Instantiation       <- TypeName '{' AssignmentList '}'
+Call                <- Id '(' List(Expression)? ')'
+Instantiation       <- TypeName '{' (List(Assignment) ','?)? '}'
 Conditional         <- 'if' '(' Expression ')' Block
 Array               <- '[' (List(Expression) ','?)? ']'
 Group               <- '(' Expression ')'

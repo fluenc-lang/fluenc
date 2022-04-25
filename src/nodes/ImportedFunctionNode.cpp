@@ -21,15 +21,15 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
-ImportedFunctionNode::ImportedFunctionNode(antlr4::ParserRuleContext *context
+ImportedFunctionNode::ImportedFunctionNode(ITypeName *returnType
 	, const std::string &name
+	, const std::shared_ptr<peg::Ast> &ast
 	, const std::vector<DzBaseArgument *> &arguments
-	, ITypeName *returnType
 	)
-	: m_token(TokenInfo::fromContext(context))
+	: m_returnType(returnType)
 	, m_name(name)
+	, m_ast(ast)
 	, m_arguments(arguments)
-	, m_returnType(returnType)
 {
 }
 
@@ -125,7 +125,7 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 		}
 		else
 		{
-			throw new InvalidArgumentTypeException(m_token);
+			throw new InvalidArgumentTypeException(m_ast);
 		}
 	}
 
@@ -137,7 +137,7 @@ std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, 
 
 	if (returnType != VoidType::instance())
 	{
-		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint, m_token);
+		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint, m_ast);
 
 		values.push(returnValue);
 	}

@@ -155,7 +155,6 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/Namespace.cpp"
     "${PROJECT_SRC_DIR}/Node.cpp"
     "${PROJECT_SRC_DIR}/Stack.cpp"
-	"${PROJECT_SRC_DIR}/TokenInfo.cpp"
     "${PROJECT_SRC_DIR}/Type.cpp"
     "${PROJECT_SRC_DIR}/UndeclaredIdentifierException.cpp"
 	"${PROJECT_SRC_DIR}/Use.cpp"

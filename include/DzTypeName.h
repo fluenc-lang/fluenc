@@ -1,6 +1,9 @@
 #ifndef DZTYPENAME_H
 #define DZTYPENAME_H
 
+#include <vector>
+#include <memory>
+
 #include "ITypeName.h"
 #include "TokenInfo.h"
 
@@ -15,7 +18,7 @@ namespace antlr4
 class DzTypeName : public ITypeName
 {
 	public:
-		DzTypeName(antlr4::ParserRuleContext *context, const std::vector<std::string> &names);
+		DzTypeName(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names);
 
 		Type *resolve(const EntryPoint &entryPoint) const override;
 
@@ -28,8 +31,7 @@ class DzTypeName : public ITypeName
 		static DzTypeName *without();
 
 	private:
-		TokenInfo m_token;
-
+		std::shared_ptr<peg::Ast> m_ast;
 		std::vector<std::string> m_names;
 };
 
