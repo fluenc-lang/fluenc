@@ -1,8 +1,6 @@
 #ifndef TESTHELPERS_H
 #define TESTHELPERS_H
 
-
-
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
@@ -15,16 +13,12 @@
 #include "src/peglib.h"
 #include "src/incbin.h"
 
-#include "antlr4-runtime/fluencBaseVisitor.h"
-#include "antlr4-runtime/fluencLexer.h"
-#include "antlr4-runtime/fluencParser.h"
-
 #include "KaleidoscopeJIT.h"
 #include "Visitor.h"
 #include "Utility.h"
 #include "EntryPoint.h"
 #include "ModuleInfo.h"
-#include "VisitorV2.h"
+#include "Visitor.h"
 
 #include "nodes/CallableNode.h"
 #include "nodes/GlobalNode.h"
@@ -42,7 +36,7 @@ CallableNode *compileFunction(std::string source)
 
 	parser.parse(source, ast);
 
-	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor.visit(ast);
 
@@ -70,7 +64,7 @@ const BaseValue *compileValue(std::string source)
 
 	parser.parse(stream.str(), ast);
 
-	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor.visit(ast);
 
@@ -122,7 +116,7 @@ EntryPoint compile(std::string source)
 
 	parser.parse(source, ast);
 
-	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor
 		.visit(ast);
@@ -165,7 +159,7 @@ int exec(std::string source)
 
 	parser.parse(source, ast);
 
-	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto llvmContext = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);

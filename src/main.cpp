@@ -25,7 +25,7 @@
 
 #include "ProjectFileParser.h"
 #include "CompilerException.h"
-#include "VisitorV2.h"
+#include "Visitor.h"
 #include "ModuleInfo.h"
 
 #include "nodes/CallableNode.h"
@@ -81,11 +81,13 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 	std::stringstream buffer;
 	buffer << stream.rdbuf();
 
+	auto source = new std::string(buffer.str());
+
 	std::shared_ptr<peg::Ast> ast;
 
-	parser.parse(buffer.str(), ast);
+	parser.parse(*source, ast);
 
-	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor
 		.visit(ast);

@@ -30,7 +30,6 @@ set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/Utility.h"
     "${PROJECT_HEADER_DIR}/ValueHelper.h"
     "${PROJECT_HEADER_DIR}/Visitor.h"
-	"${PROJECT_HEADER_DIR}/VisitorV2.h"
     "${PROJECT_HEADER_DIR}/VoidIterator.h"
     "${PROJECT_HEADER_DIR}/WithPrototypeProvider.h"
     "${PROJECT_HEADER_DIR}/ZipIterator.h"
@@ -161,7 +160,6 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/Utility.cpp"
     "${PROJECT_SRC_DIR}/ValueHelper.cpp"
     "${PROJECT_SRC_DIR}/Visitor.cpp"
-	"${PROJECT_SRC_DIR}/VisitorV2.cpp"
     "${PROJECT_SRC_DIR}/WithPrototypeProvider.cpp"
 	"${PROJECT_SRC_DIR}/metadata/ExpandedValueMetadata.cpp"
 	"${PROJECT_SRC_DIR}/metadata/ExpandableValueMetadata.cpp"
@@ -261,18 +259,10 @@ set(LIB_SOURCE_FILES
 
 set(LIB_HEADER_FILES
     ${LIB_HEADER_FILES}
-    "${PROJECT_ANTLR_DIR}/fluencBaseVisitor.h"
-    "${PROJECT_ANTLR_DIR}/fluencLexer.h"
-    "${PROJECT_ANTLR_DIR}/fluencParser.h"
-    "${PROJECT_ANTLR_DIR}/fluencVisitor.h"
 )
 
 set(LIB_SOURCE_FILES
     ${LIB_SOURCE_FILES}
-    "${PROJECT_ANTLR_DIR}/fluencBaseVisitor.cpp"
-    "${PROJECT_ANTLR_DIR}/fluencLexer.cpp"
-    "${PROJECT_ANTLR_DIR}/fluencParser.cpp"
-    "${PROJECT_ANTLR_DIR}/fluencVisitor.cpp"
 )
 
 set(COMPILER_HEADER_FILES

@@ -1,61 +1,65 @@
+#include <vector>
+#include <map>
+#include <unordered_set>
 #include <numeric>
 
+#include "peglib.h"
+
 #include "Visitor.h"
-#include "EntryPoint.h"
-#include "DzArgument.h"
-#include "DzTypeName.h"
-#include "IndexIterator.h"
-#include "DefaultPrototypeProvider.h"
-#include "WithPrototypeProvider.h"
-#include "Indexed.h"
-#include "DzTupleArgument.h"
-#include "IRBuilderEx.h"
-#include "FunctionTypeName.h"
+#include "ModuleInfo.h"
 #include "Namespace.h"
 #include "Use.h"
-#include "ModuleInfo.h"
+#include "DzTypeName.h"
+#include "FunctionTypeName.h"
+#include "DzArgument.h"
+#include "DzTupleArgument.h"
+#include "DefaultPrototypeProvider.h"
+#include "Indexed.h"
+#include "IndexIterator.h"
+#include "WithPrototypeProvider.h"
 
-#include "nodes/TerminatorNode.h"
-#include "nodes/StringLiteralNode.h"
-#include "nodes/ReturnNode.h"
-#include "nodes/StackSegmentNode.h"
-#include "nodes/MemberAccessNode.h"
-#include "nodes/LocalNode.h"
-#include "nodes/IntegralLiteralNode.h"
-#include "nodes/FunctionCallProxyNode.h"
-#include "nodes/ExportedFunctionTerminatorNode.h"
-#include "nodes/ExpansionNode.h"
-#include "nodes/BlockInstructionNode.h"
-#include "nodes/ConditionalNode.h"
-#include "nodes/ContinuationNode.h"
-#include "nodes/CharacterLiteralNode.h"
-#include "nodes/ImportedFunctionNode.h"
-#include "nodes/InstantiationNode.h"
-#include "nodes/FunctionCallNode.h"
+#include "nodes/CallableNode.h"
 #include "nodes/GlobalNode.h"
-#include "nodes/LazySinkNode.h"
-#include "nodes/ReferenceSinkNode.h"
-#include "nodes/LazyEvaluationNode.h"
-#include "nodes/JunctionNode.h"
-#include "nodes/IndexSinkNode.h"
-#include "nodes/EmptyArrayNode.h"
+#include "nodes/TerminatorNode.h"
+#include "nodes/BlockInstructionNode.h"
 #include "nodes/FunctionNode.h"
-#include "nodes/ExportedFunctionNode.h"
-#include "nodes/BooleanLiteralNode.h"
+#include "nodes/ImportedFunctionNode.h"
 #include "nodes/BlockStackFrameNode.h"
-#include "nodes/BinaryNode.h"
-#include "nodes/ArraySinkNode.h"
-#include "nodes/ArrayElementNode.h"
+#include "nodes/ReturnNode.h"
+#include "nodes/ContinuationNode.h"
+#include "nodes/ExportedFunctionTerminatorNode.h"
+#include "nodes/ExportedFunctionNode.h"
+#include "nodes/IntegralLiteralNode.h"
+#include "nodes/BooleanLiteralNode.h"
 #include "nodes/NothingNode.h"
+#include "nodes/StringLiteralNode.h"
+#include "nodes/CharacterLiteralNode.h"
+#include "nodes/BinaryNode.h"
+#include "nodes/InstantiationNode.h"
+#include "nodes/ConditionalNode.h"
+#include "nodes/ArraySinkNode.h"
+#include "nodes/EmptyArrayNode.h"
+#include "nodes/FunctionCallNode.h"
+#include "nodes/MemberAccessNode.h"
+#include "nodes/ReferenceSinkNode.h"
+#include "nodes/FunctionCallProxyNode.h"
+#include "nodes/StackSegmentNode.h"
+#include "nodes/LazyEvaluationNode.h"
+#include "nodes/IndexSinkNode.h"
+#include "nodes/ExpansionNode.h"
+#include "nodes/LocalNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
+#include "types/Int32Type.h"
+#include "types/Int64Type.h"
+#include "types/BooleanType.h"
+#include "types/StringType.h"
+#include "types/ByteType.h"
 
-#include "values/ScalarValue.h"
-#include "values/ReferenceValue.h"
-#include "values/IteratorValue.h"
-#include "values/ArrayValue.h"
-#include "values/IndexedValue.h"
+class CallableNode;
+class BaseValue;
+class Prototype;
 
 Visitor::Visitor(const std::vector<std::string> &namespaces
 	, const Type *iteratorType
@@ -97,76 +101,76 @@ void populateInstructions(const std::vector<std::string> &namespaces
 	, std::unordered_set<std::string> &uses
 	)
 {
-//	for (auto &instruction : instructions)
-//	{
-//		if (instruction.is<Namespace *>())
-//		{
-//			auto _namespace = instruction.as<Namespace *>();
+	for (auto &instruction : instructions)
+	{
+		if (instruction.type() == typeid(Namespace *))
+		{
+			auto _namespace = std::any_cast<Namespace *>(instruction);
 
-//			std::vector<std::string> nestedNamespaces(namespaces);
+			std::vector<std::string> nestedNamespaces(namespaces);
 
-//			nestedNamespaces.push_back(_namespace->name());
+			nestedNamespaces.push_back(_namespace->name());
 
-//			populateInstructions(nestedNamespaces
-//				, _namespace->children()
-//				, roots
-//				, functions
-//				, locals
-//				, globals
-//				, types
-//				, uses
-//				);
-//		}
-//		else
-//		{
-//			if (instruction.is<CallableNode *>())
-//			{
-//				auto callable = instruction.as<CallableNode *>();
+			populateInstructions(nestedNamespaces
+				, _namespace->children()
+				, roots
+				, functions
+				, locals
+				, globals
+				, types
+				, uses
+				);
+		}
+		else
+		{
+			if (instruction.type() == typeid(CallableNode *))
+			{
+				auto callable = std::any_cast<CallableNode *>(instruction);
 
-//				if (callable->attribute() == FunctionAttribute::Export)
-//				{
-//					roots.push_back(callable);
-//				}
-//				else
-//				{
-//					auto name = qualifiedNames(namespaces
-//						, callable->name()
-//						);
+				if (callable->attribute() == FunctionAttribute::Export)
+				{
+					roots.push_back(callable);
+				}
+				else
+				{
+					auto name = qualifiedNames(namespaces
+						, callable->name()
+						);
 
-//					functions.insert({ name[0], callable });
-//				}
-//			}
-//			else if (instruction.is<Prototype *>())
-//			{
-//				auto prototype = instruction.as<Prototype *>();
+					functions.insert({ name[0], callable });
+				}
+			}
+			else if (instruction.type() == typeid(Prototype *))
+			{
+				auto prototype = std::any_cast<Prototype *>(instruction);
 
-//				auto name = qualifiedNames(namespaces
-//					, prototype->name()
-//					);
+				auto name = qualifiedNames(namespaces
+					, prototype->name()
+					);
 
-//				types.insert({ name[0], prototype });
-//			}
-//			else if (instruction.is<GlobalNode *>())
-//			{
-//				auto global = instruction.as<GlobalNode *>();
+				types.insert({ name[0], prototype });
+			}
+			else if (instruction.type() == typeid(GlobalNode *))
+			{
+				auto global = std::any_cast<GlobalNode *>(instruction);
 
-//				auto name = qualifiedNames(namespaces
-//					, global->name()
-//					);
+				auto name = qualifiedNames(namespaces
+					, global->name()
+					);
 
-//				globals.insert({ name[0], global });
-//			}
-//			else if (instruction.is<Use *>())
-//			{
-//				auto use = instruction.as<Use *>();
+				globals.insert({ name[0], global });
+			}
+			else if (instruction.type() == typeid(Use *))
+			{
+				auto use = std::any_cast<Use *>(instruction);
 
-//				uses.insert(use->fileName());
-//			}
-//		}
-//	}
+				uses.insert(use->fileName());
+			}
+		}
+	}
 }
 
-antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
+ModuleInfo Visitor::visit(const std::shared_ptr<peg::Ast> &ast) const
 {
 	std::vector<CallableNode *> roots;
 	std::multimap<std::string, CallableNode *> functions;
@@ -175,14 +179,12 @@ antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
 	std::map<std::string, Prototype *> types;
 	std::unordered_set<std::string> uses;
 
-	auto instructions = context->instruction();
-
 	std::vector<std::any> results;
 
-//	std::transform(begin(instructions), end(instructions), std::back_inserter(results), [this](auto instruction)
-//	{
-//		return fluencBaseVisitor::visit(instruction);
-//	});
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto instruction)
+	{
+		return visitInstruction(instruction);
+	});
 
 	populateInstructions(std::vector<std::string>()
 		, results
@@ -205,245 +207,263 @@ antlrcpp::Any Visitor::visitProgram(fluencParser::ProgramContext *context)
 	};
 }
 
-FunctionAttribute getAttribute(fluencParser::FunctionContext *ctx)
+std::any Visitor::visitInstruction(const std::shared_ptr<peg::Ast> &ast) const
 {
-	if (ctx->attribute)
+	using namespace peg::udl;
+
+	switch (ast->tag)
 	{
-		auto attribute = ctx->attribute->getText();
-
-		if (attribute == "import")
-		{
-			return FunctionAttribute::Import;
-		}
-
-		if (attribute == "export")
-		{
-			return FunctionAttribute::Export;
-		}
-
-		if (attribute == "recursive")
-		{
-			return FunctionAttribute::Recursive;
-		}
+		case "Instruction"_:
+			return visitInstruction(ast->nodes[0]);
+		case "Function"_:
+			return visitFunction(ast);
+		case "Structure"_:
+			return visitStructure(ast);
+		case "Global"_:
+			return visitGlobal(ast);
+		case "Namespace"_:
+			return visitNamespace(ast);
+		case "Use"_:
+			return visitUse(ast);
+		case "Block"_:
+			return visitBlock(ast);
 	}
 
-	return FunctionAttribute::None;
+	throw new std::exception();
 }
 
-antlrcpp::Any Visitor::visitFunction(fluencParser::FunctionContext *context)
+std::string Visitor::visitId(const std::shared_ptr<peg::Ast> &ast) const
 {
-	std::vector<DzBaseArgument *> arguments;
-
-	for (auto argument : context->argument())
-	{
-		arguments.push_back(visit<DzBaseArgument *>(argument));
-	}
-
-	auto name = context->name->getText();
-	auto block = context->block();
-
-	auto attribute = getAttribute(context);
-
-	if (attribute == FunctionAttribute::Import)
-	{
-		auto import = new ImportedFunctionNode(visit<ITypeName *>(context->typeName())
-			, name
-			, nullptr
-			, arguments
-			);
-
-		return static_cast<CallableNode *>(import);
-	}
-
-	if (attribute == FunctionAttribute::Export)
-	{
-		auto terminator = new ExportedFunctionTerminatorNode();
-
-		Visitor visitor(m_namespaces, nullptr, terminator, nullptr);
-
-		auto entryPoint = new ExportedFunctionNode(name
-			, visitor.visit<Node *>(block)
-			, visitor.visit<ITypeName *>(context->typeName())
-			);
-
-		return static_cast<CallableNode *>(entryPoint);
-	}
-
-	auto iteratorType = new IteratorType();
-
-	auto terminator = new TerminatorNode(name, attribute);
-
-	Visitor visitor(m_namespaces, iteratorType, terminator, nullptr);
-
-	auto content = visitor.visit<Node *, BlockInstructionNode *>(block);
-
-	if (content->containsIterator())
-	{
-		attribute = FunctionAttribute::Iterator;
-	}
-
-	auto function = new FunctionNode(attribute
-		, name
-		, arguments
-		, content
-		);
-
-	return static_cast<CallableNode *>(function);
+	return ast->token_to_string();
 }
 
-antlrcpp::Any Visitor::visitRegularType(fluencParser::RegularTypeContext *context)
+std::string Visitor::visitInteger(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto qualifiedName = qualifiedNames(m_namespaces
-		, context->getText()
-		);
-
-	return static_cast<ITypeName *>(
-		new DzTypeName(nullptr
-			, qualifiedName
-		)
-	);
+	return ast->token_to_string();
 }
 
-antlrcpp::Any Visitor::visitFunctionType(fluencParser::FunctionTypeContext *context)
+std::string Visitor::visitString(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto parameterTypes = context->typeName();
+	return ast->token_to_string();
+}
 
-	std::vector<const ITypeName *> types;
+std::vector<ITypeName *> Visitor::visitTypeList(const std::shared_ptr<peg::Ast> &ast) const
+{
+	std::vector<ITypeName *> results;
 
-	std::transform(begin(parameterTypes), end(parameterTypes), std::back_inserter(types), [this](auto typeName)
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto node)
 	{
-		return visit<ITypeName *>(typeName);
+		return visitTypeName(node);
 	});
 
-	return static_cast<ITypeName *>(
-		new FunctionTypeName(types)
-		);
+	return results;
 }
 
-antlrcpp::Any Visitor::visitStandardArgument(fluencParser::StandardArgumentContext *context)
+std::vector<PrototypeFieldEmbryo> Visitor::visitFieldList(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto argument = new DzArgument(context->ID()->getText()
-		, visit<ITypeName *>(context->typeName())
-		);
+	std::vector<PrototypeFieldEmbryo> results;
 
-	return static_cast<DzBaseArgument *>(argument);
-}
-
-antlrcpp::Any Visitor::visitTupleArgument(fluencParser::TupleArgumentContext *context)
-{
-	auto arguments = context->argument();
-
-	std::vector<DzBaseArgument *> tupleArguments;
-
-	std::transform(begin(arguments), end(arguments), std::back_insert_iterator(tupleArguments), [this](fluencParser::ArgumentContext *argument)
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto node)
 	{
-		return visit<DzBaseArgument *>(argument);
+		return visitField(node);
 	});
 
-	auto argument = new DzTupleArgument(tupleArguments);
-
-	return static_cast<DzBaseArgument *>(argument);
+	return results;
 }
 
-antlrcpp::Any Visitor::visitRet(fluencParser::RetContext *context)
+std::vector<std::string> Visitor::visitIdList(const std::shared_ptr<peg::Ast> &ast) const
 {
-	if (context->chained)
+	std::vector<std::string> results;
+
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(results), [this](auto node)
 	{
-		auto continuation = visit<Node *>(context->chained);
+		return visitId(node);
+	});
 
-		auto ret = new ReturnNode(m_iteratorType, m_alpha, continuation);
+	return results;
+}
 
-		Visitor visitor(m_namespaces, nullptr, ret, nullptr);
+Node *Visitor::visitExpression(const std::shared_ptr<peg::Ast> &ast) const
+{
+	using namespace peg::udl;
 
-		auto value = visitor
-			.visit<Node *>(context->value);
-
-		auto instruction = new BlockInstructionNode(value, true);
-
-		return static_cast<Node *>(instruction);
+	switch (ast->tag)
+	{
+		case "Expression"_:
+			return visitExpression(ast->nodes[0]);
+		case "Literal"_:
+			return visitLiteral(ast);
+		case "Binary"_:
+			return visitBinary(ast);
+		case "Member"_:
+			return visitMember(ast);
+		case "Call"_:
+			return visitCall(ast);
+		case "Instantiation"_:
+			return visitInstantiation(ast);
+		case "Conditional"_:
+			return visitConditional(ast);
+		case "Array"_:
+			return visitArray(ast);
+		case "Group"_:
+			return visitGroup(ast);
+		case "Expansion"_:
+			return visitExpansion(ast);
+		case "Local"_:
+			return visitLocal(ast);
 	}
 
-	auto ret = new ReturnNode(m_iteratorType, m_alpha, nullptr);
-
-	Visitor visitor(m_namespaces, nullptr, ret, nullptr);
-
-	auto value = visitor
-		.visit<Node *>(context->value);
-
-	auto instruction = new BlockInstructionNode(value, false);
-
-	return static_cast<Node *>(instruction);
+	throw new std::exception();
 }
 
-antlrcpp::Any Visitor::visitBlock(fluencParser::BlockContext *context)
+Node *Visitor::visitLiteral(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto expressions = context->expression();
+	using namespace peg::udl;
 
-	auto ret = visit<Node *, BlockInstructionNode *>(context->ret());
-
-	auto result = std::accumulate(rbegin(expressions), rend(expressions), ret, [this](BlockInstructionNode *consumer, fluencParser::ExpressionContext *expression)
+	switch (ast->tag)
 	{
-		auto stackFrame = new BlockStackFrameNode(consumer);
+		case "Literal"_:
+			return visitLiteral(ast->nodes[0]);
+		case "Int32Literal"_:
+			return visitInt32Literal(ast);
+		case "Int64Literal"_:
+			return visitInt64Literal(ast);
+		case "BooleanLiteral"_:
+			return visitBooleanLiteral(ast);
+		case "StringLiteral"_:
+			return visitStringLiteral(ast);
+		case "Uint32Literal"_:
+			return visitUint32Literal(ast);
+		case "CharLiteral"_:
+			return visitCharLiteral(ast);
+		case "ByteLiteral"_:
+			return visitByteLiteral(ast);
+		case "NothingLiteral"_:
+			return visitNothingLiteral(ast);
+	}
 
-		Visitor visitor(m_namespaces, m_iteratorType, stackFrame, m_alpha);
-
-		auto value = visitor
-			.visit<Node *>(expression);
-
-		if (auto instruction = dynamic_cast<const BlockInstructionNode *>(value))
-		{
-			return new BlockInstructionNode(instruction
-				, instruction->containsIterator() || consumer->containsIterator()
-				);
-		}
-
-		return new BlockInstructionNode(value
-			, consumer->containsIterator()
-			);
-	});
-
-	return static_cast<Node *>(result);
+	throw new std::exception();
 }
 
-antlrcpp::Any Visitor::visitBinary(fluencParser::BinaryContext *context)
+Node *Visitor::visitInt32Literal(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new IntegralLiteralNode(m_alpha
+		, DzTypeName::int32()
+		, visitInteger(ast->nodes[0])
+		);
+}
+
+Node *Visitor::visitInt64Literal(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new IntegralLiteralNode(m_alpha
+		, DzTypeName::int64()
+		, visitInteger(ast->nodes[0])
+		);
+}
+
+Node *Visitor::visitBooleanLiteral(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new BooleanLiteralNode(m_alpha
+		, ast->token_to_string()
+		);
+}
+
+Node *Visitor::visitStringLiteral(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new StringLiteralNode(m_alpha
+		, visitString(ast->nodes[0])
+		);
+}
+
+Node *Visitor::visitUint32Literal(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new IntegralLiteralNode(m_alpha
+		, DzTypeName::uint32()
+		, visitInteger(ast->nodes[0])
+		);
+}
+
+Node *Visitor::visitCharLiteral(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new CharacterLiteralNode(m_alpha
+		, ast->token_to_string()
+		);
+}
+
+Node *Visitor::visitByteLiteral(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new IntegralLiteralNode(m_alpha
+		, DzTypeName::byte()
+		, visitInteger(ast->nodes[0])
+		);
+}
+
+Node *Visitor::visitNothingLiteral(const std::shared_ptr<peg::Ast> &ast) const
+{
+	UNUSED(ast);
+
+	return new NothingNode(m_alpha);
+}
+
+Node *Visitor::visitBinary(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto binary = new BinaryNode(m_alpha
-		, context->OP()->getText()
+		, visitId(ast->nodes[1])
 		);
 
 	Visitor leftVisitor(m_namespaces, m_iteratorType, binary, nullptr);
 
 	auto left = leftVisitor
-		.visit<Node *>(context->left);
+		.visitExpression(ast->nodes[0]);
 
 	Visitor rightVisitor(m_namespaces, m_iteratorType, left, nullptr);
 
 	auto right = rightVisitor
-		.visit<Node *>(context->right);
+		.visitExpression(ast->nodes[2]);
 
 	return right;
 }
 
-antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
+Node *Visitor::visitMember(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto expression = context->expression();
+	auto access = visitIdList(ast->nodes[0]);
 
+	auto path = std::accumulate(begin(access) + 1, end(access), (*begin(access)), [](auto name, std::string node)
+	{
+		std::stringstream ss;
+		ss << name << "." << node;
+
+		return ss.str();
+	});
+
+	auto qualifiedPath = qualifiedNames(m_namespaces, path);
+
+	if (ast->nodes.size() > 1)
+	{
+		auto with = visitWith(ast->nodes[1]);
+
+		return new MemberAccessNode(with, ast, qualifiedPath);
+	}
+
+	return new MemberAccessNode(m_alpha, ast, qualifiedPath);
+}
+
+Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
+{
 	auto names = qualifiedNames(m_namespaces
-		, context->ID()->getText()
+		, visitId(ast->nodes[0])
 		);
 
-	auto call = new FunctionCallNode(nullptr, names);
+	auto call = new FunctionCallNode(ast, names);
+	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
+
+	Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
 
 	std::vector<Node *> values;
 
-	std::transform(begin(expression), end(expression), std::back_insert_iterator(values), [this](fluencParser::ExpressionContext *parameter)
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes), std::back_inserter(values), [&](auto node)
 	{
-		auto sink = new ReferenceSinkNode(TerminatorNode::instance());
-
-		Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
-
-		return visitor
-			.visit<Node *>(parameter);
+		return visitor.visitExpression(node);
 	});
 
 	auto evaluation = new LazyEvaluationNode(call);
@@ -451,276 +471,72 @@ antlrcpp::Any Visitor::visitCall(fluencParser::CallContext *context)
 	auto withoutEvaluation = new StackSegmentNode(values, call, TerminatorNode::instance());
 	auto proxy = new FunctionCallProxyNode(names, m_alpha, withEvaluation, withoutEvaluation);
 
-	return static_cast<Node *>(proxy);
+	return proxy;
 }
 
-antlrcpp::Any Visitor::visitWith(fluencParser::WithContext *context)
+Node *Visitor::visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto assignments = context->assignment();
+	auto typeName = visitTypeName(ast->nodes[0]);
 
 	std::vector<std::string> fields;
 
-	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](fluencParser::AssignmentContext *assignment)
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes), std::back_insert_iterator(fields), [this](auto assignment)
 	{
-		return assignment->field()->ID()->getText();
+		return visitId(assignment->nodes[0]);
 	});
-
-	auto instantiation = new InstantiationNode(m_alpha
-		, WithPrototypeProvider::instance()
-		, nullptr
-		, fields
-		);
-
-	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
-	{
-		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
-
-		return visitor
-			.visit<Node *>(assignment->expression());
-	});
-}
-
-antlrcpp::Any Visitor::visitMember(fluencParser::MemberContext *context)
-{
-	auto access = context->ID();
-
-	auto path = std::accumulate(begin(access) + 1, end(access), (*begin(access))->getText(), [](auto name, antlr4::tree::TerminalNode *node)
-	{
-		std::stringstream ss;
-		ss << name << "." << node->getText();
-
-		return ss.str();
-	});
-
-	auto qualifiedPath = qualifiedNames(m_namespaces, path);
-
-	auto with = context->with();
-
-	if (with)
-	{
-		auto member = new MemberAccessNode(visit<Node *>(with), nullptr, qualifiedPath);
-
-		return static_cast<Node *>(member);
-	}
-
-	auto member = new MemberAccessNode(m_alpha, nullptr, qualifiedPath);
-
-	return static_cast<Node *>(member);
-}
-
-antlrcpp::Any Visitor::visitInt32Literal(fluencParser::Int32LiteralContext *context)
-{
-	auto constant = new IntegralLiteralNode(m_alpha
-		, DzTypeName::int32()
-		, context->INT()->getText()
-		);
-
-	return static_cast<Node *>(constant);
-}
-
-antlrcpp::Any Visitor::visitInt64Literal(fluencParser::Int64LiteralContext *context)
-{
-	auto constant = new IntegralLiteralNode(m_alpha
-		, DzTypeName::int64()
-		, context->INT()->getText()
-		);
-
-	return static_cast<Node *>(constant);
-}
-
-antlrcpp::Any Visitor::visitBoolLiteral(fluencParser::BoolLiteralContext *context)
-{
-	auto constant = new BooleanLiteralNode(m_alpha
-		, context->BOOL()->getText()
-		);
-
-	return static_cast<Node *>(constant);
-}
-
-antlrcpp::Any Visitor::visitStringLiteral(fluencParser::StringLiteralContext *context)
-{
-	auto constant = new StringLiteralNode(m_alpha
-		, context->STRING()->getText()
-		);
-
-	return static_cast<Node *>(constant);
-}
-
-antlrcpp::Any Visitor::visitUint32Literal(fluencParser::Uint32LiteralContext *context)
-{
-	auto constant = new IntegralLiteralNode(m_alpha
-		, DzTypeName::uint32()
-		, context->INT()->getText()
-		);
-
-	return static_cast<Node *>(constant);
-}
-
-antlrcpp::Any Visitor::visitStructure(fluencParser::StructureContext *context)
-{
-	auto name = context->name->getText();
-	auto inputFields = context->field();
-
-	std::vector<PrototypeFieldEmbryo> fields;
-
-	std::transform(begin(inputFields), end(inputFields), std::back_insert_iterator(fields), [this](fluencParser::FieldContext *field) -> PrototypeFieldEmbryo
-	{
-		auto name = field->ID()->getText();
-
-		ITypeName *type = nullptr;
-
-		if (field->typeName())
-		{
-			type = visit<ITypeName *>(field->typeName());
-		}
-
-		if (field->expression())
-		{
-			Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
-
-			auto defaultValue = visitor
-				.visit<Node *>(field->expression());
-
-			return { name, defaultValue, type };
-		}
-
-		return { name, nullptr, type };
-	});
-
-	std::vector<ITypeName *> parentTypes;
-
-	auto parentTypeNames = context->typeName();
-
-	std::transform(begin(parentTypeNames), end(parentTypeNames), std::back_insert_iterator(parentTypes), [this](fluencParser::TypeNameContext *typeName) -> ITypeName *
-	{
-		return visit<ITypeName *>(typeName);
-	});
-
-	return new Prototype(name, fields, parentTypes);
-}
-
-antlrcpp::Any Visitor::visitInstantiation(fluencParser::InstantiationContext *context)
-{
-	auto assignments = context->assignment();
-
-	std::vector<std::string> fields;
-
-	std::transform(begin(assignments), end(assignments), std::back_insert_iterator(fields), [](fluencParser::AssignmentContext *assignment)
-	{
-		return assignment->field()->ID()->getText();
-	});
-
-	auto typeName = visit<ITypeName *>(context->typeName());
 
 	auto prototypeProvider = new DefaultPrototypeProvider(typeName);
 	auto instantiation = new InstantiationNode(m_alpha
 		, prototypeProvider
-		, nullptr
+		, ast
 		, fields
 		);
 
-	return std::accumulate(begin(assignments), end(assignments), static_cast<Node *>(instantiation), [this](auto consumer, fluencParser::AssignmentContext *assignment)
+	return std::accumulate(begin(ast->nodes) + 1, end(ast->nodes), static_cast<Node *>(instantiation), [this](auto consumer, auto assignment)
 	{
 		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
 
 		return visitor
-			.visit<Node *>(assignment->expression());
+			.visitExpression(assignment->nodes[1]);
 	});
 }
 
-antlrcpp::Any Visitor::visitConditional(fluencParser::ConditionalContext *context)
+Node *Visitor::visitConditional(const std::shared_ptr<peg::Ast> &ast) const
 {
 	Visitor blockVisitor(m_namespaces, m_iteratorType, m_beta, nullptr);
 
 	auto block = blockVisitor
-		.visit<Node *, BlockInstructionNode *>(context->block());
+		.visitBlock(ast->nodes[1]);
 
 	auto conditional = new ConditionalNode(m_alpha, block);
 
 	Visitor expressionVisitor(m_namespaces, m_iteratorType, conditional, nullptr);
 
 	auto condition = expressionVisitor
-		.visit<Node *>(context->expression());
+		.visitExpression(ast->nodes[0]);
 
-	auto instruction = new BlockInstructionNode(condition
+	return new BlockInstructionNode(condition
 		, block->containsIterator()
 		);
-
-	return static_cast<Node *>(instruction);
 }
 
-antlrcpp::Any Visitor::visitGlobal(fluencParser::GlobalContext *context)
+Node *Visitor::visitArray(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto name = context->ID()->getText();
-
-	Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
-
-	auto literal = visitor
-		.visit<Node *>(context->expression());
-
-	return new GlobalNode(literal, name);
-}
-
-antlrcpp::Any Visitor::visitNothing(fluencParser::NothingContext *context)
-{
-	UNUSED(context);
-
-	auto constant = new NothingNode(m_alpha);
-
-	return static_cast<Node *>(constant);
-}
-
-antlrcpp::Any Visitor::visitGroup(fluencParser::GroupContext *context)
-{
-	return visit<Node *>(context->expression());
-}
-
-antlrcpp::Any Visitor::visitExpansion(fluencParser::ExpansionContext *context)
-{
-	auto expansion = new ExpansionNode(m_alpha, nullptr);
-
-	Visitor visitor(m_namespaces, m_iteratorType, expansion, nullptr);
-
-	return visitor
-		.visit<Node *>(context->expression());
-}
-
-antlrcpp::Any Visitor::visitContinuation(fluencParser::ContinuationContext *context)
-{
-	auto continuation = new ContinuationNode();
-
-	auto expressions = context->expression();
-
-	return std::accumulate(begin(expressions), end(expressions), static_cast<Node *>(continuation), [this](Node *consumer, fluencParser::ExpressionContext *parameter)
-	{
-		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
-
-		auto result = visitor
-			.visit<Node *>(parameter);
-
-		return result;
-	});
-}
-
-antlrcpp::Any Visitor::visitArray(fluencParser::ArrayContext *context)
-{
-	auto expressions = context->expression();
-
-	if (expressions.empty())
+	if (ast->nodes.empty())
 	{
 		auto empty = new EmptyArrayNode(TerminatorNode::instance());
 
 		return static_cast<Node *>(empty);
 	}
 
-	std::vector<Indexed<fluencParser::ExpressionContext *>> indexed;
+	std::vector<Indexed<std::shared_ptr<peg::Ast>>> indexed;
 
-	std::transform(begin(expressions), end(expressions), index_iterator(0u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<fluencParser::ExpressionContext *>
+	std::transform(begin(ast->nodes), end(ast->nodes), index_iterator(0u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<std::shared_ptr<peg::Ast>>
 	{
 		return { y, x };
 	});
 
-	auto firstValue = std::accumulate(begin(indexed), end(indexed), (Node *)TerminatorNode::instance(), [&](auto next, Indexed<fluencParser::ExpressionContext *> expression)
+	auto firstValue = std::accumulate(begin(indexed), end(indexed), static_cast<Node *>(TerminatorNode::instance()), [&](auto next, Indexed<std::shared_ptr<peg::Ast>> expression)
 	{
 		auto indexSink = new IndexSinkNode(expression.index, next);
 		auto referenceSink = new ReferenceSinkNode(indexSink);
@@ -728,54 +544,211 @@ antlrcpp::Any Visitor::visitArray(fluencParser::ArrayContext *context)
 		Visitor visitor(m_namespaces, m_iteratorType, referenceSink, nullptr);
 
 		return visitor
-			.visit<Node *>(expression.value);
+			.visitExpression(expression.value);
 	});
 
-	auto lazySink = new ArraySinkNode(expressions.size(), m_alpha, firstValue);
-
-	return static_cast<Node *>(lazySink);
+	return new ArraySinkNode(ast->nodes.size(), m_alpha, firstValue);
 }
 
-antlrcpp::Any Visitor::visitCharLiteral(fluencParser::CharLiteralContext *context)
+Node *Visitor::visitGroup(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto value = new CharacterLiteralNode(m_alpha
-		, context->CHARACTER()->getText()
-		);
-
-	return static_cast<Node *>(value);
+	return visitExpression(ast->nodes[0]);
 }
 
-antlrcpp::Any Visitor::visitByteLiteral(fluencParser::ByteLiteralContext *context)
+Node *Visitor::visitExpansion(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto constant = new IntegralLiteralNode(m_alpha
-		, DzTypeName::byte()
-		, context->INT()->getText()
-		);
+	auto expansion = new ExpansionNode(m_alpha, ast);
 
-	return static_cast<Node *>(constant);
+	Visitor visitor(m_namespaces, m_iteratorType, expansion, nullptr);
+
+	return visitor
+		.visitExpression(ast->nodes[0]);
 }
 
-antlrcpp::Any Visitor::visitLocal(fluencParser::LocalContext *context)
+Node *Visitor::visitLocal(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto local = new LocalNode(m_alpha
-		, context->ID()->getText()
+		, visitId(ast->nodes[0])
 		);
 
 	Visitor visitor(m_namespaces, m_iteratorType, local, nullptr);
 
-	return visitor.visit<Node *>(context->expression());
+	return visitor.visitExpression(ast->nodes[1]);
 }
 
-antlrcpp::Any Visitor::visitInstruction(fluencParser::InstructionContext *context)
+Node *Visitor::visitContinuation(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return visitChildren(context);
+	auto continuation = new ContinuationNode();
+
+	return std::accumulate(begin(ast->nodes) + 1, end(ast->nodes), static_cast<Node *>(continuation), [this](Node *consumer, auto parameter)
+	{
+		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
+
+		auto result = visitor
+			.visitExpression(parameter);
+
+		return result;
+	});
 }
 
-antlrcpp::Any Visitor::visitNs(fluencParser::NsContext *context)
+Node *Visitor::visitWith(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto instructions = context->instruction();
-	auto name = context->ID()->getText();
+	std::vector<std::string> fields;
 
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_insert_iterator(fields), [this](auto assignment)
+	{
+		return visitId(assignment->nodes[0]);
+	});
+
+	auto instantiation = new InstantiationNode(m_alpha
+		, WithPrototypeProvider::instance()
+		, ast
+		, fields
+		);
+
+	return std::accumulate(begin(ast->nodes), end(ast->nodes), static_cast<Node *>(instantiation), [this](auto consumer, auto assignment)
+	{
+		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
+
+		return visitor
+			.visitExpression(assignment->nodes[1]);
+	});
+}
+
+CallableNode *Visitor::visitFunction(const std::shared_ptr<peg::Ast> &ast) const
+{
+	using namespace peg::udl;
+
+	switch (ast->tag)
+	{
+		case "Function"_:
+			return visitFunction(ast->nodes[0]);
+		case "RegularFunction"_:
+			return visitRegularFunction(ast);
+		case "ImportedFunction"_:
+			return visitImportedFunction(ast);
+		case "ExportedFunction"_:
+			return visitExportedFunction(ast);
+	}
+
+	throw new std::exception();
+}
+
+CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto name = visitId(ast->nodes[0]);
+
+	std::vector<DzBaseArgument *> arguments;
+
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes) - 1, std::back_inserter(arguments), [this](auto argument)
+	{
+		return visitArgument(argument);
+	});
+
+	auto iteratorType = new IteratorType();
+
+	Visitor visitor(m_namespaces, iteratorType, TerminatorNode::instance(), nullptr);
+
+	auto block = visitor.visitBlock(*ast->nodes.rbegin());
+
+	if (block->containsIterator())
+	{
+		return new FunctionNode(FunctionAttribute::Iterator, name, arguments, block);
+	}
+
+	return new FunctionNode(FunctionAttribute::None, name, arguments, block);
+}
+
+CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto returnType = visitTypeName(ast->nodes[0]);
+	auto name = visitId(ast->nodes[1]);
+
+	auto terminator = new ExportedFunctionTerminatorNode();
+
+	Visitor visitor(m_namespaces, nullptr, terminator, nullptr);
+
+	auto block = visitor.visitBlock(*ast->nodes.rbegin());
+
+	return new ExportedFunctionNode(name, block, returnType);
+}
+
+CallableNode *Visitor::visitImportedFunction(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto returnType = visitTypeName(ast->nodes[0]);
+	auto name = visitId(ast->nodes[1]);
+
+	std::vector<DzBaseArgument *> arguments;
+
+	std::transform(begin(ast->nodes) + 2, end(ast->nodes), std::back_inserter(arguments), [this](auto argument)
+	{
+		return visitArgument(argument);
+	});
+
+	return new ImportedFunctionNode(returnType, name, ast, arguments);
+}
+
+DzBaseArgument *Visitor::visitArgument(const std::shared_ptr<peg::Ast> &ast) const
+{
+	using namespace peg::udl;
+
+	switch (ast->tag)
+	{
+		case "Argument"_:
+			return visitArgument(ast->nodes[0]);
+		case "StandardArgument"_:
+			return visitStandardArgument(ast);
+		case "TupleArgument"_:
+			return visitTupleArgument(ast);
+	}
+
+	throw new std::exception();
+}
+
+DzBaseArgument *Visitor::visitStandardArgument(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto type = visitTypeName(ast->nodes[0]);
+	auto name = visitId(ast->nodes[1]);
+
+	return new DzArgument(name, type);
+}
+
+DzBaseArgument *Visitor::visitTupleArgument(const std::shared_ptr<peg::Ast> &ast) const
+{
+	std::vector<DzBaseArgument *> arguments;
+
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(arguments), [this](auto node)
+	{
+		return visitArgument(node);
+	});
+
+	return new DzTupleArgument(arguments);
+}
+
+Prototype *Visitor::visitStructure(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto name = visitId(ast->nodes[0]);
+	auto parentTypes = visitTypeList(ast->nodes[1]);
+	auto fields = visitFieldList(ast->nodes[2]);
+
+	return new Prototype(name, fields, parentTypes);
+}
+
+GlobalNode *Visitor::visitGlobal(const std::shared_ptr<peg::Ast> &ast) const
+{
+	Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
+
+	auto literal = visitor
+		.visitExpression(ast->nodes[1]);
+
+	return new GlobalNode(literal
+		, visitId(ast->nodes[0])
+		);
+}
+
+Namespace *Visitor::visitNamespace(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto name = ast->nodes[0]->token_to_string();
 	auto namespaces = m_namespaces;
 
 	namespaces.push_back(name);
@@ -788,15 +761,159 @@ antlrcpp::Any Visitor::visitNs(fluencParser::NsContext *context)
 
 	std::vector<std::any> children;
 
-//	std::transform(begin(instructions), end(instructions), std::back_inserter(children), [&](auto instruction)
-//	{
-//		return visitor.visitAny(instruction);
-//	});
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes), std::back_inserter(children), [&](auto instruction)
+	{
+		return visitor.visitInstruction(instruction);
+	});
 
 	return new Namespace(children, name);
 }
 
-antlrcpp::Any Visitor::visitUse(fluencParser::UseContext *context)
+Use *Visitor::visitUse(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return new Use(context->STRING()->getText());
+	return new Use(visitString(ast->nodes[0]));
+}
+
+BlockInstructionNode *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast) const
+{
+	if (ast->nodes.size() > 1)
+	{
+		auto continuation = visitContinuation(ast->nodes[1]);
+
+		auto ret = new ReturnNode(m_iteratorType, m_alpha, continuation);
+
+		Visitor visitor(m_namespaces, nullptr, ret, nullptr);
+
+		auto value = visitor
+			.visitExpression(ast->nodes[0]);
+
+		return new BlockInstructionNode(value, true);
+	}
+
+	auto ret = new ReturnNode(m_iteratorType, m_alpha, nullptr);
+
+	Visitor visitor(m_namespaces, nullptr, ret, nullptr);
+
+	auto value = visitor
+		.visitExpression(ast->nodes[0]);
+
+	return new BlockInstructionNode(value, false);
+}
+
+BlockInstructionNode *Visitor::visitBlock(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto first = rbegin(ast->nodes);
+
+	auto ret = visitReturn(*first);
+
+	return std::accumulate(first + 1, rend(ast->nodes), ret, [this](BlockInstructionNode *consumer, auto expression) -> BlockInstructionNode *
+	{
+		auto stackFrame = new BlockStackFrameNode(consumer);
+
+		Visitor visitor(m_namespaces, m_iteratorType, stackFrame, m_alpha);
+
+		auto value = visitor
+			.visitExpression(expression);
+
+		if (auto instruction = dynamic_cast<const BlockInstructionNode *>(value))
+		{
+			return new BlockInstructionNode(instruction
+				, instruction->containsIterator() || consumer->containsIterator()
+				);
+		}
+
+		return new BlockInstructionNode(value
+			, consumer->containsIterator()
+			);
+	});
+}
+
+ITypeName *Visitor::visitTypeName(const std::shared_ptr<peg::Ast> &ast) const
+{
+	using namespace peg::udl;
+
+	switch (ast->tag)
+	{
+		case "TypeName"_:
+			return visitTypeName(ast->nodes[0]);
+		case "RegularType"_:
+			return visitRegularType(ast);
+		case "FunctionType"_:
+			return visitFunctionType(ast);
+	}
+
+	return nullptr;
+}
+
+ITypeName *Visitor::visitRegularType(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto qualifiedName = qualifiedNames(m_namespaces
+		, visitId(ast->nodes[0])
+		);
+
+	return new DzTypeName(ast, qualifiedName);
+}
+
+ITypeName *Visitor::visitFunctionType(const std::shared_ptr<peg::Ast> &ast) const
+{
+	std::vector<const ITypeName *> types;
+
+	std::transform(begin(ast->nodes), end(ast->nodes), std::back_inserter(types), [this](auto typeName)
+	{
+		return visitRegularType(typeName);
+	});
+
+	return new FunctionTypeName(types);
+}
+
+PrototypeFieldEmbryo Visitor::visitField(const std::shared_ptr<peg::Ast> &ast) const
+{
+	using namespace peg::udl;
+
+	switch (ast->tag)
+	{
+		case "Field"_:
+			return visitField(ast->nodes[0]);
+		case "StandardField"_:
+			return visitStandardField(ast);
+		case "DecoratedField"_:
+			return visitDecoratedField(ast);
+	}
+
+	throw new std::exception();
+}
+
+PrototypeFieldEmbryo Visitor::visitStandardField(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto name = visitId(ast->nodes[0]);
+
+	if (ast->nodes.size() > 1)
+	{
+		Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
+
+		auto defaultValue = visitor
+			.visitExpression(ast->nodes[1]);
+
+		return { name, defaultValue, nullptr };
+	}
+
+	return { name, nullptr, nullptr };
+}
+
+PrototypeFieldEmbryo Visitor::visitDecoratedField(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto type = visitTypeName(ast->nodes[0]);
+	auto name = visitId(ast->nodes[1]);
+
+	if (ast->nodes.size() > 2)
+	{
+		Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
+
+		auto defaultValue = visitor
+			.visitExpression(ast->nodes[2]);
+
+		return { name, defaultValue, type };
+	}
+
+	return { name, nullptr, type };
 }

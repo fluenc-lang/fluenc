@@ -1,12 +1,35 @@
-#ifndef VISITOR_H
-#define VISITOR_H
+#ifndef VISITORV2_H
+#define VISITORV2_H
 
-#include "antlr4-runtime/fluencBaseVisitor.h"
+#include <memory>
+#include <any>
+#include <vector>
+
+#include "types/PrototypeFieldEmbryo.h"
+
+namespace peg
+{
+	template <typename Annotation> struct AstBase;
+
+	struct EmptyType;
+	using Ast = AstBase<EmptyType>;
+}
+
+struct ModuleInfo;
 
 class Node;
+class CallableNode;
+class Prototype;
+class GlobalNode;
+class Namespace;
+class Use;
+class DzBaseArgument;
 class Type;
+class BlockInstructionNode;
+class ContinuationNode;
+class ITypeName;
 
-class Visitor : public fluencBaseVisitor
+class Visitor
 {
 	public:
 		Visitor(const std::vector<std::string> &namespaces
@@ -15,59 +38,66 @@ class Visitor : public fluencBaseVisitor
 			, const Node *beta
 			);
 
-		antlrcpp::Any visitProgram(fluencParser::ProgramContext *context) override;
-		antlrcpp::Any visitFunction(fluencParser::FunctionContext *context) override;
-		antlrcpp::Any visitRegularType(fluencParser::RegularTypeContext *context) override;
-		antlrcpp::Any visitFunctionType(fluencParser::FunctionTypeContext *context) override;
-		antlrcpp::Any visitStandardArgument(fluencParser::StandardArgumentContext *context) override;
-		antlrcpp::Any visitTupleArgument(fluencParser::TupleArgumentContext *context) override;
-		antlrcpp::Any visitRet(fluencParser::RetContext *context) override;
-		antlrcpp::Any visitBlock(fluencParser::BlockContext *context) override;
-		antlrcpp::Any visitBinary(fluencParser::BinaryContext *context) override;
-		antlrcpp::Any visitCall(fluencParser::CallContext *context) override;
-		antlrcpp::Any visitWith(fluencParser::WithContext *context) override;
-		antlrcpp::Any visitMember(fluencParser::MemberContext *context) override;
-		antlrcpp::Any visitInt32Literal(fluencParser::Int32LiteralContext *context) override;
-		antlrcpp::Any visitInt64Literal(fluencParser::Int64LiteralContext *context) override;
-		antlrcpp::Any visitBoolLiteral(fluencParser::BoolLiteralContext *context) override;
-		antlrcpp::Any visitStringLiteral(fluencParser::StringLiteralContext *context) override;
-		antlrcpp::Any visitUint32Literal(fluencParser::Uint32LiteralContext *context) override;
-		antlrcpp::Any visitStructure(fluencParser::StructureContext *context) override;
-		antlrcpp::Any visitInstantiation(fluencParser::InstantiationContext *context) override;
-		antlrcpp::Any visitConditional(fluencParser::ConditionalContext *context) override;
-		antlrcpp::Any visitGlobal(fluencParser::GlobalContext *context) override;
-		antlrcpp::Any visitNothing(fluencParser::NothingContext *context) override;
-		antlrcpp::Any visitGroup(fluencParser::GroupContext *context) override;
-		antlrcpp::Any visitExpansion(fluencParser::ExpansionContext *context) override;
-		antlrcpp::Any visitContinuation(fluencParser::ContinuationContext *context) override;
-		antlrcpp::Any visitArray(fluencParser::ArrayContext *context) override;
-		antlrcpp::Any visitCharLiteral(fluencParser::CharLiteralContext *context) override;
-		antlrcpp::Any visitByteLiteral(fluencParser::ByteLiteralContext *context) override;
-		antlrcpp::Any visitLocal(fluencParser::LocalContext *context) override;
-		antlrcpp::Any visitInstruction(fluencParser::InstructionContext *context) override;
-		antlrcpp::Any visitNs(fluencParser::NsContext *context) override;
-		antlrcpp::Any visitUse(fluencParser::UseContext *context) override;
-
-		antlrcpp::Any visitAny(antlr4::tree::ParseTree *tree)
-		{
-			return fluencBaseVisitor::visit(tree);
-		}
-
-		template<typename T>
-		T visit(antlr4::tree::ParseTree *tree)
-		{
-			auto result = fluencBaseVisitor::visit(tree);
-
-			return result.as<T>();
-		}
-
-		template<typename T, typename TResult>
-		TResult visit(antlr4::tree::ParseTree *tree)
-		{
-			return dynamic_cast<TResult>(visit<T>(tree));
-		}
+		ModuleInfo visit(const std::shared_ptr<peg::Ast> &ast) const;
 
 	private:
+		std::any visitInstruction(const std::shared_ptr<peg::Ast> &ast) const;
+
+		std::string visitId(const std::shared_ptr<peg::Ast> &ast) const;
+		std::string visitInteger(const std::shared_ptr<peg::Ast> &ast) const;
+		std::string visitString(const std::shared_ptr<peg::Ast> &ast) const;
+
+		std::vector<ITypeName *> visitTypeList(const std::shared_ptr<peg::Ast> &ast) const;
+		std::vector<PrototypeFieldEmbryo> visitFieldList(const std::shared_ptr<peg::Ast> &ast) const;
+		std::vector<std::string> visitIdList(const std::shared_ptr<peg::Ast> &ast) const;
+
+		Node *visitExpression(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitLiteral(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitInt32Literal(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitInt64Literal(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitBooleanLiteral(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitStringLiteral(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitUint32Literal(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitCharLiteral(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitByteLiteral(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitNothingLiteral(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitBinary(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitMember(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitCall(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitConditional(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitArray(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitGroup(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitExpansion(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitLocal(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitContinuation(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitWith(const std::shared_ptr<peg::Ast> &ast) const;
+
+		CallableNode *visitFunction(const std::shared_ptr<peg::Ast> &ast) const;
+		CallableNode *visitRegularFunction(const std::shared_ptr<peg::Ast> &ast) const;
+		CallableNode *visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const;
+		CallableNode *visitImportedFunction(const std::shared_ptr<peg::Ast> &ast) const;
+
+		DzBaseArgument *visitArgument(const std::shared_ptr<peg::Ast> &ast) const;
+		DzBaseArgument *visitStandardArgument(const std::shared_ptr<peg::Ast> &ast) const;
+		DzBaseArgument *visitTupleArgument(const std::shared_ptr<peg::Ast> &ast) const;
+
+		Prototype *visitStructure(const std::shared_ptr<peg::Ast> &ast) const;
+		GlobalNode *visitGlobal(const std::shared_ptr<peg::Ast> &ast) const;
+		Namespace *visitNamespace(const std::shared_ptr<peg::Ast> &ast) const;
+		Use *visitUse(const std::shared_ptr<peg::Ast> &ast) const;
+
+		BlockInstructionNode *visitReturn(const std::shared_ptr<peg::Ast> &ast) const;
+		BlockInstructionNode *visitBlock(const std::shared_ptr<peg::Ast> &ast) const;
+
+		ITypeName *visitTypeName(const std::shared_ptr<peg::Ast> &ast) const;
+		ITypeName *visitRegularType(const std::shared_ptr<peg::Ast> &ast) const;
+		ITypeName *visitFunctionType(const std::shared_ptr<peg::Ast> &ast) const;
+
+		PrototypeFieldEmbryo visitField(const std::shared_ptr<peg::Ast> &ast) const;
+		PrototypeFieldEmbryo visitStandardField(const std::shared_ptr<peg::Ast> &ast) const;
+		PrototypeFieldEmbryo visitDecoratedField(const std::shared_ptr<peg::Ast> &ast) const;
+
 		std::vector<std::string> m_namespaces;
 
 		const Type *m_iteratorType;
@@ -76,4 +106,4 @@ class Visitor : public fluencBaseVisitor
 		const Node *m_beta;
 };
 
-#endif // VISITOR_H
+#endif // VISITORV2_H

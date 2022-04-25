@@ -10,11 +10,6 @@
 class EntryPoint;
 class Type;
 
-namespace antlr4
-{
-	class ParserRuleContext;
-};
-
 class DzTypeName : public ITypeName
 {
 	public:

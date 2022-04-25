@@ -14,7 +14,7 @@ size_t CompilerException::row() const
 
 size_t CompilerException::column() const
 {
-	return m_ast->column;
+	return m_ast->column - 1;
 }
 
 size_t CompilerException::length() const
