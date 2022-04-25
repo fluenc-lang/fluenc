@@ -3214,6 +3214,87 @@ BOOST_AUTO_TEST_CASE (scenario85)
 	BOOST_TEST(result == 12);
 }
 
+BOOST_AUTO_TEST_CASE (scenario86)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			children: []
+		}
+
+		struct Rectangle : Item;
+		struct Button : Item;
+
+		struct ApplicationState
+		{
+			ui
+		}
+
+		function application()
+		{
+			return [
+				Rectangle
+				{
+					children: [
+						Button {},
+						Button {},
+					]
+				}
+			];
+		}
+
+		function update(ApplicationState state, without item)
+		{
+			return nothing;
+		}
+
+		function update(ApplicationState state, (Button item, ...items))
+		{
+			return item -> update(state, ...items);
+		}
+
+		function update(ApplicationState state, Button item)
+		{
+			return item;
+		}
+
+		function update(ApplicationState state, Rectangle item)
+		{
+			return item with
+			{
+				children: update(state, item.children),
+			};
+		}
+
+		function mainLoop(int count, ApplicationState state)
+		{
+			if (count > 0)
+			{
+				return 12;
+			}
+
+			let as = state with
+			{
+				ui: update(state, state.ui),
+			};
+
+			return mainLoop(count + 1, as);
+		}
+
+		export int main()
+		{
+			let state = ApplicationState
+			{
+				ui: application()
+			};
+
+			return mainLoop(0, state);
+		}
+	)");
+
+	BOOST_TEST(result == 12);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

@@ -1,6 +1,8 @@
 #ifndef TESTHELPERS_H
 #define TESTHELPERS_H
 
+
+
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
@@ -9,6 +11,9 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
+
+#include "src/peglib.h"
+#include "src/incbin.h"
 
 #include "antlr4-runtime/fluencBaseVisitor.h"
 #include "antlr4-runtime/fluencLexer.h"
@@ -19,26 +24,31 @@
 #include "Utility.h"
 #include "EntryPoint.h"
 #include "ModuleInfo.h"
+#include "VisitorV2.h"
 
 #include "nodes/CallableNode.h"
 #include "nodes/GlobalNode.h"
 
+INCTXT(Grammar, "fluenc.peg");
+
 CallableNode *compileFunction(std::string source)
 {
-	std::stringstream stream(source);
+	peg::parser parser(gGrammarData);
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
-	auto program = parser.program();
+	std::shared_ptr<peg::Ast> ast;
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	parser.parse(source, ast);
 
-	for (auto instruction : program->instruction())
+	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+
+	auto moduleInfo = visitor.visit(ast);
+
+	for (auto &[_, function] : moduleInfo.functions)
 	{
-		return visitor.visit<CallableNode *>(instruction);
+		return function;
 	}
 
 	return nullptr;
@@ -51,19 +61,21 @@ const BaseValue *compileValue(std::string source)
 	stream << source;
 	stream << ";";
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	peg::parser parser(gGrammarData);
 
-	auto program = parser.program();
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	std::shared_ptr<peg::Ast> ast;
 
-	for (auto instruction : program->instruction())
+	parser.parse(stream.str(), ast);
+
+	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+
+	auto moduleInfo = visitor.visit(ast);
+
+	for (auto &[name, global] : moduleInfo.globals)
 	{
-		auto global = visitor.visit<GlobalNode *>(instruction);
-
 		auto context = std::make_unique<llvm::LLVMContext>();
 		auto module = std::make_unique<llvm::Module>("dz", *context);
 
@@ -78,14 +90,14 @@ const BaseValue *compileValue(std::string source)
 			, nullptr
 			, block
 			, alloc
-			, nullptr
+			, function
 			, &module
 			, &context
 			, "entry"
-			, std::multimap<std::string, CallableNode *>()
-			, std::map<std::string, const BaseValue *>()
-			, std::map<std::string, const Node *>()
-			, std::map<std::string, Prototype *>()
+			, moduleInfo.functions
+			, moduleInfo.locals
+			, moduleInfo.globals
+			, moduleInfo.types
 			, Stack()
 			, nullptr
 			);
@@ -101,19 +113,19 @@ const BaseValue *compileValue(std::string source)
 
 EntryPoint compile(std::string source)
 {
-	std::stringstream stream(source);
+	peg::parser parser(gGrammarData);
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
-	auto program = parser.program();
+	std::shared_ptr<peg::Ast> ast;
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	parser.parse(source, ast);
+
+	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor
-		.visit<ModuleInfo>(program);
+		.visit(ast);
 
 	auto context = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *context);
@@ -144,22 +156,22 @@ EntryPoint compile(std::string source)
 
 int exec(std::string source)
 {
-	std::stringstream stream(source);
+	static peg::parser parser(gGrammarData);
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
-	auto program = parser.program();
+	std::shared_ptr<peg::Ast> ast;
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	parser.parse(source, ast);
+
+	VisitorV2 visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto llvmContext = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
 
 	auto moduleInfo = visitor
-		.visit<ModuleInfo>(program);
+		.visit(ast);
 
 	EntryPoint entryPoint(0
 		, nullptr
