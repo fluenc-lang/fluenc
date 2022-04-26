@@ -1,12 +1,14 @@
 #ifndef MISSINGDEFAULTVALUEEXCEPTION_H
 #define MISSINGDEFAULTVALUEEXCEPTION_H
 
+#include <string>
+
 #include "CompilerException.h"
 
 class MissingDefaultValueException : public CompilerException
 {
 	public:
-		MissingDefaultValueException(const TokenInfo &token, const std::string &fieldName);
+		MissingDefaultValueException(const std::shared_ptr<peg::Ast> &ast, const std::string &fieldName);
 
 		std::string message() const override;
 

@@ -13,9 +13,12 @@
 #include "values/ArrayValue.h"
 #include "values/FunctionValue.h"
 
-MemberAccessNode::MemberAccessNode(antlr4::ParserRuleContext *context, const Node *consumer, const std::vector<std::string> &names)
-	: m_token(TokenInfo::fromContext(context))
-	, m_consumer(consumer)
+MemberAccessNode::MemberAccessNode(const Node *consumer
+	, const std::shared_ptr<peg::Ast> &ast
+	, const std::vector<std::string> &names
+	)
+	: m_consumer(consumer)
+	, m_ast(ast)
 	, m_names(names)
 {
 }
@@ -77,5 +80,5 @@ std::vector<DzResult> MemberAccessNode::build(const EntryPoint &entryPoint, Stac
 		}
 	}
 
-	throw new UndeclaredIdentifierException(m_token, m_names[0]);
+	throw new UndeclaredIdentifierException(m_ast, m_names[0]);
 }

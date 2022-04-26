@@ -39,7 +39,7 @@ class Stack
 		}
 
 		template<typename T>
-		const T *require(const TokenInfo &token)
+		const T *require(const std::shared_ptr<peg::Ast> &ast)
 		{
 			auto value = pop();
 
@@ -51,7 +51,7 @@ class Stack
 			auto &expectedMetadata = T::staticMetadata();
 			auto &actualMetadata = value->metadata();
 
-			throw new InvalidTypeException(token
+			throw new InvalidTypeException(ast
 				, expectedMetadata.name()
 				, actualMetadata.name()
 				);

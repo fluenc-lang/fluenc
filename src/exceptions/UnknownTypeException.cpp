@@ -1,7 +1,9 @@
+#include <sstream>
+
 #include "exceptions/UnknownTypeException.h"
 
-UnknownTypeException::UnknownTypeException(const TokenInfo &token, const std::string &typeName)
-	: CompilerException(token)
+UnknownTypeException::UnknownTypeException(const std::shared_ptr<peg::Ast> &ast, const std::string &typeName)
+	: CompilerException(ast)
 	, m_typeName(typeName)
 {
 }

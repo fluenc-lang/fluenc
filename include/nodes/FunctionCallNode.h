@@ -13,7 +13,7 @@
 class FunctionCallNode : public Node
 {
 	public:
-		FunctionCallNode(antlr4::ParserRuleContext *context, const std::vector<std::string> &names);
+		FunctionCallNode(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names);
 
 		int order(const EntryPoint &entryPoint) const override;
 
@@ -70,8 +70,7 @@ class FunctionCallNode : public Node
 
 		std::vector<DzResult> regularCall(const EntryPoint &entryPoint, Stack values) const;
 
-		TokenInfo m_token;
-
+		std::shared_ptr<peg::Ast> m_ast;
 		std::vector<std::string> m_names;
 };
 

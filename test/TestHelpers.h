@@ -10,35 +10,39 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
 
-#include "antlr4-runtime/fluencBaseVisitor.h"
-#include "antlr4-runtime/fluencLexer.h"
-#include "antlr4-runtime/fluencParser.h"
+#include "src/peglib.h"
+#include "src/incbin.h"
 
 #include "KaleidoscopeJIT.h"
 #include "Visitor.h"
 #include "Utility.h"
 #include "EntryPoint.h"
 #include "ModuleInfo.h"
+#include "Visitor.h"
 
 #include "nodes/CallableNode.h"
 #include "nodes/GlobalNode.h"
 
+INCTXT(Grammar, "fluenc.peg");
+
 CallableNode *compileFunction(std::string source)
 {
-	std::stringstream stream(source);
+	peg::parser parser(gGrammarData);
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
-	auto program = parser.program();
+	std::shared_ptr<peg::Ast> ast;
+
+	parser.parse(source, ast);
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
-	for (auto instruction : program->instruction())
+	auto moduleInfo = visitor.visit(ast);
+
+	for (auto &[_, function] : moduleInfo.functions)
 	{
-		return visitor.visit<CallableNode *>(instruction);
+		return function;
 	}
 
 	return nullptr;
@@ -51,19 +55,21 @@ const BaseValue *compileValue(std::string source)
 	stream << source;
 	stream << ";";
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	peg::parser parser(gGrammarData);
 
-	auto program = parser.program();
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
+
+	std::shared_ptr<peg::Ast> ast;
+
+	parser.parse(stream.str(), ast);
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
-	for (auto instruction : program->instruction())
-	{
-		auto global = visitor.visit<GlobalNode *>(instruction);
+	auto moduleInfo = visitor.visit(ast);
 
+	for (auto &[name, global] : moduleInfo.globals)
+	{
 		auto context = std::make_unique<llvm::LLVMContext>();
 		auto module = std::make_unique<llvm::Module>("dz", *context);
 
@@ -78,14 +84,14 @@ const BaseValue *compileValue(std::string source)
 			, nullptr
 			, block
 			, alloc
-			, nullptr
+			, function
 			, &module
 			, &context
 			, "entry"
-			, std::multimap<std::string, CallableNode *>()
-			, std::map<std::string, const BaseValue *>()
-			, std::map<std::string, const Node *>()
-			, std::map<std::string, Prototype *>()
+			, moduleInfo.functions
+			, moduleInfo.locals
+			, moduleInfo.globals
+			, moduleInfo.types
 			, Stack()
 			, nullptr
 			);
@@ -101,19 +107,19 @@ const BaseValue *compileValue(std::string source)
 
 EntryPoint compile(std::string source)
 {
-	std::stringstream stream(source);
+	peg::parser parser(gGrammarData);
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
-	auto program = parser.program();
+	std::shared_ptr<peg::Ast> ast;
+
+	parser.parse(source, ast);
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor
-		.visit<ModuleInfo>(program);
+		.visit(ast);
 
 	auto context = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *context);
@@ -144,14 +150,14 @@ EntryPoint compile(std::string source)
 
 int exec(std::string source)
 {
-	std::stringstream stream(source);
+	static peg::parser parser(gGrammarData);
 
-	antlr4::ANTLRInputStream input(stream);
-	fluencLexer lexer(&input);
-	antlr4::CommonTokenStream tokens(&lexer);
-	fluencParser parser(&tokens);
+	parser.enable_ast();
+	parser.enable_packrat_parsing();
 
-	auto program = parser.program();
+	std::shared_ptr<peg::Ast> ast;
+
+	parser.parse(source, ast);
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
@@ -159,7 +165,7 @@ int exec(std::string source)
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
 
 	auto moduleInfo = visitor
-		.visit<ModuleInfo>(program);
+		.visit(ast);
 
 	EntryPoint entryPoint(0
 		, nullptr

@@ -1,7 +1,9 @@
+#include <sstream>
+
 #include "UndeclaredIdentifierException.h"
 
-UndeclaredIdentifierException::UndeclaredIdentifierException(const TokenInfo &token, const std::string &identifier)
-	: CompilerException(token)
+UndeclaredIdentifierException::UndeclaredIdentifierException(const std::shared_ptr<peg::Ast> &ast, const std::string &identifier)
+	: CompilerException(ast)
 	, m_identifier(identifier)
 {
 }

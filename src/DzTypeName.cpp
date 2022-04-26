@@ -14,8 +14,8 @@
 
 #include "exceptions/UnknownTypeException.h"
 
-DzTypeName::DzTypeName(antlr4::ParserRuleContext *context, const std::vector<std::string> &names)
-	: m_token(TokenInfo::fromContext(context))
+DzTypeName::DzTypeName(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names)
+	: m_ast(ast)
 	, m_names(names)
 {
 }
@@ -84,7 +84,7 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 		}
 	}
 
-	throw new UnknownTypeException(m_token, m_names[0]);
+	throw new UnknownTypeException(m_ast, m_names[0]);
 }
 
 DzTypeName *DzTypeName::int32()

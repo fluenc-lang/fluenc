@@ -8,9 +8,11 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "nodes/ExportedFunctionNode.h"
+
 #include "DzTypeName.h"
 #include "EntryPoint.h"
 #include "Type.h"
+#include "Utility.h"
 
 ExportedFunctionNode::ExportedFunctionNode(const std::string &name
 	, Node *block

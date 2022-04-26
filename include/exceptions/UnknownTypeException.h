@@ -1,12 +1,14 @@
 #ifndef UNKNOWNTYPEEXCEPTION_H
 #define UNKNOWNTYPEEXCEPTION_H
 
+#include <string>
+
 #include "CompilerException.h"
 
 class UnknownTypeException : public CompilerException
 {
 	public:
-		UnknownTypeException(const TokenInfo &token, const std::string &typeName);
+		UnknownTypeException(const std::shared_ptr<peg::Ast> &ast, const std::string &typeName);
 
 		std::string message() const override;
 

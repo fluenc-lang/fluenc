@@ -5,6 +5,7 @@
 #include "IndexIterator.h"
 #include "IPrototypeProvider.h"
 #include "IRBuilderEx.h"
+#include "Utility.h"
 
 #include "nodes/InstantiationNode.h"
 
@@ -18,15 +19,15 @@
 #include "exceptions/MissingDefaultValueException.h"
 #include "exceptions/MissingFieldException.h"
 
-InstantiationNode::InstantiationNode(antlr4::ParserRuleContext *context
-	, const std::vector<std::string> &fields
+InstantiationNode::InstantiationNode(const Node *consumer
 	, const IPrototypeProvider *prototypeProvider
-	, const Node *consumer
+	, const std::shared_ptr<peg::Ast> &ast
+	, const std::vector<std::string> &fields
 	)
-	: m_token(TokenInfo::fromContext(context))
-	, m_fields(fields)
+	: m_consumer(consumer)
 	, m_prototypeProvider(prototypeProvider)
-	, m_consumer(consumer)
+	, m_ast(ast)
+	, m_fields(fields)
 {
 }
 
@@ -88,7 +89,7 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 
 		if (!field.defaultValue())
 		{
-			throw new MissingDefaultValueException(m_token, field.name());
+			throw new MissingDefaultValueException(m_ast, field.name());
 		}
 
 		return new NamedValue { field.name(), field.defaultValue() };
@@ -96,7 +97,7 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 
 	for (auto &[name, _] : valuesByName)
 	{
-		throw new MissingFieldException(m_token, prototype->name(), name);
+		throw new MissingFieldException(m_ast, prototype->name(), name);
 	}
 
 	IRBuilderEx builder(entryPoint);

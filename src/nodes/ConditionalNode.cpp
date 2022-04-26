@@ -4,9 +4,11 @@
 
 #include <llvm/IR/IRBuilder.h>
 
-#include "nodes/ConditionalNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
+#include "Utility.h"
+
+#include "nodes/ConditionalNode.h"
 
 #include "values/ScalarValue.h"
 #include "values/UserTypeValue.h"
@@ -43,7 +45,7 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 
 	IRBuilderEx builder(entryPoint);
 
-	builder.createCondBr(values.require<ScalarValue>(TokenInfo()), ifTrue, ifFalse);
+	builder.createCondBr(values.require<ScalarValue>(nullptr), ifTrue, ifFalse);
 
 	auto epIfFalse = entryPoint
 		.withName("ifFalse")

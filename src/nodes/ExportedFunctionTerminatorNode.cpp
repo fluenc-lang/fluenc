@@ -1,8 +1,10 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include "nodes/ExportedFunctionTerminatorNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
+#include "Utility.h"
+
+#include "nodes/ExportedFunctionTerminatorNode.h"
 
 #include "values/ScalarValue.h"
 
@@ -22,7 +24,7 @@ std::vector<DzResult> ExportedFunctionTerminatorNode::build(const EntryPoint &en
 	auto ep = entryPoint
 		.withBlock(block);
 
-	auto returnValue = values.require<ScalarValue>(TokenInfo());
+	auto returnValue = values.require<ScalarValue>(nullptr);
 
 	IRBuilderEx builder(ep);
 	builder.createRet(*returnValue);

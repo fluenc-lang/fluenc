@@ -21,7 +21,7 @@
 const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 	, const Type *type
 	, const EntryPoint &entryPoint
-	, const TokenInfo &token
+	, const std::shared_ptr<peg::Ast> &ast
 	)
 {
 	auto &context = entryPoint.context();
@@ -69,12 +69,12 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 
 				auto load = builder.createLoad(gep, field.name());
 
-				auto value = createReadProxy(*load, fieldType, entryPoint, token);
+				auto value = createReadProxy(*load, fieldType, entryPoint, ast);
 
 				return new NamedValue { field.name(), value };
 			}
 
-			throw new MissingTypeDeclarationException(token, type->name(), field.name());
+			throw new MissingTypeDeclarationException(ast, type->name(), field.name());
 		});
 
 		return new UserTypeValue { prototype, fieldValues };

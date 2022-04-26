@@ -1,7 +1,9 @@
+#include <sstream>
+
 #include "exceptions/MissingDefaultValueException.h"
 
-MissingDefaultValueException::MissingDefaultValueException(const TokenInfo &token, const std::string &fieldName)
-	: CompilerException(token)
+MissingDefaultValueException::MissingDefaultValueException(const std::shared_ptr<peg::Ast> &ast, const std::string &fieldName)
+	: CompilerException(ast)
 	, m_fieldName(fieldName)
 {
 }

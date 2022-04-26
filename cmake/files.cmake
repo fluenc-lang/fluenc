@@ -154,7 +154,6 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/Namespace.cpp"
     "${PROJECT_SRC_DIR}/Node.cpp"
     "${PROJECT_SRC_DIR}/Stack.cpp"
-	"${PROJECT_SRC_DIR}/TokenInfo.cpp"
     "${PROJECT_SRC_DIR}/Type.cpp"
     "${PROJECT_SRC_DIR}/UndeclaredIdentifierException.cpp"
 	"${PROJECT_SRC_DIR}/Use.cpp"
@@ -260,18 +259,10 @@ set(LIB_SOURCE_FILES
 
 set(LIB_HEADER_FILES
     ${LIB_HEADER_FILES}
-    "${PROJECT_ANTLR_DIR}/fluencBaseVisitor.h"
-    "${PROJECT_ANTLR_DIR}/fluencLexer.h"
-    "${PROJECT_ANTLR_DIR}/fluencParser.h"
-    "${PROJECT_ANTLR_DIR}/fluencVisitor.h"
 )
 
 set(LIB_SOURCE_FILES
     ${LIB_SOURCE_FILES}
-    "${PROJECT_ANTLR_DIR}/fluencBaseVisitor.cpp"
-    "${PROJECT_ANTLR_DIR}/fluencLexer.cpp"
-    "${PROJECT_ANTLR_DIR}/fluencParser.cpp"
-    "${PROJECT_ANTLR_DIR}/fluencVisitor.cpp"
 )
 
 set(COMPILER_HEADER_FILES

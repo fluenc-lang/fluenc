@@ -7,15 +7,17 @@
 class MemberAccessNode : public Node
 {
 	public:
-		MemberAccessNode(antlr4::ParserRuleContext *context, const Node *consumer, const std::vector<std::string> &names);
+		MemberAccessNode(const Node *consumer
+			, const std::shared_ptr<peg::Ast> &ast
+			, const std::vector<std::string> &names
+			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		TokenInfo m_token;
-
 		const Node * m_consumer;
 
+		std::shared_ptr<peg::Ast> m_ast;
 		std::vector<std::string> m_names;
 };
 

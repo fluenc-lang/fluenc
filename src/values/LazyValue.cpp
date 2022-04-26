@@ -90,8 +90,8 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 					auto resultBlock = resultEntryPoint.block();
 
-					auto targetContinuation = targetTupleValues.require<ExpandableValue>(TokenInfo());
-					auto sourceContinuation = sourceTupleValues.require<ExpandableValue>(TokenInfo());
+					auto targetContinuation = targetTupleValues.require<ExpandableValue>(nullptr);
+					auto sourceContinuation = sourceTupleValues.require<ExpandableValue>(nullptr);
 
 					auto sourceChain = sourceContinuation->chain();
 					auto targetChain = targetContinuation->chain();
@@ -118,7 +118,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 				auto continuation = sourceTupleValues
 					.discard()
-					.require<ExpandableValue>(TokenInfo());
+					.require<ExpandableValue>(nullptr);
 
 				auto chain = continuation->chain();
 				auto provider = continuation->provider();

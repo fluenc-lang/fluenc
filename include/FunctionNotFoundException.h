@@ -7,7 +7,7 @@
 class FunctionNotFoundException : public CompilerException
 {
 	public:
-		FunctionNotFoundException(const TokenInfo &token
+		FunctionNotFoundException(const std::shared_ptr<peg::Ast> &ast
 			, const std::string &name
 			, const Stack &values
 			);

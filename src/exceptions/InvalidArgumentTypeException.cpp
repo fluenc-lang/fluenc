@@ -1,7 +1,9 @@
+#include <string>
+
 #include "exceptions/InvalidArgumentTypeException.h"
 
-InvalidArgumentTypeException::InvalidArgumentTypeException(const TokenInfo &token)
-	: CompilerException(token)
+InvalidArgumentTypeException::InvalidArgumentTypeException(const std::shared_ptr<peg::Ast> &ast)
+	: CompilerException(ast)
 {
 }
 

@@ -1,12 +1,14 @@
 #ifndef MISSINGFIELDEXCEPTION_H
 #define MISSINGFIELDEXCEPTION_H
 
+#include <string>
+
 #include "CompilerException.h"
 
 class MissingFieldException : public CompilerException
 {
 	public:
-		MissingFieldException(const TokenInfo &token
+		MissingFieldException(const std::shared_ptr<peg::Ast> &ast
 			, const std::string &typeName
 			, const std::string &fieldName
 			);
