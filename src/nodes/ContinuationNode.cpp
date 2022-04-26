@@ -51,5 +51,10 @@ std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stac
 			);
 	});
 
-	return {{ findTailCallTarget(tailCallCandidate, values), Stack() }};
+	auto tailCallTarget = findTailCallTarget(tailCallCandidate, values);
+
+	auto resultEntryPoint = tailCallTarget
+		.withBlock(tailCallCandidate.block());
+
+	return {{ resultEntryPoint, Stack() }};
 }

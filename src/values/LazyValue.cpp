@@ -108,7 +108,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 					{
 						auto loopTarget = chainEntryPoint.entry();
 
-						linkBlocks(resultBlock, loopTarget->block());
+						linkBlocks(chainEntryPoint.block(), loopTarget->block());
 					}
 				}
 			}
@@ -129,7 +129,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 				{
 					auto loopTarget = chainEntryPoint.entry();
 
-					linkBlocks(targetBlock, loopTarget->block());
+					linkBlocks(chainEntryPoint.block(), loopTarget->block());
 				}
 			}
 			else
