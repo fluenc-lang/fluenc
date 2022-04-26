@@ -19,6 +19,8 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *storage
 	)
 {
+	auto &context = entryPoint.context();
+
 	if (auto scalarValue = dynamic_cast<const ScalarValue *>(value))
 	{
 		auto referenceStorage = dynamic_cast<const ReferenceValue *>(storage);
@@ -101,13 +103,19 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	{
 		auto stringStorage = dynamic_cast<const StringValue *>(stringValue);
 
-		auto addressOf = new ScalarValue(stringValue->type()
+		IRBuilderEx builder(entryPoint);
+
+		auto stringType = llvm::Type::getInt8PtrTy(*context)->getPointerTo();
+
+		auto addressOfValue = new ScalarValue(stringValue->type()
 			, *stringValue->reference()
 			);
 
-		IRBuilderEx builder(entryPoint);
+		auto addressOfStorage = new ReferenceValue(stringValue->type()
+			, builder.createBitCast(*stringStorage->reference(), stringType, "stringStorage")
+			);
 
-		builder.createStore(addressOf, stringStorage->reference());
+		builder.createStore(addressOfValue, addressOfStorage);
 	}
 
 	return entryPoint;
