@@ -1,74 +1,8 @@
+use "sdl.fc"
+
 import int puts(string str);
 
-import int SDL_Init(uint flags);
-import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
-import int SDL_RenderClear(long renderer);
-import int SDL_RenderFillRect(long renderer, SDL_Rect rect);
-
-import long SDL_CreateRenderer(long window, int index, int flags);
-import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
-
-import void SDL_RenderPresent(long renderer);
-
-import EventState SDL_WaitEventEx(EventState events);
-
 import void printnum(int num);
-
-global SDL_INIT_VIDEO: 0x00000020u;
-global SDL_WINDOWPOS_UNDEFINED: 0x1FFF0000u;
-global SDL_KEYDOWN: 0x300u;
-global SDL_KEYUP: 0x301u;
-global SDL_MOUSEBUTTONDOWN: 0x401u;
-global SDLK_a: 0x61u;
-global SDLK_d: 0x64u;
-global SDLK_s: 0x73u;
-global SDLK_w: 0x77u;
-
-struct SDL_Rect
-{
-    int x: 0,
-    int y: 0,
-    int width: 0,
-    int height: 0
-};
-
-struct SDL_KeyboardEvent
-{
-    int type: 0,
-    int timestamp: 0,
-    int windowID: 0,
-    int padding: 0,
-    int scancode: 0,
-    int sym: 0,
-    long padding: 0L
-};
-
-struct SDL_MouseMotionEvent
-{
-    int type: 0,
-    int timestamp: 0,
-    int windowID: 0,
-    int which: 0,
-    int state: 0,
-    int x: 0,
-    int y: 0,
-    int xrel: 0,
-    int yrel: 0
-};
-
-struct SDL_MouseButtonEvent
-{
-    int type: 0,
-    int timestamp: 0,
-    int windowId: 0,
-    int which: 0,
-    byte button: 0u8,
-    byte state: 0u8,
-    byte clicks: 0u8,
-    byte padding: 0u8,
-    int x: 0,
-    int y: 0
-};
 
 global Normal: 0;
 global MouseOver: 1;
@@ -116,15 +50,15 @@ struct ControlTemplate
 
 struct EventState
 {
-    SDL_KeyboardEvent key,
-    SDL_MouseMotionEvent motion,
-    SDL_MouseButtonEvent button
+    SDL::KeyboardEvent key,
+    SDL::MouseMotionEvent motion,
+    SDL::MouseButtonEvent button
 };
 
 struct ApplicationState
 {
     events: nothing,
-    user,
+    user: nothing,
     ui: nothing
 };
 
@@ -132,9 +66,9 @@ function createEventState()
 {
     return EventState
     {
-        key: SDL_KeyboardEvent {},
-        motion: SDL_MouseMotionEvent {},
-        button: SDL_MouseButtonEvent {}
+        key: SDL::KeyboardEvent {},
+        motion: SDL::MouseMotionEvent {},
+        button: SDL::MouseButtonEvent {}
     };
 }
 
@@ -142,7 +76,7 @@ function createApplicationState(State state)
 {
     return ApplicationState
     {
-        events: SDL_WaitEventEx(createEventState()),
+        events: SDL::SDL_WaitEventEx(createEventState()),
         user: state
     };
 }
@@ -245,22 +179,22 @@ function application(State state)
 			height: 150,
             color: rgb(252, 252, 252),
             children: [
-                Button
-                {
-                    x: 30 + state.counter,
-                    y: 30,
-                    width: 210,
-                    height: 30,
-                    text: "Click me!"
-                },
-                Button
-                {
-                    x: 30 + state.counter,
-                    y: 70,
-                    width: 210,
-                    height: 30,
-                    text: "Click me!"
-                },
+//                 Button
+//                 {
+//                     x: 30 + state.counter,
+//                     y: 30,
+//                     width: 210,
+//                     height: 30,
+//                     text: "Click me!",
+//                 },
+//                 Button
+//                 {
+//                     x: 30 + state.counter,
+//                     y: 70,
+//                     width: 210,
+//                     height: 30,
+//                     text: "Click me!"
+//                 },
                 Button
                 {
                     x: 30 + state.counter,
@@ -278,7 +212,25 @@ function application(State state)
                     height: 30,
                     text: "Click me!",
                     onClicked: increaseCounter
-                }
+                },
+//                 Button
+//                 {
+//                     x: 140 + state.counter,
+//                     y: 150,
+//                     width: 70,
+//                     height: 30,
+//                     text: "Click me!",
+// //                     onClicked: increaseCounter
+//                 },
+//                 Button
+//                 {
+//                     x: 140 + state.counter,
+//                     y: 190,
+//                     width: 70,
+//                     height: 30,
+//                     text: "Click me!",
+// //                     onClicked: increaseCounter
+//                 }
             ]
         }
     ];
@@ -286,7 +238,7 @@ function application(State state)
 
 function boundingRect(Item item)
 {
-    return SDL_Rect
+    return SDL::Rect
     {
         x: item.x,
         y: item.y,
@@ -295,16 +247,9 @@ function boundingRect(Item item)
     };
 }
 
-function present(long renderer, State state)
-{
-    SDL_RenderPresent(renderer);
-
-    return state;
-}
-
 function setRenderDrawColor(long renderer, Color color)
 {
-    return SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+    return SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
 
 function selectTemplate(ControlTemplate template, Item item)
@@ -337,7 +282,7 @@ function iterate((any item, ...items))
     return iterate(...items);
 }
 
-function containsMouse(Item item, SDL_MouseMotionEvent motion)
+function containsMouse(Item item, SDL::MouseMotionEvent motion)
 {
     return (motion.x > item.x)
         && (motion.x < (item.x + item.width))
@@ -345,9 +290,9 @@ function containsMouse(Item item, SDL_MouseMotionEvent motion)
         && (motion.y < (item.y + item.height));
 }
 
-function isPressed(SDL_MouseButtonEvent button)
+function isPressed(SDL::MouseButtonEvent button)
 {
-    return button.type == SDL_MOUSEBUTTONDOWN;
+    return button.type == SDL::MOUSEBUTTONDOWN;
 }
 
 struct ItemState
@@ -356,25 +301,25 @@ struct ItemState
     state
 };
 
-function updateButton(EventState events, Button button)
+function updateButton(EventState events, Button button, Button nextButton)
 {
-    if (containsMouse(button, events.motion))
+    if (containsMouse(nextButton, events.motion))
     {
         if (isPressed(events.button))
         {
-            return button with
+            return nextButton with
             {
                 state: Pressed
             };
         }
 
-        return button with
+        return nextButton with
         {
             state: MouseOver
         };
     }
 
-    return button with
+    return nextButton with
     {
         state: Normal
     };
@@ -395,22 +340,37 @@ function processButton(EventState events, State state, Button button)
     return state;
 }
 
-function update(ApplicationState state, Rectangle rectangle)
+function update(EventState events, without item, without nextItem)
+{
+    return nothing;
+}
+
+function update(EventState events, Rectangle rectangle, Rectangle nextItem)
 {
     return rectangle with
     {
-        children: update(state, rectangle.children)
+        children: update(events, rectangle.children, nextItem.children)
     };
 }
 
-function update(ApplicationState state, Button button)
+function update(EventState events, Button button, Button nextItem)
 {
-    return updateButton(state.events, button);
+    return updateButton(events, button, nextItem);
 }
 
-function update(ApplicationState state, (Button button, ...controls))
+function update(EventState events, (Button button, ...controls), (Button nextButton, ...nextControls))
 {
-    return updateButton(state.events, button) -> update(state, ...controls);
+    return updateButton(events, button, nextButton) -> update(events, ...controls, ...nextControls);
+}
+
+function update(EventState events, (any button, ...controls), any nextButton)
+{
+    return nextButton;
+}
+
+function update(EventState events, any b, (any button, ...controls))
+{
+    return button;
 }
 
 function process(ApplicationState state, Rectangle rectangle)
@@ -442,7 +402,7 @@ function draw(long renderer, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
-    SDL_RenderFillRect(renderer, boundingRect(rectangle));
+    SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
     return draw(renderer, rectangle.children);
 }
@@ -464,31 +424,45 @@ function initState()
     return State {};
 }
 
-function mainLoop(long renderer, any state)
+function mainLoop(long renderer, ApplicationState state)
 {
-    let ui = application(state);
-    let as = createApplicationState(state);
+    SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL::SDL_RenderClear(renderer);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    draw(renderer, state.ui);
 
-    draw(renderer, ui);
+    SDL::SDL_RenderPresent(renderer);
 
-    SDL_RenderPresent(renderer);
+    let user = process(state, state.ui);
+    let events = SDL::SDL_WaitEventEx(createEventState());
 
-    return mainLoop(renderer
-        , process(as, ui)
-        );
+    let as = state with
+    {
+        user: user,
+        events: events,
+        ui: update(events, state.ui, application(user))
+    };
+
+    return mainLoop(renderer, as);
 }
 
 export int main()
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL::SDL_Init(SDL::INIT_VIDEO);
 
-    let window = SDL_CreateWindow("test", 0, 0, 800, 600, 0);
-    let renderer = SDL_CreateRenderer(window, 0, 0);
+    let window = SDL::SDL_CreateWindow("test", 0, 0, 800, 600, 0);
+    let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
+
+    let user = initState();
+
+    let state = ApplicationState
+    {
+        user: user,
+        ui: application(user),
+        events: SDL::SDL_WaitEventEx(createEventState()),
+    };
 
     return mainLoop(renderer
-        , initState()
+        , state
         );
 }
