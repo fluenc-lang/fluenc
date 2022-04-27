@@ -1,0 +1,31 @@
+struct Rectangle : Item
+{
+    color: Color {}
+};
+
+function update(EventState events, Rectangle rectangle, Rectangle nextItem)
+{
+    return rectangle with
+    {
+        children: update(events, rectangle.children, nextItem.children)
+    };
+}
+
+function process(ApplicationState state, Rectangle rectangle)
+{
+    return process(state, rectangle.children);
+}
+
+function draw(long renderer, without item)
+{
+    return nothing;
+}
+
+function draw(long renderer, Rectangle rectangle)
+{
+    setRenderDrawColor(renderer, rectangle.color);
+
+    SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle));
+
+    return draw(renderer, rectangle.children);
+}

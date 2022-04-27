@@ -1,156 +1,16 @@
 use "sdl.fc"
+use "foam.fc"
+use "button.fc"
+use "rectangle.fc"
 
 import int puts(string str);
 
 import void printnum(int num);
 
-global Normal: 0;
-global MouseOver: 1;
-global Pressed: 2;
-
-struct Item
-{
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-    state: 0,
-    children: []
-};
-
-struct Button : Item
-{
-    text,
-    onClicked: nothing
-};
-
-struct Color
-{
-    r: 0,
-    g: 0,
-    b: 0
-}
-
-struct Rectangle : Item
-{
-    color: Color {}
-};
-
 struct State
 {
     counter: 0
 };
-
-struct ControlTemplate
-{
-    normal,
-    mouseOver,
-    pressed
-};
-
-struct EventState
-{
-    SDL::KeyboardEvent key,
-    SDL::MouseMotionEvent motion,
-    SDL::MouseButtonEvent button
-};
-
-struct ApplicationState
-{
-    events: nothing,
-    user: nothing,
-    ui: nothing
-};
-
-function createEventState()
-{
-    return EventState
-    {
-        key: SDL::KeyboardEvent {},
-        motion: SDL::MouseMotionEvent {},
-        button: SDL::MouseButtonEvent {}
-    };
-}
-
-function createApplicationState(State state)
-{
-    return ApplicationState
-    {
-        events: SDL::SDL_WaitEventEx(createEventState()),
-        user: state
-    };
-}
-
-function rgb(int r, int g, int b)
-{
-    return Color
-    {
-        r: r,
-        g: g,
-        b: b
-    };
-}
-
-function defaultTemplate(Button button)
-{
-    return ControlTemplate
-    {
-        normal: Rectangle
-        {
-            x: button.x,
-            y: button.y,
-            width: button.width,
-            height: button.height + 2,
-            color: rgb(41, 128, 185),
-            children: [
-                Rectangle
-                {
-                    x: button.x,
-                    y: button.y,
-                    width: button.width,
-                    height: button.height,
-                    color: rgb(29, 153, 243)
-                }
-            ]
-        },
-        mouseOver: Rectangle
-        {
-            x: button.x,
-            y: button.y,
-            width: button.width,
-            height: button.height + 2,
-            color: rgb(41, 128, 185),
-            children: [
-                Rectangle
-                {
-                    x: button.x,
-                    y: button.y,
-                    width: button.width,
-                    height: button.height,
-                    color: rgb(61, 174, 233)
-                }
-            ]
-        },
-        pressed: Rectangle
-        {
-            x: button.x,
-            y: button.y,
-            width: button.width,
-            height: button.height + 2,
-            color: rgb(41, 128, 185)
-        }
-    };
-}
-
-function invoke(without callback, State state)
-{
-    return state;
-}
-
-function invoke(function (State) callback, State state)
-{
-    return callback(state);
-}
 
 function increaseCounter(State state)
 {
@@ -179,14 +39,14 @@ function application(State state)
 			height: 150,
             color: rgb(252, 252, 252),
             children: [
-//                 Button
-//                 {
-//                     x: 30 + state.counter,
-//                     y: 30,
-//                     width: 210,
-//                     height: 30,
-//                     text: "Click me!",
-//                 },
+                Button
+                {
+                    x: 30 + state.counter,
+                    y: 30,
+                    width: 210,
+                    height: 30,
+                    text: "Button 1",
+                },
 //                 Button
 //                 {
 //                     x: 30 + state.counter,
@@ -201,7 +61,7 @@ function application(State state)
                     y: 110,
                     width: 70,
                     height: 30,
-                    text: "Click me!",
+                    text: "Decrease",
                     onClicked: decreaseCounter
                 },
                 Button
@@ -210,7 +70,7 @@ function application(State state)
                     y: 110,
                     width: 70,
                     height: 30,
-                    text: "Click me!",
+                    text: "Increase",
                     onClicked: increaseCounter
                 },
 //                 Button
@@ -236,233 +96,18 @@ function application(State state)
     ];
 }
 
-function boundingRect(Item item)
-{
-    return SDL::Rect
-    {
-        x: item.x,
-        y: item.y,
-        width: item.width,
-        height: item.height
-    };
-}
-
-function setRenderDrawColor(long renderer, Color color)
-{
-    return SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-}
-
-function selectTemplate(ControlTemplate template, Item item)
-{
-    if (item.state == MouseOver)
-    {
-        return template.mouseOver;
-    }
-
-    if (item.state == Pressed)
-    {
-        return template.pressed;
-    }
-
-    return template.normal;
-}
-
-function iterate(without item)
-{
-    return nothing;
-}
-
-function iterate(any item)
-{
-    return item;
-}
-
-function iterate((any item, ...items))
-{
-    return iterate(...items);
-}
-
-function containsMouse(Item item, SDL::MouseMotionEvent motion)
-{
-    return (motion.x > item.x)
-        && (motion.x < (item.x + item.width))
-        && (motion.y > item.y)
-        && (motion.y < (item.y + item.height));
-}
-
-function isPressed(SDL::MouseButtonEvent button)
-{
-    return button.type == SDL::MOUSEBUTTONDOWN;
-}
-
-struct ItemState
-{
-    item,
-    state
-};
-
-function updateButton(EventState events, Button button, Button nextButton)
-{
-    if (containsMouse(nextButton, events.motion))
-    {
-        if (isPressed(events.button))
-        {
-            return nextButton with
-            {
-                state: Pressed
-            };
-        }
-
-        return nextButton with
-        {
-            state: MouseOver
-        };
-    }
-
-    return nextButton with
-    {
-        state: Normal
-    };
-}
-
-function processButton(EventState events, State state, Button button)
-{
-    if (containsMouse(button, events.motion))
-    {
-        if (isPressed(events.button))
-        {
-            return invoke(button.onClicked, state);
-        }
-
-        return state;
-    }
-
-    return state;
-}
-
-function update(EventState events, without item, without nextItem)
-{
-    return nothing;
-}
-
-function update(EventState events, Rectangle rectangle, Rectangle nextItem)
-{
-    return rectangle with
-    {
-        children: update(events, rectangle.children, nextItem.children)
-    };
-}
-
-function update(EventState events, Button button, Button nextItem)
-{
-    return updateButton(events, button, nextItem);
-}
-
-function update(EventState events, (Button button, ...controls), (Button nextButton, ...nextControls))
-{
-    return updateButton(events, button, nextButton) -> update(events, ...controls, ...nextControls);
-}
-
-function update(EventState events, (any button, ...controls), any nextButton)
-{
-    return nextButton;
-}
-
-function update(EventState events, any b, (any button, ...controls))
-{
-    return button;
-}
-
-function process(ApplicationState state, Rectangle rectangle)
-{
-    return process(state, rectangle.children);
-}
-
-function process(ApplicationState state, Button button)
-{
-    return processButton(state.events, state.user, button);
-}
-
-function process(ApplicationState state, (Button button, ...controls))
-{
-    let as = state with
-    {
-        user: processButton(state.events, state.user, button)
-    };
-
-    return process(as, ...controls);
-}
-
-function draw(long renderer, without item)
-{
-    return nothing;
-}
-
-function draw(long renderer, Rectangle rectangle)
-{
-    setRenderDrawColor(renderer, rectangle.color);
-
-    SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle));
-
-    return draw(renderer, rectangle.children);
-}
-
-function draw(long renderer, Button button)
-{
-    return draw(renderer, selectTemplate(defaultTemplate(button), button));
-}
-
-function draw(long renderer, (any item, ...controls))
-{
-    draw(renderer, item);
-
-    return draw(renderer, ...controls);
-}
-
 function initState()
 {
     return State {};
 }
 
-function mainLoop(long renderer, ApplicationState state)
-{
-    SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL::SDL_RenderClear(renderer);
-
-    draw(renderer, state.ui);
-
-    SDL::SDL_RenderPresent(renderer);
-
-    let user = process(state, state.ui);
-    let events = SDL::SDL_WaitEventEx(createEventState());
-
-    let as = state with
-    {
-        user: user,
-        events: events,
-        ui: update(events, state.ui, application(user))
-    };
-
-    return mainLoop(renderer, as);
-}
-
 export int main()
 {
-    SDL::SDL_Init(SDL::INIT_VIDEO);
-
-    let window = SDL::SDL_CreateWindow("test", 0, 0, 800, 600, 0);
-    let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
-
-    let user = initState();
-
-    let state = ApplicationState
+    let definition = ApplicationDefinition
     {
-        user: user,
-        ui: application(user),
-        events: SDL::SDL_WaitEventEx(createEventState()),
+        state: initState,
+        ui: application,
     };
 
-    return mainLoop(renderer
-        , state
-        );
+    return Foam::run(definition);
 }

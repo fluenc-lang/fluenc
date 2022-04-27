@@ -1,0 +1,129 @@
+use "foam.fc"
+
+struct Button : Item
+{
+    text,
+    onClicked: nothing
+};
+
+function defaultTemplate(Button button)
+{
+    return ControlTemplate
+    {
+        normal: Rectangle
+        {
+            x: button.x,
+            y: button.y,
+            width: button.width,
+            height: button.height + 2,
+            color: rgb(41, 128, 185),
+            children: [
+                Rectangle
+                {
+                    x: button.x,
+                    y: button.y,
+                    width: button.width,
+                    height: button.height,
+                    color: rgb(29, 153, 243)
+                }
+            ]
+        },
+        mouseOver: Rectangle
+        {
+            x: button.x,
+            y: button.y,
+            width: button.width,
+            height: button.height + 2,
+            color: rgb(41, 128, 185),
+            children: [
+                Rectangle
+                {
+                    x: button.x,
+                    y: button.y,
+                    width: button.width,
+                    height: button.height,
+                    color: rgb(61, 174, 233)
+                }
+            ]
+        },
+        pressed: Rectangle
+        {
+            x: button.x,
+            y: button.y,
+            width: button.width,
+            height: button.height + 2,
+            color: rgb(41, 128, 185)
+        }
+    };
+}
+
+function updateButton(EventState events, Button button, Button nextButton)
+{
+    puts(button.text);
+
+    if (containsMouse(nextButton, events.motion))
+    {
+        if (isPressed(events.button))
+        {
+            return nextButton with
+            {
+                state: Pressed
+            };
+        }
+
+        return nextButton with
+        {
+            state: MouseOver
+        };
+    }
+
+    return nextButton with
+    {
+        state: Normal
+    };
+}
+
+function processButton(EventState events, State state, Button button)
+{
+    if (containsMouse(button, events.motion))
+    {
+        if (isPressed(events.button))
+        {
+            return invoke(button.onClicked, state);
+        }
+
+        return state;
+    }
+
+    return state;
+}
+
+function update(EventState events, Button button, Button nextItem)
+{
+    return updateButton(events, button, nextItem);
+}
+
+function update(EventState events, (Button button, ...controls), (Button nextButton, ...nextControls))
+{
+    return updateButton(events, button, nextButton) -> update(events, ...controls, ...nextControls);
+}
+
+function process(ApplicationState state, Button button)
+{
+    return processButton(state.events, state.user, button);
+}
+
+function process(ApplicationState state, (Button button, ...controls))
+{
+    let as = state with
+    {
+        user: processButton(state.events, state.user, button)
+    };
+
+    return process(as, ...controls);
+}
+
+function draw(long renderer, Button button)
+{
+    return draw(renderer, selectTemplate(defaultTemplate(button), button));
+}
