@@ -3295,6 +3295,53 @@ BOOST_AUTO_TEST_CASE (scenario86)
 	BOOST_TEST(result == 12);
 }
 
+BOOST_AUTO_TEST_CASE (scenario87)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			text
+		}
+
+		struct ApplicationState
+		{
+			ui
+		}
+
+		function application()
+		{
+			return [
+				Item
+				{
+					text: "Foo",
+				}
+			];
+		}
+
+		function mainLoop(int count, ApplicationState state)
+		{
+			if (count > 0)
+			{
+				return 12;
+			}
+
+			return mainLoop(count + 1, state);
+		}
+
+		export int main()
+		{
+			let state = ApplicationState
+			{
+				ui: application()
+			};
+
+			return mainLoop(0, state);
+		}
+	)");
+
+	BOOST_TEST(result == 12);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

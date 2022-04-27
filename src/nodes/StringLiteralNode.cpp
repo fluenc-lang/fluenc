@@ -4,6 +4,7 @@
 
 #include "values/StringValue.h"
 #include "values/ReferenceValue.h"
+#include "values/ScalarValue.h"
 
 #include "types/StringType.h"
 
@@ -17,11 +18,17 @@ std::vector<DzResult> StringLiteralNode::build(const EntryPoint &entryPoint, Sta
 {
 	IRBuilderEx builder(entryPoint);
 
-	auto address = new ReferenceValue(StringType::instance()
+	auto stringType = StringType::get(m_value.size());
+
+	auto string = new ScalarValue(stringType
 		, builder.createGlobalStringPtr(m_value, "string")
 		);
 
-	values.push(new StringValue(address, id(), m_value.size()));
+	auto alloc = entryPoint.alloc(stringType);
+
+	builder.createStore(string, alloc);
+
+	values.push(new StringValue(alloc, id(), m_value.size()));
 
 	return m_consumer->build(entryPoint, values);
 }

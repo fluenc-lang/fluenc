@@ -105,17 +105,9 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 
 		IRBuilderEx builder(entryPoint);
 
-		auto stringType = llvm::Type::getInt8PtrTy(*context)->getPointerTo();
+		auto load = builder.createLoad(stringValue->reference());
 
-		auto addressOfValue = new ScalarValue(stringValue->type()
-			, *stringValue->reference()
-			);
-
-		auto addressOfStorage = new ReferenceValue(stringValue->type()
-			, builder.createBitCast(*stringStorage->reference(), stringType, "stringStorage")
-			);
-
-		builder.createStore(addressOfValue, addressOfStorage);
+		builder.createStore(load, stringStorage->reference());
 	}
 
 	return entryPoint;
