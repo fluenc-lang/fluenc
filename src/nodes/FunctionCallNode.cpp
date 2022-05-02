@@ -16,6 +16,7 @@
 #include "FunctionNotFoundException.h"
 
 #include "nodes/FunctionNode.h"
+#include "nodes/StackSegmentNode.h"
 
 #include "values/ExpandedValue.h"
 #include "values/ScalarValue.h"
@@ -26,6 +27,8 @@
 #include "values/ExpandableValue.h"
 #include "values/IteratorValue.h"
 #include "values/FunctionValue.h"
+#include "values/IteratorValueGenerator.h"
+#include "values/LazyValue.h"
 
 #include "types/IteratorType.h"
 
@@ -34,9 +37,10 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
-FunctionCallNode::FunctionCallNode(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names)
+FunctionCallNode::FunctionCallNode(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names, const Node *evaluation)
 	: m_ast(ast)
 	, m_names(names)
+	, m_evaluation(evaluation)
 {
 }
 
@@ -60,91 +64,58 @@ int FunctionCallNode::order(const EntryPoint &entryPoint) const
 	return -1;
 }
 
-int8_t FunctionCallNode::tryCreateTailCall(const EntryPoint &entryPoint
-	, const Stack &values
-	, const std::vector<std::string>::const_iterator &name
-	, const std::vector<std::string>::const_iterator &end
-	) const
-{
-	if (name == end)
-	{
-		return -1;
-	}
-
-	auto tailCallCandidate = entryPoint
-		.byName(*name);
-
-	if (!tailCallCandidate)
-	{
-		return tryCreateTailCall(entryPoint, values, name + 1, end);
-	}
-
-	auto targetValues = tailCallCandidate->values();
-
-	if (targetValues.size() != values.size())
-	{
-		return tryCreateTailCall(entryPoint, values, name + 1, end);
-	}
-
-	int8_t min = 0;
-	int8_t max = 0;
-
-	std::transform(targetValues.begin(), targetValues.end(), values.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
-	{
-		auto storageType = storage->type();
-		auto valueType = value->type();
-
-		return valueType->compatibility(storageType, entryPoint);
-	});
-
-	if (min < 0 || max > 0)
-	{
-		return std::min(max
-			, tryCreateTailCall(entryPoint, values, name + 1, end)
-			);
-	}
-
-	auto tailCallTarget = findTailCallTarget(tailCallCandidate, values);
-
-	if (!tailCallTarget)
-	{
-		return tryCreateTailCall(entryPoint, values, name + 1, end);
-	}
-
-	auto zipped = zip(values, targetValues);
-
-	auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto result)
-	{
-		auto [value, storage] = result;
-
-		return ValueHelper::transferValue(accumulatedEntryPoint, value, storage);
-	});
-
-	linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
-
-	return 0;
-}
-
 std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto function = entryPoint.function();
-	auto block = entryPoint.block();
+	auto &context = entryPoint.context();
 
-	insertBlock(block, function);
+	std::vector<DzResult> result;
 
-	auto score = tryCreateTailCall(entryPoint, values, begin(m_names), end(m_names));
-
-	if (score == 0)
+	for (auto &[resultEntryPoint, resultValues] : m_evaluation->build(entryPoint, values))
 	{
-		return std::vector<DzResult>();
+		auto locals = resultEntryPoint.locals();
+		auto parent = resultEntryPoint.function();
+		auto block = resultEntryPoint.block();
+
+		auto function = findFunction(resultEntryPoint, resultValues);
+
+		if (!function)
+		{
+			throw new FunctionNotFoundException(m_ast, m_names[0], resultValues);
+		}
+
+		insertBlock(resultEntryPoint.block(), parent);
+
+		auto functionBlock = llvm::BasicBlock::Create(*context);
+
+		linkBlocks(block, functionBlock);
+
+		auto functionEntryPoint = resultEntryPoint
+			.withBlock(functionBlock);
+
+		if (function->attribute() == FunctionAttribute::Import)
+		{
+			return function->build(functionEntryPoint, resultValues);
+		}
+
+		auto functionResults = function->build(functionEntryPoint, resultValues);
+
+		for (const auto &[lastEntryPoint, returnValue] : functionResults)
+		{
+			insertBlock(lastEntryPoint.block(), parent);
+
+			auto consumerBlock = llvm::BasicBlock::Create(*context);
+
+			linkBlocks(lastEntryPoint.block(), consumerBlock);
+
+			auto consumerEntryPoint = functionEntryPoint
+				.withDepth(lastEntryPoint.depth())
+				.withBlock(consumerBlock);
+
+			result.push_back({ consumerEntryPoint, returnValue });
+		}
 	}
 
-	if (score == 1)
-	{
-		throw new std::exception(); // TODO
-	}
-
-	return regularCall(entryPoint, values);
+	return result;
 }
 
 const CallableNode *FunctionCallNode::findFunction(const EntryPoint &entryPoint, Stack values) const
@@ -205,55 +176,4 @@ const CallableNode *FunctionCallNode::findFunction(const EntryPoint &entryPoint,
 	}
 
 	return nullptr;
-}
-
-std::vector<DzResult> FunctionCallNode::regularCall(const EntryPoint &entryPoint, Stack values) const
-{
-	auto &context = entryPoint.context();
-
-	auto functions = entryPoint.functions();
-	auto locals = entryPoint.locals();
-	auto parent = entryPoint.function();
-
-	auto block = entryPoint.block();
-
-	auto function = findFunction(entryPoint, values);
-
-	if (function)
-	{
-		auto functionBlock = llvm::BasicBlock::Create(*context);
-
-		linkBlocks(block, functionBlock);
-
-		auto functionEntryPoint = entryPoint
-			.withBlock(functionBlock);
-
-		if (function->attribute() == FunctionAttribute::Import)
-		{
-			return function->build(functionEntryPoint, values);
-		}
-
-		std::vector<DzResult> result;
-
-		auto functionResults = function->build(functionEntryPoint, values);
-
-		for (const auto &[lastEntryPoint, returnValue] : functionResults)
-		{
-			insertBlock(lastEntryPoint.block(), parent);
-
-			auto consumerBlock = llvm::BasicBlock::Create(*context);
-
-			linkBlocks(lastEntryPoint.block(), consumerBlock);
-
-			auto consumerEntryPoint = functionEntryPoint
-				.withDepth(lastEntryPoint.depth())
-				.withBlock(consumerBlock);
-
-			result.push_back({ consumerEntryPoint, returnValue });
-		}
-
-		return result;
-	}
-
-	throw new FunctionNotFoundException(m_ast, m_names[0], values);
 }

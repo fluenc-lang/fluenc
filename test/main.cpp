@@ -457,7 +457,7 @@ BOOST_AUTO_TEST_CASE (scenario19)
 
 		export int main()
 		{
-			return puts("foo");
+			return puts(@"foo");
 		}
 	)");
 
@@ -3340,6 +3340,98 @@ BOOST_AUTO_TEST_CASE (scenario87)
 	)");
 
 	BOOST_TEST(result == 12);
+}
+
+BOOST_AUTO_TEST_CASE (scenario88)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			children: []
+		};
+
+		struct Button : Item
+		{
+			text
+		};
+
+		struct State
+		{
+			ui
+		};
+
+		function application()
+		{
+			return [
+				Item
+				{
+					children: [
+						1, 2, 3
+					]
+				}
+			];
+		}
+
+		function update(without item, without nextItem)
+		{
+			return nothing;
+		}
+
+		function update((any item, ...controls), any nextItem)
+		{
+			return item;
+		}
+
+		function update(any item, (any nextItem, ...nextItems))
+		{
+			return item;
+		}
+
+		function update(Item rectangle, Item nextItem)
+		{
+			return rectangle with
+			{
+				children: update(rectangle.children, nextItem.children)
+			};
+		}
+
+		function update(int current, int next)
+		{
+			return current;
+		}
+
+		function update((int current, ...currents), (int next, ...nexts))
+		{
+			return current -> update(...currents, ...nexts);
+		}
+
+		function mainLoop(int i, State state)
+		{
+			if (i > 0)
+			{
+				return 21;
+			}
+
+			let s = state with
+			{
+				ui: update(application(), application())
+			};
+
+			return mainLoop(i + 1, s);
+		}
+
+		export int main()
+		{
+			let state = State
+			{
+				ui: application()
+			};
+
+			return mainLoop(0, state);
+		}
+	)");
+
+	BOOST_TEST(result == 21);
 }
 
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )

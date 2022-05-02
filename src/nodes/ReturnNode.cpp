@@ -17,6 +17,7 @@
 #include "values/ScalarValue.h"
 #include "values/ExpandableValue.h"
 #include "values/TupleValue.h"
+#include "values/ReferenceValue.h"
 
 ReturnNode::ReturnNode(const Type *iteratorType
 	, const Node *consumer
@@ -42,7 +43,7 @@ const BaseValue *fetchValue(Stack &values, const EntryPoint &entryPoint)
 
 		builder.createStore(typedValue, alloc);
 
-		return builder.createLoad(alloc);
+		return alloc;
 	}
 
 	return value;

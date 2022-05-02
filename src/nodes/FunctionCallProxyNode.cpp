@@ -1,8 +1,13 @@
-#include "nodes/FunctionCallProxyNode.h"
-#include "AllIterator.h"
-#include "nodes/JunctionNode.h"
+#include <numeric>
 
+#include "AllIterator.h"
+#include "ZipIterator.h"
+#include "ValueHelper.h"
+
+#include "nodes/FunctionCallProxyNode.h"
+#include "nodes/JunctionNode.h"
 #include "nodes/CallableNode.h"
+#include "nodes/CapsuleNode.h"
 
 #include "values/LazyValue.h"
 #include "values/IteratorValueGenerator.h"
@@ -11,21 +16,96 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
-// TODO Could this be moved into StackSegment instead?
-FunctionCallProxyNode::FunctionCallProxyNode(const std::vector<std::string> &names
-	, const Node *consumer
-	, const Node *withEvaluation
-	, const Node *withoutEvaluation
-	)
+FunctionCallProxyNode::FunctionCallProxyNode(const std::vector<std::string> &names, const Node *regularCall)
 	: m_names(names)
-	, m_consumer(consumer)
-	, m_withEvaluation(withEvaluation)
-	, m_withoutEvaluation(withoutEvaluation)
+	, m_regularCall(regularCall)
 {
 }
 
-std::vector<DzResult> FunctionCallProxyNode::regularCall(const EntryPoint &entryPoint, Stack values) const
+int8_t FunctionCallProxyNode::tryCreateTailCall(const EntryPoint &entryPoint
+	, const Stack &values
+	, const std::vector<std::string>::const_iterator &name
+	, const std::vector<std::string>::const_iterator &end
+	) const
 {
+	if (name == end)
+	{
+		return -1;
+	}
+
+	auto tailCallCandidate = entryPoint
+		.byName(*name);
+
+	if (!tailCallCandidate)
+	{
+		return tryCreateTailCall(entryPoint, values, name + 1, end);
+	}
+
+	auto targetValues = tailCallCandidate->values();
+
+	if (targetValues.size() != values.size())
+	{
+		return tryCreateTailCall(entryPoint, values, name + 1, end);
+	}
+
+	int8_t min = 0;
+	int8_t max = 0;
+
+	std::transform(targetValues.begin(), targetValues.end(), values.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
+	{
+		auto storageType = storage->type();
+		auto valueType = value->type();
+
+		return valueType->compatibility(storageType, entryPoint);
+	});
+
+	if (min < 0 || max > 0)
+	{
+		return std::min(max
+			, tryCreateTailCall(entryPoint, values, name + 1, end)
+			);
+	}
+
+	auto tailCallTarget = findTailCallTarget(tailCallCandidate, values);
+
+	if (!tailCallTarget)
+	{
+		return tryCreateTailCall(entryPoint, values, name + 1, end);
+	}
+
+	auto zipped = zip(values, targetValues);
+
+	auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto result)
+	{
+		auto [value, storage] = result;
+
+		return ValueHelper::transferValue(accumulatedEntryPoint, value, storage);
+	});
+
+	linkBlocks(resultEntryPoint.block(), tailCallTarget->block());
+
+	return 0;
+}
+
+std::vector<DzResult> FunctionCallProxyNode::build(const EntryPoint &entryPoint, Stack values) const
+{
+	auto function = entryPoint.function();
+	auto block = entryPoint.block();
+
+	insertBlock(block, function);
+
+	auto score = tryCreateTailCall(entryPoint, values, begin(m_names), end(m_names));
+
+	if (score == 0)
+	{
+		return std::vector<DzResult>();
+	}
+
+	if (score == 1)
+	{
+		throw new std::exception(); // TODO
+	}
+
 	auto functions = entryPoint.functions();
 
 	for (auto &name : m_names)
@@ -37,86 +117,16 @@ std::vector<DzResult> FunctionCallProxyNode::regularCall(const EntryPoint &entry
 			// Naive. Really naive.
 			if (function->attribute() == FunctionAttribute::Iterator)
 			{
-				auto generator = new IteratorValueGenerator(new IteratorType(), m_withEvaluation, entryPoint);
+				auto capsule = new CapsuleNode(values, m_regularCall);
+				auto generator = new IteratorValueGenerator(new IteratorType(), capsule, entryPoint);
 				auto lazy = new LazyValue(generator);
 
-				values.push(lazy);
-
-				return m_consumer->build(entryPoint, values);
-			}
-
-			if (function->attribute() == FunctionAttribute::Import)
-			{
-				std::vector<DzResult> results;
-
-				auto junction = new JunctionNode(m_withoutEvaluation);
-
-				for (auto &[subjectEntryPoint, subjectValues] : junction->build(entryPoint, values))
-				{
-					for (auto &consumerResult : m_consumer->build(subjectEntryPoint, subjectValues))
-					{
-						results.push_back(consumerResult);
-					}
-				}
-
-				return results;
+				return {{ entryPoint, lazy }};
 			}
 		}
 	}
 
-	std::vector<DzResult> results;
+	auto junction = new JunctionNode(m_regularCall);
 
-	auto junction = new JunctionNode(m_withEvaluation);
-
-	for (auto &[subjectEntryPoint, subjectValues] : junction->build(entryPoint, values))
-	{
-		for (auto &consumerResult : m_consumer->build(subjectEntryPoint, subjectValues))
-		{
-			results.push_back(consumerResult);
-		}
-	}
-
-	return results;
-}
-
-std::vector<DzResult> FunctionCallProxyNode::build(const EntryPoint &entryPoint, Stack values) const
-{
-	for (auto &name : m_names)
-	{
-		auto tailCallCandidate = entryPoint
-			.byName(name);
-
-		if (!tailCallCandidate)
-		{
-			return regularCall(entryPoint, values);
-		}
-
-		auto targetValues = tailCallCandidate->values();
-		auto inputValues = values;
-
-		if (targetValues.size() != inputValues.size())
-		{
-			return regularCall(entryPoint, values);
-		}
-
-		int8_t min = 0;
-		int8_t max = 0;
-
-		std::transform(targetValues.begin(), targetValues.end(), inputValues.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
-		{
-			auto storageType = storage->type();
-			auto valueType = value->type();
-
-			return valueType->compatibility(storageType, entryPoint);
-		});
-
-		if (min < 0 || max > 0)
-		{
-			return regularCall(entryPoint, values);
-		}
-	}
-
-	// Tail call
-
-	return m_withEvaluation->build(entryPoint, values);
+	return junction->build(entryPoint, values);
 }

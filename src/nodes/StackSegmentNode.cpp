@@ -15,7 +15,7 @@
 #include "values/UserTypeValue.h"
 #include "values/NamedValue.h"
 
-StackSegmentNode::StackSegmentNode(std::vector<Node *> values, Node *call, Node *consumer)
+StackSegmentNode::StackSegmentNode(std::vector<Node *> values, const Node *call, const Node *consumer)
 	: m_values(values)
 	, m_call(call)
 	, m_consumer(consumer)
