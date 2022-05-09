@@ -1,10 +1,12 @@
 #include <numeric>
 
+#include "IteratorStorage.h"
+#include "IndexIterator.h"
+
 #include "values/ArrayValueGenerator.h"
 #include "values/ArrayValue.h"
 #include "values/ReferenceValue.h"
-#include "IteratorStorage.h"
-#include "IndexIterator.h"
+#include "values/IndexedValue.h"
 
 #include "nodes/ArrayElementNode.h"
 
@@ -51,6 +53,30 @@ const Type *ArrayValueGenerator::type() const
 	}
 
 	return IteratorType::instance();
+}
+
+size_t ArrayValueGenerator::size() const
+{
+	return m_size;
+}
+
+const BaseValue *ArrayValueGenerator::elementAt(size_t index) const
+{
+	if (m_values.size() != 1)
+	{
+		throw new std::exception();
+	}
+
+	auto [_, values] = m_values[0];
+
+	if (index >= values.size())
+	{
+		throw new std::exception();
+	}
+
+	auto indexed = dynamic_cast<const IndexedValue *>(*(values.rbegin() + index));
+
+	return indexed->subject();
 }
 
 const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoint) const

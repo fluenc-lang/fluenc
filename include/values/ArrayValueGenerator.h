@@ -16,6 +16,10 @@ class ArrayValueGenerator : public ILazyValueGenerator
 
 		const Type *type() const override;
 
+		size_t size() const;
+
+		const BaseValue *elementAt(size_t index) const;
+
 	private:
 		const std::vector<DzResult> m_values;
 

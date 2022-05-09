@@ -14,6 +14,7 @@
 #include "ZipIterator.h"
 #include "ValueHelper.h"
 #include "FunctionNotFoundException.h"
+#include "FunctionHelper.h"
 
 #include "nodes/FunctionNode.h"
 #include "nodes/StackSegmentNode.h"
@@ -66,6 +67,13 @@ int FunctionCallNode::order(const EntryPoint &entryPoint) const
 
 std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stack values) const
 {
+	auto [score, _1, _2] = FunctionHelper::tryCreateTailCall(entryPoint, values, begin(m_names), end(m_names));
+
+	if (score == 0)
+	{
+		throw new std::exception(); // TODO
+	}
+
 	auto &context = entryPoint.context();
 
 	std::vector<DzResult> result;

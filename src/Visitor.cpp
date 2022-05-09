@@ -42,13 +42,14 @@
 #include "nodes/FunctionCallNode.h"
 #include "nodes/MemberAccessNode.h"
 #include "nodes/ReferenceSinkNode.h"
-#include "nodes/FunctionCallProxyNode.h"
+#include "nodes/TailFunctionCallNode.h"
 #include "nodes/StackSegmentNode.h"
 #include "nodes/LazyEvaluationNode.h"
 #include "nodes/IndexSinkNode.h"
 #include "nodes/ExpansionNode.h"
 #include "nodes/LocalNode.h"
 #include "nodes/UnaryNode.h"
+#include "nodes/FunctionCallProxyNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -314,6 +315,8 @@ Node *Visitor::visitExpression(const std::shared_ptr<peg::Ast> &ast) const
 			return visitExpansion(ast);
 		case "Local"_:
 			return visitLocal(ast);
+		case "Tail"_:
+			return visitTail(ast);
 	}
 
 	throw new std::exception();
@@ -470,9 +473,10 @@ Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 
 	auto evaluation = new LazyEvaluationNode(TerminatorNode::instance());
 	auto call = new FunctionCallNode(ast, names, evaluation);
-	auto proxy = new FunctionCallProxyNode(names, call);
 
-	return new StackSegmentNode(values, proxy, m_alpha);
+	auto segment = new StackSegmentNode(values, call, TerminatorNode::instance());
+
+	return new FunctionCallProxyNode(names, segment, m_alpha);
 }
 
 Node *Visitor::visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const
@@ -627,7 +631,31 @@ Node *Visitor::visitUnary(const std::shared_ptr<peg::Ast> &ast) const
 	Visitor visitor(m_namespaces, m_iteratorType, unary, nullptr);
 
 	return visitor
-		.visitExpression(ast->nodes[1]);
+			.visitExpression(ast->nodes[1]);
+}
+
+Node *Visitor::visitTail(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
+
+	Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
+
+	std::vector<Node *> values;
+
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes), std::back_inserter(values), [&](auto node)
+	{
+		return visitor.visitExpression(node);
+	});
+
+	auto names = qualifiedNames(m_namespaces
+		, visitId(ast->nodes[0])
+		);
+
+	auto evaluation = new LazyEvaluationNode(TerminatorNode::instance());
+	auto call = new FunctionCallNode(ast, names, evaluation);
+	auto proxy = new TailFunctionCallNode(names, call);
+
+	return new StackSegmentNode(values, proxy, m_alpha);
 }
 
 CallableNode *Visitor::visitFunction(const std::shared_ptr<peg::Ast> &ast) const

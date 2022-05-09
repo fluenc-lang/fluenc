@@ -12,6 +12,7 @@
 #include "values/TupleValue.h"
 #include "values/ExpandableValue.h"
 #include "values/ScalarValue.h"
+#include "values/IndexedValue.h"
 
 LazyValue::LazyValue(const ILazyValueGenerator *generator)
 	: m_generator(generator)
@@ -49,72 +50,55 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 	auto dataLayout = module->getDataLayout();
 
 	auto exitBlock = llvm::BasicBlock::Create(*context, "exit");
-	auto targetEntryBlock = llvm::BasicBlock::Create(*context, "targetEntry");
 
 	IteratorStorage iteratorStorage;
 
 	auto sourceEntryPoint = entryPoint
 		.withIteratorStorage(&iteratorStorage);
 
-	auto targetEntryPoint = entryPoint
-		.withBlock(targetEntryBlock);
-
 	auto iteratable = source->generate(sourceEntryPoint);
-	auto array = m_generator->generate(sourceEntryPoint);
+
+	auto array = dynamic_cast<const ArrayValueGenerator *>(m_generator);
+
+	if (!array)
+	{
+		throw new std::exception();
+	}
 
 	auto iteratableResults = iteratable->build(entryPoint);
-	auto arrayResults = array->build(targetEntryPoint);
 
-	auto branchRatio = iteratableResults.size() / arrayResults.size();
+	auto branchRatio = iteratableResults.size() / array->size();
 
 	for (auto i = 0u; i < iteratableResults.size(); i++)
 	{
-		auto targetIndex = i / branchRatio;
+		auto arrayIndex = i / branchRatio;
 
 		auto [sourceResultEntryPoint, sourceResultValues] = iteratableResults[i];
-		auto [targetResultEntryPoint, targetResultValues] = arrayResults[targetIndex];
 
 		auto sourceBlock = sourceResultEntryPoint.block();
-		auto targetBlock = targetResultEntryPoint.block();
 
 		insertBlock(sourceBlock, function);
-		insertBlock(targetBlock, function);
-
-		linkBlocks(sourceBlock, targetEntryBlock);
 
 		auto sourceValue = sourceResultValues.pop();
-		auto targetValue = targetResultValues.pop();
+		auto targetValue = array->elementAt(arrayIndex);
 
-		if (auto targetTupleValue = dynamic_cast<const TupleValue *>(targetValue))
+		auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+
+		if (sourceTupleValue)
 		{
-			auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
-
-			if (!sourceTupleValue)
-			{
-				continue;
-			}
-
-			auto targetTupleValues = targetTupleValue->values();
 			auto sourceTupleValues = sourceTupleValue->values();
 
-			auto resultEntryPoint = ValueHelper::transferValue(targetResultEntryPoint
+			auto resultEntryPoint = ValueHelper::transferValue(sourceResultEntryPoint
 				, sourceTupleValues.pop()
-				, targetTupleValues.pop()
+				, targetValue
 				);
 
-			auto targetContinuation = targetTupleValues.require<ExpandableValue>(nullptr);
 			auto sourceContinuation = sourceTupleValues.require<ExpandableValue>(nullptr);
 
 			auto sourceChain = sourceContinuation->chain();
-			auto targetChain = targetContinuation->chain();
-
 			auto sourceProvider = sourceContinuation->provider();
-			auto targetProvider = targetContinuation->provider();
 
-			auto sourceContinuationEntryPoint = sourceProvider->withBlock(targetBlock);
-			auto targetContinuationEntryPoint = targetProvider->withBlock(targetBlock);
-
-			targetChain->build(targetContinuationEntryPoint, Stack());
+			auto sourceContinuationEntryPoint = sourceProvider->withBlock(resultEntryPoint.block());
 
 			for (auto &[chainEntryPoint, _] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
 			{
@@ -125,13 +109,14 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		}
 		else
 		{
-			auto resultEntryPoint = ValueHelper::transferValue(targetResultEntryPoint, sourceValue, targetValue);
+			auto resultEntryPoint = ValueHelper::transferValue(sourceResultEntryPoint
+				, sourceValue
+				, targetValue
+				);
 
 			linkBlocks(resultEntryPoint.block(), exitBlock);
 		}
 	}
-
-	insertBlock(targetEntryBlock, function);
 
 	exitBlock->insertInto(function);
 

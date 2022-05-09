@@ -15,7 +15,7 @@ Return              <- 'return' Expression ('->' Continuation)?
 Continuation        <- Id '(' List(Expression)? ')'
 Argument            <- StandardArgument / TupleArgument
 TypeName            <- FunctionType / RegularType
-Expression          <- Unary / Binary / Instantiation / Literal / Group / Call / Expansion / Member / Conditional / Array / Local
+Expression          <- Unary / Binary / Instantiation / Literal / Group / Tail / Call / Expansion / Member / Conditional / Array / Local
 Comment             <- '//' [^\r\n]*
 Assignment          <- Id ':' Expression
 With                <- 'with' '{' List(Assignment) ','? '}'
@@ -47,6 +47,7 @@ Literal             <- ByteLiteral / Uint32Literal / Int64Literal / Int32Literal
 Binary              <- (Group BinaryOperator Expression) / (Literal BinaryOperator Expression) / (Member BinaryOperator Expression) / (Call BinaryOperator Expression)
 Unary               <- (UnaryOperator Group) / (UnaryOperator Literal) / (UnaryOperator Member) / (UnaryOperator Call)
 Member              <- IdList With?
+Tail                <- 'tail' Id '(' List(Expression)? ')'
 Call                <- Id '(' List(Expression)? ')'
 Instantiation       <- TypeName '{' (List(Assignment) ','?)? '}'
 Conditional         <- 'if' '(' Expression ')' Block
