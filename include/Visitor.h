@@ -72,6 +72,8 @@ class Visitor
 		Node *visitLocal(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitContinuation(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitWith(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitUnary(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitTail(const std::shared_ptr<peg::Ast> &ast) const;
 
 		CallableNode *visitFunction(const std::shared_ptr<peg::Ast> &ast) const;
 		CallableNode *visitRegularFunction(const std::shared_ptr<peg::Ast> &ast) const;

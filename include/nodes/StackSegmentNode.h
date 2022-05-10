@@ -6,7 +6,7 @@
 class StackSegmentNode : public Node
 {
 	public:
-		StackSegmentNode(std::vector<Node *> values, Node *call, Node *consumer);
+		StackSegmentNode(std::vector<Node *> values, const Node *call, const Node *consumer);
 
 		int order(const EntryPoint &entryPoint) const override;
 
@@ -15,8 +15,8 @@ class StackSegmentNode : public Node
 	private:
 		std::vector<Node *> m_values;
 
-		Node *m_call;
-		Node *m_consumer;
+		const Node *m_call;
+		const Node *m_consumer;
 };
 
 #endif // STACKSEGMENTNODE_H

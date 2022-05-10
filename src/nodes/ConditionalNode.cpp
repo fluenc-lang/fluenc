@@ -7,6 +7,7 @@
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 #include "Utility.h"
+#include "ValueHelper.h"
 
 #include "nodes/ConditionalNode.h"
 
@@ -45,7 +46,9 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 
 	IRBuilderEx builder(entryPoint);
 
-	builder.createCondBr(values.require<ScalarValue>(nullptr), ifTrue, ifFalse);
+	auto conditional = ValueHelper::getScalar(entryPoint, values);
+
+	builder.createCondBr(conditional, ifTrue, ifFalse);
 
 	auto epIfFalse = entryPoint
 		.withName("ifFalse")

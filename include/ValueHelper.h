@@ -4,6 +4,7 @@
 #include "EntryPoint.h"
 
 class BaseValue;
+class ScalarValue;
 
 class ValueHelper
 {
@@ -12,6 +13,8 @@ class ValueHelper
 			, const BaseValue *value
 			, const BaseValue *storage
 			);
+
+		static const ScalarValue *getScalar(const EntryPoint &entryPoint, Stack &values);
 };
 
 #endif // VALUEHELPER_H

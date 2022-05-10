@@ -42,12 +42,14 @@
 #include "nodes/FunctionCallNode.h"
 #include "nodes/MemberAccessNode.h"
 #include "nodes/ReferenceSinkNode.h"
-#include "nodes/FunctionCallProxyNode.h"
+#include "nodes/TailFunctionCallNode.h"
 #include "nodes/StackSegmentNode.h"
 #include "nodes/LazyEvaluationNode.h"
 #include "nodes/IndexSinkNode.h"
 #include "nodes/ExpansionNode.h"
 #include "nodes/LocalNode.h"
+#include "nodes/UnaryNode.h"
+#include "nodes/FunctionCallProxyNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -295,6 +297,8 @@ Node *Visitor::visitExpression(const std::shared_ptr<peg::Ast> &ast) const
 			return visitLiteral(ast);
 		case "Binary"_:
 			return visitBinary(ast);
+		case "Unary"_:
+			return visitUnary(ast);
 		case "Member"_:
 			return visitMember(ast);
 		case "Call"_:
@@ -311,6 +315,8 @@ Node *Visitor::visitExpression(const std::shared_ptr<peg::Ast> &ast) const
 			return visitExpansion(ast);
 		case "Local"_:
 			return visitLocal(ast);
+		case "Tail"_:
+			return visitTail(ast);
 	}
 
 	throw new std::exception();
@@ -450,11 +456,6 @@ Node *Visitor::visitMember(const std::shared_ptr<peg::Ast> &ast) const
 
 Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto names = qualifiedNames(m_namespaces
-		, visitId(ast->nodes[0])
-		);
-
-	auto call = new FunctionCallNode(ast, names);
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
 
 	Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
@@ -466,12 +467,16 @@ Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 		return visitor.visitExpression(node);
 	});
 
-	auto evaluation = new LazyEvaluationNode(call);
-	auto withEvaluation = new StackSegmentNode(values, evaluation, TerminatorNode::instance());
-	auto withoutEvaluation = new StackSegmentNode(values, call, TerminatorNode::instance());
-	auto proxy = new FunctionCallProxyNode(names, m_alpha, withEvaluation, withoutEvaluation);
+	auto names = qualifiedNames(m_namespaces
+		, visitId(ast->nodes[0])
+		);
 
-	return proxy;
+	auto evaluation = new LazyEvaluationNode(TerminatorNode::instance());
+	auto call = new FunctionCallNode(ast, names, evaluation);
+
+	auto segment = new StackSegmentNode(values, call, TerminatorNode::instance());
+
+	return new FunctionCallProxyNode(names, segment, m_alpha);
 }
 
 Node *Visitor::visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const
@@ -613,6 +618,44 @@ Node *Visitor::visitWith(const std::shared_ptr<peg::Ast> &ast) const
 		return visitor
 			.visitExpression(assignment->nodes[1]);
 	});
+}
+
+Node *Visitor::visitUnary(const std::shared_ptr<peg::Ast> &ast) const
+{
+	UNUSED(ast);
+
+	auto unary = new UnaryNode(m_alpha
+		, visitId(ast->nodes[0])
+		);
+
+	Visitor visitor(m_namespaces, m_iteratorType, unary, nullptr);
+
+	return visitor
+			.visitExpression(ast->nodes[1]);
+}
+
+Node *Visitor::visitTail(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
+
+	Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
+
+	std::vector<Node *> values;
+
+	std::transform(begin(ast->nodes) + 1, end(ast->nodes), std::back_inserter(values), [&](auto node)
+	{
+		return visitor.visitExpression(node);
+	});
+
+	auto names = qualifiedNames(m_namespaces
+		, visitId(ast->nodes[0])
+		);
+
+	auto evaluation = new LazyEvaluationNode(TerminatorNode::instance());
+	auto call = new FunctionCallNode(ast, names, evaluation);
+	auto proxy = new TailFunctionCallNode(names, call);
+
+	return new StackSegmentNode(values, proxy, m_alpha);
 }
 
 CallableNode *Visitor::visitFunction(const std::shared_ptr<peg::Ast> &ast) const

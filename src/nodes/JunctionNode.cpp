@@ -28,7 +28,7 @@ JunctionNode::JunctionNode(const Node *subject)
 
 std::vector<DzResult> JunctionNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto inputResults = m_subject->build(entryPoint, Stack());
+	auto inputResults = m_subject->build(entryPoint, values);
 
 	std::vector<DzResult> outputResults;
 
@@ -68,11 +68,7 @@ std::vector<DzResult> JunctionNode::build(const EntryPoint &entryPoint, Stack va
 
 		auto [joinedEntryPoint, joinedValue] = tryJoin(inputValues, entryPoint);
 
-		auto finalValues = values;
-
-		finalValues.push(joinedValue);
-
-		outputResults.push_back({ joinedEntryPoint, finalValues });
+		outputResults.push_back({ joinedEntryPoint, joinedValue });
 	}
 
 	return outputResults;

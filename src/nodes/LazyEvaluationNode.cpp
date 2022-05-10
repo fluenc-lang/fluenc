@@ -6,6 +6,7 @@
 #include "values/TupleValue.h"
 #include "values/LazyValue.h"
 #include "values/StringValue.h"
+#include "values/ForwardedValue.h"
 
 LazyEvaluationNode::LazyEvaluationNode(const Node *consumer)
 	: m_consumer(consumer)
@@ -17,6 +18,29 @@ std::vector<DzResult> LazyEvaluationNode::digestDepth(const EntryPoint &entryPoi
 	for (auto i = 0u; i < values.size(); i++)
 	{
 		auto value = values.pop();
+
+		if (auto forwarded = dynamic_cast<const ForwardedValue *>(value))
+		{
+			std::vector<DzResult> results;
+
+			for (auto &[resultEntryPoint, resultValues] : digestDepth(entryPoint, values))
+			{
+				std::vector<const BaseValue *> forwardedValues;
+
+				for (auto resultValue : resultValues)
+				{
+					forwardedValues.push_back(resultValue);
+				}
+
+				auto subject = forwarded->subject();
+
+				forwardedValues.push_back(subject);
+
+				results.push_back({ resultEntryPoint, forwardedValues });
+			}
+
+			return results;
+		}
 
 		if (auto lazy = dynamic_cast<const LazyValue *>(value))
 		{

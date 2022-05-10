@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE (scenario15)
 		{
 			if (i < count)
 			{
-				return loop(i + 1, count);
+				return tail loop(i + 1, count);
 			}
 
 			return i;
@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE (fibonacci)
 		{
 			if (i < count)
 			{
-				return fibonacci(current + previous, current, i + 1, count);
+				return tail fibonacci(current + previous, current, i + 1, count);
 			}
 
 			return current;
@@ -457,7 +457,7 @@ BOOST_AUTO_TEST_CASE (scenario19)
 
 		export int main()
 		{
-			return puts("foo");
+			return puts(@"foo");
 		}
 	)");
 
@@ -1005,7 +1005,7 @@ BOOST_AUTO_TEST_CASE (scenario37)
 
 		function sum(int value, (int number, ...numbers))
 		{
-			return sum(value + number, ...numbers);
+			return tail sum(value + number, ...numbers);
 		}
 
 		export int main()
@@ -1027,7 +1027,7 @@ BOOST_AUTO_TEST_CASE (scenario38)
 
 		function sum(int value, (int number, ...numbers))
 		{
-			return sum(value + number, ...numbers);
+			return tail sum(value + number, ...numbers);
 		}
 
 		export int main()
@@ -1059,7 +1059,7 @@ BOOST_AUTO_TEST_CASE (scenario39)
 
 		function sum(int value, (Struct1 s, ...ss))
 		{
-			return sum(value + s.x, ...ss);
+			return tail sum(value + s.x, ...ss);
 		}
 
 		function sum(int value, Struct2 s)
@@ -1069,7 +1069,7 @@ BOOST_AUTO_TEST_CASE (scenario39)
 
 		function sum(int value, (Struct2 s, ...ss))
 		{
-			return sum(value + s.y, ...ss);
+			return tail sum(value + s.y, ...ss);
 		}
 
 		export int main()
@@ -1105,7 +1105,7 @@ BOOST_AUTO_TEST_CASE (scenario40)
 
 		function sum(int value, (int number, ...numbers))
 		{
-			return sum(value + number, ...numbers);
+			return tail sum(value + number, ...numbers);
 		}
 
 		export int main()
@@ -1166,7 +1166,7 @@ BOOST_AUTO_TEST_CASE (scenario42)
 
 		function sum(int product, (int value, ...values))
 		{
-			return sum(product + value, ...values);
+			return tail sum(product + value, ...values);
 		}
 
 		export int main()
@@ -1341,7 +1341,7 @@ BOOST_AUTO_TEST_CASE (scenario47)
 
 		function foo2(int accumulator, (Item item, ...values))
 		{
-			return foo2(accumulator + item.value, ...values);
+			return tail foo2(accumulator + item.value, ...values);
 		}
 
 		function foo1(int accumulator, without item)
@@ -1351,12 +1351,12 @@ BOOST_AUTO_TEST_CASE (scenario47)
 
 		function foo1(int accumulator, Item item)
 		{
-			return foo2(accumulator + item.value, item.children);
+			return tail foo2(accumulator + item.value, item.children);
 		}
 
 		function foo1(int accumulator, (Item item, ...values))
 		{
-			return foo1(foo2(accumulator + item.value, item.children), ...values);
+			return tail foo1(foo2(accumulator + item.value, item.children), ...values);
 		}
 
 		export int main()
@@ -1424,22 +1424,22 @@ BOOST_AUTO_TEST_CASE (scenario48)
 
 		function sumWidth(int sum, Rectangle r)
 		{
-			return sumWidth(sum + r.width, r.children);
+			return tail sumWidth(sum + r.width, r.children);
 		}
 
 		function sumWidth(int sum, (Rectangle r, ...items))
 		{
-			return sumWidth(sumWidth(sum + r.width, r.children), ...items);
+			return tail sumWidth(sumWidth(sum + r.width, r.children), ...items);
 		}
 
 		function sumWidth(int sum, Button b)
 		{
-			return sumWidth(sum + b.width, b.children);
+			return tail sumWidth(sum + b.width, b.children);
 		}
 
 		function sumWidth(int sum, (Button b, ...items))
 		{
-			return sumWidth(sumWidth(sum + b.width, b.children), ...items);
+			return tail sumWidth(sumWidth(sum + b.width, b.children), ...items);
 		}
 
 		export int main()
@@ -1499,7 +1499,7 @@ BOOST_AUTO_TEST_CASE (scenario52)
 		{
 			if (row.x < 5)
 			{
-				return foo(row with { x: row.x + 1 });
+				return tail foo(row with { x: row.x + 1 });
 			}
 
 			return row.x;
@@ -1590,7 +1590,7 @@ BOOST_AUTO_TEST_CASE (scenario54)
 
 		function drawButton(Button button)
 		{
-			return draw(selectTemplate(button));
+			return tail draw(selectTemplate(button));
 		}
 
 		function draw(without item)
@@ -1625,7 +1625,7 @@ BOOST_AUTO_TEST_CASE (scenario54)
 
 		function sum(int accumulator, (int value, ...values))
 		{
-			return sum(accumulator + value, ...values);
+			return tail sum(accumulator + value, ...values);
 		}
 
 		export int main()
@@ -1647,7 +1647,7 @@ BOOST_AUTO_TEST_CASE (scenario55)
 
 		function sum(int product, (int value, ...values))
 		{
-			return sum(product + value, ...values);
+			return tail sum(product + value, ...values);
 		}
 
 		export int main()
@@ -1674,7 +1674,7 @@ BOOST_AUTO_TEST_CASE (scenario56)
 
 		function sum(int product, (Struct s, ...structs))
 		{
-			return sum(product + s.x, ...structs);
+			return tail sum(product + s.x, ...structs);
 		}
 
 		function createStructs()
@@ -1720,7 +1720,7 @@ BOOST_AUTO_TEST_CASE (scenario57)
 
 		function sum(int product, (Struct s, ...structs))
 		{
-			return sum(product + s.x, ...structs);
+			return tail sum(product + s.x, ...structs);
 		}
 
 		function createStructs()
@@ -1791,7 +1791,7 @@ BOOST_AUTO_TEST_CASE (scenario58)
 				return 41;
 			}
 
-			return loop(c2, c1);
+			return tail loop(c2, c1);
 		}
 
 		export int main()
@@ -1813,7 +1813,7 @@ BOOST_AUTO_TEST_CASE (scenario59)
 				return 41;
 			}
 
-			return loop(v2, v1);
+			return tail loop(v2, v1);
 		}
 
 		export int main()
@@ -1891,7 +1891,7 @@ BOOST_AUTO_TEST_CASE (scenario61)
 
 		function sum(int product, (int v, ...values))
 		{
-			return sum(product + v, ...values);
+			return tail sum(product + v, ...values);
 		}
 
 		function add(int addend, int v)
@@ -1926,7 +1926,7 @@ BOOST_AUTO_TEST_CASE (scenario61)
 		{
 			if (sum(0, s.values) < 20)
 			{
-				return foo(s with { values: add(1, s.values) });
+				return tail foo(s with { values: add(1, s.values) });
 			}
 
 			return first(s.values);
@@ -1956,7 +1956,7 @@ BOOST_AUTO_TEST_CASE (scenario62)
 
 		function sum(int product, (int v, ...values))
 		{
-			return sum(product + v, ...values);
+			return tail sum(product + v, ...values);
 		}
 
 		function first(int v)
@@ -1981,7 +1981,7 @@ BOOST_AUTO_TEST_CASE (scenario62)
 		{
 			if (sum(0, s.values) < 9)
 			{
-				return foo(s with { values: [2, 3, 4] });
+				return tail foo(s with { values: [2, 3, 4] });
 			}
 
 			return first(s.values);
@@ -2016,7 +2016,7 @@ BOOST_AUTO_TEST_CASE (scenario63)
 
 		function sum(int product, (Element v, ...values))
 		{
-			return sum(product + v.value, ...values);
+			return tail sum(product + v.value, ...values);
 		}
 
 		function add(int addend, Element v)
@@ -2064,7 +2064,7 @@ BOOST_AUTO_TEST_CASE (scenario63)
 		{
 			if (sum(0, s.values) < 20)
 			{
-				return foo(s with { values: add(1, s.values) });
+				return tail foo(s with { values: add(1, s.values) });
 			}
 
 			return first(s.values);
@@ -2116,7 +2116,7 @@ BOOST_AUTO_TEST_CASE (scenario64)
 
 		function sum(int product, (Struct s, ...structs))
 		{
-			return sum(product + sum(s.value), ...structs);
+			return tail sum(product + sum(s.value), ...structs);
 		}
 
 		function createStructs()
@@ -2209,7 +2209,7 @@ BOOST_AUTO_TEST_CASE (scenario66)
 
 		function sum(int product, (int value, ...values))
 		{
-			return sum(product + value, ...values);
+			return tail sum(product + value, ...values);
 		}
 
 		function createStructs()
@@ -2245,7 +2245,7 @@ BOOST_AUTO_TEST_CASE (scenario67)
 
 		function sum(int product, (int value, ...values))
 		{
-			return sum(product + value, ...values);
+			return tail sum(product + value, ...values);
 		}
 
 		function foo(int product, int value)
@@ -2299,7 +2299,7 @@ BOOST_AUTO_TEST_CASE (scenario68)
 
 		function sum(int product, (int value, ...values))
 		{
-			return sum(product + value, ...values);
+			return tail sum(product + value, ...values);
 		}
 
 		export int main()
@@ -2341,7 +2341,7 @@ BOOST_AUTO_TEST_CASE (scenario69)
 
 		function sum(int product, (int value, ...values))
 		{
-			return sum(product + value, ...values);
+			return tail sum(product + value, ...values);
 		}
 
 		function addOne(int value)
@@ -2502,7 +2502,7 @@ BOOST_AUTO_TEST_CASE (scenario70)
 				return item;
 			}
 
-			return elementAt(index, i + 1, ...items);
+			return tail elementAt(index, i + 1, ...items);
 		}
 
 		function foo(int product, int index)
@@ -2516,7 +2516,7 @@ BOOST_AUTO_TEST_CASE (scenario70)
 		{
 			let table = [10, 20];
 
-			return foo(product + elementAt(index, 0, table), ...indexes);
+			return tail foo(product + elementAt(index, 0, table), ...indexes);
 		}
 
 		export int main()
@@ -2598,7 +2598,7 @@ BOOST_AUTO_TEST_CASE (scenario71)
 
 		function count(int product, (int c, ...characters))
 		{
-			return count(product + 1, ...characters);
+			return tail count(product + 1, ...characters);
 		}
 
 		export int main()
@@ -2912,7 +2912,7 @@ BOOST_AUTO_TEST_CASE (scenario81)
 				return 12;
 			}
 
-			return mainLoop(count + 1, state);
+			return tail mainLoop(count + 1, state);
 		}
 
 		export int main()
@@ -2981,14 +2981,14 @@ BOOST_AUTO_TEST_CASE (scenario82)
 
 		function update((Item item, ...items))
 		{
-			return update(item) -> update(...items);
+			return tail update(item) -> update(...items);
 		}
 
 		function update(Item item)
 		{
 			return item with
 			{
-				children: update(item.children),
+				children: tail update(item.children),
 			};
 		}
 
@@ -3004,7 +3004,7 @@ BOOST_AUTO_TEST_CASE (scenario82)
 				ui: update(state.ui),
 			};
 
-			return mainLoop(count + 1, as);
+			return tail mainLoop(count + 1, as);
 		}
 
 		export int main()
@@ -3062,7 +3062,7 @@ BOOST_AUTO_TEST_CASE (scenario83)
 
 		function update((Item item, ...items))
 		{
-			return update(item) -> update(...items);
+			return tail update(item) -> update(...items);
 		}
 
 		function update(Item item)
@@ -3085,7 +3085,7 @@ BOOST_AUTO_TEST_CASE (scenario83)
 				ui: update(state.ui),
 			};
 
-			return mainLoop(count + 1, as);
+			return tail mainLoop(count + 1, as);
 		}
 
 		export int main()
@@ -3188,17 +3188,17 @@ BOOST_AUTO_TEST_CASE (scenario85)
 
 		function draw(Rectangle rectangle)
 		{
-			return draw(rectangle.children);
+			return tail draw(rectangle.children);
 		}
 
 		function draw(Button button)
 		{
-			return draw(selectTemplate(defaultTemplate(button), button));
+			return tail draw(selectTemplate(defaultTemplate(button), button));
 		}
 
 		function draw((any item, ...controls))
 		{
-			return draw(...controls);
+			return tail draw(...controls);
 		}
 
 		export int main()
@@ -3278,7 +3278,7 @@ BOOST_AUTO_TEST_CASE (scenario86)
 				ui: update(state, state.ui),
 			};
 
-			return mainLoop(count + 1, as);
+			return tail mainLoop(count + 1, as);
 		}
 
 		export int main()
@@ -3325,7 +3325,7 @@ BOOST_AUTO_TEST_CASE (scenario87)
 				return 12;
 			}
 
-			return mainLoop(count + 1, state);
+			return tail mainLoop(count + 1, state);
 		}
 
 		export int main()
@@ -3340,6 +3340,156 @@ BOOST_AUTO_TEST_CASE (scenario87)
 	)");
 
 	BOOST_TEST(result == 12);
+}
+
+BOOST_AUTO_TEST_CASE (scenario88)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			children: []
+		};
+
+		struct Button : Item
+		{
+			text
+		};
+
+		struct State
+		{
+			ui
+		};
+
+		function application()
+		{
+			return [
+				Item
+				{
+					children: [
+						1, 2, 3
+					]
+				}
+			];
+		}
+
+		function update(without item, without nextItem)
+		{
+			return nothing;
+		}
+
+		function update((any item, ...controls), any nextItem)
+		{
+			return item;
+		}
+
+		function update(any item, (any nextItem, ...nextItems))
+		{
+			return item;
+		}
+
+		function update(Item rectangle, Item nextItem)
+		{
+			return rectangle with
+			{
+				children: update(rectangle.children, nextItem.children)
+			};
+		}
+
+		function update(int current, int next)
+		{
+			return current;
+		}
+
+		function update((int current, ...currents), (int next, ...nexts))
+		{
+			return current -> update(...currents, ...nexts);
+		}
+
+		function mainLoop(int i, State state)
+		{
+			if (i > 0)
+			{
+				return 21;
+			}
+
+			let s = state with
+			{
+				ui: update(application(), application())
+			};
+
+			return tail mainLoop(i + 1, s);
+		}
+
+		export int main()
+		{
+			let state = State
+			{
+				ui: application()
+			};
+
+			return mainLoop(0, state);
+		}
+	)");
+
+	BOOST_TEST(result == 21);
+}
+
+BOOST_AUTO_TEST_CASE (scenario89)
+{
+	auto result = exec(R"(
+		function getBool()
+		{
+			return true;
+		}
+
+		export int main()
+		{
+			if (getBool())
+			{
+				return 1;
+			}
+
+			return 2;
+		}
+	)");
+
+	BOOST_TEST(result == 1);
+}
+
+BOOST_AUTO_TEST_CASE (scenario90)
+{
+	auto result = exec(R"(
+		function generator(int count, int i)
+		{
+			if (i < count)
+			{
+				return i -> generator(count, i + 1);
+			}
+
+			return i;
+		}
+
+		function sum(int product, (int value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function sum(int product, int value)
+		{
+			return product + value;
+		}
+
+		export int main()
+		{
+			let range = generator(3, 0);
+
+			sum(0, range);
+
+			return sum(0, range);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
 }
 
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )

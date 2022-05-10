@@ -3,10 +3,12 @@
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
 #include "Utility.h"
+#include "ValueHelper.h"
 
 #include "nodes/ExportedFunctionTerminatorNode.h"
 
 #include "values/ScalarValue.h"
+#include "values/ReferenceValue.h"
 
 std::vector<DzResult> ExportedFunctionTerminatorNode::build(const EntryPoint &entryPoint, Stack values) const
 {
@@ -24,7 +26,7 @@ std::vector<DzResult> ExportedFunctionTerminatorNode::build(const EntryPoint &en
 	auto ep = entryPoint
 		.withBlock(block);
 
-	auto returnValue = values.require<ScalarValue>(nullptr);
+	auto returnValue = ValueHelper::getScalar(ep, values);
 
 	IRBuilderEx builder(ep);
 	builder.createRet(*returnValue);

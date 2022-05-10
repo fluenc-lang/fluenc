@@ -1,11 +1,15 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include "nodes/BinaryNode.h"
 #include "EntryPoint.h"
 #include "IRBuilderEx.h"
+#include "ValueHelper.h"
+
+#include "nodes/BinaryNode.h"
 
 #include "types/BooleanType.h"
+
 #include "values/ScalarValue.h"
+#include "values/ReferenceValue.h"
 
 BinaryNode::BinaryNode(const Node *consumer, const std::string &op)
 	: m_consumer(consumer)
@@ -15,8 +19,8 @@ BinaryNode::BinaryNode(const Node *consumer, const std::string &op)
 
 std::vector<DzResult> BinaryNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto left = values.require<ScalarValue>(nullptr);
-	auto right = values.require<ScalarValue>(nullptr);
+	auto left = ValueHelper::getScalar(entryPoint, values);
+	auto right = ValueHelper::getScalar(entryPoint, values);
 
 	auto value = resolveOp(entryPoint, left, right);
 

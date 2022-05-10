@@ -13,10 +13,8 @@ std::ostream& operator<<(std::ostream &stream, const llvm::StringRef &string)
 
 void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target)
 {
-	if (source->size() > 0)
+	for (auto &instruction : *source)
 	{
-		auto &instruction = source->back();
-
 		if (llvm::isa <llvm::BranchInst> (instruction))
 		{
 			throw new std::exception();

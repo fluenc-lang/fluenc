@@ -19,18 +19,12 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *storage
 	)
 {
-	auto &context = entryPoint.context();
-
 	if (auto scalarValue = dynamic_cast<const ScalarValue *>(value))
 	{
 		auto referenceStorage = dynamic_cast<const ReferenceValue *>(storage);
 
 		if (!referenceStorage)
 		{
-			// TODO: This will be fixed when array transfer is O(N).
-			// Right now, we will always create branches for all possible values.
-			// This *can* include "without", for example.
-
 			return entryPoint;
 		}
 
@@ -44,8 +38,6 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 
 		if (!referenceStorage)
 		{
-			// TODO: This will be fixed when array transfer is O(N)
-
 			return entryPoint;
 		}
 
@@ -77,6 +69,11 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	else if (auto lazyValue = dynamic_cast<const LazyValue *>(value))
 	{
 		auto lazyStorage = dynamic_cast<const LazyValue *>(storage);
+
+		if (!lazyStorage)
+		{
+			return entryPoint;
+		}
 
 		return lazyStorage->assignFrom(entryPoint, lazyValue);
 	}
@@ -111,4 +108,23 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	}
 
 	return entryPoint;
+}
+
+const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, Stack &values)
+{
+	auto value = values.pop();
+
+	if (auto scalar = dynamic_cast<const ScalarValue *>(value))
+	{
+		return scalar;
+	}
+
+	if (auto reference = dynamic_cast<const ReferenceValue *>(value))
+	{
+		IRBuilderEx builder(entryPoint);
+
+		return builder.createLoad(reference);
+	}
+
+	throw new std::exception();
 }
