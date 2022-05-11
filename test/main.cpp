@@ -3492,6 +3492,53 @@ BOOST_AUTO_TEST_CASE (scenario90)
 	BOOST_TEST(result == 6);
 }
 
+BOOST_AUTO_TEST_CASE (scenario91)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			array
+		};
+
+		function process(int value)
+		{
+			if (value > 2)
+			{
+				return value;
+			}
+
+			return value * 2;
+		}
+
+		function process((int value, ...values))
+		{
+			return value -> process(...values);
+		}
+
+		function mainLoop(State state)
+		{
+			let s = state with
+			{
+				array: process(state.array),
+			};
+
+			return tail mainLoop(s);
+		}
+
+		export int main()
+		{
+			let state = State
+			{
+				array: [1, 2]
+			};
+
+			return mainLoop(state);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

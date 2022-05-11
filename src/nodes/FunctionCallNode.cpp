@@ -35,6 +35,7 @@
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/AmbiguousFunctionException.h"
+#include "exceptions/MissingTailCallException.h"
 
 #include "iterators/ExtremitiesIterator.h"
 
@@ -71,7 +72,7 @@ std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stac
 
 	if (score == 0)
 	{
-		throw new std::exception(); // TODO
+		throw new MissingTailCallException(m_ast);
 	}
 
 	auto &context = entryPoint.context();
