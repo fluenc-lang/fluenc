@@ -144,7 +144,7 @@ function draw(long renderer, (any item, ...controls))
 {
     draw(renderer, item);
 
-    return draw(renderer, ...controls);
+    return tail draw(renderer, ...controls);
 }
 
 function containsMouse(Item item, SDL::MouseMotionEvent motion)
@@ -179,7 +179,7 @@ function mainLoop(long renderer, ApplicationState state, ApplicationDefinition d
         ui: update(events, state.ui, invoke(definition.ui, user))
     };
 
-    return mainLoop(renderer, as, definition);
+    return tail mainLoop(renderer, as, definition);
 }
 
 namespace Foam
@@ -188,7 +188,7 @@ namespace Foam
     {
         SDL::SDL_Init(SDL::INIT_VIDEO);
 
-        let window = SDL::SDL_CreateWindow("test", 0, 0, 800, 600, 0);
+        let window = SDL::SDL_CreateWindow(@"test", 0, 0, 800, 600, 0);
         let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
 
         let user = invoke(definition.state);

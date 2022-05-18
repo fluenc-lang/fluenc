@@ -17,7 +17,7 @@ namespace Array
             return item;
         }
 
-        return elementAt(...items, index, i + 1);
+        return tail elementAt(...items, index, i + 1);
     }
 
     function set((int value, ...values), int index, int result, int i)

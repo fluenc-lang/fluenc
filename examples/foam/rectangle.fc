@@ -27,5 +27,5 @@ function draw(long renderer, Rectangle rectangle)
 
     SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
-    return draw(renderer, rectangle.children);
+    return tail draw(renderer, rectangle.children);
 }

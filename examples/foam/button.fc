@@ -59,7 +59,7 @@ function defaultTemplate(Button button)
 
 function updateButton(EventState events, Button button, Button nextButton)
 {
-    puts(button.text);
+//     puts(@button.text);
 
     if (containsMouse(nextButton, events.motion))
     {
@@ -120,10 +120,10 @@ function process(ApplicationState state, (Button button, ...controls))
         user: processButton(state.events, state.user, button)
     };
 
-    return process(as, ...controls);
+    return tail process(as, ...controls);
 }
 
 function draw(long renderer, Button button)
 {
-    return draw(renderer, selectTemplate(defaultTemplate(button), button));
+    return tail draw(renderer, selectTemplate(defaultTemplate(button), button));
 }

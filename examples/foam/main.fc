@@ -47,14 +47,14 @@ function application(State state)
                     height: 30,
                     text: "Button 1",
                 },
-//                 Button
-//                 {
-//                     x: 30 + state.counter,
-//                     y: 70,
-//                     width: 210,
-//                     height: 30,
-//                     text: "Click me!"
-//                 },
+                Button
+                {
+                    x: 30 + state.counter,
+                    y: 70,
+                    width: 210,
+                    height: 30,
+                    text: "Click me!"
+                },
                 Button
                 {
                     x: 30 + state.counter,
