@@ -3515,14 +3515,19 @@ BOOST_AUTO_TEST_CASE (scenario91)
 			return value -> process(...values);
 		}
 
-		function mainLoop(State state)
+		function mainLoop(int i, State state)
 		{
 			let s = state with
 			{
 				array: process(state.array),
 			};
 
-			return tail mainLoop(s);
+			if (i < 1)
+			{
+				return tail mainLoop(i + 1, s);
+			}
+
+			return 6;
 		}
 
 		export int main()
@@ -3532,7 +3537,7 @@ BOOST_AUTO_TEST_CASE (scenario91)
 				array: [1, 2]
 			};
 
-			return mainLoop(state);
+			return mainLoop(0, state);
 		}
 	)");
 

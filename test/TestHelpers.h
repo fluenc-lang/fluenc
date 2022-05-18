@@ -80,6 +80,7 @@ const BaseValue *compileValue(std::string source)
 		auto block = llvm::BasicBlock::Create(*context, "block", function);
 
 		EntryPoint entryPoint(0
+			, -1
 			, nullptr
 			, nullptr
 			, block
@@ -131,6 +132,7 @@ EntryPoint compile(std::string source)
 	auto block = llvm::BasicBlock::Create(*context, "block", function);
 
 	return EntryPoint(0
+		, -1
 		, nullptr
 		, nullptr
 		, block
@@ -168,6 +170,7 @@ int exec(std::string source)
 		.visit(ast);
 
 	EntryPoint entryPoint(0
+		, -1
 		, nullptr
 		, nullptr
 		, nullptr

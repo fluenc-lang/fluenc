@@ -297,6 +297,7 @@ int main(int argc, char **argv)
 			Stack values;
 
 			EntryPoint entryPoint(0
+				, -1
 				, nullptr
 				, nullptr
 				, nullptr

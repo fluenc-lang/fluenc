@@ -61,9 +61,11 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 		builder.createCondBr(comparison , ifTrue, ifFalse);
 
 		auto epIfFalse = entryPoint
+			.withIndex(value->index())
 			.withBlock(ifFalse);
 
 		auto epIfTrue = entryPoint
+			.withIndex(value->index())
 			.withBlock(ifTrue);
 
 		valuesIfFalse.push(index);
@@ -84,7 +86,10 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 		return result;
 	}
 
+	auto ep = entryPoint
+		.withIndex(value->index());
+
 	values.push(value->subject());
 
-	return {{ entryPoint, values }};
+	return {{ ep, values }};
 }

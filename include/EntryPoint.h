@@ -20,6 +20,7 @@ class EntryPoint
 {
 	public:
 		EntryPoint(int depth
+			, int index
 			, const EntryPoint *parent
 			, const EntryPoint *entry
 			, llvm::BasicBlock *block
@@ -40,6 +41,7 @@ class EntryPoint
 		EntryPoint(const EntryPoint &) = default;
 
 		int depth() const;
+		int index() const;
 
 		llvm::BasicBlock *block() const;
 
@@ -75,10 +77,12 @@ class EntryPoint
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
 		EntryPoint withValues(const Stack &values) const;
 		EntryPoint withDepth(int depth) const;
+		EntryPoint withIndex(int index) const;
 		EntryPoint withModule(std::unique_ptr<llvm::Module> *module) const;
 
 	private:
 		int m_depth;
+		int m_index;
 
 		const EntryPoint *m_parent;
 		const EntryPoint *m_entry;

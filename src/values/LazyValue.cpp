@@ -67,12 +67,8 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 	auto iteratableResults = iteratable->build(entryPoint);
 
-	auto branchRatio = iteratableResults.size() / array->size();
-
 	for (auto i = 0u; i < iteratableResults.size(); i++)
 	{
-		auto arrayIndex = i / branchRatio;
-
 		auto [sourceResultEntryPoint, sourceResultValues] = iteratableResults[i];
 
 		auto sourceBlock = sourceResultEntryPoint.block();
@@ -80,7 +76,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		insertBlock(sourceBlock, function);
 
 		auto sourceValue = sourceResultValues.pop();
-		auto targetValue = array->elementAt(arrayIndex);
+		auto targetValue = array->elementAt(sourceResultEntryPoint.index());
 
 		auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
 
