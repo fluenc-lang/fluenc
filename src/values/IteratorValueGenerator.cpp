@@ -24,6 +24,13 @@ const ILazyValueGenerator *IteratorValueGenerator::clone(const EntryPoint &entry
 	return this;
 }
 
+const ILazyValueGenerator *IteratorValueGenerator::forward(size_t id) const
+{
+	UNUSED(id);
+
+	return this;
+}
+
 const Type *IteratorValueGenerator::type() const
 {
 	return m_iteratorType;

@@ -37,3 +37,8 @@ const BaseValue *StringValue::clone(const EntryPoint &entryPoint) const
 
 	return new StringValue(subject, m_id, m_length);
 }
+
+const BaseValue *StringValue::forward(size_t id) const
+{
+	return new StringValue(m_address, id, m_length);
+}

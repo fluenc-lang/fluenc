@@ -29,6 +29,11 @@ const ILazyValueGenerator *StringIteratableGenerator::clone(const EntryPoint &en
 	return this;
 }
 
+const ILazyValueGenerator *StringIteratableGenerator::forward(size_t id) const
+{
+	return new StringIteratableGenerator(m_address, id, m_length);
+}
+
 const Type *StringIteratableGenerator::type() const
 {
 	return IteratorType::instance();

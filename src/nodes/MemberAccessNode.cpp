@@ -45,7 +45,9 @@ std::vector<DzResult> MemberAccessNode::build(const EntryPoint &entryPoint, Stac
 			}
 			else if (localsIterator->second)
 			{
-				values.push(localsIterator->second);
+				auto forwarded = localsIterator->second->forward(id());
+
+				values.push(forwarded);
 			}
 
 			return m_consumer->build(entryPoint, values);

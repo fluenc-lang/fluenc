@@ -1,6 +1,8 @@
 #ifndef ILAZYVALUEGENERATOR_H
 #define ILAZYVALUEGENERATOR_H
 
+#include <string>
+
 class IIteratable;
 class EntryPoint;
 class Type;
@@ -9,7 +11,9 @@ class ILazyValueGenerator
 {
 	public:
 		virtual const IIteratable *generate(const EntryPoint &entryPoint) const = 0;
+
 		virtual const ILazyValueGenerator *clone(const EntryPoint &entryPoint) const = 0;
+		virtual const ILazyValueGenerator *forward(size_t id) const = 0;
 
 		virtual const Type *type() const = 0;
 };

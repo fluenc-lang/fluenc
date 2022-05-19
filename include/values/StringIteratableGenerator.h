@@ -13,6 +13,8 @@ class StringIteratableGenerator : public ILazyValueGenerator
 		const IIteratable *generate(const EntryPoint &entryPoint) const override;
 
 		const ILazyValueGenerator *clone(const EntryPoint &entryPoint) const override;
+		const ILazyValueGenerator *forward(size_t id) const override;
+
 		const Type *type() const override;
 
 	private:

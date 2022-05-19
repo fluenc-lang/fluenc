@@ -26,7 +26,11 @@ const ReferenceValue *IteratorStorage::getOrCreate(size_t id, const EntryPoint &
 			, llvm::ConstantInt::get(storageType, 0)
 			);
 
-		auto alloc = entryPoint.alloc(indexType);
+		std::ostringstream name;
+		name << "index_";
+		name << id;
+
+		auto alloc = entryPoint.alloc(indexType, name.str());
 
 		builder.createStore(zero, alloc);
 

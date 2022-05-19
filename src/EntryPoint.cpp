@@ -71,14 +71,14 @@ llvm::Function *EntryPoint::function() const
 	return m_function;
 }
 
-const ReferenceValue *EntryPoint::alloc(const Type *type) const
+const ReferenceValue *EntryPoint::alloc(const Type *type, const llvm::Twine &name) const
 {
 	llvm::IRBuilder<> builder(m_alloc, m_alloc->begin());
 
 	auto storageType = type->storageType(**m_context);
 
 	return new ReferenceValue(type
-		, builder.CreateAlloca(storageType)
+		, builder.CreateAlloca(storageType, nullptr, name)
 		);
 }
 

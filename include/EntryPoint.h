@@ -47,7 +47,7 @@ class EntryPoint
 
 		llvm::Function *function() const;
 
-		const ReferenceValue *alloc(const Type *type) const;
+		const ReferenceValue *alloc(const Type *type, const llvm::Twine &name = "") const;
 
 		std::unique_ptr<llvm::Module> &module() const;
 		std::unique_ptr<llvm::LLVMContext> &context() const;

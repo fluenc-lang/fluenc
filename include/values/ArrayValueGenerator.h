@@ -12,7 +12,9 @@ class ArrayValueGenerator : public ILazyValueGenerator
 		ArrayValueGenerator(const std::vector<DzResult> &values, size_t id, size_t size);
 
 		const IIteratable *generate(const EntryPoint &entryPoint) const override;
+
 		const ILazyValueGenerator *clone(const EntryPoint &entryPoint) const override;
+		const ILazyValueGenerator *forward(size_t id) const override;
 
 		const Type *type() const override;
 

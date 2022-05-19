@@ -31,6 +31,13 @@ const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const
 	return new LazyValue(cloned);
 }
 
+const BaseValue *LazyValue::forward(size_t id) const
+{
+	auto forwarded = m_generator->forward(id);
+
+	return new LazyValue(forwarded);
+}
+
 const IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
 {
 	return m_generator->generate(entryPoint);

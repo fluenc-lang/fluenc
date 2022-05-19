@@ -13,7 +13,9 @@ class IteratorValueGenerator : public ILazyValueGenerator
 		IteratorValueGenerator(const Type *iteratorType, const Node *subject, const EntryPoint &entryPoint);
 
 		const IIteratable *generate(const EntryPoint &entryPoint) const override;
+
 		const ILazyValueGenerator *clone(const EntryPoint &entryPoint) const override;
+		const ILazyValueGenerator *forward(size_t id) const override;
 
 		const Type *type() const override;
 
