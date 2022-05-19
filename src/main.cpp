@@ -85,7 +85,7 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 
 	std::shared_ptr<peg::Ast> ast;
 
-	parser.parse(*source, ast);
+	parser.parse(*source, ast, file.c_str());
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
 
@@ -351,12 +351,12 @@ int main(int argc, char **argv)
 			}
 			catch (CompilerException *exception)
 			{
-				std::cout << job.sourceFile << ":" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
+				std::cout << exception->file() << ":" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
 				std::cout << std::setw(5) << exception->row() << " | ";
 
 				std::ifstream stream;
 
-				stream.open(job.sourceFile);
+				stream.open(exception->file());
 
 				std::string line;
 

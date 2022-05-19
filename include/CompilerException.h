@@ -15,6 +15,8 @@ class CompilerException : public std::exception
 		size_t column() const;
 		size_t length() const;
 
+		std::string file() const;
+
 		virtual std::string message() const = 0;
 
 	private:

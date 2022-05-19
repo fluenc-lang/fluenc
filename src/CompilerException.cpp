@@ -21,3 +21,8 @@ size_t CompilerException::length() const
 {
 	return m_ast->length;
 }
+
+std::string CompilerException::file() const
+{
+	return m_ast->path;
+}
