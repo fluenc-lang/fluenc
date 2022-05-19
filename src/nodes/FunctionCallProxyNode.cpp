@@ -1,5 +1,6 @@
 #include "nodes/FunctionCallProxyNode.h"
 #include "nodes/CallableNode.h"
+#include "nodes/JunctionNode.h"
 
 #include "values/LazyValue.h"
 #include "values/IteratorValueGenerator.h"
@@ -53,7 +54,9 @@ std::vector<DzResult> FunctionCallProxyNode::build(const EntryPoint &entryPoint,
 
 	std::vector<DzResult> results;
 
-	for (auto &[resultEntryPoint, resultValues] : m_regularCall->build(entryPoint, values))
+	auto junction = new JunctionNode(m_regularCall);
+
+	for (auto &[resultEntryPoint, resultValues] : junction->build(entryPoint, values))
 	{
 		for (auto &result : m_consumer->build(resultEntryPoint, resultValues))
 		{
