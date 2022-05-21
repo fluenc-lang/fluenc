@@ -94,7 +94,7 @@ function invoke(function () callback)
 
 // Update stubs
 
-function update(EventState events, without item, without nextItem)
+function update(EventState events, any item, any nextItem)
 {
     return nothing;
 }
@@ -107,6 +107,14 @@ function update(EventState events, (any item, ...controls), any nextItem)
 function update(EventState events, any item, (any nextItem, ...nextItems))
 {
     return nothing;
+}
+
+// Process stubs
+
+
+function process(ApplicationState state, without item)
+{
+    return state.user;
 }
 
 function boundingRect(Item item)

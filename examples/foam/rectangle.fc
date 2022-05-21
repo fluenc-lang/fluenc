@@ -11,6 +11,26 @@ function update(EventState events, Rectangle rectangle, Rectangle nextItem)
     };
 }
 
+function update(EventState events, (Rectangle rectangle, ...controls), (Rectangle nextItem, ...nextControls))
+{
+    let r = rectangle with
+    {
+        children: update(events, rectangle.children, nextItem.children)
+    };
+
+	return r -> update(events, ...controls, ...nextControls);
+}
+
+function process(ApplicationState state, (Rectangle rectangle, ...controls))
+{
+	let s = state with
+	{
+		user: process(state, rectangle.children)
+	};
+
+    return tail process(s, ...controls);
+}
+
 function process(ApplicationState state, Rectangle rectangle)
 {
     return process(state, rectangle.children);

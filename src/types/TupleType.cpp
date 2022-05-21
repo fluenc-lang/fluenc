@@ -19,9 +19,9 @@ std::string TupleType::name() const
 
 	ss << "(";
 
-	for (auto i = begin(m_types); i != end(m_types); i++)
+	for (auto i = rbegin(m_types); i != rend(m_types); i++)
 	{
-		if (i != begin(m_types))
+		if (i != rbegin(m_types))
 		{
 			ss << ", ";
 		}
@@ -40,9 +40,9 @@ std::string TupleType::fullName() const
 
 	ss << "(";
 
-	for (auto i = begin(m_types); i != end(m_types); i++)
+	for (auto i = rbegin(m_types); i != rend(m_types); i++)
 	{
-		if (i != begin(m_types))
+		if (i != rbegin(m_types))
 		{
 			ss << ", ";
 		}

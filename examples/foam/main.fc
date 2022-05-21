@@ -2,6 +2,8 @@ use "sdl.fc"
 use "foam.fc"
 use "button.fc"
 use "rectangle.fc"
+use "image.fc"
+use "composite.fc"
 
 import int puts(string str);
 
@@ -11,6 +13,33 @@ struct State
 {
     counter: 0
 };
+
+struct SideBarItem : Composite
+{
+	icon
+}
+
+function composite(SideBarItem item)
+{
+	return Rectangle
+	{
+		x: item.x,
+		y: item.y,
+		width: item.width,
+		height: item.height,
+		color: rgb(210, 51, 81),
+		children: [
+			Image
+			{
+				x: item.x + 25,
+				y: item.y + 25,
+				width: 50,
+				height: 50,
+				source: item.icon
+			}
+		]
+	};
+}
 
 function increaseCounter(State state)
 {
@@ -31,68 +60,105 @@ function decreaseCounter(State state)
 function application(State state)
 {
     return [
-        Rectangle
-        {
-			x: 10,
-			y: 10,
+		Rectangle
+		{
+			width: 100,
+			height: 600,
+			color: rgb(199, 0, 37),
+			children: [
+				Image
+				{
+					x: 20,
+					y: 20,
+					width: 60,
+					height: 60,
+					source: "menui_logo.bmp"
+				},
+				SideBarItem
+				{
+					y: 110,
+					width: 100,
+					height: 140,
+					icon: "dishes.bmp"
+				}
+			]
+		},
+		Rectangle
+		{
+			x: 100,
 			width: 250,
-			height: 150,
-            color: rgb(252, 252, 252),
-            children: [
-                Button
-                {
-                    x: 30 + state.counter,
-                    y: 30,
-                    width: 210,
-                    height: 30,
-                    text: "Button 1",
-                },
-                Button
-                {
-                    x: 30 + state.counter,
-                    y: 70,
-                    width: 210,
-                    height: 30,
-                    text: "Click me!"
-                },
-                Button
-                {
-                    x: 30 + state.counter,
-                    y: 110,
-                    width: 70,
-                    height: 30,
-                    text: "Decrease",
-                    onClicked: decreaseCounter
-                },
-                Button
-                {
-                    x: 140 + state.counter,
-                    y: 110,
-                    width: 70,
-                    height: 30,
-                    text: "Increase",
-                    onClicked: increaseCounter
-                },
+			height: 600,
+			color: rgb(255, 255, 255)
+		},
+		Rectangle
+		{
+			x: 350,
+			width: 800 - 350,
+			height: 600,
+			color: rgb(240, 240, 240)
+		}
+//         Rectangle
+//         {
+// 			x: 10,
+// 			y: 10,
+// 			width: 250,
+// 			height: 150,
+//             color: rgb(252, 252, 252),
+//             children: [
 //                 Button
 //                 {
-//                     x: 140 + state.counter,
-//                     y: 150,
+//                     x: 30 + state.counter,
+//                     y: 30,
+//                     width: 210,
+//                     height: 30,
+//                     text: "Button 1",
+//                 },
+// // //                 Button
+// // //                 {
+// // //                     x: 30 + state.counter,
+// // //                     y: 70,
+// // //                     width: 210,
+// // //                     height: 30,
+// // //                     text: "Click me!"
+// // //                 },
+//                 Button
+//                 {
+//                     x: 30 + state.counter,
+//                     y: 110,
 //                     width: 70,
 //                     height: 30,
-//                     text: "Click me!",
-// //                     onClicked: increaseCounter
+//                     text: "Decrease",
+//                     onClicked: decreaseCounter
 //                 },
 //                 Button
 //                 {
 //                     x: 140 + state.counter,
-//                     y: 190,
+//                     y: 110,
 //                     width: 70,
 //                     height: 30,
-//                     text: "Click me!",
-// //                     onClicked: increaseCounter
-//                 }
-            ]
-        }
+//                     text: "Increase",
+//                     onClicked: increaseCounter
+//                 },
+// //                 Button
+// //                 {
+// //                     x: 140 + state.counter,
+// //                     y: 150,
+// //                     width: 70,
+// //                     height: 30,
+// //                     text: "Click me!",
+// // //                     onClicked: increaseCounter
+// //                 },
+// //                 Button
+// //                 {
+// //                     x: 140 + state.counter,
+// //                     y: 190,
+// //                     width: 70,
+// //                     height: 30,
+// //                     text: "Click me!",
+// // //                     onClicked: increaseCounter
+// //                 }
+//             ]
+//         }
     ];
 }
 
