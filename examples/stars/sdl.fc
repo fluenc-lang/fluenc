@@ -1,0 +1,77 @@
+namespace SDL
+{
+    import int SDL_Init(uint flags);
+    import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
+    import int SDL_RenderClear(long renderer);
+    import int SDL_RenderFillRect(long renderer, Rect rect);
+	import int SDL_RenderDrawLine(long renderer, int x1, int y1, int x2, int y2);
+	import int SDL_GetTicks();
+	import int SDL_SetRenderDrawBlendMode(long renderer, int blendMode);
+
+    import long SDL_CreateRenderer(long window, int index, int flags);
+    import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
+
+    import void SDL_RenderPresent(long renderer);
+
+    import void SDL_PlayAudio(string source);
+
+    global INIT_VIDEO: 0x00000020u;
+	global INIT_AUDIO: 0x00000010u;
+
+    global WINDOWPOS_UNDEFINED: 0x1FFF0000u;
+    global KEYDOWN: 0x300u;
+    global KEYUP: 0x301u;
+    global MOUSEBUTTONDOWN: 0x401u;
+	global WINDOW_FULLSCREEN_DESKTOP: 0x00001001;
+
+	global BLENDMODE_NONE: 0;
+	global BLENDMODE_BLEND: 1;
+	global BLENDMODE_ADD: 2;
+	global BLENDMODE_MOD: 4;
+
+    struct Rect
+    {
+        int x: 0,
+        int y: 0,
+        int width: 0,
+        int height: 0
+    };
+
+    struct KeyboardEvent
+    {
+        int type: 0,
+        int timestamp: 0,
+        int windowID: 0,
+        int padding: 0,
+        int scancode: 0,
+        int sym: 0,
+        long padding: 0L
+    };
+
+    struct MouseMotionEvent
+    {
+        int type: 0,
+        int timestamp: 0,
+        int windowID: 0,
+        int which: 0,
+        int state: 0,
+        int x: 0,
+        int y: 0,
+        int xrel: 0,
+        int yrel: 0
+    };
+
+    struct MouseButtonEvent
+    {
+        int type: 0,
+        int timestamp: 0,
+        int windowId: 0,
+        int which: 0,
+        byte button: 0u8,
+        byte state: 0u8,
+        byte clicks: 0u8,
+        byte padding: 0u8,
+        int x: 0,
+        int y: 0
+    };
+}

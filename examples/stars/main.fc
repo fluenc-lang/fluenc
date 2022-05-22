@@ -1,0 +1,316 @@
+use "sdl.fc"
+
+import int puts(string str);
+import int rand();
+
+import void srand(int seed);
+import void printnum(int num);
+
+global Width: 1920;
+global Height: 1080;
+global Target: (Width / 2) - 100;
+
+function rect(int x, int y, int width, int height)
+{
+	return SDL::Rect
+	{
+		x: x,
+		y: y,
+		width: width,
+		height: height,
+	};
+}
+
+function min(int left, int right)
+{
+	if (left < right)
+	{
+		return left;
+	}
+
+	return right;
+}
+
+function max(int left, int right)
+{
+	if (left > right)
+	{
+		return left;
+	}
+
+	return right;
+}
+
+struct Skyscraper
+{
+	width,
+	height
+};
+
+struct Star
+{
+	x,
+	y
+};
+
+function drawSkyscraper(int x, int y, int scale, Skyscraper previous, Skyscraper current)
+{
+	let right = x + current.width;
+	let height = (current.height * scale) / 100;
+	let foliage = (min(previous.height, height) * 50) / 100;
+
+	SDL::SDL_RenderFillRect(renderer, rect(x, (Height - height) + y, current.width, height));
+	SDL::SDL_RenderFillRect(renderer, rect(x - 20, (Height - foliage) + y, 20, foliage));
+
+	return right + 20;
+}
+
+function drawSkyscrapers(int x, int y, int scale, Skyscraper previous, Skyscraper current)
+{
+	return drawSkyscraper(x, y, scale, previous, current);
+}
+
+function drawSkyscrapers(int x, int y, int scale, Skyscraper previous, (Skyscraper current, ...next))
+{
+	let offset = drawSkyscraper(x, y, scale, previous, current);
+
+	return tail drawSkyscrapers(offset, y, scale, current, ...next);
+}
+
+function skyscrapers(int seed, int total)
+{
+	srand(seed + total);
+
+	let height = 128 + (rand() % 350);
+	let width = min(20 + (rand() % 150), Target - total);
+
+	let skyscraper = Skyscraper
+	{
+		width: width,
+		height: height
+	};
+
+	let accumulated = total + width + 20;
+
+	if (accumulated < Target)
+	{
+		return skyscraper -> skyscrapers(seed, accumulated);
+	}
+
+	return skyscraper;
+}
+
+function stars(int seed, int i, int count)
+{
+	srand(seed + (i * 2));
+
+	let x = 100 + rand() % (Width - 200);
+
+	srand(seed + (i * 2) + 1);
+
+	let y = 100 + rand() % 300;
+
+	let star = Star
+	{
+		x: x,
+		y: y
+	};
+
+	if (i < count)
+	{
+		return star -> stars(seed, i + 1, count);
+	}
+
+	return star;
+}
+
+struct Color
+{
+	r,
+	g,
+	b
+};
+
+function colorForStar(int episodes, int twinkleIndex, int starIndex)
+{
+	if ((episodes > 63) || (twinkleIndex == starIndex))
+	{
+		return Color
+		{
+			r: 111,
+			g: 111,
+			b: 145
+		};
+	}
+
+	return Color
+	{
+		r: 83,
+		g: 83,
+		b: 108
+	};
+}
+
+function setRenderColor(long renderer, Color color)
+{
+	SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+
+	return nothing;
+}
+
+function drawStars(long renderer, int y, int episodes, int i, Star star)
+{
+	let radius = 20;
+	let color = colorForStar(episodes, episodes % 5, i % 5);
+
+	setRenderColor(renderer, color);
+
+	SDL::SDL_RenderFillRect(renderer, rect(star.x - (radius / 4), (star.y - (radius / 4)) + y, radius / 2, radius / 2));
+
+	SDL::SDL_RenderDrawLine(renderer, star.x - radius, (star.y - radius) + y, star.x + radius, (star.y + radius) + y);
+	SDL::SDL_RenderDrawLine(renderer, star.x + radius, (star.y - radius) + y, star.x - radius, (star.y + radius) + y);
+
+	return nothing;
+}
+
+function strokeStars(long renderer, int y, int episodes, int i, Star previous, Star current)
+{
+	if (i > (episodes - 48))
+	{
+		return nothing;
+	}
+
+	if ((previous.x + previous.y) == 0)
+	{
+		return nothing;
+	}
+
+	SDL::SDL_SetRenderDrawColor(renderer, 183, 183, 200, 255);
+	SDL::SDL_RenderDrawLine(renderer, previous.x, previous.y + y, current.x, current.y + y);
+
+	return nothing;
+}
+
+function strokeStars(long renderer, int y, int episodes, int i, Star previous, (Star current, ...next))
+{
+	strokeStars(renderer, y, episodes, i, previous, current);
+
+	return tail strokeStars(renderer, y, episodes, i + 1, current, ...next);
+}
+
+function drawStars(long renderer, int y, int episodes, int i, (Star star, ...next))
+{
+	drawStars(renderer, y, episodes, i, star);
+
+	return tail drawStars(renderer, y, episodes, i + 1, ...next);
+}
+
+function star(int x, int y)
+{
+	return Star
+	{
+		x: x,
+		y: y
+	};
+}
+
+function scene1(long renderer, int episodes)
+{
+	let ticks = SDL::SDL_GetTicks();
+
+	if (ticks > 20000)
+	{
+		return 0;
+	}
+
+	let seed = Skyscraper
+	{
+		width: 0,
+		height: 0,
+	};
+
+	let foregroundLeft = skyscrapers(10, 0);
+	let backgroundLeft = skyscrapers(20, 0);
+
+	let foregroundRight = skyscrapers(22, 0);
+	let backgroundRight = skyscrapers(40, 0);
+
+	let pan = min(1900, max(0, ticks - 6000));
+
+	let cameraPan = (pan * (pan / 10)) / 300;
+
+	let fadeIn = max(255 - ((ticks * 255) / 1000), 0);
+	let fadeOut = min(255, max(((ticks - 19000) * 255) / 1000, 0));
+
+	SDL::SDL_SetRenderDrawColor(renderer, 55, 55, 72, 255);
+
+	drawSkyscrapers(-50, cameraPan, 130, seed, backgroundLeft);
+	drawSkyscrapers((Width - Target) + 50, cameraPan, 130, seed, backgroundRight);
+
+	SDL::SDL_SetRenderDrawColor(renderer, 83, 83, 108, 255);
+
+	drawSkyscrapers(0, cameraPan, 100, seed, foregroundLeft);
+	drawSkyscrapers((Width - Target), cameraPan, 100, seed, foregroundRight);
+
+	SDL::SDL_RenderFillRect(renderer, rect(Target, (Height - 100) + cameraPan, 200, 10));
+
+	let cityStars = stars(2, 0, 15);
+
+	drawStars(renderer, cameraPan, episodes, 0, cityStars);
+
+	let birdieStars = [
+		star(942, -806),
+		star(904, -754),
+		star(918, -688),
+		star(882, -630),
+		star(932, -598),
+		star(910, -554),
+		star(896, -482),
+		star(886, -426),
+		star(928, -414),
+		star(972, -430),
+		star(956, -482),
+		star(946, -536),
+		star(932, -598),
+		star(956, -656),
+		star(972, -736),
+		star(942, -806),
+	];
+
+	drawStars(renderer, cameraPan, episodes, 0, birdieStars);
+
+	strokeStars(renderer, cameraPan, episodes, 0, star(0, 0), birdieStars);
+
+	SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, fadeIn + fadeOut);
+	SDL::SDL_RenderFillRect(renderer, rect(0, 0, Width, Height));
+
+	SDL::SDL_RenderPresent(renderer);
+
+	if (ticks >= (episodes * 250))
+	{
+		return tail mainLoop(renderer, episodes + 1);
+	}
+
+	return tail mainLoop(renderer, episodes);
+}
+
+function mainLoop(long renderer, int episodes)
+{
+	SDL::SDL_SetRenderDrawColor(renderer, 28, 28, 36, 255);
+	SDL::SDL_RenderClear(renderer);
+	SDL::SDL_SetRenderDrawBlendMode(renderer, SDL::BLENDMODE_BLEND);
+
+	return scene1(renderer, episodes);
+}
+
+export int main()
+{
+	SDL::SDL_Init(SDL::INIT_VIDEO + SDL::INIT_AUDIO);
+
+	SDL::SDL_PlayAudio(@"music.wav");
+
+	let window = SDL::SDL_CreateWindow(@"Stars", 0, 0, Width, Height, SDL::WINDOW_FULLSCREEN_DESKTOP);
+	let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
+
+	return mainLoop(renderer, 0);
+}
