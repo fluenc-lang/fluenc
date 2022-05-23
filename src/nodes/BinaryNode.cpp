@@ -85,17 +85,32 @@ const ScalarValue *BinaryNode::resolveOp(const EntryPoint &entryPoint, const Sca
 
 	if (m_op == "&&")
 	{
-		return builder.createAnd(left, right);
+		return builder.createLogicalAnd(left, right);
 	}
 
 	if (m_op == "||")
 	{
-		return builder.createOr(left, right);
+		return builder.createLogicalOr(left, right);
 	}
 
 	if (m_op == "%")
 	{
 		return builder.createSRem(left, right);
+	}
+
+	if (m_op == "|")
+	{
+		return builder.createOr(left, right);
+	}
+
+	if (m_op == "&")
+	{
+		return builder.createAnd(left, right);
+	}
+
+	if (m_op == "^")
+	{
+		return builder.createXor(left, right);
 	}
 
 	throw new std::exception();

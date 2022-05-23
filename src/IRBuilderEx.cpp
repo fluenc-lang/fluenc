@@ -138,6 +138,39 @@ const ScalarValue *IRBuilderEx::createSRem(const ScalarValue *lhs, const ScalarV
 		);
 }
 
+const ScalarValue *IRBuilderEx::createLogicalOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+{
+	auto block = m_entryPoint.block();
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(BooleanType::instance()
+		, builder.CreateLogicalOr(*lhs, *rhs, name)
+		);
+}
+
+const ScalarValue *IRBuilderEx::createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+{
+	auto block = m_entryPoint.block();
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(BooleanType::instance()
+		, builder.CreateLogicalAnd(*lhs, *rhs, name)
+		);
+}
+
+const ScalarValue *IRBuilderEx::createXor(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+{
+	auto block = m_entryPoint.block();
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(BooleanType::instance()
+		, builder.CreateXor(*lhs, *rhs, name)
+		);
+}
+
 llvm::Value *IRBuilderEx::createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse)
 {
 	auto block = m_entryPoint.block();

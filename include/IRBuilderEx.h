@@ -13,8 +13,9 @@ class IRBuilderEx
 	public:
 		IRBuilderEx(const EntryPoint &entryPoint);
 
-		const ScalarValue *createLoad(const ReferenceValue *address, const llvm::Twine &name = "");
 		llvm::Value *createStore(const ScalarValue *value, const ReferenceValue *address);
+
+		const ScalarValue *createLoad(const ReferenceValue *address, const llvm::Twine &name = "");
 		const ScalarValue *createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
 		const ScalarValue *createSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
 		const ScalarValue *createMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
@@ -23,6 +24,10 @@ class IRBuilderEx
 		const ScalarValue *createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
 		const ScalarValue *createOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
 		const ScalarValue *createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createLogicalOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createXor(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+
 		llvm::Value *createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse);
 		llvm::Value *createRet(llvm::Value *value);
 		llvm::Value *createCall(llvm::FunctionCallee function, const std::vector<llvm::Value *> &arguments);

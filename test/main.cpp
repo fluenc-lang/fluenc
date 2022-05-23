@@ -3544,6 +3544,57 @@ BOOST_AUTO_TEST_CASE (scenario91)
 	BOOST_TEST(result == 6);
 }
 
+BOOST_AUTO_TEST_CASE (scenario92)
+{
+	auto result = exec(R"(
+		export int main()
+		{
+			if ((0x00000101u & 0x00000101u) == 0x00000101u)
+			{
+				return 1;
+			}
+
+			return 0;
+		}
+	)");
+
+	BOOST_TEST(result == 1);
+}
+
+BOOST_AUTO_TEST_CASE (scenario93)
+{
+	auto result = exec(R"(
+		export int main()
+		{
+			if ((0x00010100u | 0x00000101u) == 0x00010101u)
+			{
+				return 1;
+			}
+
+			return 0;
+		}
+	)");
+
+	BOOST_TEST(result == 1);
+}
+
+BOOST_AUTO_TEST_CASE (scenario94)
+{
+	auto result = exec(R"(
+		export int main()
+		{
+			if ((0x00010100u ^ 0x00000101u) == 0x00010001u)
+			{
+				return 1;
+			}
+
+			return 0;
+		}
+	)");
+
+	BOOST_TEST(result == 1);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
