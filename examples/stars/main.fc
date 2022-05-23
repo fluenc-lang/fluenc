@@ -131,6 +131,11 @@ struct Color
 	b
 };
 
+function getViewport(long renderer)
+{
+	return SDL::SDL_RenderGetViewportEx(renderer, SDL::Rect {});
+}
+
 function colorForStar(int episodes, int twinkleIndex, int starIndex)
 {
 	if ((episodes > 63) || (twinkleIndex == starIndex))
@@ -214,9 +219,29 @@ function star(int x, int y)
 	};
 }
 
+struct Padding
+{
+	x,
+	y
+}
+
+function getAdaptedViewport(SDL::Rect actual)
+{
+	return SDL::Rect
+	{
+		x: (actual.width - Width) / 2,
+		y: (actual.height - Height) / 2,
+		width: Width,
+		height: Height,
+	};
+}
+
 function scene1(long renderer, int episodes)
 {
 	let ticks = SDL::SDL_GetTicks();
+	let viewport = getAdaptedViewport(getViewport(renderer));
+
+	SDL::SDL_RenderSetViewport(renderer, viewport);
 
 	if (ticks > 20000)
 	{
@@ -305,7 +330,7 @@ function mainLoop(long renderer, int episodes)
 
 export int main()
 {
-	SDL::SDL_Init(SDL::INIT_VIDEO + SDL::INIT_AUDIO);
+	SDL::SDL_Init(SDL::INIT_VIDEO | SDL::INIT_AUDIO);
 
 	SDL::SDL_PlayAudio(@"music.wav");
 

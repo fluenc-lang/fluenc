@@ -111,7 +111,7 @@ const ScalarValue *IRBuilderEx::createAnd(const ScalarValue *lhs, const ScalarVa
 
 	llvm::IRBuilder<> builder(block);
 
-	return new ScalarValue(BooleanType::instance()
+	return new ScalarValue(lhs->type()
 		, builder.CreateAnd(*lhs, *rhs, name)
 		);
 }
@@ -122,7 +122,7 @@ const ScalarValue *IRBuilderEx::createOr(const ScalarValue *lhs, const ScalarVal
 
 	llvm::IRBuilder<> builder(block);
 
-	return new ScalarValue(BooleanType::instance()
+	return new ScalarValue(lhs->type()
 		, builder.CreateOr(*lhs, *rhs, name)
 		);
 }
@@ -166,7 +166,7 @@ const ScalarValue *IRBuilderEx::createXor(const ScalarValue *lhs, const ScalarVa
 
 	llvm::IRBuilder<> builder(block);
 
-	return new ScalarValue(BooleanType::instance()
+	return new ScalarValue(lhs->type()
 		, builder.CreateXor(*lhs, *rhs, name)
 		);
 }

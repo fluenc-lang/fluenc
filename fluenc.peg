@@ -67,7 +67,7 @@ ByteLiteral         <- Integer 'u8'
 NothingLiteral      <- 'nothing'
 
 # Primitives
-BinaryOperator      <- '<=' | '>=' | '==' | '!=' | '&&' | '||' | '-' | '+' | '/' | '*' | '%' | '<' | '>'
+BinaryOperator      <- '<=' | '>=' | '==' | '!=' | '&&' | '||' | '-' | '+' | '/' | '*' | '%' | '<' | '>' | '|' | '&' | '^'
 UnaryOperator       <- '!' | '@'
 Integer             <- < ('0x'[0-9A-F]+) / ('-'?[0-9]+) >
 String              <- < '"' < [^"]* > '"' >

@@ -48,3 +48,10 @@ void SDL_PlayAudio(const char *source)
         SDL_FreeWAV(wav_buffer);
     }
 }
+
+SDL_Rect *SDL_RenderGetViewportEx(SDL_Renderer *renderer, SDL_Rect *rect)
+{
+    SDL_RenderGetViewport(renderer, rect);
+
+    return rect;
+}
