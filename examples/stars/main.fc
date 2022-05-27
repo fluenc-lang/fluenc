@@ -178,6 +178,14 @@ function drawStars(long renderer, int y, int episodes, int i, Star star)
 	return nothing;
 }
 
+function strokeStars(long renderer, int y, int episodes, int i, without previous, Star current)
+{
+	SDL::SDL_SetRenderDrawColor(renderer, 183, 183, 200, 255);
+	SDL::SDL_RenderDrawLine(renderer, previous.x, previous.y + y, current.x, current.y + y);
+
+	return nothing;
+}
+
 function strokeStars(long renderer, int y, int episodes, int i, Star previous, Star current)
 {
 	if (i > (episodes - 48))
@@ -236,6 +244,45 @@ function getAdaptedViewport(SDL::Rect actual)
 	};
 }
 
+function credits(long renderer)
+{
+	let ticks = SDL::SDL_GetTicks();
+
+	if (ticks > 30000)
+	{
+		return 0;
+	}
+
+	let viewport = getAdaptedViewport(getViewport(renderer));
+
+	let rw = SDL::SDL_RWFromFile(@"stars.bmp", @"r");
+	let surface = SDL::SDL_LoadBMP_RW(rw, 1);
+	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
+
+	let bounds = SDL::Rect
+	{
+		x: (Width - 800) / 2,
+		y: (Height - 600) / 2,
+		width: 800,
+		height: 600,
+	};
+
+	SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL::SDL_RenderFillRect(renderer, viewport);
+	SDL::SDL_RenderCopy(renderer, texture, 0L, bounds);
+	SDL::SDL_FreeSurface(surface);
+
+	let fadeIn = max(255 - (((ticks - 20000) * 255) / 1000), 0);
+	let fadeOut = min(255, max(((ticks - 29000) * 255) / 1000, 0));
+
+	SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, fadeIn + fadeOut);
+	SDL::SDL_RenderFillRect(renderer, viewport);
+
+	SDL::SDL_RenderPresent(renderer);
+
+	return tail mainLoop(renderer, 0);
+}
+
 function scene1(long renderer, int episodes)
 {
 	let ticks = SDL::SDL_GetTicks();
@@ -245,7 +292,7 @@ function scene1(long renderer, int episodes)
 
 	if (ticks > 20000)
 	{
-		return 0;
+		return credits(renderer);
 	}
 
 	let seed = Skyscraper

@@ -8,12 +8,16 @@ namespace SDL
 	import int SDL_GetTicks();
 	import int SDL_SetRenderDrawBlendMode(long renderer, int blendMode);
 	import int SDL_RenderSetViewport(long renderer, Rect rect);
+	import int SDL_RenderCopy(long renderer, long texture, long srcrect, Rect dstrect);
 
     import long SDL_CreateRenderer(long window, int index, int flags);
     import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
+	import long SDL_RWFromFile(string file, string mode);
+	import long SDL_CreateTextureFromSurface(long renderer, long surface);
+	import long SDL_LoadBMP_RW(long src, int freesrc);
 
     import void SDL_RenderPresent(long renderer);
-
+	import void SDL_FreeSurface(long surface);
     import void SDL_PlayAudio(string source);
 
 	import Rect SDL_RenderGetViewportEx(long renderer, Rect rect);
