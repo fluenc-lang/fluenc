@@ -25,15 +25,19 @@ class Namespace;
 class Use;
 class DzBaseArgument;
 class Type;
-class BlockInstructionNode;
+class IBlockInstruction;
 class ContinuationNode;
 class ITypeName;
+class ParentInjectorNode;
 
 class Visitor
 {
+	friend ParentInjectorNode;
+
 	public:
 		Visitor(const std::vector<std::string> &namespaces
 			, const Type *iteratorType
+			, const Node *parent
 			, const Node *alpha
 			, const Node *beta
 			);
@@ -89,8 +93,8 @@ class Visitor
 		Namespace *visitNamespace(const std::shared_ptr<peg::Ast> &ast) const;
 		Use *visitUse(const std::shared_ptr<peg::Ast> &ast) const;
 
-		BlockInstructionNode *visitReturn(const std::shared_ptr<peg::Ast> &ast) const;
-		BlockInstructionNode *visitBlock(const std::shared_ptr<peg::Ast> &ast) const;
+		IBlockInstruction *visitReturn(const std::shared_ptr<peg::Ast> &ast) const;
+		IBlockInstruction *visitBlock(const std::shared_ptr<peg::Ast> &ast) const;
 
 		ITypeName *visitTypeName(const std::shared_ptr<peg::Ast> &ast) const;
 		ITypeName *visitRegularType(const std::shared_ptr<peg::Ast> &ast) const;
@@ -104,6 +108,7 @@ class Visitor
 
 		const Type *m_iteratorType;
 
+		const Node *m_parent;
 		const Node *m_alpha;
 		const Node *m_beta;
 };

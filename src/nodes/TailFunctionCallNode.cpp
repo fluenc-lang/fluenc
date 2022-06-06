@@ -53,26 +53,6 @@ std::vector<DzResult> TailFunctionCallNode::build(const EntryPoint &entryPoint, 
 		throw new std::exception(); // TODO
 	}
 
-	auto functions = entryPoint.functions();
-
-	for (auto &name : m_names)
-	{
-		for (auto [i, end] = functions.equal_range(name); i != end; i++)
-		{
-			auto function = i->second;
-
-			// Naive. Really naive.
-			if (function->attribute() == FunctionAttribute::Iterator)
-			{
-				auto capsule = new CapsuleNode(values, m_regularCall);
-				auto generator = new IteratorValueGenerator(new IteratorType(), capsule, entryPoint);
-				auto lazy = new LazyValue(generator);
-
-				return {{ entryPoint, lazy }};
-			}
-		}
-	}
-
 	auto junction = new JunctionNode(m_regularCall);
 
 	return junction->build(entryPoint, values);

@@ -36,7 +36,7 @@ CallableNode *compileFunction(std::string source)
 
 	parser.parse(source, ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor.visit(ast);
 
@@ -64,7 +64,7 @@ const BaseValue *compileValue(std::string source)
 
 	parser.parse(stream.str(), ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor.visit(ast);
 
@@ -117,7 +117,7 @@ EntryPoint compile(std::string source)
 
 	parser.parse(source, ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor
 		.visit(ast);
@@ -161,7 +161,7 @@ int exec(std::string source)
 
 	parser.parse(source, ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
 	auto llvmContext = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);

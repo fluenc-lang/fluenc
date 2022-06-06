@@ -87,7 +87,7 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 
 	parser.parse(*source, ast, file.c_str());
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr);
+	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
 	auto moduleInfo = visitor
 		.visit(ast);

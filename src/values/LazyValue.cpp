@@ -1,6 +1,7 @@
 #include "ValueHelper.h"
 #include "IteratorStorage.h"
 #include "IRBuilderEx.h"
+#include "FunctionHelper.h"
 
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
@@ -103,11 +104,13 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 			auto sourceContinuationEntryPoint = sourceProvider->withBlock(resultEntryPoint.block());
 
-			for (auto &[chainEntryPoint, _] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
+			for (auto &[chainEntryPoint, chainValues] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
 			{
-				auto loopTarget = chainEntryPoint.entry();
+				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, chainValues);
 
-				linkBlocks(chainEntryPoint.block(), loopTarget->block());
+				auto loopTargetEntry = loopTarget->entry();
+
+				linkBlocks(chainEntryPoint.block(), loopTargetEntry->block());
 			}
 		}
 		else

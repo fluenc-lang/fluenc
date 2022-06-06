@@ -70,7 +70,7 @@ std::vector<DzResult> StringIteratable::build(const EntryPoint &entryPoint) cons
 	auto epIfTrue = iteratorEntryPoint
 		.withBlock(ifTrue);
 
-	auto continuation = new ArrayContinuationNode(m_index);
+	auto continuation = new ArrayContinuationNode(m_index, IteratorType::instance());
 	auto expandable = new ExpandableValue(IteratorType::instance(), iteratorEntryPoint, continuation);
 
 	auto tuple = new TupleValue({ expandable, value });

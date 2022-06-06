@@ -2,15 +2,19 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "nodes/ArrayContinuationNode.h"
 #include "IRBuilderEx.h"
 
+#include "nodes/ArrayContinuationNode.h"
+#include "nodes/ContinuationNode.h"
+
 #include "values/ScalarValue.h"
+#include "values/ExpandedValue.h"
 
 #include "types/Int64Type.h"
 
-ArrayContinuationNode::ArrayContinuationNode(const ReferenceValue *index)
+ArrayContinuationNode::ArrayContinuationNode(const ReferenceValue *index, const Type *iteratorType)
 	: m_index(index)
+	, m_iteratorType(iteratorType)
 {
 }
 
@@ -34,5 +38,11 @@ std::vector<DzResult> ArrayContinuationNode::build(const EntryPoint &entryPoint,
 
 	builder.createStore(add, m_index);
 
-	return {{ entryPoint, Stack() }};
+	auto value = new ExpandedValue(m_iteratorType
+		, entryPoint
+		, nullptr
+		, std::vector<const ExpandedValue *>()
+		);
+
+	return {{ entryPoint, value }};
 }

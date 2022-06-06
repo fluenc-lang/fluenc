@@ -52,11 +52,13 @@ class FunctionHelper
 
 				if (auto expandedValue = dynamic_cast<const ExpandedValue *>(value))
 				{
-					auto provider = expandedValue->provider();
+					auto provider = findTailCallTarget(expandedValue->provider()
+						, expandedValue->next()
+						);
 
 					if (provider->depth() < target->depth())
 					{
-						return provider->entry();
+						return provider;
 					}
 				}
 

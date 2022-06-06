@@ -11,29 +11,35 @@
 #include "values/TupleValue.h"
 
 template<typename Container>
-const EntryPoint findTailCallTarget(const EntryPoint &candidate, Container container)
+std::vector<const ExpandedValue *> findExpandedValues(Container container)
 {
-	return std::accumulate(container.rbegin(), container.rend(), candidate, [&](auto target, auto value)
+	std::vector<const ExpandedValue *> values;
+
+	for (auto i = container.rbegin(); i != container.rend(); i++)
 	{
-		if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
+		if (auto tupleValue = dynamic_cast<const TupleValue *>(*i))
 		{
-			return findTailCallTarget(target
-				, tupleValue->values()
-				);
-		}
+			auto nested = findExpandedValues(tupleValue->values());
 
-		if (auto expandedValue = dynamic_cast<const ExpandedValue *>(value))
-		{
-			auto provider = expandedValue->provider();
-
-			if (provider->depth() < target.depth())
+			for (auto &value : nested)
 			{
-				return *provider;
+				values.push_back(value);
 			}
 		}
 
-		return target;
-	});
+		if (auto expandedValue = dynamic_cast<const ExpandedValue *>(*i))
+		{
+			values.push_back(expandedValue);
+		}
+	}
+
+	return values;
+}
+
+ContinuationNode::ContinuationNode(const Node *node, const Type *iteratorType)
+	: m_node(node)
+	, m_iteratorType(iteratorType)
+{
 }
 
 std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stack values) const
@@ -51,10 +57,13 @@ std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stac
 			);
 	});
 
-	auto tailCallTarget = findTailCallTarget(tailCallCandidate, values);
+	auto next = findExpandedValues(values);
 
-	auto resultEntryPoint = tailCallTarget
-		.withBlock(tailCallCandidate.block());
+	auto value = new ExpandedValue(m_iteratorType
+		, tailCallCandidate
+		, m_node
+		, next
+		);
 
-	return {{ resultEntryPoint, Stack() }};
+	return {{ tailCallCandidate, value }};
 }

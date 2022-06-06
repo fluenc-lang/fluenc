@@ -50,6 +50,7 @@
 #include "nodes/LocalNode.h"
 #include "nodes/UnaryNode.h"
 #include "nodes/FunctionCallProxyNode.h"
+#include "nodes/ParentInjectorNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -65,11 +66,13 @@ class Prototype;
 
 Visitor::Visitor(const std::vector<std::string> &namespaces
 	, const Type *iteratorType
+	, const Node *parent
 	, const Node *alpha
 	, const Node *beta
 	)
 	: m_namespaces(namespaces)
 	, m_iteratorType(iteratorType)
+	, m_parent(parent)
 	, m_alpha(alpha)
 	, m_beta(beta)
 {
@@ -417,12 +420,12 @@ Node *Visitor::visitBinary(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[1])
 		);
 
-	Visitor leftVisitor(m_namespaces, m_iteratorType, binary, nullptr);
+	Visitor leftVisitor(m_namespaces, m_iteratorType, m_parent, binary, nullptr);
 
 	auto left = leftVisitor
 		.visitExpression(ast->nodes[0]);
 
-	Visitor rightVisitor(m_namespaces, m_iteratorType, left, nullptr);
+	Visitor rightVisitor(m_namespaces, m_iteratorType, m_parent, left, nullptr);
 
 	auto right = rightVisitor
 		.visitExpression(ast->nodes[2]);
@@ -458,7 +461,7 @@ Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
 
-	Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, sink, nullptr);
 
 	std::vector<Node *> values;
 
@@ -499,7 +502,7 @@ Node *Visitor::visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const
 
 	return std::accumulate(begin(ast->nodes) + 1, end(ast->nodes), static_cast<Node *>(instantiation), [this](auto consumer, auto assignment)
 	{
-		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, consumer, nullptr);
 
 		return visitor
 			.visitExpression(assignment->nodes[1]);
@@ -508,14 +511,14 @@ Node *Visitor::visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const
 
 Node *Visitor::visitConditional(const std::shared_ptr<peg::Ast> &ast) const
 {
-	Visitor blockVisitor(m_namespaces, m_iteratorType, m_beta, nullptr);
+	Visitor blockVisitor(m_namespaces, m_iteratorType, m_parent, m_beta, nullptr);
 
 	auto block = blockVisitor
 		.visitBlock(ast->nodes[1]);
 
 	auto conditional = new ConditionalNode(m_alpha, block);
 
-	Visitor expressionVisitor(m_namespaces, m_iteratorType, conditional, nullptr);
+	Visitor expressionVisitor(m_namespaces, m_iteratorType, m_parent, conditional, nullptr);
 
 	auto condition = expressionVisitor
 		.visitExpression(ast->nodes[0]);
@@ -546,7 +549,7 @@ Node *Visitor::visitArray(const std::shared_ptr<peg::Ast> &ast) const
 		auto indexSink = new IndexSinkNode(expression.index, next);
 		auto referenceSink = new ReferenceSinkNode(indexSink);
 
-		Visitor visitor(m_namespaces, m_iteratorType, referenceSink, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, referenceSink, nullptr);
 
 		return visitor
 			.visitExpression(expression.value);
@@ -564,7 +567,7 @@ Node *Visitor::visitExpansion(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto expansion = new ExpansionNode(m_alpha, ast);
 
-	Visitor visitor(m_namespaces, m_iteratorType, expansion, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, expansion, nullptr);
 
 	return visitor
 		.visitExpression(ast->nodes[0]);
@@ -576,18 +579,18 @@ Node *Visitor::visitLocal(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[0])
 		);
 
-	Visitor visitor(m_namespaces, m_iteratorType, local, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, local, nullptr);
 
 	return visitor.visitExpression(ast->nodes[1]);
 }
 
 Node *Visitor::visitContinuation(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto continuation = new ContinuationNode();
+	auto continuation = new ContinuationNode(m_parent, m_iteratorType);
 
 	return std::accumulate(begin(ast->nodes) + 1, end(ast->nodes), static_cast<Node *>(continuation), [this](Node *consumer, auto parameter)
 	{
-		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, consumer, nullptr);
 
 		auto result = visitor
 			.visitExpression(parameter);
@@ -613,7 +616,7 @@ Node *Visitor::visitWith(const std::shared_ptr<peg::Ast> &ast) const
 
 	return std::accumulate(begin(ast->nodes), end(ast->nodes), static_cast<Node *>(instantiation), [this](auto consumer, auto assignment)
 	{
-		Visitor visitor(m_namespaces, m_iteratorType, consumer, nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, consumer, nullptr);
 
 		return visitor
 			.visitExpression(assignment->nodes[1]);
@@ -628,7 +631,7 @@ Node *Visitor::visitUnary(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[0])
 		);
 
-	Visitor visitor(m_namespaces, m_iteratorType, unary, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, unary, nullptr);
 
 	return visitor
 			.visitExpression(ast->nodes[1]);
@@ -638,7 +641,7 @@ Node *Visitor::visitTail(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
 
-	Visitor visitor(m_namespaces, m_iteratorType, sink, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, sink, nullptr);
 
 	std::vector<Node *> values;
 
@@ -690,7 +693,7 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 
 	auto iteratorType = new IteratorType();
 
-	Visitor visitor(m_namespaces, iteratorType, TerminatorNode::instance(), nullptr);
+	Visitor visitor(m_namespaces, iteratorType, m_parent, TerminatorNode::instance(), nullptr);
 
 	auto block = visitor.visitBlock(*ast->nodes.rbegin());
 
@@ -709,7 +712,7 @@ CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &as
 
 	auto terminator = new ExportedFunctionTerminatorNode();
 
-	Visitor visitor(m_namespaces, nullptr, terminator, nullptr);
+	Visitor visitor(m_namespaces, nullptr, m_parent, terminator, nullptr);
 
 	auto block = visitor.visitBlock(*ast->nodes.rbegin());
 
@@ -779,7 +782,7 @@ Prototype *Visitor::visitStructure(const std::shared_ptr<peg::Ast> &ast) const
 
 GlobalNode *Visitor::visitGlobal(const std::shared_ptr<peg::Ast> &ast) const
 {
-	Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, TerminatorNode::instance(), nullptr);
 
 	auto literal = visitor
 		.visitExpression(ast->nodes[1]);
@@ -798,6 +801,7 @@ Namespace *Visitor::visitNamespace(const std::shared_ptr<peg::Ast> &ast) const
 
 	Visitor visitor(namespaces
 		, m_iteratorType
+		, m_parent
 		, m_alpha
 		, m_beta
 		);
@@ -817,7 +821,7 @@ Use *Visitor::visitUse(const std::shared_ptr<peg::Ast> &ast) const
 	return new Use(visitString(ast->nodes[0]));
 }
 
-BlockInstructionNode *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast) const
+IBlockInstruction *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast) const
 {
 	if (ast->nodes.size() > 1)
 	{
@@ -825,7 +829,7 @@ BlockInstructionNode *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast)
 
 		auto ret = new ReturnNode(m_iteratorType, m_alpha, continuation);
 
-		Visitor visitor(m_namespaces, nullptr, ret, nullptr);
+		Visitor visitor(m_namespaces, nullptr, m_parent, ret, nullptr);
 
 		auto value = visitor
 			.visitExpression(ast->nodes[0]);
@@ -835,7 +839,7 @@ BlockInstructionNode *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast)
 
 	auto ret = new ReturnNode(m_iteratorType, m_alpha, nullptr);
 
-	Visitor visitor(m_namespaces, nullptr, ret, nullptr);
+	Visitor visitor(m_namespaces, nullptr, m_parent, ret, nullptr);
 
 	auto value = visitor
 		.visitExpression(ast->nodes[0]);
@@ -843,32 +847,14 @@ BlockInstructionNode *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast)
 	return new BlockInstructionNode(value, false);
 }
 
-BlockInstructionNode *Visitor::visitBlock(const std::shared_ptr<peg::Ast> &ast) const
+IBlockInstruction *Visitor::visitBlock(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto first = rbegin(ast->nodes);
-
-	auto ret = visitReturn(*first);
-
-	return std::accumulate(first + 1, rend(ast->nodes), ret, [this](BlockInstructionNode *consumer, auto expression) -> BlockInstructionNode *
-	{
-		auto stackFrame = new BlockStackFrameNode(consumer);
-
-		Visitor visitor(m_namespaces, m_iteratorType, stackFrame, m_alpha);
-
-		auto value = visitor
-			.visitExpression(expression);
-
-		if (auto instruction = dynamic_cast<const BlockInstructionNode *>(value))
-		{
-			return new BlockInstructionNode(instruction
-				, instruction->containsIterator() || consumer->containsIterator()
-				);
-		}
-
-		return new BlockInstructionNode(value
-			, consumer->containsIterator()
-			);
-	});
+	return new ParentInjectorNode(ast->nodes
+		, m_namespaces
+		, m_iteratorType
+		, m_alpha
+		, m_beta
+		);
 }
 
 ITypeName *Visitor::visitTypeName(const std::shared_ptr<peg::Ast> &ast) const
@@ -932,7 +918,7 @@ PrototypeFieldEmbryo Visitor::visitStandardField(const std::shared_ptr<peg::Ast>
 
 	if (ast->nodes.size() > 1)
 	{
-		Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, TerminatorNode::instance(), nullptr);
 
 		auto defaultValue = visitor
 			.visitExpression(ast->nodes[1]);
@@ -950,7 +936,7 @@ PrototypeFieldEmbryo Visitor::visitDecoratedField(const std::shared_ptr<peg::Ast
 
 	if (ast->nodes.size() > 2)
 	{
-		Visitor visitor(m_namespaces, m_iteratorType, TerminatorNode::instance(), nullptr);
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, TerminatorNode::instance(), nullptr);
 
 		auto defaultValue = visitor
 			.visitExpression(ast->nodes[2]);

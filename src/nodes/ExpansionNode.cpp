@@ -1,4 +1,5 @@
 #include "nodes/ExpansionNode.h"
+#include "nodes/ContinuationNode.h"
 
 #include "values/ExpandableValue.h"
 #include "values/ExpandedValue.h"
@@ -24,11 +25,10 @@ std::vector<DzResult> ExpansionNode::build(const EntryPoint &entryPoint, Stack v
 
 	auto result = continuation->build(continuationEntryPoint, Stack());
 
-	for (auto &[targetEntryPoint, _] : result)
+	for (auto &[targetEntryPoint, continuationValues] : result)
 	{
-		auto value = new ExpandedValue(expandable->type()
-			, new EntryPoint(targetEntryPoint)
-			);
+		auto value = continuationValues
+			.require<ExpandedValue>(nullptr);
 
 		auto tuple = new TupleValue({ value, PlaceholderValue::instance() });
 

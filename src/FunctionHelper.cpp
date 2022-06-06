@@ -23,7 +23,8 @@ std::tuple<int8_t, const EntryPoint *, Stack> FunctionHelper::tryCreateTailCall(
 		return tryCreateTailCall(entryPoint, values, name + 1, end);
 	}
 
-	auto targetValues = tailCallCandidate->values();
+	auto targetEntry = tailCallCandidate->entry();
+	auto targetValues = targetEntry->values();
 
 	if (targetValues.size() != values.size())
 	{
@@ -55,5 +56,5 @@ std::tuple<int8_t, const EntryPoint *, Stack> FunctionHelper::tryCreateTailCall(
 		return tryCreateTailCall(entryPoint, values, name + 1, end);
 	}
 
-	return { 0, tailCallTarget, targetValues };
+	return { 0, tailCallTarget->entry(), targetValues };
 }

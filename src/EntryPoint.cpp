@@ -131,7 +131,7 @@ const EntryPoint *EntryPoint::byName(const std::string &name) const
 {
 	if (m_name == name)
 	{
-		return m_entry;
+		return this;
 	}
 
 	if (m_parent)
