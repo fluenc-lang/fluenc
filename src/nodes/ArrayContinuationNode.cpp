@@ -12,8 +12,9 @@
 
 #include "types/Int64Type.h"
 
-ArrayContinuationNode::ArrayContinuationNode(const ReferenceValue *index, const Type *iteratorType)
+ArrayContinuationNode::ArrayContinuationNode(const ReferenceValue *index, const Node *node, const Type *iteratorType)
 	: m_index(index)
+	, m_node(node)
 	, m_iteratorType(iteratorType)
 {
 }
@@ -40,7 +41,8 @@ std::vector<DzResult> ArrayContinuationNode::build(const EntryPoint &entryPoint,
 
 	auto value = new ExpandedValue(m_iteratorType
 		, entryPoint
-		, nullptr
+		, m_node
+		, this
 		, std::vector<const ExpandedValue *>()
 		);
 

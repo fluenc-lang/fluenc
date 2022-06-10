@@ -28,7 +28,7 @@ std::vector<DzResult> StringLiteralNode::build(const EntryPoint &entryPoint, Sta
 
 	builder.createStore(string, alloc);
 
-	values.push(new StringValue(alloc, id(), m_value.size()));
+	values.push(new StringValue(this, alloc, id(), m_value.size()));
 
 	return m_consumer->build(entryPoint, values);
 }

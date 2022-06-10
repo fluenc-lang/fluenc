@@ -1,4 +1,5 @@
 #include "IteratorStorage.h"
+
 #include "nodes/LazyEvaluationNode.h"
 
 #include "values/IteratorValue.h"
@@ -7,6 +8,11 @@
 #include "values/LazyValue.h"
 #include "values/StringValue.h"
 #include "values/ForwardedValue.h"
+#include "values/ExpandedValue.h"
+#include "values/ExpandableValue.h"
+
+#include "types/IteratorType.h"
+#include "types/PlaceholderType.h"
 
 LazyEvaluationNode::LazyEvaluationNode(const Node *consumer)
 	: m_consumer(consumer)
@@ -82,6 +88,36 @@ std::vector<DzResult> LazyEvaluationNode::digestDepth(const EntryPoint &entryPoi
 
 		if (auto tuple = dynamic_cast<const TupleValue *>(value))
 		{
+			for (auto &element : tuple->values())
+			{
+				if (auto expanded = dynamic_cast<const ExpandedValue *>(element))
+				{
+					auto node = expanded->node();
+
+					std::vector<DzResult> results;
+
+					for (auto &[resultEntryPoint, resultValues] : node->build(entryPoint, values))
+					{
+						auto forwardedValues = values;
+
+						for (auto &resultValue : resultValues)
+						{
+							forwardedValues.push(resultValue);
+						}
+
+						auto forwardedEntryPoint = resultEntryPoint
+							.withIteratorStorage(entryPoint.iteratorStorage());
+
+						for (auto &result : digestDepth(forwardedEntryPoint, forwardedValues))
+						{
+							results.push_back(result);
+						}
+					}
+
+					return results;
+				}
+			}
+
 			std::vector<DzResult> results;
 
 			auto digestedResults = digestDepth(entryPoint

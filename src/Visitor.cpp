@@ -93,6 +93,11 @@ std::vector<std::string> qualifiedNames(const std::vector<std::string> &namespac
 
 	qualifiedName << name;
 
+	if (qualifiedName.str() == name)
+	{
+		return { name };
+	}
+
 	return { qualifiedName.str(), name };
 }
 

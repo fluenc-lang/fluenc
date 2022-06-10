@@ -10,8 +10,9 @@
 
 #include "nodes/ArrayContinuationNode.h"
 
-StringIteratable::StringIteratable(const ReferenceValue *index, llvm::Value *address, size_t length)
+StringIteratable::StringIteratable(const ReferenceValue *index, const Node *node, llvm::Value *address, size_t length)
 	: m_index(index)
+	, m_node(node)
 	, m_address(address)
 	, m_length(length)
 {
@@ -70,7 +71,7 @@ std::vector<DzResult> StringIteratable::build(const EntryPoint &entryPoint) cons
 	auto epIfTrue = iteratorEntryPoint
 		.withBlock(ifTrue);
 
-	auto continuation = new ArrayContinuationNode(m_index, IteratorType::instance());
+	auto continuation = new ArrayContinuationNode(m_index, m_node, IteratorType::instance());
 	auto expandable = new ExpandableValue(IteratorType::instance(), iteratorEntryPoint, continuation);
 
 	auto tuple = new TupleValue({ expandable, value });

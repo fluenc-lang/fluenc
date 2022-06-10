@@ -15,8 +15,9 @@
 #include "values/IndexedValue.h"
 #include "values/ScalarValue.h"
 
-ArrayElementNode::ArrayElementNode(const Type *arrayType, const Node *next)
+ArrayElementNode::ArrayElementNode(const Type *arrayType, const Node *node, const Node *next)
 	: m_arrayType(arrayType)
+	, m_node(node)
 	, m_next(next)
 {
 }
@@ -70,7 +71,7 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 
 		valuesIfFalse.push(index);
 
-		auto continuation = new ArrayContinuationNode(index, IteratorType::instance());
+		auto continuation = new ArrayContinuationNode(index, m_node, IteratorType::instance());
 		auto expandable = new ExpandableValue(m_arrayType, entryPoint, continuation);
 
 		auto tuple = new TupleValue({ expandable, value->subject() });

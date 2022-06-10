@@ -62,6 +62,7 @@ std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stac
 	auto value = new ExpandedValue(m_iteratorType
 		, tailCallCandidate
 		, m_node
+		, this
 		, next
 		);
 

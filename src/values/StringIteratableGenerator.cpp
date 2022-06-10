@@ -5,8 +5,9 @@
 
 #include "types/IteratorType.h"
 
-StringIteratableGenerator::StringIteratableGenerator(llvm::Value *address, size_t id, size_t length)
-	: m_address(address)
+StringIteratableGenerator::StringIteratableGenerator(const Node *node, llvm::Value *address, size_t id, size_t length)
+	: m_node(node)
+	, m_address(address)
 	, m_id(id)
 	, m_length(length)
 {
@@ -19,7 +20,7 @@ const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPo
 
 	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
 
-	return new StringIteratable(index, m_address, m_length);
+	return new StringIteratable(index, m_node, m_address, m_length);
 }
 
 const ILazyValueGenerator *StringIteratableGenerator::clone(const EntryPoint &entryPoint) const
@@ -31,7 +32,7 @@ const ILazyValueGenerator *StringIteratableGenerator::clone(const EntryPoint &en
 
 const ILazyValueGenerator *StringIteratableGenerator::forward(size_t id) const
 {
-	return new StringIteratableGenerator(m_address, id, m_length);
+	return new StringIteratableGenerator(m_node, m_address, id, m_length);
 }
 
 const Type *StringIteratableGenerator::type() const

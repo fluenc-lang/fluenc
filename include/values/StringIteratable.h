@@ -6,12 +6,13 @@
 class StringIteratable : public IIteratable
 {
 	public:
-		StringIteratable(const ReferenceValue *index, llvm::Value *address, size_t length);
+		StringIteratable(const ReferenceValue *index, const Node *node, llvm::Value *address, size_t length);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
 
 	private:
 		const ReferenceValue *m_index;
+		const Node *m_node;
 
 		llvm::Value *m_address;
 

@@ -13,13 +13,16 @@ class ArrayValue : public IIteratable
 {
 	public:
 		ArrayValue(const ReferenceValue *index
-			, const Node *iterator
+			, const Type *type
 			, const std::vector<DzResult> &values
+			, size_t size
 			);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
 
 	private:
+		static const Node *createIterator(const IIteratable *parent, const Type *type, size_t size);
+
 		const ReferenceValue *m_index;
 		const Node *m_iterator;
 

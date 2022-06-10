@@ -28,12 +28,7 @@ const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint) c
 
 	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
 
-	auto iterator = std::accumulate(index_iterator(0u), index_iterator(m_size), (Node *)nullptr, [&](auto next, auto)
-	{
-		return new ArrayElementNode(type(), next);
-	});
-
-	return new ArrayValue(index, iterator, m_values);
+	return new ArrayValue(index, type(), m_values, m_size);
 }
 
 const Type *ArrayValueGenerator::type() const

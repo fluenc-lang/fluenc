@@ -1,11 +1,13 @@
+#include "IRBuilderEx.h"
+#include "ValueHelper.h"
+#include "IndexIterator.h"
+
 #include "values/ArrayValue.h"
 #include "values/ScalarValue.h"
 #include "values/TupleValue.h"
 #include "values/ReferenceValue.h"
 #include "values/ExpandableValue.h"
-#include "IRBuilderEx.h"
 #include "values/IteratorValue.h"
-#include "ValueHelper.h"
 #include "values/LazyValue.h"
 
 #include "nodes/TerminatorNode.h"
@@ -14,12 +16,16 @@
 #include "types/IteratorType.h"
 #include "types/Int64Type.h"
 
+#include "nodes/ArrayElementNode.h"
+#include "nodes/IteratableNode.h"
+
 ArrayValue::ArrayValue(const ReferenceValue *index
-	, const Node *iterator
+	, const Type *type
 	, const std::vector<DzResult> &values
+	, size_t size
 	)
 	: m_index(index)
-	, m_iterator(iterator)
+	, m_iterator(createIterator(this, type, size))
 	, m_values(values)
 {
 }
@@ -58,4 +64,12 @@ std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint) const
 	}
 
 	return results;
+}
+
+const Node *ArrayValue::createIterator(const IIteratable *parent, const Type *type, size_t size)
+{
+	return std::accumulate(index_iterator(0u), index_iterator(size), (Node *)nullptr, [&](auto next, auto)
+	{
+		return new ArrayElementNode(type, new IteratableNode(parent), next);
+	});
 }

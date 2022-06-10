@@ -10,13 +10,14 @@ class Type;
 class ArrayElementNode : public Node
 {
 	public:
-		ArrayElementNode(const Type *arrayType, const Node *next);
+		ArrayElementNode(const Type *arrayType, const Node *node, const Node *next);
 
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		const Type *m_arrayType;
 
+		const Node *m_node;
 		const Node *m_next;
 };
 

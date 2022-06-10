@@ -4,10 +4,11 @@
 
 #include "types/IteratorType.h"
 
-ExpandedValue::ExpandedValue(const Type *iteratorType, const EntryPoint &provider, const Node *node, const std::vector<const ExpandedValue *> &next)
+ExpandedValue::ExpandedValue(const Type *iteratorType, const EntryPoint &provider, const Node *node, const Node *chain, const std::vector<const ExpandedValue *> &next)
 	: m_iteratorType(iteratorType)
 	, m_provider(new EntryPoint(provider))
 	, m_node(node)
+	, m_chain(chain)
 	, m_next(next)
 {
 
@@ -33,6 +34,11 @@ const EntryPoint *ExpandedValue::provider() const
 const Node *ExpandedValue::node() const
 {
 	return m_node;
+}
+
+const Node *ExpandedValue::chain() const
+{
+	return m_chain;
 }
 
 std::vector<const ExpandedValue *> ExpandedValue::next() const
