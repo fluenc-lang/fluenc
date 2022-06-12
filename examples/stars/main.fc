@@ -180,9 +180,6 @@ function drawStars(long renderer, int y, int episodes, int i, Star star)
 
 function strokeStars(long renderer, int y, int episodes, int i, without previous, Star current)
 {
-	SDL::SDL_SetRenderDrawColor(renderer, 183, 183, 200, 255);
-	SDL::SDL_RenderDrawLine(renderer, previous.x, previous.y + y, current.x, current.y + y);
-
 	return nothing;
 }
 
@@ -193,15 +190,15 @@ function strokeStars(long renderer, int y, int episodes, int i, Star previous, S
 		return nothing;
 	}
 
-	if ((previous.x + previous.y) == 0)
-	{
-		return nothing;
-	}
-
 	SDL::SDL_SetRenderDrawColor(renderer, 183, 183, 200, 255);
 	SDL::SDL_RenderDrawLine(renderer, previous.x, previous.y + y, current.x, current.y + y);
 
 	return nothing;
+}
+
+function strokeStars(long renderer, int y, int episodes, int i, without previous, (Star current, ...next))
+{
+	return tail strokeStars(renderer, y, episodes, i + 1, current, ...next);
 }
 
 function strokeStars(long renderer, int y, int episodes, int i, Star previous, (Star current, ...next))
@@ -351,7 +348,7 @@ function scene1(long renderer, int episodes)
 
 	drawStars(renderer, cameraPan, episodes, 0, birdieStars);
 
-	strokeStars(renderer, cameraPan, episodes, 0, star(0, 0), birdieStars);
+	strokeStars(renderer, cameraPan, episodes, 0, nothing, birdieStars);
 
 	SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, fadeIn + fadeOut);
 	SDL::SDL_RenderFillRect(renderer, rect(0, 0, Width, Height));

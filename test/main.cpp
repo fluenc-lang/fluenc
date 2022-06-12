@@ -3631,6 +3631,42 @@ BOOST_AUTO_TEST_CASE (scenario95)
 	BOOST_TEST(result == 3);
 }
 
+BOOST_AUTO_TEST_CASE (scenario96)
+{
+	auto result = exec(R"(
+		function add1(without previous, int value)
+		{
+			return value;
+		}
+
+		function add1(int previous, int value)
+		{
+			return previous + value;
+		}
+
+		function add(any previous, int value)
+		{
+			return add1(previous, value);
+		}
+
+		function add(any previous, (int value, ...values))
+		{
+			let product = add1(previous, value);
+
+			return tail add(product, ...values);
+		}
+
+		export int main()
+		{
+			let values = [1, 2, 3];
+
+			return add(nothing, values);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
