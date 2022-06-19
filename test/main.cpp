@@ -3667,6 +3667,68 @@ BOOST_AUTO_TEST_CASE (scenario96)
 	BOOST_TEST(result == 6);
 }
 
+BOOST_AUTO_TEST_CASE (scenario97)
+{
+	auto result = exec(R"(
+		struct Foo
+		{
+			items
+		};
+
+		function add(int value)
+		{
+			return value + 10;
+		}
+
+		function transform(int k, int value)
+		{
+			return value + k;
+		}
+
+		function transform(int k, (int value, ...values))
+		{
+			return value + k -> transform(add(value), ...values);
+		}
+
+		function sum(int product, (int value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function sum(int product, int value)
+		{
+			return product + value;
+		}
+
+		function mainLoop(Foo foo)
+		{
+			if (sum(0, foo.items) > 10)
+			{
+				return 32;
+			}
+
+			let mut = foo with
+			{
+				items: transform(0, foo.items)
+			};
+
+			return tail mainLoop(mut);
+		}
+
+		export int main()
+		{
+			let foo = Foo
+			{
+				items: [1, 2]
+			};
+
+			return mainLoop(foo);
+		}
+	)");
+
+	BOOST_TEST(result == 32);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

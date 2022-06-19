@@ -37,6 +37,11 @@ Stack::const_reverse_iterator Stack::rend() const
 
 const BaseValue *Stack::pop()
 {
+	if (m_values.empty())
+	{
+		throw new std::exception();
+	}
+
 	auto value = m_values.back();
 
 	m_values.pop_back();

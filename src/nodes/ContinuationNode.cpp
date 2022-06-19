@@ -44,6 +44,8 @@ ContinuationNode::ContinuationNode(const Node *node, const Type *iteratorType)
 
 std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stack values) const
 {
+	insertBlock(entryPoint.block(), entryPoint.function());
+
 	auto numberOfArguments = values.size();
 
 	auto inputValues = values;
