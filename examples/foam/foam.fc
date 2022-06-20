@@ -128,6 +128,28 @@ function boundingRect(Item item)
     };
 }
 
+function boundingRect(Item item, without parent)
+{
+    return SDL::Rect
+    {
+        x: item.x,
+        y: item.y,
+        width: item.width,
+        height: item.height
+    };
+}
+
+function boundingRect(Item item, Item parent)
+{
+    return SDL::Rect
+    {
+        x: item.x + parent.x,
+        y: item.y + parent.y,
+        width: item.width,
+        height: item.height
+    };
+}
+
 function setRenderDrawColor(long renderer, Color color)
 {
     return SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
@@ -148,11 +170,11 @@ function selectTemplate(ControlTemplate template, Item item)
     return template.normal;
 }
 
-function draw(long renderer, (any item, ...controls))
+function draw(long renderer, any parent, (any item, ...controls))
 {
-    draw(renderer, item);
+    draw(renderer, parent, item);
 
-    return tail draw(renderer, ...controls);
+    return tail draw(renderer, parent, ...controls);
 }
 
 function containsMouse(Item item, SDL::MouseMotionEvent motion)
@@ -173,7 +195,7 @@ function mainLoop(long renderer, ApplicationState state, ApplicationDefinition d
     SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL::SDL_RenderClear(renderer);
 
-    draw(renderer, state.ui);
+    draw(renderer, nothing, state.ui);
 
     SDL::SDL_RenderPresent(renderer);
 

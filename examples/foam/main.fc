@@ -4,6 +4,7 @@ use "button.fc"
 use "rectangle.fc"
 use "image.fc"
 use "composite.fc"
+use "column.fc"
 
 import int puts(string str);
 
@@ -17,7 +18,12 @@ struct State
 struct SideBarItem : Composite
 {
 	icon
-}
+};
+
+struct LayoutItem
+{
+	item
+};
 
 function composite(SideBarItem item)
 {
@@ -66,20 +72,38 @@ function application(State state)
 			height: 600,
 			color: rgb(199, 0, 37),
 			children: [
-				Image
+				Column
 				{
-					x: 20,
-					y: 20,
-					width: 60,
-					height: 60,
-					source: "menui_logo.bmp"
-				},
-				SideBarItem
-				{
-					y: 110,
-					width: 100,
-					height: 140,
-					icon: "dishes.bmp"
+					children: [
+						LayoutItem
+						{
+							item: Image
+							{
+// 								x: 20,
+								width: 60,
+								height: 60,
+								source: "menui_logo.bmp"
+							},
+						},
+						LayoutItem
+						{
+							item: SideBarItem
+							{
+								width: 100,
+								height: 140,
+								icon: "dishes.bmp"
+							}
+						},
+						LayoutItem
+						{
+							item: SideBarItem
+							{
+								width: 100,
+								height: 140,
+								icon: "dishes.bmp"
+							}
+						}
+					]
 				}
 			]
 		},
@@ -88,7 +112,42 @@ function application(State state)
 			x: 100,
 			width: 250,
 			height: 600,
-			color: rgb(255, 255, 255)
+			color: rgb(255, 255, 255),
+			children: [
+				Rectangle
+				{
+					x: 5,
+					y: 5,
+					width: 50,
+					height: 50
+				},
+				Row
+				{
+					x: 160,
+					y: 5,
+					spacing: 5,
+					children: [
+						LayoutItem
+						{
+							item: Rectangle
+							{
+								width: 50,
+								height: 50,
+								color: rgb(255, 0, 0)
+							}
+						},
+						LayoutItem
+						{
+							item: Rectangle
+							{
+								width: 50,
+								height: 50,
+								color: rgb(0, 255, 0)
+							}
+						}
+					]
+				}
+			]
 		},
 		Rectangle
 		{

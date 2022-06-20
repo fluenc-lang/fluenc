@@ -36,16 +36,16 @@ function process(ApplicationState state, Rectangle rectangle)
     return process(state, rectangle.children);
 }
 
-function draw(long renderer, without item)
+function draw(long renderer, any parent, without item)
 {
     return nothing;
 }
 
-function draw(long renderer, Rectangle rectangle)
+function draw(long renderer, any parent, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
-    SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle));
+    SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle, parent));
 
-    return tail draw(renderer, rectangle.children);
+    return tail draw(renderer, rectangle, rectangle.children);
 }
