@@ -1,9 +1,9 @@
 #ifndef INT32TYPE_H
 #define INT32TYPE_H
 
-#include "BuiltinType.h"
+#include "IntegerType.h"
 
-class Int32Type : public BuiltinType<Int32Type>
+class Int32Type : public IntegerType<Int32Type>
 {
 	public:
 		std::string name() const override;

@@ -12,7 +12,7 @@ IRBuilderEx::IRBuilderEx(const EntryPoint &entryPoint)
 {
 }
 
-const ScalarValue *IRBuilderEx::createLoad(const ReferenceValue *address, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createLoad(const ReferenceValue *address, const llvm::Twine &name) const
 {
 	auto &module = m_entryPoint.module();
 	auto &context = m_entryPoint.context();
@@ -50,7 +50,7 @@ llvm::Value *IRBuilderEx::createStore(const ScalarValue *value, const ReferenceV
 	return store;
 }
 
-const ScalarValue *IRBuilderEx::createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -61,7 +61,18 @@ const ScalarValue *IRBuilderEx::createAdd(const ScalarValue *lhs, const ScalarVa
 		);
 }
 
-const ScalarValue *IRBuilderEx::createSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createFAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
+{
+	auto block = m_entryPoint.block();
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(lhs->type()
+		, builder.CreateFAdd(*lhs, *rhs, name)
+		);
+}
+
+const ScalarValue *IRBuilderEx::createSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -72,7 +83,18 @@ const ScalarValue *IRBuilderEx::createSub(const ScalarValue *lhs, const ScalarVa
 		);
 }
 
-const ScalarValue *IRBuilderEx::createMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createFSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
+{
+	auto block = m_entryPoint.block();
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(lhs->type()
+		, builder.CreateFSub(*lhs, *rhs, name)
+		);
+}
+
+const ScalarValue *IRBuilderEx::createMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -83,7 +105,18 @@ const ScalarValue *IRBuilderEx::createMul(const ScalarValue *lhs, const ScalarVa
 		);
 }
 
-const ScalarValue *IRBuilderEx::createSDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createFMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
+{
+	auto block = m_entryPoint.block();
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(lhs->type()
+		, builder.CreateFMul(*lhs, *rhs, name)
+		);
+}
+
+const ScalarValue *IRBuilderEx::createSDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -94,7 +127,18 @@ const ScalarValue *IRBuilderEx::createSDiv(const ScalarValue *lhs, const ScalarV
 		);
 }
 
-const ScalarValue *IRBuilderEx::createCmp(llvm::CmpInst::Predicate pred, const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createFDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
+{
+	auto block = m_entryPoint.block();
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(lhs->type()
+		, builder.CreateFDiv(*lhs, *rhs, name)
+		);
+}
+
+const ScalarValue *IRBuilderEx::createCmp(llvm::CmpInst::Predicate pred, const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -105,7 +149,7 @@ const ScalarValue *IRBuilderEx::createCmp(llvm::CmpInst::Predicate pred, const S
 		);
 }
 
-const ScalarValue *IRBuilderEx::createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -116,7 +160,7 @@ const ScalarValue *IRBuilderEx::createAnd(const ScalarValue *lhs, const ScalarVa
 		);
 }
 
-const ScalarValue *IRBuilderEx::createOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -127,7 +171,7 @@ const ScalarValue *IRBuilderEx::createOr(const ScalarValue *lhs, const ScalarVal
 		);
 }
 
-const ScalarValue *IRBuilderEx::createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -138,7 +182,7 @@ const ScalarValue *IRBuilderEx::createSRem(const ScalarValue *lhs, const ScalarV
 		);
 }
 
-const ScalarValue *IRBuilderEx::createLogicalOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createLogicalOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -149,7 +193,7 @@ const ScalarValue *IRBuilderEx::createLogicalOr(const ScalarValue *lhs, const Sc
 		);
 }
 
-const ScalarValue *IRBuilderEx::createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 
@@ -160,7 +204,7 @@ const ScalarValue *IRBuilderEx::createLogicalAnd(const ScalarValue *lhs, const S
 		);
 }
 
-const ScalarValue *IRBuilderEx::createXor(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name)
+const ScalarValue *IRBuilderEx::createXor(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
 

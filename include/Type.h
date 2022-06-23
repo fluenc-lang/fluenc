@@ -6,6 +6,7 @@
 #include <llvm/IR/DerivedTypes.h>
 
 class EntryPoint;
+class IOperatorSet;
 
 class Type
 {
@@ -16,6 +17,8 @@ class Type
 		virtual llvm::Type *storageType(llvm::LLVMContext &context) const = 0;
 
 		virtual int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const = 0;
+
+		virtual IOperatorSet *operators() const;
 };
 
 #endif // TYPE_H

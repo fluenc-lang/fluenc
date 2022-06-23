@@ -59,6 +59,7 @@ class Visitor
 		Node *visitLiteral(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitInt32Literal(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitInt64Literal(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitFloat32Literal(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitBooleanLiteral(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitStringLiteral(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitUint32Literal(const std::shared_ptr<peg::Ast> &ast) const;

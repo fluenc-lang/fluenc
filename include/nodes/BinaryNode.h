@@ -13,8 +13,6 @@ class BinaryNode : public Node
 		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		const ScalarValue *resolveOp(const EntryPoint &entryPoint, const ScalarValue *left, const ScalarValue *right) const;
-
 		const Node * m_consumer;
 
 		std::string m_op;

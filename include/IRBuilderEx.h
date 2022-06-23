@@ -15,18 +15,22 @@ class IRBuilderEx
 
 		llvm::Value *createStore(const ScalarValue *value, const ReferenceValue *address);
 
-		const ScalarValue *createLoad(const ReferenceValue *address, const llvm::Twine &name = "");
-		const ScalarValue *createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createSDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createCmp(llvm::CmpInst::Predicate pred, const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createLogicalOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
-		const ScalarValue *createXor(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "");
+		const ScalarValue *createLoad(const ReferenceValue *address, const llvm::Twine &name = "") const;
+		const ScalarValue *createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createFAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createFSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createFMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createSDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createFDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createCmp(llvm::CmpInst::Predicate pred, const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createLogicalOr(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createXor(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
 
 		llvm::Value *createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse);
 		llvm::Value *createRet(llvm::Value *value);

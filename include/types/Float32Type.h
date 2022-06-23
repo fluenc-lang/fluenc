@@ -1,9 +1,9 @@
-#ifndef BOOLEANTYPE_H
-#define BOOLEANTYPE_H
+#ifndef FLOAT32TYPE_H
+#define FLOAT32TYPE_H
 
 #include "BuiltinType.h"
 
-class BooleanType : public BuiltinType<BooleanType>
+class Float32Type : public BuiltinType<Float32Type>
 {
 	public:
 		std::string name() const override;
@@ -13,4 +13,4 @@ class BooleanType : public BuiltinType<BooleanType>
 		IOperatorSet *operators() const override;
 };
 
-#endif // BOOLEANTYPE_H
+#endif // FLOAT32TYPE_H

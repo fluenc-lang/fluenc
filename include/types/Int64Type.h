@@ -1,9 +1,9 @@
 #ifndef INT64TYPE_H
 #define INT64TYPE_H
 
-#include "BuiltinType.h"
+#include "IntegerType.h"
 
-class Int64Type : public BuiltinType<Int64Type>
+class Int64Type : public IntegerType<Int64Type>
 {
 	public:
 		std::string name() const override;

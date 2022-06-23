@@ -51,6 +51,7 @@
 #include "nodes/UnaryNode.h"
 #include "nodes/FunctionCallProxyNode.h"
 #include "nodes/ParentInjectorNode.h"
+#include "nodes/FloatLiteralNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -342,6 +343,8 @@ Node *Visitor::visitLiteral(const std::shared_ptr<peg::Ast> &ast) const
 			return visitInt32Literal(ast);
 		case "Int64Literal"_:
 			return visitInt64Literal(ast);
+		case "Float32Literal"_:
+			return visitFloat32Literal(ast);
 		case "BooleanLiteral"_:
 			return visitBooleanLiteral(ast);
 		case "StringLiteral"_:
@@ -372,6 +375,14 @@ Node *Visitor::visitInt64Literal(const std::shared_ptr<peg::Ast> &ast) const
 	return new IntegralLiteralNode(m_alpha
 		, DzTypeName::int64()
 		, visitInteger(ast->nodes[0])
+		);
+}
+
+Node *Visitor::visitFloat32Literal(const std::shared_ptr<peg::Ast> &ast) const
+{
+	return new FloatLiteralNode(m_alpha
+		, DzTypeName::f32()
+		, ast->token_to_string()
 		);
 }
 

@@ -3729,6 +3729,28 @@ BOOST_AUTO_TEST_CASE (scenario97)
 	BOOST_TEST(result == 32);
 }
 
+BOOST_AUTO_TEST_CASE (scenario98)
+{
+	auto result = exec(R"(
+		function foo(f32 f)
+		{
+			if (f > 1.0)
+			{
+				return 1;
+			}
+
+			return 2;
+		}
+
+		export int main()
+		{
+			return foo(1.23 * 2.0);
+		}
+	)");
+
+	BOOST_TEST(result == 1);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

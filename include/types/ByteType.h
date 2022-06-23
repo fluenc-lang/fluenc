@@ -1,9 +1,9 @@
 #ifndef BYTETYPE_H
 #define BYTETYPE_H
 
-#include "BuiltinType.h"
+#include "IntegerType.h"
 
-class ByteType : public BuiltinType<ByteType>
+class ByteType : public IntegerType<ByteType>
 {
 	public:
 		std::string name() const override;

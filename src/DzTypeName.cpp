@@ -11,6 +11,7 @@
 #include "types/Prototype.h"
 #include "types/ByteType.h"
 #include "types/AnyType.h"
+#include "types/Float32Type.h"
 
 #include "exceptions/UnknownTypeException.h"
 
@@ -42,6 +43,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 		if (name == "byte")
 		{
 			return ByteType::instance();
+		}
+
+		if (name == "f32")
+		{
+			return Float32Type::instance();
 		}
 
 		if (name == "bool")
@@ -97,6 +103,13 @@ DzTypeName *DzTypeName::int32()
 DzTypeName *DzTypeName::int64()
 {
 	static DzTypeName typeName(nullptr, { "long" });
+
+	return &typeName;
+}
+
+DzTypeName *DzTypeName::f32()
+{
+	static DzTypeName typeName(nullptr, { "f32" });
 
 	return &typeName;
 }

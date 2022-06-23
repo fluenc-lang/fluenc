@@ -19,6 +19,7 @@ class DzTypeName : public ITypeName
 
 		static DzTypeName *int32();
 		static DzTypeName *int64();
+		static DzTypeName *f32();
 		static DzTypeName *uint32();
 		static DzTypeName *byte();
 		static DzTypeName *boolean();
