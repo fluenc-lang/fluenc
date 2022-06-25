@@ -43,7 +43,7 @@ ImportedFunction    <- 'import' TypeName Id '(' List(Argument)? ')'
 ExportedFunction    <- 'export' TypeName Id '(' List(Argument)? ')' Block
 
 # Expressions
-Literal             <- ByteLiteral / Uint32Literal / Int64Literal / Int32Literal / BooleanLiteral / StringLiteral / CharLiteral / NothingLiteral
+Literal             <- ByteLiteral / Float32Literal / Uint32Literal / Int64Literal / Int32Literal / BooleanLiteral / StringLiteral / CharLiteral / NothingLiteral
 Binary              <- (Group BinaryOperator Expression) / (Literal BinaryOperator Expression) / (Member BinaryOperator Expression) / (Call BinaryOperator Expression)
 Unary               <- (UnaryOperator Group) / (UnaryOperator Literal) / (UnaryOperator Member) / (UnaryOperator Call)
 Member              <- IdList With?
@@ -59,6 +59,7 @@ Local               <- 'let' Id '=' Expression
 # Literals
 Int32Literal        <- Integer
 Int64Literal        <- Integer 'L'
+Float32Literal      <- < Integer '.' Integer >
 BooleanLiteral      <- < 'true' | 'false' >
 StringLiteral       <- String
 Uint32Literal       <- Integer 'u'
