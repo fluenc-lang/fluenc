@@ -26,3 +26,13 @@ void printnum(int num)
 {
     printf("%d\n", num);
 }
+
+float intToFloat(int value)
+{
+    return (float)value;
+}
+
+int floatToInt(float value)
+{
+    return (int)value;
+}

@@ -20,11 +20,6 @@ struct SideBarItem : Composite
 	icon
 };
 
-struct LayoutItem
-{
-	item
-};
-
 function composite(SideBarItem item)
 {
 	return Rectangle
@@ -74,35 +69,53 @@ function application(State state)
 			children: [
 				Column
 				{
+					width: 100,
+					height: 600,
 					children: [
 						LayoutItem
 						{
-							item: Image
+							stretch: 1,
+							item: Rectangle
 							{
-// 								x: 20,
-								width: 60,
-								height: 60,
-								source: "menui_logo.bmp"
-							},
-						},
-						LayoutItem
-						{
-							item: SideBarItem
-							{
-								width: 100,
-								height: 140,
-								icon: "dishes.bmp"
+								color: rgb(255, 0, 0),
 							}
 						},
 						LayoutItem
 						{
-							item: SideBarItem
+							stretch: 2,
+							item: Rectangle
 							{
-								width: 100,
-								height: 140,
-								icon: "dishes.bmp"
+								color: rgb(0, 255, 0)
 							}
 						}
+
+// 						LayoutItem
+// 						{
+// 							minimum: 60,
+// 							item: Image
+// 							{
+// 								height: 60,
+// 								source: "menui_logo.bmp"
+// 							},
+// 						},
+// 						LayoutItem
+// 						{
+// 							minimum: 140,
+// 							item: SideBarItem
+// 							{
+// 								height: 140,
+// 								icon: "dishes.bmp"
+// 							}
+// 						},
+// 						LayoutItem
+// 						{
+// 							minimum: 140,
+// 							item: SideBarItem
+// 							{
+// 								height: 140,
+// 								icon: "dishes.bmp"
+// 							}
+// 						}
 					]
 				}
 			]
@@ -123,7 +136,7 @@ function application(State state)
 				},
 				Row
 				{
-					x: 160,
+					x: 60,
 					y: 5,
 					spacing: 5,
 					children: [
