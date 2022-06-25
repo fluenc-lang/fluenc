@@ -3773,6 +3773,38 @@ BOOST_AUTO_TEST_CASE (scenario99)
 	BOOST_TEST(result == 2);
 }
 
+BOOST_AUTO_TEST_CASE (scenario100)
+{
+	auto result = exec(R"(
+		struct Struct
+		{
+			value
+		};
+
+		function f()
+		{
+			return 4;
+		}
+
+		export int main()
+		{
+			let s = Struct
+			{
+				value: 2
+			};
+
+			let q = s with
+			{
+				value: f()
+			};
+
+			return q.value;
+		}
+	)");
+
+	BOOST_TEST(result == 4);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

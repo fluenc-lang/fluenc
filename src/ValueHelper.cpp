@@ -110,10 +110,8 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	return entryPoint;
 }
 
-const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, Stack &values)
+const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, const BaseValue *value)
 {
-	auto value = values.pop();
-
 	if (auto scalar = dynamic_cast<const ScalarValue *>(value))
 	{
 		return scalar;
@@ -127,4 +125,11 @@ const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, Stack &v
 	}
 
 	throw new std::exception();
+}
+
+const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, Stack &values)
+{
+	auto value = values.pop();
+
+	return getScalar(entryPoint, value);
 }

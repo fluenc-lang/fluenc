@@ -14,6 +14,7 @@ class ValueHelper
 			, const BaseValue *storage
 			);
 
+		static const ScalarValue *getScalar(const EntryPoint &entryPoint, const BaseValue *value);
 		static const ScalarValue *getScalar(const EntryPoint &entryPoint, Stack &values);
 };
 

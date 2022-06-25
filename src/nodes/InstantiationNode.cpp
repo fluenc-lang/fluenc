@@ -6,6 +6,7 @@
 #include "IPrototypeProvider.h"
 #include "IRBuilderEx.h"
 #include "Utility.h"
+#include "ValueHelper.h"
 
 #include "nodes/InstantiationNode.h"
 
@@ -75,7 +76,7 @@ std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Sta
 
 				auto align = dataLayout.getABITypeAlign(storageType);
 
-				auto typedValue = static_cast<const ScalarValue *>(value);
+				auto typedValue = ValueHelper::getScalar(entryPoint, value);
 
 				auto store = new llvm::StoreInst(*typedValue, *reference, false, align, block);
 
