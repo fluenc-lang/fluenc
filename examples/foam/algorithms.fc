@@ -1,0 +1,7 @@
+namespace Algorithms
+{
+	function sum(any product, any value)
+	{
+		return product + value;
+	}
+}

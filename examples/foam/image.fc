@@ -1,0 +1,36 @@
+struct Image : Item
+{
+    source
+};
+
+function update(EventState events, Image image, Image nextItem)
+{
+    return image;
+}
+
+function update(EventState events, (Image image, ...controls), (Image nextItem, ...nextControls))
+{
+	return image -> update(events, ...controls, ...nextControls);
+}
+
+function process(ApplicationState state, (Image image, ...controls))
+{
+    return tail process(state, ...controls);
+}
+
+function process(ApplicationState state, Image image)
+{
+    return state.user;
+}
+
+function draw(long renderer, any parent, Image image)
+{
+	let rw = SDL::SDL_RWFromFile(@image.source, @"r");
+	let surface = SDL::SDL_LoadBMP_RW(rw, 1);
+	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL::SDL_RenderCopy(renderer, texture, 0L, boundingRect(image));
+	SDL::SDL_FreeSurface(surface);
+
+	return nothing;
+}

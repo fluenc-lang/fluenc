@@ -1,0 +1,170 @@
+use "array.fc"
+use "algorithms.fc"
+
+import f32 intToFloat(int value);
+import int floatToInt(f32 value);
+
+// Types
+
+struct Layout : Item
+{
+	spacing: 5
+};
+
+struct LayoutItem
+{
+	item,
+	stretch: 0,
+	minimum: 0,
+	maximum: 32767
+};
+
+struct Column : Layout;
+struct Row : Layout;
+
+// Utility
+
+function getHeight(Item item)
+{
+	return item.height;
+}
+
+function getWidth(Item item)
+{
+	return item.width;
+}
+
+// Draw
+
+function draw(long renderer, Item parent, Layout item)
+{
+	let surrogate = parent with
+	{
+		x: parent.x + item.x,
+		y: parent.y + item.y
+	};
+
+	return draw(renderer, surrogate, item.children);
+}
+
+function draw(long renderer, any parent, LayoutItem item)
+{
+	return draw(renderer, parent, item.item);
+}
+
+// Process
+
+function process(ApplicationState state, (Layout item, ...controls))
+{
+	return tail process(state, ...controls);
+}
+
+function process(ApplicationState state, Layout item)
+{
+	return state.user;
+}
+
+// Update
+
+function update(EventState events, Layout item, Layout nextItem)
+{
+	return item with
+	{
+		children: layout(events, item, 0, item.children, nextItem.children)
+	};
+}
+
+function update(EventState events, (Layout item, ...controls), (Layout nextItem, ...nextControls))
+{
+	let layouted = item with
+	{
+		children: layout(events, item, 0, item.children, nextItem.children)
+	};
+
+	return layouted -> update(events, ...controls, ...nextControls);
+}
+
+// Column
+
+function getStretch(LayoutItem item)
+{
+	return intToFloat(item.stretch);
+}
+
+function calculateHeight(LayoutItem item, Item parent)
+{
+	if (item.stretch > 0)
+	{
+		let stretch = Array::select(parent.children, getStretch);
+		let totalStretch = Array::aggregate(stretch, 0.0, Algorithms::sum);
+
+		let distributed = intToFloat(parent.height) * (intToFloat(item.stretch) / totalStretch);
+
+		return floatToInt(distributed);
+	}
+
+	return item.minimum;
+}
+
+function layout(EventState events, Column column, int offset, LayoutItem item, LayoutItem nextItem)
+{
+	let layouted = item.item with
+	{
+		y: offset,
+		width: column.width,
+		height: calculateHeight(item, column),
+	};
+
+	return update(events, layouted, nextItem);
+}
+
+function layout(EventState events, Column column, int offset, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+{
+	let height = calculateHeight(item, column);
+	let layouted = item.item with
+	{
+		y: offset,
+		width: column.width,
+		height: height,
+	};
+
+	return update(events, layouted, nextItem) -> layout(events, column, height + offset + column.spacing, ...items, ...nextItems);
+}
+
+// Row
+
+function layout(EventState events, Row row, int offset, LayoutItem item, LayoutItem nextItem)
+{
+	let layouted = item.item with
+	{
+		x: offset,
+		height: row.height
+	};
+
+	return update(events, layouted, nextItem);
+}
+
+function layout(EventState events, Row row, int offset, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+{
+	let layouted = item.item with
+	{
+		x: offset,
+		height: row.height
+	};
+
+	let width = getWidth(item.item);
+
+	return update(events, layouted, nextItem) -> layout(events, row, width + offset + row.spacing, ...items, ...nextItems);
+}
+
+// Common
+
+function layout(EventState events, Item item, int offset, (LayoutItem item, ...items), LayoutItem nextItem)
+{
+	return nothing;
+}
+
+function layout(EventState events, Item item, int offset, LayoutItem item, (LayoutItem nextItem, ...nextItems))
+{
+	return nothing;
+}
