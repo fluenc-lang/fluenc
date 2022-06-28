@@ -25,6 +25,7 @@ namespace SDL
 
     global INIT_VIDEO: 0x00000020u;
     global WINDOWPOS_UNDEFINED: 0x1FFF0000u;
+	global WINDOW_RESIZABLE: 0x00000020;
     global KEYDOWN: 0x300u;
     global KEYUP: 0x301u;
     global MOUSEBUTTONDOWN: 0x401u;

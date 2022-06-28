@@ -5,7 +5,7 @@ struct Rectangle : Item
 
 function update(EventState events, Rectangle rectangle, Rectangle nextItem)
 {
-    return rectangle with
+	return rectangle with
     {
         children: update(events, rectangle.children, nextItem.children)
     };

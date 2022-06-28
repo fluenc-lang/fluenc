@@ -61,16 +61,16 @@ function decreaseCounter(State state)
 function application(State state)
 {
     return [
-		Rectangle
-		{
-			width: 100,
-			height: 600,
-			color: rgb(199, 0, 37),
-			children: [
+// 		Rectangle
+// 		{
+// 			width: 100,
+// 			height: 600,
+// 			color: rgb(199, 0, 37),
+// 			children: [
 				Column
 				{
 					width: 100,
-					height: 600,
+					height: 590,
 					children: [
 						LayoutItem
 						{
@@ -85,7 +85,25 @@ function application(State state)
 							stretch: 2,
 							item: Rectangle
 							{
-								color: rgb(0, 255, 0)
+								color: rgb(0, 255, 0),
+								children: [
+									Rectangle
+									{
+										x: 5,
+										y: 5,
+										width: 50,
+										height: 50,
+										color: rgb(255, 255, 0),
+									}
+								]
+							}
+						},
+						LayoutItem
+						{
+							stretch: 1,
+							item: Rectangle
+							{
+								color: rgb(0, 0, 255)
 							}
 						}
 
@@ -118,119 +136,119 @@ function application(State state)
 // 						}
 					]
 				}
-			]
-		},
-		Rectangle
-		{
-			x: 100,
-			width: 250,
-			height: 600,
-			color: rgb(255, 255, 255),
-			children: [
-				Rectangle
-				{
-					x: 5,
-					y: 5,
-					width: 50,
-					height: 50
-				},
-				Row
-				{
-					x: 60,
-					y: 5,
-					spacing: 5,
-					children: [
-						LayoutItem
-						{
-							item: Rectangle
-							{
-								width: 50,
-								height: 50,
-								color: rgb(255, 0, 0)
-							}
-						},
-						LayoutItem
-						{
-							item: Rectangle
-							{
-								width: 50,
-								height: 50,
-								color: rgb(0, 255, 0)
-							}
-						}
-					]
-				}
-			]
-		},
-		Rectangle
-		{
-			x: 350,
-			width: 800 - 350,
-			height: 600,
-			color: rgb(240, 240, 240)
-		}
-//         Rectangle
-//         {
-// 			x: 10,
-// 			y: 10,
+// 			]
+// 		},
+// 		Rectangle
+// 		{
+// 			x: 100,
 // 			width: 250,
-// 			height: 150,
-//             color: rgb(252, 252, 252),
-//             children: [
-//                 Button
-//                 {
-//                     x: 30 + state.counter,
-//                     y: 30,
-//                     width: 210,
-//                     height: 30,
-//                     text: "Button 1",
-//                 },
-// // //                 Button
-// // //                 {
-// // //                     x: 30 + state.counter,
-// // //                     y: 70,
-// // //                     width: 210,
-// // //                     height: 30,
-// // //                     text: "Click me!"
-// // //                 },
-//                 Button
-//                 {
-//                     x: 30 + state.counter,
-//                     y: 110,
-//                     width: 70,
-//                     height: 30,
-//                     text: "Decrease",
-//                     onClicked: decreaseCounter
-//                 },
-//                 Button
-//                 {
-//                     x: 140 + state.counter,
-//                     y: 110,
-//                     width: 70,
-//                     height: 30,
-//                     text: "Increase",
-//                     onClicked: increaseCounter
-//                 },
+// 			height: 600,
+// 			color: rgb(255, 255, 255),
+// 			children: [
+// 				Rectangle
+// 				{
+// 					x: 5,
+// 					y: 5,
+// 					width: 50,
+// 					height: 50
+// 				},
+// 				Row
+// 				{
+// 					x: 60,
+// 					y: 5,
+// 					spacing: 5,
+// 					width: 250,
+// 					height: 50,
+// 					children: [
+// 						LayoutItem
+// 						{
+// 							minimum: 50,
+// 							item: Rectangle
+// 							{
+// 								color: rgb(255, 0, 0)
+// 							}
+// 						},
+// 						LayoutItem
+// 						{
+// 							minimum: 50,
+// 							item: Rectangle
+// 							{
+// 								color: rgb(0, 255, 0)
+// 							}
+// 						}
+// 					]
+// 				}
+// 			]
+// 		},
+// 		Rectangle
+// 		{
+// 			x: 350,
+// 			width: 800 - 350,
+// 			height: 600,
+// 			color: rgb(240, 240, 240)
+// 		}
+// //         Rectangle
+// //         {
+// // 			x: 10,
+// // 			y: 10,
+// // 			width: 250,
+// // 			height: 150,
+// //             color: rgb(252, 252, 252),
+// //             children: [
 // //                 Button
 // //                 {
-// //                     x: 140 + state.counter,
-// //                     y: 150,
+// //                     x: 30 + state.counter,
+// //                     y: 30,
+// //                     width: 210,
+// //                     height: 30,
+// //                     text: "Button 1",
+// //                 },
+// // // //                 Button
+// // // //                 {
+// // // //                     x: 30 + state.counter,
+// // // //                     y: 70,
+// // // //                     width: 210,
+// // // //                     height: 30,
+// // // //                     text: "Click me!"
+// // // //                 },
+// //                 Button
+// //                 {
+// //                     x: 30 + state.counter,
+// //                     y: 110,
 // //                     width: 70,
 // //                     height: 30,
-// //                     text: "Click me!",
-// // //                     onClicked: increaseCounter
+// //                     text: "Decrease",
+// //                     onClicked: decreaseCounter
 // //                 },
 // //                 Button
 // //                 {
 // //                     x: 140 + state.counter,
-// //                     y: 190,
+// //                     y: 110,
 // //                     width: 70,
 // //                     height: 30,
-// //                     text: "Click me!",
-// // //                     onClicked: increaseCounter
-// //                 }
-//             ]
-//         }
+// //                     text: "Increase",
+// //                     onClicked: increaseCounter
+// //                 },
+// // //                 Button
+// // //                 {
+// // //                     x: 140 + state.counter,
+// // //                     y: 150,
+// // //                     width: 70,
+// // //                     height: 30,
+// // //                     text: "Click me!",
+// // // //                     onClicked: increaseCounter
+// // //                 },
+// // //                 Button
+// // //                 {
+// // //                     x: 140 + state.counter,
+// // //                     y: 190,
+// // //                     width: 70,
+// // //                     height: 30,
+// // //                     text: "Click me!",
+// // // //                     onClicked: increaseCounter
+// // //                 }
+// //             ]
+// //         }
     ];
 }
 

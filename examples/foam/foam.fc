@@ -218,7 +218,7 @@ namespace Foam
     {
         SDL::SDL_Init(SDL::INIT_VIDEO);
 
-        let window = SDL::SDL_CreateWindow(@"test", 0, 0, 800, 600, 0);
+        let window = SDL::SDL_CreateWindow(@"test", 0, 0, 800, 600, SDL::WINDOW_RESIZABLE);
         let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
 
         let user = invoke(definition.state);

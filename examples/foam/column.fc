@@ -24,17 +24,64 @@ struct Row : Layout;
 
 // Utility
 
+struct LayoutInfo
+{
+	totalStretch: 0.0,
+	numberOfItems: 0,
+};
+
+function buildLayoutInfo(LayoutInfo info, Item item)
+{
+	return info with
+	{
+		totalStretch: info.totalStretch + intToFloat(item.stretch),
+		numberOfItems: info.numberOfItems + 1,
+	};
+}
+
 function getHeight(Item item)
 {
 	return item.height;
 }
 
-function getWidth(Item item)
+function getHeight(LayoutItem item)
 {
-	return item.width;
+	return getHeight(item.item);
+}
+
+function getStretch(LayoutItem item)
+{
+	return intToFloat(item.stretch);
+}
+
+function getNativeSize(Column column)
+{
+	return column.height;
+}
+
+function getNativeSize(Row row)
+{
+	return row.width;
+}
+
+function calculateNativeItemSize(LayoutItem item, int availableSize, f32 totalStretch)
+{
+	if (item.stretch > 0)
+	{
+		let distributed = intToFloat(availableSize) * (intToFloat(item.stretch) / totalStretch);
+
+		return floatToInt(distributed);
+	}
+
+	return item.minimum;
 }
 
 // Draw
+
+function draw(long renderer, without parent, Layout item)
+{
+	return draw(renderer, item, item.children);
+}
 
 function draw(long renderer, Item parent, Layout item)
 {
@@ -68,103 +115,86 @@ function process(ApplicationState state, Layout item)
 
 function update(EventState events, Layout item, Layout nextItem)
 {
+	let seed = LayoutInfo {};
+
+	let info = Array::aggregate(item.children, seed, buildLayoutInfo);
+
 	return item with
 	{
-		children: layout(events, item, 0, item.children, nextItem.children)
+		children: layout(events, item, 0, info, item.children, nextItem.children)
 	};
 }
 
 function update(EventState events, (Layout item, ...controls), (Layout nextItem, ...nextControls))
 {
-	let layouted = item with
-	{
-		children: layout(events, item, 0, item.children, nextItem.children)
-	};
-
-	return layouted -> update(events, ...controls, ...nextControls);
+	return tail update(events, item, nextItem) -> update(events, ...controls, ...nextControls);
 }
 
 // Column
 
-function getStretch(LayoutItem item)
+function layout(EventState events, Column column, int offset, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
 {
-	return intToFloat(item.stretch);
-}
-
-function calculateHeight(LayoutItem item, Item parent)
-{
-	if (item.stretch > 0)
-	{
-		let stretch = Array::select(parent.children, getStretch);
-		let totalStretch = Array::aggregate(stretch, 0.0, Algorithms::sum);
-
-		let distributed = intToFloat(parent.height) * (intToFloat(item.stretch) / totalStretch);
-
-		return floatToInt(distributed);
-	}
-
-	return item.minimum;
-}
-
-function layout(EventState events, Column column, int offset, LayoutItem item, LayoutItem nextItem)
-{
+	let spacing = (info.numberOfItems - 1) * column.spacing;
+	let availableSize = getNativeSize(column) - spacing;
 	let layouted = item.item with
 	{
 		y: offset,
 		width: column.width,
-		height: calculateHeight(item, column),
+		height: calculateNativeItemSize(item, availableSize, info.totalStretch),
 	};
 
-	return update(events, layouted, nextItem);
+	return item with
+	{
+		item: tail update(events, layouted, nextItem.item)
+	};
 }
 
-function layout(EventState events, Column column, int offset, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+function layout(EventState events, Column column, int offset, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
 {
-	let height = calculateHeight(item, column);
-	let layouted = item.item with
-	{
-		y: offset,
-		width: column.width,
-		height: height,
-	};
+	let layouted = tail layout(events, column, offset, info, item, nextItem);
 
-	return update(events, layouted, nextItem) -> layout(events, column, height + offset + column.spacing, ...items, ...nextItems);
+	return layouted -> layout(events, column, getHeight(layouted) + offset + column.spacing, info, ...items, ...nextItems);
 }
 
 // Row
 
-function layout(EventState events, Row row, int offset, LayoutItem item, LayoutItem nextItem)
+function layout(EventState events, Row row, int offset, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
 {
+	let spacing = (info.numberOfItems - 1) * row.spacing;
+	let availableSize = getNativeSize(row) - spacing;
 	let layouted = item.item with
 	{
 		x: offset,
-		height: row.height
+		width: calculateNativeItemSize(item, availableSize, info.totalStretch),
+		height: row.height,
 	};
 
 	return update(events, layouted, nextItem);
 }
 
-function layout(EventState events, Row row, int offset, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+function layout(EventState events, Row row, int offset, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
 {
+	let spacing = (info.numberOfItems - 1) * row.spacing;
+	let availableSize = getNativeSize(row) - spacing;
+	let width = calculateNativeItemSize(item, availableSize, info.totalStretch);
 	let layouted = item.item with
 	{
 		x: offset,
+		width: width,
 		height: row.height
 	};
 
-	let width = getWidth(item.item);
-
-	return update(events, layouted, nextItem) -> layout(events, row, width + offset + row.spacing, ...items, ...nextItems);
+	return update(events, layouted, nextItem) -> layout(events, row, width + offset + row.spacing, info, ...items, ...nextItems);
 }
 
 // Common
 
-function layout(EventState events, Item item, int offset, (LayoutItem item, ...items), LayoutItem nextItem)
+function layout(EventState events, Item item, int offset, LayoutInfo info, (LayoutItem item, ...items), LayoutItem nextItem)
 {
 	return nothing;
 }
 
-function layout(EventState events, Item item, int offset, LayoutItem item, (LayoutItem nextItem, ...nextItems))
+function layout(EventState events, Item item, int offset, LayoutInfo info, LayoutItem item, (LayoutItem nextItem, ...nextItems))
 {
 	return nothing;
 }
