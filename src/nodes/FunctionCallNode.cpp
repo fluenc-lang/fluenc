@@ -92,7 +92,7 @@ std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stac
 			throw new FunctionNotFoundException(m_ast, m_names[0], resultValues);
 		}
 
-		insertBlock(resultEntryPoint.block(), parent);
+		insertBlock(block, parent);
 
 		auto functionBlock = llvm::BasicBlock::Create(*context);
 

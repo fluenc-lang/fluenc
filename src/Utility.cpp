@@ -13,13 +13,7 @@ std::ostream& operator<<(std::ostream &stream, const llvm::StringRef &string)
 
 void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target)
 {
-	for (auto &instruction : *source)
-	{
-		if (llvm::isa <llvm::BranchInst> (instruction))
-		{
-			throw new std::exception();
-		}
-	}
+	guardBranch(source);
 
 	llvm::IRBuilder<> builder(source);
 	builder.CreateBr(target);
@@ -30,5 +24,16 @@ void insertBlock(llvm::BasicBlock *block, llvm::Function *function)
 	if (!block->getParent())
 	{
 		block->insertInto(function);
+	}
+}
+
+void guardBranch(llvm::BasicBlock *block)
+{
+	for (auto &instruction : *block)
+	{
+		if (llvm::isa <llvm::BranchInst> (instruction))
+		{
+			throw new std::exception();
+		}
 	}
 }

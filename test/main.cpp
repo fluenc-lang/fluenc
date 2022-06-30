@@ -3805,6 +3805,91 @@ BOOST_AUTO_TEST_CASE (scenario100)
 	BOOST_TEST(result == 4);
 }
 
+BOOST_AUTO_TEST_CASE (scenario101)
+{
+	auto result = exec(R"(
+		function f(int value)
+		{
+			return value * 10;
+		}
+
+		function getNumbers(int i, int count)
+		{
+			if (i >= count)
+			{
+				return f(i);
+			}
+
+			return f(i) -> getNumbers(i + 1, count);
+		}
+
+		function sum((int value, ...values), int product)
+		{
+			return tail sum(...values, product + value);
+		}
+
+		function sum(int value, int product)
+		{
+			return product + value;
+		}
+
+		export int main()
+		{
+			let numbers = getNumbers(0, 5);
+
+			return sum(numbers, 0);
+		}
+	)");
+
+	BOOST_TEST(result == 150);
+}
+
+BOOST_AUTO_TEST_CASE (scenario102)
+{
+	auto result = exec(R"(
+		struct Foo
+		{
+			children
+		};
+
+		function sum((int value, ...values), int product)
+		{
+			return tail sum(...values, product + value);
+		}
+
+		function sum(int value, int product)
+		{
+			return product + value;
+		}
+
+		function add(Foo foo, (int left, ...lefts))
+		{
+			return left -> add(foo, ...lefts);
+		}
+
+		function add(Foo foo, int left)
+		{
+			return left;
+		}
+
+		export int main()
+		{
+			let foo = Foo
+			{
+				children: [1, 2]
+			};
+
+			let input1 = [1, 2, 3];
+
+			let numbers = add(foo, input1);
+
+			return sum(numbers, 0);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

@@ -34,7 +34,10 @@ std::vector<DzResult> ExpansionNode::build(const EntryPoint &entryPoint, Stack v
 
 		values.push(tuple);
 
-		return m_consumer->build(entryPoint, values);
+		auto consumerEntryPoint = entryPoint
+			.withBlock(targetEntryPoint.block());
+
+		return m_consumer->build(consumerEntryPoint, values);
 	}
 
 	throw new std::exception();

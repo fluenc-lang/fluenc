@@ -19,6 +19,8 @@ const ScalarValue *IRBuilderEx::createLoad(const ReferenceValue *address, const 
 
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	auto type = address->type();
 	auto storageType = type->storageType(*context);
 
@@ -38,6 +40,8 @@ llvm::Value *IRBuilderEx::createStore(const ScalarValue *value, const ReferenceV
 
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	auto type = value->type();
 	auto storageType = type->storageType(*context);
 
@@ -54,6 +58,8 @@ const ScalarValue *IRBuilderEx::createAdd(const ScalarValue *lhs, const ScalarVa
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(lhs->type()
@@ -64,6 +70,8 @@ const ScalarValue *IRBuilderEx::createAdd(const ScalarValue *lhs, const ScalarVa
 const ScalarValue *IRBuilderEx::createFAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -76,6 +84,8 @@ const ScalarValue *IRBuilderEx::createSub(const ScalarValue *lhs, const ScalarVa
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(lhs->type()
@@ -86,6 +96,8 @@ const ScalarValue *IRBuilderEx::createSub(const ScalarValue *lhs, const ScalarVa
 const ScalarValue *IRBuilderEx::createFSub(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -98,6 +110,8 @@ const ScalarValue *IRBuilderEx::createMul(const ScalarValue *lhs, const ScalarVa
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(lhs->type()
@@ -108,6 +122,8 @@ const ScalarValue *IRBuilderEx::createMul(const ScalarValue *lhs, const ScalarVa
 const ScalarValue *IRBuilderEx::createFMul(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -120,6 +136,8 @@ const ScalarValue *IRBuilderEx::createSDiv(const ScalarValue *lhs, const ScalarV
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(lhs->type()
@@ -130,6 +148,8 @@ const ScalarValue *IRBuilderEx::createSDiv(const ScalarValue *lhs, const ScalarV
 const ScalarValue *IRBuilderEx::createFDiv(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -142,6 +162,8 @@ const ScalarValue *IRBuilderEx::createCmp(llvm::CmpInst::Predicate pred, const S
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(BooleanType::instance()
@@ -152,6 +174,8 @@ const ScalarValue *IRBuilderEx::createCmp(llvm::CmpInst::Predicate pred, const S
 const ScalarValue *IRBuilderEx::createAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -164,6 +188,8 @@ const ScalarValue *IRBuilderEx::createOr(const ScalarValue *lhs, const ScalarVal
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(lhs->type()
@@ -174,6 +200,8 @@ const ScalarValue *IRBuilderEx::createOr(const ScalarValue *lhs, const ScalarVal
 const ScalarValue *IRBuilderEx::createSRem(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -186,6 +214,8 @@ const ScalarValue *IRBuilderEx::createLogicalOr(const ScalarValue *lhs, const Sc
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(BooleanType::instance()
@@ -196,6 +226,8 @@ const ScalarValue *IRBuilderEx::createLogicalOr(const ScalarValue *lhs, const Sc
 const ScalarValue *IRBuilderEx::createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -208,6 +240,8 @@ const ScalarValue *IRBuilderEx::createXor(const ScalarValue *lhs, const ScalarVa
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return new ScalarValue(lhs->type()
@@ -219,6 +253,8 @@ llvm::Value *IRBuilderEx::createCondBr(const ScalarValue *condition, llvm::Basic
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return builder.CreateCondBr(*condition, ifTrue, ifFalse);
@@ -228,6 +264,8 @@ llvm::Value *IRBuilderEx::createRet(llvm::Value *value)
 {
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return builder.CreateRet(value);
@@ -236,6 +274,8 @@ llvm::Value *IRBuilderEx::createRet(llvm::Value *value)
 llvm::Value *IRBuilderEx::createCall(llvm::FunctionCallee function, const std::vector<llvm::Value *> &arguments)
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
@@ -247,6 +287,8 @@ llvm::Value *IRBuilderEx::createGlobalStringPtr(const llvm::StringRef &string, c
 	auto &module = m_entryPoint.module();
 	auto block = m_entryPoint.block();
 
+	guardBranch(block);
+
 	llvm::IRBuilder<> builder(block);
 
 	return builder.CreateGlobalStringPtr(string, name, 0, module.get());
@@ -255,6 +297,8 @@ llvm::Value *IRBuilderEx::createGlobalStringPtr(const llvm::StringRef &string, c
 llvm::Value *IRBuilderEx::createBitCast(llvm::Value *value, llvm::Type *targetType, const llvm::Twine &name)
 {
 	auto block = m_entryPoint.block();
+
+	guardBranch(block);
 
 	auto cast = new llvm::BitCastInst(value, targetType, name, block);
 
