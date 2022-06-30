@@ -50,9 +50,9 @@ function getForeignSize(Column column)
 	return column.width;
 }
 
-function getForeignSize(Row column)
+function getForeignSize(Row row)
 {
-	return column.height;
+	return row.height;
 }
 
 // Layouting
@@ -150,7 +150,7 @@ function getOverflow(any i)
 
 function solve(int overflow, EventState events, LayoutInfo info, Layout item, Layout nextItem)
 {
-	let result = layout(events, 0, overflow, info, item.children, nextItem.children);
+	let result = layout(events, item, 0, overflow, info, item.children, nextItem.children);
 
 	let remainingOverflow = getOverflow(result);
 
@@ -234,13 +234,14 @@ function update(EventState events, any parent, (Layout item, ...controls), (Layo
 
 // Column
 
-function layout(EventState events, int offset, int overflow, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
+function layout(EventState events, Column column, int offset, int overflow, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
 {
 	let nis = calculateNativeItemSize(item, overflow, info);
 
 	let layouted = item.item with
 	{
-		y: offset,
+		x: column.x,
+		y: offset + column.y,
 		width: info.foreign,
 		height: nis.actual,
 	};
@@ -252,26 +253,39 @@ function layout(EventState events, int offset, int overflow, LayoutInfo info, La
 		return remainingOverflow;
 	}
 
+	let parent = Item
+	{
+		width: info.foreign,
+		height: nis.actual,
+	};
+
 	return item with
 	{
-		item: update(events, nothing, layouted, nextItem.item)
+		item: tail update(events, parent, layouted, nextItem.item)
 	};
 }
 
-function layout(EventState events, int offset, int overflow, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+function layout(EventState events, Column column, int offset, int overflow, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
 {
 	let nis = calculateNativeItemSize(item, overflow, info);
 
 	let layouted = item.item with
 	{
-		y: offset,
+		x: column.x,
+		y: offset + column.y,
+		width: info.foreign,
+		height: nis.actual,
+	};
+
+	let parent = Item
+	{
 		width: info.foreign,
 		height: nis.actual,
 	};
 
 	let result = item with
 	{
-		item: update(events, nothing, layouted, nextItem.item)
+		item: tail update(events, parent, layouted, nextItem.item)
 	};
 
 	let nextOffset = nis.actual + offset + info.spacing;
@@ -282,48 +296,72 @@ function layout(EventState events, int offset, int overflow, LayoutInfo info, (L
 		remainingStretch: nis.stretch,
 	};
 
-	return result -> layout(events, nextOffset, remainingOverflow, withRemainingStretch, ...items, ...nextItems);
+	return result -> layout(events, column, nextOffset, remainingOverflow, withRemainingStretch, ...items, ...nextItems);
 }
 
 // Row
 
-// function layout(EventState events, Row row, int offset, int overflow, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
-// {
-// 	let spacing = (info.numberOfItems - 1) * row.spacing;
-// 	let availableSize = getNativeSize(row) - spacing;
-// 	let layouted = item.item with
-// 	{
-// 		x: offset,
-// 		width: calculateNativeItemSize(item, availableSize, info.totalStretch),
-// 		height: row.height,
-// 	};
-//
-// 	return update(events, row, layouted, nextItem);
-// }
-//
-// function layout(EventState events, Row row, int offset, int overflow, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
-// {
-// 	let spacing = (info.numberOfItems - 1) * row.spacing;
-// 	let availableSize = getNativeSize(row) - spacing;
-// 	let width = calculateNativeItemSize(item, availableSize, info.totalStretch);
-// 	let layouted = item.item with
-// 	{
-// 		x: offset,
-// 		width: width,
-// 		height: row.height
-// 	};
-//
-// 	return update(events, row, layouted, nextItem) -> layout(events, row, width + offset + row.spacing, overflow, info, ...items, ...nextItems);
-// }
+function layout(EventState events, Row row, int offset, int overflow, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
+{
+	let nis = calculateNativeItemSize(item, overflow, info);
+
+	let layouted = item.item with
+	{
+		x: offset + row.x,
+		y: row.y,
+		width: nis.actual,
+		height: info.foreign,
+	};
+
+	let remainingOverflow = (nis.allocated - nis.actual) + overflow;
+
+	if (remainingOverflow != 0)
+	{
+		return remainingOverflow;
+	}
+
+	return item with
+	{
+		item: tail update(events, row, layouted, nextItem.item)
+	};
+}
+
+function layout(EventState events, Row row, int offset, int overflow, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+{
+	let nis = calculateNativeItemSize(item, overflow, info);
+
+	let layouted = item.item with
+	{
+		x: offset + row.x,
+		y: row.y,
+		width: nis.actual,
+		height: info.foreign,
+	};
+
+	let result = item with
+	{
+		item: tail update(events, row, layouted, nextItem.item)
+	};
+
+	let nextOffset = nis.actual + offset + info.spacing;
+	let remainingOverflow = (nis.allocated - nis.actual) + overflow;
+
+	let withRemainingStretch = info with
+	{
+		remainingStretch: nis.stretch,
+	};
+
+	return result -> layout(events, row, nextOffset, remainingOverflow, withRemainingStretch, ...items, ...nextItems);
+}
 
 // Common
 
-function layout(EventState events, int offset, int overflow, LayoutInfo info, (LayoutItem item, ...items), LayoutItem nextItem)
+function layout(EventState events, Layout layout, int offset, int overflow, LayoutInfo info, (LayoutItem item, ...items), LayoutItem nextItem)
 {
 	return nothing;
 }
 
-function layout(EventState events, int offset, int overflow, LayoutInfo info, LayoutItem item, (LayoutItem nextItem, ...nextItems))
+function layout(EventState events, Layout layout, int offset, int overflow, LayoutInfo info, LayoutItem item, (LayoutItem nextItem, ...nextItems))
 {
 	return nothing;
 }

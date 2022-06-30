@@ -92,7 +92,7 @@ std::vector<DzResult> FunctionNode::build(const EntryPoint &entryPoint, Stack va
 	auto pep = entryPoint
 		.withValues(values);
 
-	auto locals = entryPoint.locals();
+	std::map<std::string, const BaseValue *> locals;
 
 	for (const auto &argument : m_arguments)
 	{

@@ -51,7 +51,7 @@ function draw(long renderer, any parent, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 
-    SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle, parent));
+    SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
     return tail draw(renderer, rectangle, rectangle.children);
 }
