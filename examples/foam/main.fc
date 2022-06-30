@@ -69,11 +69,13 @@ function application(State state)
 // 			children: [
 				Column
 				{
-					width: 100,
-					height: 590,
+// 					width: 100,
+// 					height: 600,
+// 					spacing: 0,
 					children: [
 						LayoutItem
 						{
+							minimum: 200,
 							stretch: 1,
 							item: Rectangle
 							{
@@ -82,20 +84,21 @@ function application(State state)
 						},
 						LayoutItem
 						{
+							maximum: 300,
 							stretch: 2,
 							item: Rectangle
 							{
 								color: rgb(0, 255, 0),
-								children: [
-									Rectangle
-									{
-										x: 5,
-										y: 5,
-										width: 50,
-										height: 50,
-										color: rgb(255, 255, 0),
-									}
-								]
+// 								children: [
+// 									Rectangle
+// 									{
+// 										x: 5,
+// 										y: 5,
+// 										width: 50,
+// 										height: 50,
+// 										color: rgb(255, 255, 0),
+// 									}
+// 								]
 							}
 						},
 						LayoutItem

@@ -22,6 +22,13 @@ struct Event *SDL_WaitEventEx(struct Event *events)
     return events;
 }
 
+SDL_Rect *SDL_RenderGetViewportEx(SDL_Renderer *renderer, SDL_Rect *rect)
+{
+    SDL_RenderGetViewport(renderer, rect);
+
+    return rect;
+}
+
 void printnum(int num)
 {
     printf("%d\n", num);

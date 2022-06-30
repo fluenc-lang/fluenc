@@ -98,15 +98,19 @@ function processButton(EventState events, State state, Button button)
     return state;
 }
 
-function update(EventState events, Button button, Button nextItem)
+// Update
+
+function update(EventState events, any parent, Button button, Button nextItem)
 {
     return updateButton(events, button, nextItem);
 }
 
-function update(EventState events, (Button button, ...controls), (Button nextButton, ...nextControls))
+function update(EventState events, any parent, (Button button, ...controls), (Button nextButton, ...nextControls))
 {
-    return updateButton(events, button, nextButton) -> update(events, ...controls, ...nextControls);
+    return updateButton(events, button, nextButton) -> update(events, parent, ...controls, ...nextControls);
 }
+
+// Process
 
 function process(ApplicationState state, Button button)
 {
@@ -122,6 +126,8 @@ function process(ApplicationState state, (Button button, ...controls))
 
     return tail process(as, ...controls);
 }
+
+// Draw
 
 function draw(long renderer, Button button)
 {

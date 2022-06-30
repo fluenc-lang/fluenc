@@ -3,23 +3,27 @@ struct Rectangle : Item
     color: Color {}
 };
 
-function update(EventState events, Rectangle rectangle, Rectangle nextItem)
+// Update
+
+function update(EventState events, any parent, Rectangle rectangle, Rectangle nextItem)
 {
 	return rectangle with
     {
-        children: update(events, rectangle.children, nextItem.children)
+        children: update(events, rectangle, rectangle.children, nextItem.children)
     };
 }
 
-function update(EventState events, (Rectangle rectangle, ...controls), (Rectangle nextItem, ...nextControls))
+function update(EventState events, any parent, (Rectangle rectangle, ...controls), (Rectangle nextItem, ...nextControls))
 {
     let r = rectangle with
     {
-        children: update(events, rectangle.children, nextItem.children)
+        children: update(events, rectangle, rectangle.children, nextItem.children)
     };
 
-	return r -> update(events, ...controls, ...nextControls);
+	return r -> update(events, parent, ...controls, ...nextControls);
 }
+
+// Process
 
 function process(ApplicationState state, (Rectangle rectangle, ...controls))
 {
@@ -35,6 +39,8 @@ function process(ApplicationState state, Rectangle rectangle)
 {
     return process(state, rectangle.children);
 }
+
+// Draw
 
 function draw(long renderer, any parent, without item)
 {

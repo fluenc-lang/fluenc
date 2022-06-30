@@ -22,6 +22,7 @@ namespace SDL
 	import void SDL_FreeSurface(long surface);
 
     import EventState SDL_WaitEventEx(EventState events);
+	import Rect SDL_RenderGetViewportEx(long renderer, Rect rect);
 
     global INIT_VIDEO: 0x00000020u;
     global WINDOWPOS_UNDEFINED: 0x1FFF0000u;

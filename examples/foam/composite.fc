@@ -1,21 +1,23 @@
 struct Composite : Item;
 
-function update(EventState events, Composite image, Composite nextItem)
+function update(EventState events, any parent, Composite image, Composite nextItem)
 {
     return update(events
+		, parent
 		, composite(image)
 		, composite(nextItem)
 		);
 }
 
-function update(EventState events, (Composite image, ...controls), (Composite nextItem, ...nextControls))
+function update(EventState events, any parent, (Composite image, ...controls), (Composite nextItem, ...nextControls))
 {
 	let result = update(events
+		, parent
 		, composite(image)
 		, composite(nextItem)
 		);
 
-	return result -> update(events, ...controls, ...nextControls);
+	return result -> update(events, parent, ...controls, ...nextControls);
 }
 
 function process(ApplicationState state, (Composite image, ...controls))

@@ -45,8 +45,6 @@ std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint) const
 	{
 		elementValues.push(m_index);
 
-		insertBlock(block, function);
-
 		auto arrayBlock = llvm::BasicBlock::Create(*context);
 
 		linkBlocks(block, arrayBlock);

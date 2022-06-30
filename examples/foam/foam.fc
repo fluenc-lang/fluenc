@@ -94,17 +94,17 @@ function invoke(function () callback)
 
 // Update stubs
 
-function update(EventState events, any item, any nextItem)
+function update(EventState events, any parent, any item, any nextItem)
 {
     return nothing;
 }
 
-function update(EventState events, (any item, ...controls), any nextItem)
+function update(EventState events, any parent, (any item, ...controls), any nextItem)
 {
     return nothing;
 }
 
-function update(EventState events, any item, (any nextItem, ...nextItems))
+function update(EventState events, any parent, any item, (any nextItem, ...nextItems))
 {
     return nothing;
 }
@@ -201,12 +201,19 @@ function mainLoop(long renderer, ApplicationState state, ApplicationDefinition d
 
     let user = process(state, state.ui);
     let events = SDL::SDL_WaitEventEx(createEventState());
+	let viewport = SDL::SDL_RenderGetViewportEx(renderer, SDL::Rect {});
+
+	let window = Item
+	{
+		width: viewport.width,
+		height: viewport.height,
+	};
 
     let as = state with
     {
         user: user,
         events: events,
-        ui: update(events, state.ui, invoke(definition.ui, user))
+        ui: update(events, window, state.ui, invoke(definition.ui, user))
     };
 
     return tail mainLoop(renderer, as, definition);
