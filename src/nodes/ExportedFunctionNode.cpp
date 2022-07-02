@@ -49,8 +49,8 @@ int8_t ExportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 
 std::vector<DzResult> ExportedFunctionNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
+	auto module = entryPoint.module();
+	auto context = entryPoint.context();
 
 	auto returnType = m_returnType->resolve(entryPoint);
 	auto storageType = returnType->storageType(*context);
@@ -58,7 +58,7 @@ std::vector<DzResult> ExportedFunctionNode::build(const EntryPoint &entryPoint, 
 	std::vector<llvm::Type *> argumentTypes;
 
 	auto functionType = llvm::FunctionType::get(storageType, argumentTypes, false);
-	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, m_name, module.get());
+	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, m_name, module);
 
 	auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
 	auto block = llvm::BasicBlock::Create(*context);

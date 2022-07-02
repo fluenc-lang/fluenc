@@ -32,7 +32,7 @@ ArrayValue::ArrayValue(const ReferenceValue *index
 
 std::vector<DzResult> ArrayValue::build(const EntryPoint &entryPoint) const
 {
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto block = entryPoint.block();
 	auto function = entryPoint.function();

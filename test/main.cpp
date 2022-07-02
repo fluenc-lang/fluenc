@@ -2583,7 +2583,7 @@ BOOST_AUTO_TEST_CASE (arrayType_2)
 
 //	BOOST_TEST(functionValues.size() == 1);
 
-//	auto lazy = functionValues.require<LazyValue>();
+//	auto lazy = functionValues.require<LazyValue>(nullptr);
 
 //	BOOST_TEST(lazy->type()->name() == "[int, int]");
 //}

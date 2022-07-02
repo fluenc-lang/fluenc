@@ -75,7 +75,7 @@ std::vector<DzResult> FunctionCallNode::build(const EntryPoint &entryPoint, Stac
 		throw new MissingTailCallException(m_ast);
 	}
 
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	std::vector<DzResult> result;
 

@@ -24,7 +24,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 	, const std::shared_ptr<peg::Ast> &ast
 	)
 {
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto block = entryPoint.block();
 
@@ -85,8 +85,8 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 
 llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue, const EntryPoint &entryPoint)
 {
-	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
+	auto context = entryPoint.context();
+	auto module = entryPoint.module();
 
 	auto block = entryPoint.block();
 

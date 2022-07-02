@@ -116,7 +116,7 @@ JunctionNode::SingleResult JunctionNode::tryJoin(const std::vector<JunctionNode:
 {
 	if (values.size() > 1)
 	{
-		auto &context = entryPoint.context();
+		auto context = entryPoint.context();
 
 		auto junctionBlock = llvm::BasicBlock::Create(*context, "junction");
 

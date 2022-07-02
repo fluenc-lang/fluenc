@@ -26,8 +26,8 @@ class EntryPoint
 			, llvm::BasicBlock *block
 			, llvm::BasicBlock *alloc
 			, llvm::Function *function
-			, std::unique_ptr<llvm::Module> *module
-			, std::unique_ptr<llvm::LLVMContext> *context
+			, llvm::Module *module
+			, llvm::LLVMContext *context
 			, const std::string &name
 			, const std::multimap<std::string, CallableNode *> &functions
 			, const std::map<std::string, const BaseValue *> &locals
@@ -49,8 +49,8 @@ class EntryPoint
 
 		const ReferenceValue *alloc(const Type *type, const llvm::Twine &name = "") const;
 
-		std::unique_ptr<llvm::Module> &module() const;
-		std::unique_ptr<llvm::LLVMContext> &context() const;
+		llvm::Module *module() const;
+		llvm::LLVMContext *context() const;
 
 		std::string name() const;
 		std::string tag() const;
@@ -78,7 +78,6 @@ class EntryPoint
 		EntryPoint withValues(const Stack &values) const;
 		EntryPoint withDepth(int depth) const;
 		EntryPoint withIndex(int index) const;
-		EntryPoint withModule(std::unique_ptr<llvm::Module> *module) const;
 
 	private:
 		int m_depth;
@@ -92,8 +91,8 @@ class EntryPoint
 
 		llvm::Function *m_function;
 
-		std::unique_ptr<llvm::Module> *m_module;
-		std::unique_ptr<llvm::LLVMContext> *m_context;
+		llvm::Module *m_module;
+		llvm::LLVMContext *m_context;
 
 		std::string m_name;
 

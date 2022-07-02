@@ -26,8 +26,8 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 {
 	Stack valuesIfTrue;
 
-	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
+	auto context = entryPoint.context();
+	auto module = entryPoint.module();
 
 	auto block = entryPoint.block();
 	auto function = entryPoint.function();

@@ -20,7 +20,7 @@ StringIteratable::StringIteratable(const ReferenceValue *index, const Node *node
 
 std::vector<DzResult> StringIteratable::build(const EntryPoint &entryPoint) const
 {
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto block = entryPoint.block();
 	auto function = entryPoint.function();

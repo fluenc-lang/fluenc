@@ -81,8 +81,8 @@ int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 
 std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &module = entryPoint.module();
-	auto &context = entryPoint.context();
+	auto module = entryPoint.module();
+	auto context = entryPoint.context();
 
 	auto returnType = m_returnType->resolve(entryPoint);
 

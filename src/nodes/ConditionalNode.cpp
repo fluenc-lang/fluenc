@@ -29,8 +29,8 @@ std::vector<DzResult> ConditionalNode::build(const EntryPoint &entryPoint, Stack
 		const ScalarValue *value;
 	};
 
-	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
+	auto context = entryPoint.context();
+	auto module = entryPoint.module();
 
 	auto function = entryPoint.function();
 	auto block = entryPoint.block();

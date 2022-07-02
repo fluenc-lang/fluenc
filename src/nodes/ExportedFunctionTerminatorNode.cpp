@@ -12,7 +12,7 @@
 
 std::vector<DzResult> ExportedFunctionTerminatorNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto function = entryPoint.function();
 	auto previous = entryPoint.block();

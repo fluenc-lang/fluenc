@@ -12,8 +12,8 @@ EntryPoint::EntryPoint(int depth
 	, llvm::BasicBlock *block
 	, llvm::BasicBlock *alloc
 	, llvm::Function *function
-	, std::unique_ptr<llvm::Module> *module
-	, std::unique_ptr<llvm::LLVMContext> *context
+	, llvm::Module *module
+	, llvm::LLVMContext *context
 	, const std::string &name
 	, const std::multimap<std::string, CallableNode *> &functions
 	, const std::map<std::string, const BaseValue *> &locals
@@ -75,21 +75,21 @@ const ReferenceValue *EntryPoint::alloc(const Type *type, const llvm::Twine &nam
 {
 	llvm::IRBuilder<> builder(m_alloc, m_alloc->begin());
 
-	auto storageType = type->storageType(**m_context);
+	auto storageType = type->storageType(*m_context);
 
 	return new ReferenceValue(type
 		, builder.CreateAlloca(storageType, nullptr, name)
 		);
 }
 
-std::unique_ptr<llvm::Module> &EntryPoint::module() const
+llvm::Module *EntryPoint::module() const
 {
-	return *m_module;
+	return m_module;
 }
 
-std::unique_ptr<llvm::LLVMContext> &EntryPoint::context() const
+llvm::LLVMContext *EntryPoint::context() const
 {
-	return *m_context;
+	return m_context;
 }
 
 std::string EntryPoint::name() const
@@ -341,27 +341,6 @@ EntryPoint EntryPoint::withIndex(int index) const
 		, m_alloc
 		, m_function
 		, m_module
-		, m_context
-		, m_name
-		, m_functions
-		, m_locals
-		, m_globals
-		, m_types
-		, m_values
-		, m_iteratorStorage
-		);
-}
-
-EntryPoint EntryPoint::withModule(std::unique_ptr<llvm::Module> *module) const
-{
-	return EntryPoint(m_depth + 1
-		, m_index
-		, m_parent
-		, m_entry
-		, m_block
-		, m_alloc
-		, m_function
-		, module
 		, m_context
 		, m_name
 		, m_functions

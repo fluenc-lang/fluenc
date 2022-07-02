@@ -13,7 +13,7 @@ BooleanLiteralNode::BooleanLiteralNode(const Node *consumer, const std::string &
 
 const ScalarValue *BooleanLiteralNode::resolveValue(const EntryPoint &entryPoint) const
 {
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto type = BooleanType::instance();
 

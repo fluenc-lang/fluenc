@@ -34,8 +34,8 @@ InstantiationNode::InstantiationNode(const Node *consumer
 
 std::vector<DzResult> InstantiationNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
+	auto context = entryPoint.context();
+	auto module = entryPoint.module();
 
 	auto block = entryPoint.block();
 

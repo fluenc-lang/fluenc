@@ -14,8 +14,8 @@ IRBuilderEx::IRBuilderEx(const EntryPoint &entryPoint)
 
 const ScalarValue *IRBuilderEx::createLoad(const ReferenceValue *address, const llvm::Twine &name) const
 {
-	auto &module = m_entryPoint.module();
-	auto &context = m_entryPoint.context();
+	auto module = m_entryPoint.module();
+	auto context = m_entryPoint.context();
 
 	auto block = m_entryPoint.block();
 
@@ -35,8 +35,8 @@ const ScalarValue *IRBuilderEx::createLoad(const ReferenceValue *address, const 
 
 llvm::Value *IRBuilderEx::createStore(const ScalarValue *value, const ReferenceValue *address)
 {
-	auto &module = m_entryPoint.module();
-	auto &context = m_entryPoint.context();
+	auto module = m_entryPoint.module();
+	auto context = m_entryPoint.context();
 
 	auto block = m_entryPoint.block();
 
@@ -284,14 +284,14 @@ llvm::Value *IRBuilderEx::createCall(llvm::FunctionCallee function, const std::v
 
 llvm::Value *IRBuilderEx::createGlobalStringPtr(const llvm::StringRef &string, const llvm::Twine &name)
 {
-	auto &module = m_entryPoint.module();
+	auto module = m_entryPoint.module();
 	auto block = m_entryPoint.block();
 
 	guardBranch(block);
 
 	llvm::IRBuilder<> builder(block);
 
-	return builder.CreateGlobalStringPtr(string, name, 0, module.get());
+	return builder.CreateGlobalStringPtr(string, name, 0, module);
 }
 
 llvm::Value *IRBuilderEx::createBitCast(llvm::Value *value, llvm::Type *targetType, const llvm::Twine &name)

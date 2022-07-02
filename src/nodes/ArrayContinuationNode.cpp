@@ -23,7 +23,7 @@ std::vector<DzResult> ArrayContinuationNode::build(const EntryPoint &entryPoint,
 {
 	UNUSED(values);
 
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto indexType = Int64Type::instance();
 	auto storageType = indexType->storageType(*context);

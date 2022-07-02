@@ -303,8 +303,8 @@ int main(int argc, char **argv)
 				, nullptr
 				, nullptr
 				, nullptr
-				, &llvmModule
-				, &llvmContext
+				, llvmModule.get()
+				, llvmContext.get()
 				, "term"
 				, module.functions
 				, module.locals

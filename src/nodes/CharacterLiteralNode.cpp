@@ -16,7 +16,7 @@ CharacterLiteralNode::CharacterLiteralNode(const Node *consumer, const std::stri
 
 std::vector<DzResult> CharacterLiteralNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto type = Int32Type::instance();
 	auto storageType = type->storageType(*context);

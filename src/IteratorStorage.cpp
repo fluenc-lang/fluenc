@@ -18,7 +18,7 @@ const ReferenceValue *IteratorStorage::getOrCreate(size_t id, const EntryPoint &
 	{
 		IRBuilderEx builder(entryPoint);
 
-		auto &context = entryPoint.context();
+		auto context = entryPoint.context();
 
 		auto storageType = indexType->storageType(*context);
 

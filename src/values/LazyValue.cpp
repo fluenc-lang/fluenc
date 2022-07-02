@@ -48,8 +48,8 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 {
 	auto block = entryPoint.block();
 
-	auto &context = entryPoint.context();
-	auto &module = entryPoint.module();
+	auto context = entryPoint.context();
+	auto module = entryPoint.module();
 
 	auto function = entryPoint.function();
 

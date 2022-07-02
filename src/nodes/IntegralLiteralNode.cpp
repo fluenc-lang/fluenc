@@ -19,7 +19,7 @@ IntegralLiteralNode::IntegralLiteralNode(const Node *consumer, ITypeName *type, 
 
 std::vector<DzResult> IntegralLiteralNode::build(const EntryPoint &entryPoint, Stack values) const
 {
-	auto &context = entryPoint.context();
+	auto context = entryPoint.context();
 
 	auto type = m_type->resolve(entryPoint);
 	auto storageType = type->storageType(*context);
