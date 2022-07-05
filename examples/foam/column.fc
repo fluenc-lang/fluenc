@@ -248,7 +248,7 @@ function layout(EventState events, Column column, int offset, int overflow, Layo
 
 	let remainingOverflow = (nis.allocated - nis.actual) + overflow;
 
-	if (remainingOverflow != 0)
+	if ((remainingOverflow != 0) && (info.remainingStretch > 0.0))
 	{
 		return remainingOverflow;
 	}
@@ -315,7 +315,7 @@ function layout(EventState events, Row row, int offset, int overflow, LayoutInfo
 
 	let remainingOverflow = (nis.allocated - nis.actual) + overflow;
 
-	if (remainingOverflow != 0)
+	if ((remainingOverflow != 0) && (info.remainingStretch > 0.0))
 	{
 		return remainingOverflow;
 	}
