@@ -130,7 +130,7 @@ const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, const Ba
 	throw new std::exception();
 }
 
-const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, Stack &values)
+const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, Stack<BaseValue> &values)
 {
 	auto value = values.pop();
 

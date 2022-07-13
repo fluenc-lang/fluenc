@@ -1,14 +1,13 @@
-#ifndef EMITTER_H
-#define EMITTER_H
+#ifndef ANALYZER_H
+#define ANALYZER_H
 
 #include "NodeVisitor.h"
-#include "DzResult.h"
 
-class BaseValue;
-
-class Emitter : public NodeVisitor<BaseValue>
+class Analyzer : public NodeVisitor<BaseValue>
 {
 	public:
+		Analyzer();
+
 		std::vector<DzResult<BaseValue>> visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
 		std::vector<DzResult<BaseValue>> visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
 		std::vector<DzResult<BaseValue>> visitArrayContinuation(const ArrayContinuationNode *node, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
@@ -51,4 +50,4 @@ class Emitter : public NodeVisitor<BaseValue>
 		std::vector<DzResult<BaseValue>> visitStringIteratable(const StringIteratable *node, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
 };
 
-#endif // EMITTER_H
+#endif // ANALYZER_H

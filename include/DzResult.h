@@ -4,10 +4,11 @@
 #include "EntryPoint.h"
 #include "Stack.h"
 
+template<typename T>
 struct DzResult
 {
 	EntryPoint entryPoint;
-	Stack values;
+	Stack<T> values;
 };
 
 #endif // DZRESULT_H

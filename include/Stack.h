@@ -10,26 +10,63 @@
 
 #include "values/BaseValue.h"
 
+template<typename T>
 class Stack
 {
 	public:
-		typedef std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator const_iterator;
-		typedef std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator const_reverse_iterator;
+		using const_iterator = typename std::vector<const T *, std::allocator<const T *>>::const_iterator;
+		using const_reverse_iterator = typename std::vector<const T *, std::allocator<const T *>>::const_reverse_iterator;
 
 		Stack() = default;
-		Stack(const std::vector<const BaseValue *> &values);
-		Stack(const BaseValue *value);
+
+		Stack(const std::vector<const T *> &values)
+			: m_values(values)
+		{
+		}
+
+		Stack(const T *value)
+			: m_values({ value })
+		{
+		}
+
 		Stack(const Stack &other) = default;
 
-		size_t size() const;
+		size_t size() const
+		{
+			return m_values.size();
+		}
 
-		const_iterator begin() const;
-		const_iterator end() const;
+		const_iterator begin() const
+		{
+			return m_values.begin();
+		}
+		const_iterator end() const
+		{
+			return m_values.end();
+		}
 
-		const_reverse_iterator rbegin() const;
-		const_reverse_iterator rend() const;
+		const_reverse_iterator rbegin() const
+		{
+			return m_values.rbegin();
+		}
+		const_reverse_iterator rend() const
+		{
+			return m_values.rend();
+		}
 
-		const BaseValue *pop();
+		const T *pop()
+		{
+			if (m_values.empty())
+			{
+				throw new std::exception();
+			}
+
+			auto value = m_values.back();
+
+			m_values.pop_back();
+
+			return value;
+		}
 
 		Stack &discard()
 		{
@@ -38,17 +75,17 @@ class Stack
 			return *this;
 		}
 
-		template<typename T>
-		const T *require(const std::shared_ptr<peg::Ast> &ast)
+		template<typename TValue>
+		const TValue *require(const std::shared_ptr<peg::Ast> &ast)
 		{
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const T *>(value))
+			if (auto casted = dynamic_cast<const TValue *>(value))
 			{
 				return casted;
 			}
 
-			auto &expectedMetadata = T::staticMetadata();
+			auto &expectedMetadata = TValue::staticMetadata();
 			auto &actualMetadata = value->metadata();
 
 			throw new InvalidTypeException(ast
@@ -57,8 +94,8 @@ class Stack
 				);
 		}
 
-		template<typename T>
-		const T *request()
+		template<typename TValue>
+		const TValue *request()
 		{
 			if (size() <= 0)
 			{
@@ -67,7 +104,7 @@ class Stack
 
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const T *>(value))
+			if (auto casted = dynamic_cast<const TValue *>(value))
 			{
 				return casted;
 			}
@@ -75,10 +112,13 @@ class Stack
 			return nullptr;
 		}
 
-		void push(const BaseValue *value);
+		void push(const T *value)
+		{
+			m_values.push_back(value);
+		}
 
 	private:
-		std::vector<const BaseValue *> m_values;
+		std::vector<const T *> m_values;
 };
 
 #endif // STACK_H

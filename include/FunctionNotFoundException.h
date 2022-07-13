@@ -9,15 +9,14 @@ class FunctionNotFoundException : public CompilerException
 	public:
 		FunctionNotFoundException(const std::shared_ptr<peg::Ast> &ast
 			, const std::string &name
-			, const Stack &values
+			, const std::vector<const Type *> &values
 			);
 
 		std::string message() const override;
 
 	private:
 		std::string m_name;
-
-		Stack m_values;
+		std::vector<const Type *> m_values;
 };
 
 #endif // FUNCTIONNOTFOUNDEXCEPTION_H

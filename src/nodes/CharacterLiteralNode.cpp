@@ -6,7 +6,12 @@ CharacterLiteralNode::CharacterLiteralNode(const Node *consumer, const std::stri
 {
 }
 
-std::vector<DzResult> CharacterLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> CharacterLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitCharacterLiteral(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue>> CharacterLiteralNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitCharacterLiteral(this, entryPoint, values);
 }

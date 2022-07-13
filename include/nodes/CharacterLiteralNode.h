@@ -8,11 +8,13 @@
 class CharacterLiteralNode : public Node
 {
 	friend class Emitter;
+	friend class Analyzer;
 
 	public:
 		CharacterLiteralNode(const Node *consumer, const std::string &value);
 
-		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult<BaseValue>> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
+		std::vector<DzResult<BaseValue>> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
 
 	private:
 		llvm::ConstantInt *getValue(llvm::Type *storageType) const;

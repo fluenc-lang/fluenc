@@ -6,7 +6,12 @@ LocalNode::LocalNode(const Node *consumer, const std::string &name)
 {
 }
 
-std::vector<DzResult> LocalNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> LocalNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitLocal(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue> > LocalNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitLocal(this, entryPoint, values);
 }

@@ -36,7 +36,7 @@ const BaseValue *TupleValue::clone(const EntryPoint &entryPoint) const
 	return new TupleValue(values);
 }
 
-Stack TupleValue::values() const
+Stack<BaseValue> TupleValue::values() const
 {
 	return m_values;
 }

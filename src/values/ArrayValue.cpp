@@ -7,7 +7,7 @@
 
 ArrayValue::ArrayValue(const ReferenceValue *index
 	, const Type *type
-	, const std::vector<DzResult> &values
+	, const std::vector<DzResult<BaseValue> > &values
 	, size_t size
 	)
 	: m_index(index)
@@ -16,9 +16,14 @@ ArrayValue::ArrayValue(const ReferenceValue *index
 {
 }
 
-std::vector<DzResult> ArrayValue::accept(const Emitter &emitter, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> ArrayValue::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
-	return emitter.visitArrayValue(this, entryPoint, values);
+	return visitor.visitArrayValue(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue> > ArrayValue::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitArrayValue(this, entryPoint, values);
 }
 
 const Node *ArrayValue::createIterator(const IIteratable *parent, const Type *type, size_t size)

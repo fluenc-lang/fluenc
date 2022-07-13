@@ -14,7 +14,7 @@
 #include "types/ArrayType.h"
 #include "types/IteratorType.h"
 
-ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult> &values, size_t id, size_t size)
+ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult<BaseValue> > &values, size_t id, size_t size)
 	: m_values(values)
 	, m_id(id)
 	, m_size(size)

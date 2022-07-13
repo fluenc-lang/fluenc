@@ -19,7 +19,7 @@ EntryPoint::EntryPoint(int depth
 	, const std::map<std::string, const BaseValue *> &locals
 	, const std::map<std::string, const Node *> &globals
 	, const std::map<std::string, Prototype *> &types
-	, const Stack &values
+	, const Stack<BaseValue> &values
 	, IteratorStorage *iteratorStorage
 	)
 	: m_depth(depth)
@@ -120,7 +120,7 @@ std::map<std::string, Prototype *> EntryPoint::types() const
 	return m_types;
 }
 
-Stack EntryPoint::values() const
+Stack<BaseValue> EntryPoint::values() const
 {
 	return m_values;
 }
@@ -292,7 +292,7 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		);
 }
 
-EntryPoint EntryPoint::withValues(const Stack &values) const
+EntryPoint EntryPoint::withValues(const Stack<BaseValue> &values) const
 {
 	return EntryPoint(m_depth + 1
 		, m_index

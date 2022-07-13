@@ -31,7 +31,7 @@ FunctionAttribute ImportedFunctionNode::attribute() const
 	return FunctionAttribute::Import;
 }
 
-int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const Stack &values) const
+int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const std::vector<const Type *> &values) const
 {
 	if (m_arguments.size() != values.size())
 	{
@@ -41,15 +41,14 @@ int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 	int8_t min = 0;
 	int8_t max = 0;
 
-	std::transform(begin(m_arguments), end(m_arguments), values.rbegin(), extremities_iterator(min, max), [=](auto argument, auto value) -> int8_t
+	std::transform(begin(m_arguments), end(m_arguments), begin(values), extremities_iterator(min, max), [=](auto argument, auto valueType) -> int8_t
 	{
-		if (!value)
+		if (!valueType)
 		{
 			return -1;
 		}
 
 		auto argumentType = argument->type(entryPoint);
-		auto valueType = value->type();
 
 		return valueType->compatibility(argumentType, entryPoint);
 	});
@@ -62,7 +61,12 @@ int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 	return max;
 }
 
-std::vector<DzResult> ImportedFunctionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue> > ImportedFunctionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitImportedFunction(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue> > ImportedFunctionNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitImportedFunction(this, entryPoint, values);
 }

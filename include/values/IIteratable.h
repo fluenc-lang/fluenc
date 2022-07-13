@@ -1,11 +1,12 @@
 #ifndef IITERATABLE_H
 #define IITERATABLE_H
 
-#include "Node.h"
+#include "Emitter.h"
+#include "Analyzer.h"
 
 class EntryPoint;
 
-class IIteratable : public Visitable<Emitter>
+class IIteratable : public Visitable<Emitter, Analyzer>
 {
 };
 

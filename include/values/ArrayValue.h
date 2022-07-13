@@ -16,11 +16,12 @@ class ArrayValue : public IIteratable
 	public:
 		ArrayValue(const ReferenceValue *index
 			, const Type *type
-			, const std::vector<DzResult> &values
+			, const std::vector<DzResult<BaseValue>> &values
 			, size_t size
 			);
 
-		std::vector<DzResult> accept(const Emitter &emitter, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult<BaseValue>> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
+		std::vector<DzResult<BaseValue>> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
 
 	private:
 		static const Node *createIterator(const IIteratable *parent, const Type *type, size_t size);
@@ -28,7 +29,7 @@ class ArrayValue : public IIteratable
 		const ReferenceValue *m_index;
 		const Node *m_iterator;
 
-		const std::vector<DzResult> m_values;
+		const std::vector<DzResult<BaseValue>> m_values;
 };
 
 #endif // ARRAYVALUE_H

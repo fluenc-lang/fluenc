@@ -295,7 +295,7 @@ int main(int argc, char **argv)
 
 			auto llvmModule = std::make_unique<llvm::Module>(job.name, *llvmContext);
 
-			Stack values;
+			Stack<BaseValue> values;
 
 			EntryPoint entryPoint(0
 				, -1

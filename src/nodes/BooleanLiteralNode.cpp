@@ -6,7 +6,12 @@ BooleanLiteralNode::BooleanLiteralNode(const Node *consumer, const std::string &
 {
 }
 
-std::vector<DzResult> BooleanLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> BooleanLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitBooleanLiteral(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue>> BooleanLiteralNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitBooleanLiteral(this, entryPoint, values);
 }

@@ -1,5 +1,6 @@
 set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/AllIterator.h"
+	"${PROJECT_HEADER_DIR}/Analyzer.h"
 	"${PROJECT_HEADER_DIR}/BuildConfiguration.h"
     "${PROJECT_HEADER_DIR}/CompilerException.h"
     "${PROJECT_HEADER_DIR}/DefaultPrototypeProvider.h"
@@ -60,7 +61,6 @@ set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/nodes/BlockStackFrameNode.h"
     "${PROJECT_HEADER_DIR}/nodes/BooleanLiteralNode.h"
     "${PROJECT_HEADER_DIR}/nodes/CallableNode.h"
-    "${PROJECT_HEADER_DIR}/nodes/CapsuleNode.h"
     "${PROJECT_HEADER_DIR}/nodes/CharacterLiteralNode.h"
     "${PROJECT_HEADER_DIR}/nodes/ConditionalNode.h"
     "${PROJECT_HEADER_DIR}/nodes/ContinuationNode.h"
@@ -158,6 +158,7 @@ set(LIB_HEADER_FILES
 
 set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/AllIterator.cpp"
+	"${PROJECT_SRC_DIR}/Analyzer.cpp"
     "${PROJECT_SRC_DIR}/CompilerException.cpp"
     "${PROJECT_SRC_DIR}/DefaultPrototypeProvider.cpp"
     "${PROJECT_SRC_DIR}/DzArgument.cpp"
@@ -202,7 +203,6 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/nodes/BlockInstructionNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/BlockStackFrameNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/BooleanLiteralNode.cpp"
-	"${PROJECT_SRC_DIR}/nodes/CapsuleNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/CharacterLiteralNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/ConditionalNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/ContinuationNode.cpp"

@@ -28,7 +28,12 @@ int FunctionCallNode::order(const EntryPoint &entryPoint) const
 	return -1;
 }
 
-std::vector<DzResult> FunctionCallNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> FunctionCallNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitFunctionCall(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue>> FunctionCallNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitFunctionCall(this, entryPoint, values);
 }

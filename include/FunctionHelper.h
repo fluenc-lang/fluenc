@@ -13,13 +13,14 @@
 #include "values/ExpandedValue.h"
 #include "values/NamedValue.h"
 
+template<typename T>
 class Stack;
 
 class FunctionHelper
 {
 	public:
-		static std::tuple<int8_t, const EntryPoint *, Stack> tryCreateTailCall(const EntryPoint &entryPoint
-			, const Stack &values
+		static std::tuple<int8_t, const EntryPoint *, Stack<BaseValue>> tryCreateTailCall(const EntryPoint &entryPoint
+			, const Stack<BaseValue> &values
 			, const std::vector<std::string>::const_iterator &name
 			, const std::vector<std::string>::const_iterator &end
 			);

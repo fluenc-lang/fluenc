@@ -2576,7 +2576,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, entryPoint, Stack());
+	auto functionResults = function->accept(emitter, entryPoint, Stack<BaseValue>());
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2619,7 +2619,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, entryPoint, Stack());
+	auto functionResults = function->accept(emitter, entryPoint, Stack<BaseValue>());
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2657,7 +2657,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, entryPoint, Stack());
+	auto functionResults = function->accept(emitter, entryPoint, Stack<BaseValue>());
 
 	BOOST_TEST(functionResults.size() == 1);
 

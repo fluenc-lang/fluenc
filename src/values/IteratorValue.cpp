@@ -8,7 +8,12 @@ IteratorValue::IteratorValue(const EntryPoint *entryPoint
 {
 }
 
-std::vector<DzResult> IteratorValue::accept(const Emitter &emitter, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue> > IteratorValue::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
-	return emitter.visitIteratorValue(this, entryPoint, values);
+	return visitor.visitIteratorValue(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue> > IteratorValue::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitIteratorValue(this, entryPoint, values);
 }

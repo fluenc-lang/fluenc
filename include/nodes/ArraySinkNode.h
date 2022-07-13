@@ -8,6 +8,7 @@ class Type;
 class ArraySinkNode : public Node
 {
 	friend class Emitter;
+	friend class Analyzer;
 
 	public:
 		ArraySinkNode(size_t size
@@ -15,7 +16,8 @@ class ArraySinkNode : public Node
 			, const Node *firstValue
 			);
 
-		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult<BaseValue>> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
+		std::vector<DzResult<BaseValue>> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
 
 	private:
 		size_t m_size;

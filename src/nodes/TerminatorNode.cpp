@@ -18,7 +18,12 @@ TerminatorNode *TerminatorNode::instance()
 	return &instance;
 }
 
-std::vector<DzResult> TerminatorNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> TerminatorNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitTerminator(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue>> TerminatorNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitTerminator(this, entryPoint, values);
 }

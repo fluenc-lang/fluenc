@@ -33,7 +33,7 @@ class EntryPoint
 			, const std::map<std::string, const BaseValue *> &locals
 			, const std::map<std::string, const Node *> &globals
 			, const std::map<std::string, Prototype *> &types
-			, const Stack &values
+			, const Stack<BaseValue> &values
 			, IteratorStorage *iteratorStorage
 			);
 
@@ -60,7 +60,7 @@ class EntryPoint
 		std::map<std::string, const Node *> globals() const;
 		std::map<std::string, Prototype *> types() const;
 
-		Stack values() const;
+		Stack<BaseValue> values() const;
 
 		IteratorStorage *iteratorStorage() const;
 
@@ -75,7 +75,7 @@ class EntryPoint
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
 		EntryPoint withName(const std::string &name) const;
 		EntryPoint withReturnValueAddress(llvm::Value *address) const;
-		EntryPoint withValues(const Stack &values) const;
+		EntryPoint withValues(const Stack<BaseValue> &values) const;
 		EntryPoint withDepth(int depth) const;
 		EntryPoint withIndex(int index) const;
 
@@ -101,7 +101,7 @@ class EntryPoint
 		std::map<std::string, const Node *> m_globals;
 		std::map<std::string, Prototype *> m_types;
 
-		Stack m_values;
+		Stack<BaseValue> m_values;
 
 		IteratorStorage *m_iteratorStorage;
 };

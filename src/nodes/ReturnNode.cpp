@@ -10,7 +10,12 @@ ReturnNode::ReturnNode(const Type *iteratorType
 {
 }
 
-std::vector<DzResult> ReturnNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> ReturnNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitReturn(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue>> ReturnNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitReturn(this, entryPoint, values);
 }

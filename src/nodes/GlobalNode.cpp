@@ -11,7 +11,12 @@ std::string GlobalNode::name() const
 	return m_name;
 }
 
-std::vector<DzResult> GlobalNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult<BaseValue>> GlobalNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+{
+	return visitor.visitGlobal(this, entryPoint, values);
+}
+
+std::vector<DzResult<BaseValue>> GlobalNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
 {
 	return visitor.visitGlobal(this, entryPoint, values);
 }
