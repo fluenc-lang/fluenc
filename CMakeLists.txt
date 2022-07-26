@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(fluenc LANGUAGES CXX)
+project(fluenc LANGUAGES C CXX)
 
 option(FLUENC_BUILD_TESTS "Build the tests for the project" OFF)
 option(FLUENC_BUILD_COMPILER "Build the compiler" ON)

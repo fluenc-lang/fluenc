@@ -13,7 +13,7 @@
 #include <llvm/Analysis/CFGPrinter.h>
 #include <llvm/Transforms/Scalar/SimplifyCFG.h>
 #include <llvm/Passes/PassBuilder.h>
-#include <llvm/Support/TargetRegistry.h>
+#include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetOptions.h>
 
@@ -448,7 +448,7 @@ int main(int argc, char **argv)
 		return strcpy(new char[argument.size() + 1], argument.c_str());
 	});
 
-	lld::elf::link(llvm::makeArrayRef(arguments), true, llvm::outs(), llvm::errs());
+    lld::elf::link(llvm::makeArrayRef(arguments), llvm::outs(), llvm::errs(), true, false);
 
 	return 0;
 }
