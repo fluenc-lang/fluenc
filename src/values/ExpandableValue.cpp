@@ -3,14 +3,21 @@
 
 #include "types/IteratorType.h"
 
-ExpandableValue::ExpandableValue(const Type *iteratorType
+ExpandableValue::ExpandableValue(bool isArray
+	, const Type *iteratorType
 	, const EntryPoint &provider
 	, const Node *chain
 	)
-	: m_iteratorType(iteratorType)
+	: m_isArray(isArray)
+	, m_iteratorType(iteratorType)
 	, m_provider(new EntryPoint(provider))
 	, m_chain(chain)
 {
+}
+
+bool ExpandableValue::isArray() const
+{
+	return m_isArray;
 }
 
 const Type *ExpandableValue::type() const

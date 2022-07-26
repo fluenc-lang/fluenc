@@ -68,11 +68,11 @@ const BaseValue *compileValue(std::string source)
 
 	for (auto &[name, global] : moduleInfo.globals)
 	{
-		auto context = std::make_unique<llvm::LLVMContext>();
-		auto module = std::make_unique<llvm::Module>("dz", *context);
+		auto context = new llvm::LLVMContext();
+		auto module = new llvm::Module("dz", *context);
 
 		auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(*context), false);
-		auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module.get());
+		auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module);
 
 		auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
 		auto block = llvm::BasicBlock::Create(*context, "block", function);
@@ -84,8 +84,8 @@ const BaseValue *compileValue(std::string source)
 			, block
 			, alloc
 			, function
-			, module.get()
-			, context.get()
+			, module
+			, context
 			, "entry"
 			, moduleInfo.functions
 			, moduleInfo.locals

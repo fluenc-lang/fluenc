@@ -1,5 +1,7 @@
 #include "values/TupleValue.h"
 
+#include "types/TupleType.h"
+
 TupleValue::TupleValue(const std::vector<const BaseValue *> &values)
 	: m_values(values)
 {
@@ -37,4 +39,9 @@ const BaseValue *TupleValue::clone(const EntryPoint &entryPoint) const
 Stack TupleValue::values() const
 {
 	return m_values;
+}
+
+bool TupleValue::isArray() const
+{
+	return m_isArray;
 }

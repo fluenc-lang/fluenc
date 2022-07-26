@@ -2552,41 +2552,118 @@ BOOST_AUTO_TEST_CASE (arrayType_2)
 	BOOST_TEST(value2->type()->compatibility(value1->type(), EntryPoint()) == -1);
 }
 
-//BOOST_AUTO_TEST_CASE (arrayTypePropagation)
-//{
-//	auto entryPoint = compile(R"(
-//		function foo((int value, ...values))
-//		{
-//			return value -> foo(...values);
-//		}
+BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
+{
+	auto entryPoint = compile(R"(
+		function foo((int value, ...values))
+		{
+			return value -> foo(...values);
+		}
 
-//		function foo(int value)
-//		{
-//			return value;
-//		}
+		function foo(int value)
+		{
+			return value;
+		}
 
-//		function bar()
-//		{
-//			return foo([1, 2]);
-//		}
-//	)");
+		function bar()
+		{
+			return foo([1, 2]);
+		}
+	)");
 
-//	auto functions = entryPoint.functions();
+	auto functions = entryPoint.functions();
 
-//	auto [_1, function] = *functions.find("bar");
+	auto [_1, function] = *functions.find("bar");
 
-//	auto functionResults = function->build(entryPoint, Stack());
+	auto functionResults = function->build(entryPoint, Stack());
 
-//	BOOST_TEST(functionResults.size() == 1);
+	BOOST_TEST(functionResults.size() == 1);
 
-//	auto [_2, functionValues] = functionResults[0];
+	auto [_2, functionValues] = functionResults[0];
 
-//	BOOST_TEST(functionValues.size() == 1);
+	BOOST_TEST(functionValues.size() == 1);
 
-//	auto lazy = functionValues.require<LazyValue>(nullptr);
+	auto lazy = functionValues.require<LazyValue>(nullptr);
 
-//	BOOST_TEST(lazy->type()->name() == "[int, int]");
-//}
+	BOOST_TEST(lazy->type()->name() == "[int, int]");
+}
+
+BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
+{
+	auto entryPoint = compile(R"(
+		function foo((int value, ...values))
+		{
+			if (value > 1)
+			{
+				return true -> foo(...values);
+			}
+
+			return false -> foo(...values);
+		}
+
+		function foo(int value)
+		{
+			return value;
+		}
+
+		function bar()
+		{
+			return foo([1, 2, 3]);
+		}
+	)");
+
+	auto functions = entryPoint.functions();
+
+	auto [_1, function] = *functions.find("bar");
+
+	auto functionResults = function->build(entryPoint, Stack());
+
+	BOOST_TEST(functionResults.size() == 1);
+
+	auto [_2, functionValues] = functionResults[0];
+
+	BOOST_TEST(functionValues.size() == 1);
+
+	auto lazy = functionValues.require<LazyValue>(nullptr);
+
+	BOOST_TEST(lazy->type()->name() == "[bool, bool, int]");
+}
+
+BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
+{
+	auto entryPoint = compile(R"(
+		function foo(int i, int count)
+		{
+			if (i < count)
+			{
+				return i -> foo(i + 1, count);
+			}
+
+			return i;
+		}
+
+		function bar()
+		{
+			return foo(0, 3);
+		}
+	)");
+
+	auto functions = entryPoint.functions();
+
+	auto [_1, function] = *functions.find("bar");
+
+	auto functionResults = function->build(entryPoint, Stack());
+
+	BOOST_TEST(functionResults.size() == 1);
+
+	auto [_2, functionValues] = functionResults[0];
+
+	BOOST_TEST(functionValues.size() == 1);
+
+	auto lazy = functionValues.require<LazyValue>(nullptr);
+
+	BOOST_TEST(lazy->type()->name() == "...");
+}
 
 BOOST_AUTO_TEST_CASE (scenario71)
 {
@@ -2981,7 +3058,7 @@ BOOST_AUTO_TEST_CASE (scenario82)
 
 		function update((Item item, ...items))
 		{
-			return tail update(item) -> update(...items);
+			return update(item) -> update(...items);
 		}
 
 		function update(Item item)

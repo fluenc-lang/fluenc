@@ -60,7 +60,7 @@ std::vector<DzResult> ReturnNode::build(const EntryPoint &entryPoint, Stack valu
 
 	if (m_chained)
 	{
-		auto expandable = new ExpandableValue(m_iteratorType, entryPoint, m_chained);
+		auto expandable = new ExpandableValue(false, m_iteratorType, entryPoint, m_chained);
 
 		auto tuple = new TupleValue({ expandable, value });
 

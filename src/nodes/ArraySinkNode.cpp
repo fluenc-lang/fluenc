@@ -20,7 +20,7 @@ std::vector<DzResult> ArraySinkNode::build(const EntryPoint &entryPoint, Stack v
 	auto arrayContents = m_firstValue->build(entryPoint, Stack());
 
 	auto generator = new ArrayValueGenerator(arrayContents, id(), m_size);
-	auto lazy = new LazyValue(generator);
+	auto lazy = new LazyValue(generator, entryPoint);
 
 	values.push(lazy);
 

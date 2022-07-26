@@ -61,7 +61,13 @@ std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stac
 
 	auto next = findExpandedValues(values);
 
-	auto value = new ExpandedValue(m_iteratorType
+	auto isArray = accumulate(begin(next), end(next), next.size() > 0, [](auto accumulated, auto value)
+	{
+		return accumulated && value->isArray();
+	});
+
+	auto value = new ExpandedValue(isArray
+		, m_iteratorType
 		, tailCallCandidate
 		, m_node
 		, this

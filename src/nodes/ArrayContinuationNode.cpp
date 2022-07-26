@@ -39,7 +39,8 @@ std::vector<DzResult> ArrayContinuationNode::build(const EntryPoint &entryPoint,
 
 	builder.createStore(add, m_index);
 
-	auto value = new ExpandedValue(m_iteratorType
+	auto value = new ExpandedValue(true
+		, m_iteratorType
 		, entryPoint
 		, m_node
 		, this

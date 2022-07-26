@@ -34,7 +34,7 @@ std::vector<DzResult> FunctionCallProxyNode::build(const EntryPoint &entryPoint,
 			if (function->attribute() == FunctionAttribute::Iterator)
 			{
 				auto generator = new IteratorValueGenerator(new IteratorType(), m_regularCall, entryPoint);
-				auto lazy = new LazyValue(generator);
+				auto lazy = new LazyValue(generator, entryPoint);
 
 				auto forwardedValues = values;
 

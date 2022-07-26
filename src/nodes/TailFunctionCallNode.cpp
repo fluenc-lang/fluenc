@@ -1,21 +1,11 @@
 #include <numeric>
 
-#include "AllIterator.h"
 #include "ZipIterator.h"
 #include "ValueHelper.h"
 #include "FunctionHelper.h"
 
 #include "nodes/TailFunctionCallNode.h"
 #include "nodes/JunctionNode.h"
-#include "nodes/CallableNode.h"
-#include "nodes/CapsuleNode.h"
-
-#include "values/LazyValue.h"
-#include "values/IteratorValueGenerator.h"
-
-#include "types/IteratorType.h"
-
-#include "iterators/ExtremitiesIterator.h"
 
 TailFunctionCallNode::TailFunctionCallNode(const std::vector<std::string> &names, const Node *regularCall)
 	: m_names(names)

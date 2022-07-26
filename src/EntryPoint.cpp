@@ -73,12 +73,15 @@ llvm::Function *EntryPoint::function() const
 
 const ReferenceValue *EntryPoint::alloc(const Type *type, const llvm::Twine &name) const
 {
-	llvm::IRBuilder<> builder(m_alloc, m_alloc->begin());
-
 	auto storageType = type->storageType(*m_context);
 
+	auto dataLayout = m_module->getDataLayout();
+
+	auto align = dataLayout.getPrefTypeAlign(storageType);
+	auto addressSpace = dataLayout.getAllocaAddrSpace();
+
 	return new ReferenceValue(type
-		, builder.CreateAlloca(storageType, nullptr, name)
+		, new llvm::AllocaInst(storageType, addressSpace, nullptr, align, name, &*m_alloc->begin())
 		);
 }
 

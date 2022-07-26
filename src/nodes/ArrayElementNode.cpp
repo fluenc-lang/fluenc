@@ -72,7 +72,7 @@ std::vector<DzResult> ArrayElementNode::build(const EntryPoint &entryPoint, Stac
 		valuesIfFalse.push(index);
 
 		auto continuation = new ArrayContinuationNode(index, m_node, IteratorType::instance());
-		auto expandable = new ExpandableValue(m_arrayType, entryPoint, continuation);
+		auto expandable = new ExpandableValue(true, m_arrayType, entryPoint, continuation);
 
 		auto tuple = new TupleValue({ expandable, value->subject() });
 
