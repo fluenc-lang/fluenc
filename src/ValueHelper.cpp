@@ -17,6 +17,7 @@
 EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *value
 	, const BaseValue *storage
+	, const Emitter &emitter
 	)
 {
 	if (auto scalarValue = dynamic_cast<const ScalarValue *>(value))
@@ -63,6 +64,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 			return transferValue(accumulatedEntryPoint
 				, valueField->value()
 				, storageField->value()
+				, emitter
 				);
 		});
 	}
@@ -75,7 +77,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 			return entryPoint;
 		}
 
-		return lazyStorage->assignFrom(entryPoint, lazyValue);
+		return lazyStorage->assignFrom(entryPoint, lazyValue, emitter);
 	}
 	else if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
 	{
@@ -93,6 +95,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 			return transferValue(accumulatedEntryPoint
 				, valueElement
 				, storageElement
+				, emitter
 				);
 		});
 	}

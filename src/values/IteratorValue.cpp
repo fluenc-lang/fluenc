@@ -1,8 +1,4 @@
 #include "values/IteratorValue.h"
-#include "EntryPoint.h"
-#include "DzTypeName.h"
-
-#include "types/IteratorType.h"
 
 IteratorValue::IteratorValue(const EntryPoint *entryPoint
 	, const Node *subject
@@ -12,19 +8,7 @@ IteratorValue::IteratorValue(const EntryPoint *entryPoint
 {
 }
 
-std::vector<DzResult> IteratorValue::build(const EntryPoint &entryPoint) const
+std::vector<DzResult> IteratorValue::accept(const Emitter &emitter, const EntryPoint &entryPoint, Stack values) const
 {
-	auto locals = entryPoint.locals();
-
-	for (auto &[key, value] : m_entryPoint->locals())
-	{
-		locals[key] = value;
-	}
-
-	auto ep = (*m_entryPoint)
-		.withBlock(entryPoint.block())
-		.withLocals(locals)
-		.withIteratorStorage(entryPoint.iteratorStorage());
-
-	return m_subject->build(ep, Stack());
+	return emitter.visitIteratorValue(this, entryPoint, values);
 }

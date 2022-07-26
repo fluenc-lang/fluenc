@@ -5,10 +5,8 @@
 
 class EntryPoint;
 
-class IIteratable
+class IIteratable : public Visitable<Emitter>
 {
-	public:
-		virtual std::vector<DzResult> build(const EntryPoint &entryPoint) const = 0;
 };
 
 #endif // IITERATABLE_H

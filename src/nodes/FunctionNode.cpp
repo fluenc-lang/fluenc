@@ -1,27 +1,9 @@
-#include <map>
 #include <algorithm>
-#include <sstream>
-#include <iostream>
-
-#include <llvm/IR/Type.h>
-#include <llvm/IR/IRBuilder.h>
+#include <numeric>
 
 #include "nodes/FunctionNode.h"
 
 #include "DzArgument.h"
-#include "DzTypeName.h"
-#include "EntryPoint.h"
-#include "AllIterator.h"
-#include "Type.h"
-#include "IndexIterator.h"
-#include "DzTupleArgument.h"
-
-#include "values/ExpandableValue.h"
-#include "values/ScalarValue.h"
-#include "values/TupleValue.h"
-#include "values/BaseValue.h"
-#include "values/UserTypeValue.h"
-#include "values/NamedValue.h"
 
 FunctionNode::FunctionNode(FunctionAttribute attribute
 	, const std::string &name
@@ -87,78 +69,7 @@ int8_t FunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const 
 	});
 }
 
-std::vector<DzResult> FunctionNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FunctionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	auto pep = entryPoint
-		.withValues(values);
-
-	std::map<std::string, const BaseValue *> locals;
-
-	for (const auto &argument : m_arguments)
-	{
-		for (auto &[name, value] : handleArgument(argument, entryPoint, values.pop()))
-		{
-			locals[name] = value;
-		}
-	}
-
-	auto ep = pep
-		.withName(m_name)
-		.markEntry()
-		.withLocals(locals)
-		.withIteratorStorage(nullptr);
-
-	return m_block->build(ep, values);
-}
-
-std::vector<FunctionNode::Argument> FunctionNode::handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const
-{
-	if (auto standardArgument = dynamic_cast<DzArgument *>(argument))
-	{
-		auto name = standardArgument->name();
-
-		std::vector<Argument> result
-		{
-			{ name, value }
-		};
-
-		if (auto userValue = dynamic_cast<const UserTypeValue * >(value))
-		{
-			auto fields = userValue->fields();
-
-			std::transform(begin(fields), end(fields), std::back_inserter(result), [=](auto field) -> Argument
-			{
-				std::stringstream ss;
-				ss << name;
-				ss << ".";
-				ss << field->name();
-
-				return { ss.str(), field->value() };
-			});
-		}
-
-		return result;
-	}
-
-	if (auto tupleArgument = dynamic_cast<DzTupleArgument *>(argument))
-	{
-		auto tupleValue = dynamic_cast<const TupleValue *>(value);
-
-		auto tupleValues = tupleValue->values();
-		auto arguments = tupleArgument->arguments();
-
-		std::vector<Argument> results;
-
-		for (auto argument : arguments)
-		{
-			for (auto &result : handleArgument(argument, entryPoint, tupleValues.pop()))
-			{
-				results.push_back(result);
-			}
-		}
-
-		return results;
-	}
-
-	throw new std::exception();
+	return visitor.visitFunction(this, entryPoint, values);
 }

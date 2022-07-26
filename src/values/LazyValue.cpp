@@ -1,10 +1,7 @@
 #include "ValueHelper.h"
 #include "IteratorStorage.h"
-#include "IRBuilderEx.h"
 #include "FunctionHelper.h"
 
-#include "types/IteratorType.h"
-#include "types/Int64Type.h"
 #include "types/ArrayType.h"
 
 #include "values/LazyValue.h"
@@ -13,8 +10,6 @@
 #include "values/ArrayValueGenerator.h"
 #include "values/TupleValue.h"
 #include "values/ExpandableValue.h"
-#include "values/ScalarValue.h"
-#include "values/IndexedValue.h"
 
 using ElementType = std::pair<bool, const Type *>;
 
@@ -38,8 +33,10 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 			auto chain = expandable->chain();
 			auto provider = expandable->provider();
 
+			Emitter emitter;
+
 			auto chainEntryPoint = provider->withBlock(entryPoint.block());
-			auto chainResult = chain->build(chainEntryPoint, Stack());
+			auto chainResult = chain->accept(emitter, chainEntryPoint, Stack());
 
 			auto [_, chainValues] = *chainResult.begin();
 
@@ -73,7 +70,9 @@ const Type *LazyValue::type() const
 
 	auto iteratable = m_generator->generate(entryPoint);
 
-	auto results = iteratable->build(entryPoint);
+	Emitter emitter;
+
+	auto results = iteratable->accept(emitter, entryPoint, Stack());
 
 	std::map<int, const Type *> typesByIndex;
 
@@ -125,7 +124,7 @@ const IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
 	return m_generator->generate(entryPoint);
 }
 
-EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const
+EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *source, const Emitter &emitter) const
 {
 	auto block = entryPoint.block();
 
@@ -154,7 +153,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		throw new std::exception();
 	}
 
-	auto iteratableResults = iteratable->build(entryPoint);
+	auto iteratableResults = iteratable->accept(emitter, entryPoint, Stack());
 
 	for (auto i = 0u; i < iteratableResults.size(); i++)
 	{
@@ -176,6 +175,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 			auto resultEntryPoint = ValueHelper::transferValue(sourceResultEntryPoint
 				, sourceTupleValues.pop()
 				, targetValue
+				, emitter
 				);
 
 			auto sourceContinuation = sourceTupleValues.require<ExpandableValue>(nullptr);
@@ -185,7 +185,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 			auto sourceContinuationEntryPoint = sourceProvider->withBlock(resultEntryPoint.block());
 
-			for (auto &[chainEntryPoint, chainValues] : sourceChain->build(sourceContinuationEntryPoint, Stack()))
+			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, sourceContinuationEntryPoint, Stack()))
 			{
 				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, chainValues);
 
@@ -199,6 +199,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 			auto resultEntryPoint = ValueHelper::transferValue(sourceResultEntryPoint
 				, sourceValue
 				, targetValue
+				, emitter
 				);
 
 			linkBlocks(resultEntryPoint.block(), exitBlock);

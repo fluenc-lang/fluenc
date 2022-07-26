@@ -35,7 +35,9 @@ std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint) cons
 
 		if (defaultValue)
 		{
-			auto defaultResults = defaultValue->build(entryPoint, Stack());
+			Emitter emitter;
+
+			auto defaultResults = defaultValue->accept(emitter, entryPoint, Stack());
 
 			auto &[_, defaultValues] = *defaultResults.begin();
 

@@ -11,6 +11,8 @@ class LazyValue;
 
 class ArrayValue : public IIteratable
 {
+	friend class Emitter;
+
 	public:
 		ArrayValue(const ReferenceValue *index
 			, const Type *type
@@ -18,7 +20,7 @@ class ArrayValue : public IIteratable
 			, size_t size
 			);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
+		std::vector<DzResult> accept(const Emitter &emitter, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		static const Node *createIterator(const IIteratable *parent, const Type *type, size_t size);

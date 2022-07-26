@@ -1,9 +1,4 @@
-#include <llvm/IR/Constants.h>
-
 #include "nodes/BooleanLiteralNode.h"
-
-#include "types/BooleanType.h"
-#include "values/ScalarValue.h"
 
 BooleanLiteralNode::BooleanLiteralNode(const Node *consumer, const std::string &value)
 	: m_consumer(consumer)
@@ -11,30 +6,7 @@ BooleanLiteralNode::BooleanLiteralNode(const Node *consumer, const std::string &
 {
 }
 
-const ScalarValue *BooleanLiteralNode::resolveValue(const EntryPoint &entryPoint) const
+std::vector<DzResult> BooleanLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	auto context = entryPoint.context();
-
-	auto type = BooleanType::instance();
-
-	if (m_value == "true")
-	{
-		return new ScalarValue { type, llvm::ConstantInt::get(type->storageType(*context), 1) };
-	}
-
-	if (m_value == "false")
-	{
-		return new ScalarValue { type, llvm::ConstantInt::get(type->storageType(*context), 0) };
-	}
-
-	throw new std::exception(); // TODO
-}
-
-std::vector<DzResult> BooleanLiteralNode::build(const EntryPoint &entryPoint, Stack values) const
-{
-	auto value = resolveValue(entryPoint);
-
-	values.push(value);
-
-	return m_consumer->build(entryPoint, values);
+	return visitor.visitBooleanLiteral(this, entryPoint, values);
 }

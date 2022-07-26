@@ -5,10 +5,12 @@
 
 class StringIteratable : public IIteratable
 {
+	friend class Emitter;
+
 	public:
 		StringIteratable(const ReferenceValue *index, const Node *node, llvm::Value *address, size_t length);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		const ReferenceValue *m_index;

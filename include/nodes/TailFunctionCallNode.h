@@ -12,10 +12,12 @@
 
 class TailFunctionCallNode : public Node
 {
+	friend class Emitter;
+
 	public:
 		TailFunctionCallNode(const std::vector<std::string> &names, const Node *regularCall);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 		int order(const EntryPoint &entryPoint) const override;
 

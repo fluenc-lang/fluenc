@@ -6,13 +6,7 @@ IndexSinkNode::IndexSinkNode(size_t index, const Node *consumer)
 {
 }
 
-std::vector<DzResult> IndexSinkNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IndexSinkNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	auto value = values.pop();
-
-	auto indexed = new IndexedValue(m_index, value);
-
-	values.push(indexed);
-
-	return m_consumer->build(entryPoint, values);
+	return visitor.visitIndexSink(this, entryPoint, values);
 }

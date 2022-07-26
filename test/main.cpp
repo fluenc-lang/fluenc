@@ -3,7 +3,6 @@
 #include "TestHelpers.h"
 
 #include "values/LazyValue.h"
-#include "values/TupleValue.h"
 
 #include "types/AnyType.h"
 #include "types/Prototype.h"
@@ -2575,7 +2574,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	auto [_1, function] = *functions.find("bar");
 
-	auto functionResults = function->build(entryPoint, Stack());
+	Emitter emitter;
+
+	auto functionResults = function->accept(emitter, entryPoint, Stack());
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2616,7 +2617,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	auto [_1, function] = *functions.find("bar");
 
-	auto functionResults = function->build(entryPoint, Stack());
+	Emitter emitter;
+
+	auto functionResults = function->accept(emitter, entryPoint, Stack());
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2652,7 +2655,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	auto [_1, function] = *functions.find("bar");
 
-	auto functionResults = function->build(entryPoint, Stack());
+	Emitter emitter;
+
+	auto functionResults = function->accept(emitter, entryPoint, Stack());
 
 	BOOST_TEST(functionResults.size() == 1);
 

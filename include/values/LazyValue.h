@@ -21,7 +21,7 @@ class LazyValue : public BaseValueWithMetadata<LazyValueMetadata>
 
 		const IIteratable *generate(const EntryPoint &entryPoint) const;
 
-		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;
+		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source, const Emitter &emitter) const;
 
 	private:
 		const ILazyValueGenerator *m_generator;

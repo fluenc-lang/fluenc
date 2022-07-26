@@ -1,23 +1,6 @@
-#include <llvm/IR/IRBuilder.h>
+#include "DzArgument.h"
 
 #include "nodes/ImportedFunctionNode.h"
-#include "DzTypeName.h"
-#include "DzArgument.h"
-#include "AllIterator.h"
-#include "Type.h"
-#include "IndexIterator.h"
-#include "InteropHelper.h"
-#include "IRBuilderEx.h"
-
-#include "types/VoidType.h"
-#include "types/Prototype.h"
-
-#include "values/ScalarValue.h"
-#include "values/UserTypeValue.h"
-#include "values/ReferenceValue.h"
-#include "values/StringValue.h"
-
-#include "exceptions/InvalidArgumentTypeException.h"
 
 #include "iterators/ExtremitiesIterator.h"
 
@@ -79,68 +62,7 @@ int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 	return max;
 }
 
-std::vector<DzResult> ImportedFunctionNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ImportedFunctionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	auto module = entryPoint.module();
-	auto context = entryPoint.context();
-
-	auto returnType = m_returnType->resolve(entryPoint);
-
-	std::vector<llvm::Type *> argumentTypes;
-	std::vector<llvm::Value *> argumentValues;
-
-	IRBuilderEx builder(entryPoint);
-
-	for (const auto &argument : m_arguments)
-	{
-		if (auto standardArgument  = dynamic_cast<DzArgument *>(argument))
-		{
-			auto name = standardArgument->name();
-			auto type = standardArgument->type(entryPoint);
-
-			auto storageType = type->storageType(*context);
-
-			argumentTypes.push_back(storageType);
-
-			auto value = values.pop();
-
-			if (auto addressOfArgument = dynamic_cast<const ReferenceValue *>(value))
-			{
-				auto load = builder.createLoad(addressOfArgument, name);
-
-				argumentValues.push_back(*load);
-			}
-			else if (auto stringValue = dynamic_cast<const StringValue *>(value))
-			{
-				auto load = builder.createLoad(stringValue->reference());
-
-				argumentValues.push_back(*load);
-			}
-			else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
-			{
-				auto cast = InteropHelper::createWriteProxy(userTypeValue, entryPoint);
-
-				argumentValues.push_back(cast);
-			}
-		}
-		else
-		{
-			throw new InvalidArgumentTypeException(m_ast);
-		}
-	}
-
-	llvm::FunctionType *functionType = llvm::FunctionType::get(returnType->storageType(*context), argumentTypes, false);
-
-	auto function = module->getOrInsertFunction(m_name, functionType);
-
-	auto call = builder.createCall(function, argumentValues);
-
-	if (returnType != VoidType::instance())
-	{
-		auto returnValue = InteropHelper::createReadProxy(call, returnType, entryPoint, m_ast);
-
-		values.push(returnValue);
-	}
-
-	return {{ entryPoint, values }};
+	return visitor.visitImportedFunction(this, entryPoint, values);
 }

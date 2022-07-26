@@ -95,7 +95,9 @@ const BaseValue *compileValue(std::string source)
 			, nullptr
 			);
 
-		for (auto &[_, values] : global->build(entryPoint, Stack()))
+		Emitter emitter;
+
+		for (auto &[_, values] : global->accept(emitter, entryPoint, Stack()))
 		{
 			return *values.begin();
 		}
@@ -185,9 +187,11 @@ int exec(std::string source)
 		, nullptr
 		);
 
+	Emitter emitter;
+
 	for (auto root : moduleInfo.roots)
 	{
-		root->build(entryPoint, Stack());
+		root->accept(emitter, entryPoint, Stack());
 	}
 
 	module->print(llvm::errs(), nullptr);

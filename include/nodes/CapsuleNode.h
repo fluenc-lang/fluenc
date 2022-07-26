@@ -8,8 +8,6 @@ class CapsuleNode : public Node
 	public:
 		CapsuleNode(const Stack &values, const Node *subject);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
-
 	private:
 		Stack m_values;
 

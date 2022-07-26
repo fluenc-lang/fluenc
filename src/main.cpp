@@ -27,6 +27,7 @@
 #include "CompilerException.h"
 #include "Visitor.h"
 #include "ModuleInfo.h"
+#include "Emitter.h"
 
 #include "nodes/CallableNode.h"
 
@@ -316,9 +317,11 @@ int main(int argc, char **argv)
 
 			try
 			{
+				Emitter emitter;
+
 				for (auto root : module.roots)
 				{
-					root->build(entryPoint, values);
+					root->accept(emitter, entryPoint, values);
 				}
 
 				llvmModule->print(llvm::errs(), nullptr);

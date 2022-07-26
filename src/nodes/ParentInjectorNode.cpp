@@ -21,14 +21,9 @@ bool ParentInjectorNode::containsIterator() const
 	return m_subject->containsIterator();
 }
 
-std::vector<DzResult> ParentInjectorNode::build(const EntryPoint &entryPoint, Stack values) const
+const IBlockInstruction *ParentInjectorNode::inject(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType> > > &nodes, const std::vector<std::string> &namespaces, const Type *iteratorType, const Node *node, const Node *alpha, const Node *beta)
 {
-	return m_subject->build(entryPoint, values);
-}
-
-const IBlockInstruction *ParentInjectorNode::inject(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType> > > &nodes, const std::vector<std::string> &namespaces, const Type *iteratorType, const Node *kask, const Node *alpha, const Node *beta)
-{
-	Visitor visitor(namespaces, iteratorType, kask, alpha, beta);
+	Visitor visitor(namespaces, iteratorType, node, alpha, beta);
 
 	auto first = rbegin(nodes);
 
@@ -38,10 +33,10 @@ const IBlockInstruction *ParentInjectorNode::inject(const std::vector<std::share
 	{
 		auto stackFrame = new BlockStackFrameNode(consumer);
 
-		Visitor visitor(namespaces, iteratorType, kask, stackFrame, alpha);
+		Visitor visitor(namespaces, iteratorType, node, stackFrame, alpha);
 
 		auto value = visitor
-				.visitExpression(expression);
+			.visitExpression(expression);
 
 		if (auto instruction = dynamic_cast<const IBlockInstruction *>(value))
 		{
@@ -54,4 +49,9 @@ const IBlockInstruction *ParentInjectorNode::inject(const std::vector<std::share
 			, consumer->containsIterator()
 			);
 	});
+}
+
+std::vector<DzResult> ParentInjectorNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitParentInjector(this, entryPoint, values);
 }

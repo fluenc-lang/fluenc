@@ -10,12 +10,14 @@ class ITypeName;
 
 class IteratorValue : public IIteratable
 {
+	friend class Emitter;
+
 	public:
 		IteratorValue(const EntryPoint *entryPoint
 			, const Node *subject
 			);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint) const override;
+		std::vector<DzResult> accept(const Emitter &emitter, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		const EntryPoint *m_entryPoint;

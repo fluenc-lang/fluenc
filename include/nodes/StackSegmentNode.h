@@ -5,12 +5,14 @@
 
 class StackSegmentNode : public Node
 {
+	friend class Emitter;
+
 	public:
 		StackSegmentNode(std::vector<Node *> values, const Node *call, const Node *consumer);
 
 		int order(const EntryPoint &entryPoint) const override;
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		std::vector<Node *> m_values;

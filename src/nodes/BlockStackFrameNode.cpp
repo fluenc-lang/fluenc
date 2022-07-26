@@ -7,9 +7,9 @@ BlockStackFrameNode::BlockStackFrameNode(Node *consumer)
 {
 }
 
-std::vector<DzResult> BlockStackFrameNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> BlockStackFrameNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	UNUSED(values);
 
-	return m_consumer->build(entryPoint, Stack());
+	return visitor.visitBlockStackFrame(this, entryPoint, Stack());
 }

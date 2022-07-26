@@ -7,10 +7,12 @@ class ScalarValue;
 
 class BooleanLiteralNode : public Node
 {
+	friend class Emitter;
+
 	public:
 		BooleanLiteralNode(const Node *consumer, const std::string &value);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		const ScalarValue *resolveValue(const EntryPoint &entryPoint) const;
