@@ -6,10 +6,7 @@
 #include "ITypeName.h"
 #include "UndeclaredIdentifierException.h"
 #include "IteratorStorage.h"
-#include "FunctionNotFoundException.h"
 #include "FunctionHelper.h"
-#include "Indexed.h"
-#include "IndexIterator.h"
 #include "IPrototypeProvider.h"
 #include "DzArgument.h"
 #include "DzTupleArgument.h"
@@ -78,12 +75,6 @@
 #include "nodes/BlockStackFrameNode.h"
 #include "nodes/IteratableNode.h"
 
-#include "exceptions/InvalidFunctionPointerTypeException.h"
-#include "exceptions/MissingTailCallException.h"
-#include "exceptions/AmbiguousFunctionException.h"
-#include "exceptions/MissingDefaultValueException.h"
-#include "exceptions/MissingFieldException.h"
-
 class DummyValueMetadata : public ValueMetadata
 {
 	public:
@@ -123,19 +114,8 @@ std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, const EntryP
 	auto right = ValueHelper::getScalar(entryPoint, values);
 
 	auto leftType = left->type();
-	auto rightType = right->type();
-
-	if (leftType->compatibility(rightType, entryPoint) > 0)
-	{
-		throw new std::exception(); // TODO
-	}
 
 	auto operators = leftType->operators();
-
-	if (!operators)
-	{
-		throw new std::exception(); // TODO
-	}
 
 	IRBuilderEx builder(entryPoint);
 
@@ -174,28 +154,15 @@ std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, 
 {
 	Stack valuesIfTrue;
 
-	auto context = entryPoint.context();
-	auto module = entryPoint.module();
-
-	auto dataLayout = module->getDataLayout();
-
 	auto index = values.require<ReferenceValue>(nullptr);
 	auto value = values.require<IndexedValue>(nullptr);
+
+	auto ep = entryPoint
+		.withIndex(value->index());
 
 	if (node->m_next)
 	{
 		auto valuesIfFalse = values;
-
-		auto ifTrue = llvm::BasicBlock::Create(*context);
-		auto ifFalse = llvm::BasicBlock::Create(*context);
-
-		auto epIfFalse = entryPoint
-			.withIndex(value->index())
-			.withBlock(ifFalse);
-
-		auto epIfTrue = entryPoint
-			.withIndex(value->index())
-			.withBlock(ifTrue);
 
 		valuesIfFalse.push(index);
 
@@ -206,17 +173,14 @@ std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, 
 
 		valuesIfTrue.push(tuple);
 
-		auto resultsIfFalse = node->m_next->accept(*this, epIfFalse, valuesIfFalse);
+		auto resultsIfFalse = node->m_next->accept(*this, ep, valuesIfFalse);
 
-		std::vector<DzResult> result = {{ epIfTrue, valuesIfTrue }};
+		std::vector<DzResult> result = {{ ep, valuesIfTrue }};
 
 		result.insert(end(result), begin(resultsIfFalse), end(resultsIfFalse));
 
 		return result;
 	}
-
-	auto ep = entryPoint
-		.withIndex(value->index());
 
 	values.push(value->subject());
 
@@ -309,38 +273,9 @@ std::vector<DzResult> Analyzer::visitStringLiteral(const StringLiteralNode *node
 
 std::vector<DzResult> Analyzer::visitCharacterLiteral(const CharacterLiteralNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	auto context = entryPoint.context();
-
 	auto type = Int32Type::instance();
-	auto storageType = type->storageType(*context);
 
-	auto valueProvider = [&]
-	{
-		static std::unordered_map<std::string, std::string> sequences =
-		{
-			{ "\\n", "\n" },
-			{ "\\r", "\r" },
-			{ "\\t", "\t" },
-			{ "\\0", "\0" },
-		};
-
-		auto iterator = sequences.find(node->m_value);
-
-		if (iterator != sequences.end())
-		{
-			return llvm::ConstantInt::get((llvm::IntegerType *)storageType
-				, *iterator->second.begin()
-				);
-		}
-
-		return llvm::ConstantInt::get((llvm::IntegerType *)storageType
-			, *node->m_value.begin()
-			);
-	};
-
-	auto value = new ScalarValue(type
-		, valueProvider()
-		);
+	auto value = new DummyValue(type);
 
 	values.push(value);
 
@@ -606,11 +541,6 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 			{
 				auto value = dynamic_cast<const FunctionValue *>(local->second);
 
-				if (!value)
-				{
-					throw new InvalidFunctionPointerTypeException(node->m_ast, name);
-				}
-
 				return value->function();
 			}
 
@@ -627,18 +557,6 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 					continue;
 				}
 
-				auto candidate = candidates.find(score);
-
-				if (candidate != candidates.end())
-				{
-					std::vector<CallableNode *> functions = { candidate->second, function };
-
-					throw new AmbiguousFunctionException(node->m_ast
-						, functions
-						, entryPoint
-						);
-				}
-
 				candidates[score] = function;
 			}
 
@@ -653,22 +571,11 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 		return nullptr;
 	};
 
-	auto [score, _1, _2] = FunctionHelper::tryCreateTailCall(entryPoint, values, begin(node->m_names), end(node->m_names));
-
-	if (score == 0)
-	{
-		throw new MissingTailCallException(node->m_ast);
-	}
-
-	auto context = entryPoint.context();
-
 	std::vector<DzResult> result;
 
 	for (auto &[resultEntryPoint, resultValues] : node->m_evaluation->accept(*this, entryPoint, values))
 	{
 		auto locals = resultEntryPoint.locals();
-		auto parent = resultEntryPoint.function();
-		auto block = resultEntryPoint.block();
 
 		std::vector<const Type *> types;
 
@@ -678,11 +585,6 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 		});
 
 		auto function = findFunction(types);
-
-		if (!function)
-		{
-			throw new FunctionNotFoundException(node->m_ast, node->m_names[0], types);
-		}
 
 		if (function->attribute() == FunctionAttribute::Import)
 		{
@@ -708,25 +610,13 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 	std::vector<DzResult> result;
 	std::vector<DzResult> input = {{ entryPoint, Stack() }};
 
-	std::vector<Indexed<Node *>> orderedValues;
-
-	std::transform(begin(node->m_values), end(node->m_values), index_iterator(), std::back_inserter(orderedValues), [](auto value, auto index) -> Indexed<Node *>
-	{
-		return { index, value };
-	});
-
-	std::sort(begin(orderedValues), end(orderedValues), [=](auto first, auto second)
-	{
-		return first.value->order(entryPoint) < second.value->order(entryPoint);
-	});
-
-	auto subjectResults = std::accumulate(begin(orderedValues), end(orderedValues), input, [&](auto accumulator, auto argument)
+	auto subjectResults = std::accumulate(rbegin(node->m_values), rend(node->m_values), input, [&](auto accumulator, auto argument)
 	{
 		std::vector<DzResult> results;
 
 		for (auto &[accumulatorEntryPoint, accumulatorValues] : accumulator)
 		{
-			auto result = argument.value->accept(*this, accumulatorEntryPoint, Stack());
+			auto result = argument->accept(*this, accumulatorEntryPoint, Stack());
 
 			for (auto &[resultEntryPoint, resultValues] : result)
 			{
@@ -734,9 +624,7 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 
 				for (auto resultValue : resultValues)
 				{
-					auto returnValue = new IndexedValue{ argument.index, resultValue };
-
-					scopedReturnValues.push(returnValue);
+					scopedReturnValues.push(resultValue);
 				}
 
 				results.push_back({ resultEntryPoint, scopedReturnValues });
@@ -748,23 +636,7 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 
 	for (auto &[subjectEntryPoint, subjectValues] : subjectResults)
 	{
-		std::multimap<int, const BaseValue *, std::greater<int>> indexedValues;
-
-		for (auto &value : subjectValues)
-		{
-			auto indexed = static_cast<const IndexedValue *>(value);
-
-			indexedValues.insert({ indexed->index(), indexed->subject() });
-		}
-
-		Stack pointersToValues;
-
-		for (auto [_, value] : indexedValues)
-		{
-			pointersToValues.push(value);
-		}
-
-		auto callResults = node->m_call->accept(*this, subjectEntryPoint, pointersToValues);
+		auto callResults = node->m_call->accept(*this, subjectEntryPoint, subjectValues);
 
 		for (auto &[callEntryPoint, callValues] : callResults)
 		{
@@ -878,18 +750,8 @@ std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node
 			return new NamedValue { field.name(), value };
 		}
 
-		if (!field.defaultValue())
-		{
-			throw new MissingDefaultValueException(node->m_ast, field.name());
-		}
-
 		return new NamedValue { field.name(), field.defaultValue() };
 	});
-
-	for (auto &[name, _] : valuesByName)
-	{
-		throw new MissingFieldException(node->m_ast, prototype->name(), name);
-	}
 
 	auto userTypeValue = new UserTypeValue(prototype, namedValues);
 
