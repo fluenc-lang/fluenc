@@ -49,7 +49,7 @@ class EntryPoint;
 template<typename TVisitor>
 struct VisitableImpl
 {
-	virtual std::vector<DzResult<typename TVisitor::ReturnType>> accept(const TVisitor &visitor, const EntryPoint &entryPoint, Stack<typename TVisitor::ReturnType> values) const = 0;
+	virtual std::vector<DzResult> accept(const TVisitor &visitor, const EntryPoint &entryPoint, Stack values) const = 0;
 };
 
 template<typename ...TVisitor>
@@ -64,46 +64,46 @@ class NodeVisitor
 	public:
 		using ReturnType = T;
 
-		virtual std::vector<DzResult<T>> visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitArrayContinuation(const ArrayContinuationNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitArrayElement(const ArrayElementNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitIntegralLiteral(const IntegralLiteralNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitFloatLiteral(const FloatLiteralNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitBooleanLiteral(const BooleanLiteralNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitStringLiteral(const StringLiteralNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitCharacterLiteral(const CharacterLiteralNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitNothing(const NothingNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitMemberAccess(const MemberAccessNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitReferenceSink(const ReferenceSinkNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitLazyEvaluation(const LazyEvaluationNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitFunctionCall(const FunctionCallNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitStackSegment(const StackSegmentNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitFunctionCallProxy(const FunctionCallProxyNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitJunction(const JunctionNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitInstantiation(const InstantiationNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitConditional(const ConditionalNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitBlockInstruction(const BlockInstructionNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitEmptyArray(const EmptyArrayNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitIndexSink(const IndexSinkNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitArraySink(const ArraySinkNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitExpansion(const ExpansionNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitLocal(const LocalNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitContinuation(const ContinuationNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitUnary(const UnaryNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitTailFunctionCall(const TailFunctionCallNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitFunction(const FunctionNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitExportedFunctionTerminator(const ExportedFunctionTerminatorNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitImportedFunction(const ImportedFunctionNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitGlobal(const GlobalNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitReturn(const ReturnNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitParentInjector(const ParentInjectorNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitBlockStackFrame(const BlockStackFrameNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitTerminator(const TerminatorNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitIteratable(const IteratableNode *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitArrayValue(const ArrayValue *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitIteratorValue(const IteratorValue *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
-		virtual std::vector<DzResult<T>> visitStringIteratable(const StringIteratable *node, const EntryPoint &entryPoint, Stack<T> values) const = 0;
+		virtual std::vector<DzResult> visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitArrayContinuation(const ArrayContinuationNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitArrayElement(const ArrayElementNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitIntegralLiteral(const IntegralLiteralNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitFloatLiteral(const FloatLiteralNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitBooleanLiteral(const BooleanLiteralNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitStringLiteral(const StringLiteralNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitCharacterLiteral(const CharacterLiteralNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitNothing(const NothingNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitMemberAccess(const MemberAccessNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitReferenceSink(const ReferenceSinkNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitLazyEvaluation(const LazyEvaluationNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitFunctionCall(const FunctionCallNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitStackSegment(const StackSegmentNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitFunctionCallProxy(const FunctionCallProxyNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitJunction(const JunctionNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitInstantiation(const InstantiationNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitConditional(const ConditionalNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitBlockInstruction(const BlockInstructionNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitEmptyArray(const EmptyArrayNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitIndexSink(const IndexSinkNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitArraySink(const ArraySinkNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitExpansion(const ExpansionNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitLocal(const LocalNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitContinuation(const ContinuationNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitUnary(const UnaryNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitTailFunctionCall(const TailFunctionCallNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitFunction(const FunctionNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitExportedFunctionTerminator(const ExportedFunctionTerminatorNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitImportedFunction(const ImportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitGlobal(const GlobalNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitReturn(const ReturnNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitParentInjector(const ParentInjectorNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitBlockStackFrame(const BlockStackFrameNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitTerminator(const TerminatorNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitIteratable(const IteratableNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitArrayValue(const ArrayValue *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitIteratorValue(const IteratorValue *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitStringIteratable(const StringIteratable *node, const EntryPoint &entryPoint, Stack values) const = 0;
 };
 
 #endif // NODEVISITOR_H

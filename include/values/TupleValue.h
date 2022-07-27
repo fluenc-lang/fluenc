@@ -21,7 +21,7 @@ class TupleValue : public BaseValueWithMetadata<TupleValueMetadata>
 
 		const Type *iteratorType() const;
 
-		Stack<BaseValue> values() const;
+		Stack values() const;
 
 		bool isArray() const;
 

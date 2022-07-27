@@ -7,7 +7,7 @@ DefaultPrototypeProvider::DefaultPrototypeProvider(ITypeName *type)
 {
 }
 
-IPrototype *DefaultPrototypeProvider::provide(const EntryPoint &entryPoint, Stack<BaseValue> &values) const
+IPrototype *DefaultPrototypeProvider::provide(const EntryPoint &entryPoint, Stack &values) const
 {
 	UNUSED(values);
 

@@ -15,8 +15,8 @@ class IntegralLiteralNode : public Node
 	public:
 		IntegralLiteralNode(const Node *consumer, ITypeName *type, const std::string &value);
 
-		std::vector<DzResult<BaseValue>> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
-		std::vector<DzResult<BaseValue>> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		llvm::ConstantInt *getValue(llvm::Type *storageType) const;

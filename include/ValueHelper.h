@@ -19,7 +19,7 @@ class ValueHelper
 			);
 
 		static const ScalarValue *getScalar(const EntryPoint &entryPoint, const BaseValue *value);
-		static const ScalarValue *getScalar(const EntryPoint &entryPoint, Stack<BaseValue> &values);
+		static const ScalarValue *getScalar(const EntryPoint &entryPoint, Stack &values);
 
 		template<typename T, typename TContainer>
 		static std::vector<const T *> extractValues(TContainer container)

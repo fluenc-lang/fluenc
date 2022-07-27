@@ -2,15 +2,15 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
-std::tuple<int8_t, const EntryPoint *, Stack<BaseValue> > FunctionHelper::tryCreateTailCall(const EntryPoint &entryPoint
-	, const Stack<BaseValue> &values
+std::tuple<int8_t, const EntryPoint *, Stack> FunctionHelper::tryCreateTailCall(const EntryPoint &entryPoint
+	, const Stack &values
 	, const std::vector<std::string>::const_iterator &name
 	, const std::vector<std::string>::const_iterator &end
 	)
 {
 	if (name == end)
 	{
-		return { -1, nullptr, Stack<BaseValue>() };
+		return { -1, nullptr, Stack() };
 	}
 
 	auto tailCallCandidate = entryPoint

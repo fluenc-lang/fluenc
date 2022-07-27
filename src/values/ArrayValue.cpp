@@ -7,7 +7,7 @@
 
 ArrayValue::ArrayValue(const ReferenceValue *index
 	, const Type *type
-	, const std::vector<DzResult<BaseValue> > &values
+	, const std::vector<DzResult > &values
 	, size_t size
 	)
 	: m_index(index)
@@ -16,12 +16,12 @@ ArrayValue::ArrayValue(const ReferenceValue *index
 {
 }
 
-std::vector<DzResult<BaseValue>> ArrayValue::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ArrayValue::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitArrayValue(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue> > ArrayValue::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult > ArrayValue::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitArrayValue(this, entryPoint, values);
 }

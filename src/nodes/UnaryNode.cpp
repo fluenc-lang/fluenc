@@ -6,12 +6,12 @@ UnaryNode::UnaryNode(const Node *consumer, const std::string &op)
 {
 }
 
-std::vector<DzResult<BaseValue>> UnaryNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> UnaryNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitUnary(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue>> UnaryNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> UnaryNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitUnary(this, entryPoint, values);
 }

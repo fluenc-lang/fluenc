@@ -10,7 +10,7 @@ class DefaultPrototypeProvider : public IPrototypeProvider
 	public:
 		DefaultPrototypeProvider(ITypeName *type);
 
-		IPrototype *provide(const EntryPoint &entryPoint, Stack<BaseValue> &values) const override;
+		IPrototype *provide(const EntryPoint &entryPoint, Stack &values) const override;
 
 	private:
 		ITypeName *m_type;

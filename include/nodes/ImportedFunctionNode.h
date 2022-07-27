@@ -11,6 +11,7 @@ class ITypeName;
 class ImportedFunctionNode : public CallableNode
 {
 	friend class Emitter;
+	friend class Analyzer;
 
 	public:
 		ImportedFunctionNode(ITypeName *returnType
@@ -26,8 +27,8 @@ class ImportedFunctionNode : public CallableNode
 
 		int8_t signatureCompatibility(const EntryPoint &entryPoint, const std::vector<const Type *> &values) const override;
 
-		std::vector<DzResult<BaseValue>> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
-		std::vector<DzResult<BaseValue>> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		ITypeName *m_returnType;

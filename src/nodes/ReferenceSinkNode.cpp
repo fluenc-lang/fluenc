@@ -5,12 +5,12 @@ ReferenceSinkNode::ReferenceSinkNode(const Node *consumer)
 {
 }
 
-std::vector<DzResult<BaseValue>> ReferenceSinkNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ReferenceSinkNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitReferenceSink(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue>> ReferenceSinkNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ReferenceSinkNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitReferenceSink(this, entryPoint, values);
 }

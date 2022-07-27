@@ -33,12 +33,12 @@ int8_t ExportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 	return 0;
 }
 
-std::vector<DzResult<BaseValue>> ExportedFunctionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ExportedFunctionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitExportedFunction(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue> > ExportedFunctionNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult > ExportedFunctionNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitExportedFunction(this, entryPoint, values);
 }

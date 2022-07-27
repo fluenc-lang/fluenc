@@ -19,7 +19,7 @@ LazyValue::LazyValue(const ILazyValueGenerator *generator, const EntryPoint &ent
 {
 }
 
-ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack<BaseValue> values)
+ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack values)
 {
 	return accumulate(values.begin(), values.end(), seed, [&](auto accumulated, auto value) -> ElementType
 	{
@@ -36,7 +36,7 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 			Emitter emitter;
 
 			auto chainEntryPoint = provider->withBlock(entryPoint.block());
-			auto chainResult = chain->accept(emitter, chainEntryPoint, Stack<BaseValue>());
+			auto chainResult = chain->accept(emitter, chainEntryPoint, Stack());
 
 			auto [_, chainValues] = *chainResult.begin();
 
@@ -70,9 +70,9 @@ const Type *LazyValue::type() const
 
 	auto iteratable = m_generator->generate(entryPoint);
 
-	Emitter emitter;
+	Analyzer emitter;
 
-	auto results = iteratable->accept(emitter, entryPoint, Stack<BaseValue>());
+	auto results = iteratable->accept(emitter, entryPoint, Stack());
 
 	std::map<int, const Type *> typesByIndex;
 
@@ -153,7 +153,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		throw new std::exception();
 	}
 
-	auto iteratableResults = iteratable->accept(emitter, entryPoint, Stack<BaseValue>());
+	auto iteratableResults = iteratable->accept(emitter, entryPoint, Stack());
 
 	for (auto i = 0u; i < iteratableResults.size(); i++)
 	{
@@ -185,7 +185,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 			auto sourceContinuationEntryPoint = sourceProvider->withBlock(resultEntryPoint.block());
 
-			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, sourceContinuationEntryPoint, Stack<BaseValue>()))
+			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, sourceContinuationEntryPoint, Stack()))
 			{
 				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, chainValues);
 

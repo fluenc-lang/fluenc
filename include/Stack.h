@@ -10,70 +10,29 @@
 
 #include "values/BaseValue.h"
 
-template<typename T>
 class Stack
 {
 	public:
-		using const_iterator = typename std::vector<const T *, std::allocator<const T *>>::const_iterator;
-		using const_reverse_iterator = typename std::vector<const T *, std::allocator<const T *>>::const_reverse_iterator;
+		using const_iterator = typename std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator;
+		using const_reverse_iterator = typename std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator;
 
 		Stack() = default;
 
-		Stack(const std::vector<const T *> &values)
-			: m_values(values)
-		{
-		}
-
-		Stack(const T *value)
-			: m_values({ value })
-		{
-		}
-
+		Stack(const std::vector<const BaseValue *> &values);
+		Stack(const BaseValue *value);
 		Stack(const Stack &other) = default;
 
-		size_t size() const
-		{
-			return m_values.size();
-		}
+		size_t size() const;
 
-		const_iterator begin() const
-		{
-			return m_values.begin();
-		}
-		const_iterator end() const
-		{
-			return m_values.end();
-		}
+		const_iterator begin() const;
+		const_iterator end() const;
 
-		const_reverse_iterator rbegin() const
-		{
-			return m_values.rbegin();
-		}
-		const_reverse_iterator rend() const
-		{
-			return m_values.rend();
-		}
+		const_reverse_iterator rbegin() const;
+		const_reverse_iterator rend() const;
 
-		const T *pop()
-		{
-			if (m_values.empty())
-			{
-				throw new std::exception();
-			}
+		const BaseValue *pop();
 
-			auto value = m_values.back();
-
-			m_values.pop_back();
-
-			return value;
-		}
-
-		Stack &discard()
-		{
-			pop();
-
-			return *this;
-		}
+		Stack &discard();
 
 		template<typename TValue>
 		const TValue *require(const std::shared_ptr<peg::Ast> &ast)
@@ -112,13 +71,10 @@ class Stack
 			return nullptr;
 		}
 
-		void push(const T *value)
-		{
-			m_values.push_back(value);
-		}
+		void push(const BaseValue *value);
 
 	private:
-		std::vector<const T *> m_values;
+		std::vector<const BaseValue *> m_values;
 };
 
 #endif // STACK_H

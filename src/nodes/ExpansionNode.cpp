@@ -6,12 +6,12 @@ ExpansionNode::ExpansionNode(const Node *consumer, const std::shared_ptr<peg::As
 {
 }
 
-std::vector<DzResult<BaseValue>> ExpansionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ExpansionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitExpansion(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue>> ExpansionNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ExpansionNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitExpansion(this, entryPoint, values);
 }

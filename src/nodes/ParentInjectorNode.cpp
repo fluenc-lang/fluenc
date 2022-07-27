@@ -51,12 +51,12 @@ const IBlockInstruction *ParentInjectorNode::inject(const std::vector<std::share
 	});
 }
 
-std::vector<DzResult<BaseValue>> ParentInjectorNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ParentInjectorNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitParentInjector(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue>> ParentInjectorNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> ParentInjectorNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitParentInjector(this, entryPoint, values);
 }

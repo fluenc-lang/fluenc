@@ -91,13 +91,13 @@ const BaseValue *compileValue(std::string source)
 			, moduleInfo.locals
 			, moduleInfo.globals
 			, moduleInfo.types
-			, Stack<BaseValue>()
+			, Stack()
 			, nullptr
 			);
 
 		Emitter emitter;
 
-		for (auto &[_, values] : global->accept(emitter, entryPoint, Stack<BaseValue>()))
+		for (auto &[_, values] : global->accept(emitter, entryPoint, Stack()))
 		{
 			return *values.begin();
 		}
@@ -145,7 +145,7 @@ EntryPoint compile(std::string source)
 		, moduleInfo.locals
 		, moduleInfo.globals
 		, moduleInfo.types
-		, Stack<BaseValue>()
+		, Stack()
 		, nullptr
 		);
 }
@@ -183,7 +183,7 @@ int exec(std::string source)
 		, moduleInfo.locals
 		, moduleInfo.globals
 		, moduleInfo.types
-		, Stack<BaseValue>()
+		, Stack()
 		, nullptr
 		);
 
@@ -191,7 +191,7 @@ int exec(std::string source)
 
 	for (auto root : moduleInfo.roots)
 	{
-		root->accept(emitter, entryPoint, Stack<BaseValue>());
+		root->accept(emitter, entryPoint, Stack());
 	}
 
 	module->print(llvm::errs(), nullptr);

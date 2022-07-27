@@ -12,12 +12,12 @@ InstantiationNode::InstantiationNode(const Node *consumer
 {
 }
 
-std::vector<DzResult<BaseValue>> InstantiationNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> InstantiationNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitInstantiation(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue>> InstantiationNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> InstantiationNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitInstantiation(this, entryPoint, values);
 }

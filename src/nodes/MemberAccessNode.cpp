@@ -10,12 +10,12 @@ MemberAccessNode::MemberAccessNode(const Node *consumer
 {
 }
 
-std::vector<DzResult<BaseValue>> MemberAccessNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> MemberAccessNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitMemberAccess(this, entryPoint, values);
 }
 
-std::vector<DzResult<BaseValue>> MemberAccessNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack<BaseValue> values) const
+std::vector<DzResult> MemberAccessNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
 {
 	return visitor.visitMemberAccess(this, entryPoint, values);
 }
