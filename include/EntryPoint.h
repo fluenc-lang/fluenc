@@ -11,7 +11,7 @@
 class CallableNode;
 class DzStruct;
 class Prototype;
-class IteratorStorage;
+class IIteratorStorage;
 class Node;
 class ReferenceValue;
 class Type;
@@ -34,7 +34,7 @@ class EntryPoint
 			, const std::map<std::string, const Node *> &globals
 			, const std::map<std::string, Prototype *> &types
 			, const Stack &values
-			, IteratorStorage *iteratorStorage
+			, IIteratorStorage *iteratorStorage
 			);
 
 		EntryPoint() = default;
@@ -62,14 +62,14 @@ class EntryPoint
 
 		Stack values() const;
 
-		IteratorStorage *iteratorStorage() const;
+		IIteratorStorage *iteratorStorage() const;
 
 		const EntryPoint *byName(const std::string &name) const;
 		const EntryPoint *entry() const;
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
-		EntryPoint withIteratorStorage(IteratorStorage *iteratorStorage) const;
+		EntryPoint withIteratorStorage(IIteratorStorage *iteratorStorage) const;
 		EntryPoint markEntry() const;
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
@@ -103,7 +103,7 @@ class EntryPoint
 
 		Stack m_values;
 
-		IteratorStorage *m_iteratorStorage;
+		IIteratorStorage *m_iteratorStorage;
 };
 
 #endif // ENTRYPOINT_H

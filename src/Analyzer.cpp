@@ -2,7 +2,6 @@
 
 #include "Analyzer.h"
 #include "ValueHelper.h"
-#include "IRBuilderEx.h"
 #include "ITypeName.h"
 #include "UndeclaredIdentifierException.h"
 #include "IteratorStorage.h"
@@ -108,22 +107,191 @@ class DummyValue : public BaseValueWithMetadata<DummyValueMetadata>
 		const Type *m_type;
 };
 
-std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitBooleanBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	auto left = ValueHelper::getScalar(entryPoint, values);
-	auto right = ValueHelper::getScalar(entryPoint, values);
+	UNUSED(node);
 
-	auto leftType = left->type();
+	return {{ entryPoint, values.discard() }};
+}
 
-	auto operators = leftType->operators();
+std::vector<DzResult> Analyzer::visitFloatBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+{
+	auto left = values.pop();
+	auto right = values.pop();
 
-	IRBuilderEx builder(entryPoint);
+	UNUSED(right);
 
-	auto value = operators->resolve(node->m_op, builder, left, right);
+	auto valueFactory = [&]() -> const BaseValue *
+	{
+		if (node->m_op == "+")
+		{
+			return left;
+		}
+
+		if (node->m_op == "-")
+		{
+			return left;
+		}
+
+		if (node->m_op == "*")
+		{
+			return left;
+		}
+
+		if (node->m_op == "/")
+		{
+			return left;
+		}
+
+		if (node->m_op == "<")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == "<=")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == ">")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == ">=")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == "==")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == "!=")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		throw new std::exception();
+	};
+
+	auto value = valueFactory();
 
 	values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return {{ entryPoint, values }};
+}
+
+std::vector<DzResult> Analyzer::visitIntegerBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+{
+	auto left = values.pop();
+	auto right = values.pop();
+
+	UNUSED(right);
+
+	auto valueFactory = [&]() -> const BaseValue *
+	{
+		if (node->m_op == "+")
+		{
+			return left;
+		}
+
+		if (node->m_op == "-")
+		{
+			return left;
+		}
+
+		if (node->m_op == "*")
+		{
+			return left;
+		}
+
+		if (node->m_op == "/")
+		{
+			return left;
+		}
+
+		if (node->m_op == "<")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == "<=")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == ">")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == ">=")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == "==")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == "!=")
+		{
+			return new DummyValue(BooleanType::instance());
+		}
+
+		if (node->m_op == "%")
+		{
+			return left;
+		}
+
+		if (node->m_op == "|")
+		{
+			return left;
+		}
+
+		if (node->m_op == "&")
+		{
+			return left;
+		}
+
+		if (node->m_op == "^")
+		{
+			return left;
+		}
+
+		throw new std::exception();
+	};
+
+	auto value = valueFactory();
+
+	values.push(value);
+
+	return {{ entryPoint, values }};
+}
+
+std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+{
+	auto left = values.peek();
+
+	auto leftType = left->type();
+	auto operators = leftType->operators();
+
+	auto binary = operators->forBinary(node);
+
+	std::vector<DzResult> results;
+
+	for (auto &[resultEntryPoint, resultValues] : binary->accept(*this, entryPoint, values))
+	{
+		for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
+		{
+			results.push_back(result);
+		}
+	}
+
+	return results;
 }
 
 std::vector<DzResult> Analyzer::visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const
@@ -152,9 +320,6 @@ std::vector<DzResult> Analyzer::visitArrayContinuation(const ArrayContinuationNo
 
 std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	Stack valuesIfTrue;
-
-	auto index = values.require<ReferenceValue>(nullptr);
 	auto value = values.require<IndexedValue>(nullptr);
 
 	auto ep = entryPoint
@@ -162,20 +327,14 @@ std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, 
 
 	if (node->m_next)
 	{
-		auto valuesIfFalse = values;
-
-		valuesIfFalse.push(index);
-
-		auto continuation = new ArrayContinuationNode(index, node->m_node, IteratorType::instance());
+		auto continuation = new ArrayContinuationNode(nullptr, node->m_node, IteratorType::instance());
 		auto expandable = new ExpandableValue(true, node->m_arrayType, entryPoint, continuation);
 
 		auto tuple = new TupleValue({ expandable, value->subject() });
 
-		valuesIfTrue.push(tuple);
+		auto resultsIfFalse = node->m_next->accept(*this, ep, values);
 
-		auto resultsIfFalse = node->m_next->accept(*this, ep, valuesIfFalse);
-
-		std::vector<DzResult> result = {{ ep, valuesIfTrue }};
+		std::vector<DzResult> result = {{ ep, tuple }};
 
 		result.insert(end(result), begin(resultsIfFalse), end(resultsIfFalse));
 
@@ -391,10 +550,7 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 						forwardedValues.push(resultValue);
 					}
 
-					auto forwardedEntryPoint = resultEntryPoint
-						.withIteratorStorage(entryPoint.iteratorStorage());
-
-					for (auto &result : recurse(forwardedEntryPoint, forwardedValues, recurse))
+					for (auto &result : recurse(resultEntryPoint, forwardedValues, recurse))
 					{
 						results.push_back(result);
 					}
@@ -497,27 +653,11 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 		return {{ entryPoint, values }};
 	};
 
-	auto tryForkEntryPoint = [&]
-	{
-		if (entryPoint.iteratorStorage())
-		{
-			return entryPoint;
-		}
-
-		return entryPoint
-			.withIteratorStorage(new IteratorStorage());
-	};
-
-	auto forkedEntryPoint = tryForkEntryPoint();
-
 	std::vector<DzResult> results;
 
-	for (auto &[resultEntryPoint, resultValues] : digestDepth(forkedEntryPoint, values, digestDepth))
+	for (auto &[resultEntryPoint, resultValues] : digestDepth(entryPoint, values, digestDepth))
 	{
-		auto consumerEntryPoint = resultEntryPoint
-			.withIteratorStorage(entryPoint.iteratorStorage());
-
-		for (auto &result : node->m_consumer->accept(*this, consumerEntryPoint, resultValues))
+		for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
 		{
 			results.push_back(result);
 		}
@@ -661,11 +801,6 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 
 std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	auto function = entryPoint.function();
-	auto block = entryPoint.block();
-
-	insertBlock(block, function);
-
 	auto functions = entryPoint.functions();
 
 	for (auto &name : node->m_names)
@@ -1095,8 +1230,6 @@ std::vector<DzResult> Analyzer::visitArrayValue(const ArrayValue *node, const En
 
 	for (auto [_, elementValues] : node->m_values)
 	{
-		elementValues.push(node->m_index);
-
 		auto iteratorEntryPoint = entryPoint
 			.withName("__array")
 			.markEntry()
@@ -1123,7 +1256,6 @@ std::vector<DzResult> Analyzer::visitIteratorValue(const IteratorValue *node, co
 	}
 
 	auto ep = (*node->m_entryPoint)
-		.withBlock(entryPoint.block())
 		.withLocals(locals)
 		.withIteratorStorage(entryPoint.iteratorStorage());
 

@@ -1,3 +1,4 @@
+#include "DummyIteratorStorage.h"
 #include "ValueHelper.h"
 #include "IteratorStorage.h"
 #include "FunctionHelper.h"
@@ -33,14 +34,13 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 			auto chain = expandable->chain();
 			auto provider = expandable->provider();
 
-			Emitter emitter;
+			Analyzer analyzer;
 
-			auto chainEntryPoint = provider->withBlock(entryPoint.block());
-			auto chainResult = chain->accept(emitter, chainEntryPoint, Stack());
+			auto chainResult = chain->accept(analyzer, *provider, Stack());
 
 			auto [_, chainValues] = *chainResult.begin();
 
-			return getElementType(accumulated, chainEntryPoint, chainValues);
+			return getElementType(accumulated, *provider, chainValues);
 		}
 
 		if (auto expanded = dynamic_cast<const ExpandedValue *>(value))
@@ -61,7 +61,7 @@ const Type *LazyValue::type() const
 
 	linkBlocks(alloc, block);
 
-	auto iteratorStorage = new IteratorStorage();
+	auto iteratorStorage = new DummyIteratorStorage();
 
 	auto entryPoint = (*m_entryPoint)
 		.withBlock(block)
@@ -70,9 +70,9 @@ const Type *LazyValue::type() const
 
 	auto iteratable = m_generator->generate(entryPoint);
 
-	Analyzer emitter;
+	Analyzer analyzer;
 
-	auto results = iteratable->accept(emitter, entryPoint, Stack());
+	auto results = iteratable->accept(analyzer, entryPoint, Stack());
 
 	std::map<int, const Type *> typesByIndex;
 

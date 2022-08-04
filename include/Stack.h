@@ -31,6 +31,7 @@ class Stack
 		const_reverse_iterator rend() const;
 
 		const BaseValue *pop();
+		const BaseValue *peek();
 
 		Stack &discard();
 

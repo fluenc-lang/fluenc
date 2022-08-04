@@ -3,12 +3,9 @@
 
 #include <unordered_map>
 
-#include <llvm/IR/Value.h>
+#include "IIteratorStorage.h"
 
-class EntryPoint;
-class ReferenceValue;
-
-class IteratorStorage
+class IteratorStorage : public IIteratorStorage
 {
 	public:
 		const ReferenceValue *getOrCreate(size_t id, const EntryPoint &entryPoint);

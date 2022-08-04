@@ -88,33 +88,223 @@
 #include "exceptions/MissingFieldException.h"
 #include "exceptions/InvalidArgumentTypeException.h"
 
-std::vector<DzResult> Emitter::visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Emitter::visitBooleanBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
 {
 	auto left = ValueHelper::getScalar(entryPoint, values);
 	auto right = ValueHelper::getScalar(entryPoint, values);
 
-	auto leftType = left->type();
-	auto rightType = right->type();
-
-	if (leftType->compatibility(rightType, entryPoint) > 0)
-	{
-		throw new std::exception(); // TODO
-	}
-
-	auto operators = leftType->operators();
-
-	if (!operators)
-	{
-		throw new std::exception(); // TODO
-	}
-
 	IRBuilderEx builder(entryPoint);
 
-	auto value = operators->resolve(node->m_op, builder, left, right);
+	auto valueFactory = [&]
+	{
+		if (node->m_op == "==")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right);
+		}
+
+		if (node->m_op == "!=")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right);
+		}
+
+		if (node->m_op == "&&")
+		{
+			return builder.createLogicalAnd(left, right);
+		}
+
+		if (node->m_op == "||")
+		{
+			return builder.createLogicalOr(left, right);
+		}
+
+		throw new std::exception();
+	};
+
+	auto value = valueFactory();
 
 	values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return {{ entryPoint, values }};
+}
+
+std::vector<DzResult> Emitter::visitFloatBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+{
+	auto left = ValueHelper::getScalar(entryPoint, values);
+	auto right = ValueHelper::getScalar(entryPoint, values);
+
+	IRBuilderEx builder(entryPoint);
+
+	auto valueFactory = [&]
+	{
+		if (node->m_op == "+")
+		{
+			return builder.createFAdd(left, right);
+		}
+
+		if (node->m_op == "-")
+		{
+			return builder.createFSub(left, right);
+		}
+
+		if (node->m_op == "*")
+		{
+			return builder.createFMul(left, right);
+		}
+
+		if (node->m_op == "/")
+		{
+			return builder.createFDiv(left, right);
+		}
+
+		if (node->m_op == "<")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_ULT, left, right);
+		}
+
+		if (node->m_op == "<=")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_ULE, left, right);
+		}
+
+		if (node->m_op == ">")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UGT, left, right);
+		}
+
+		if (node->m_op == ">=")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UGE, left, right);
+		}
+
+		if (node->m_op == "==")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UEQ, left, right);
+		}
+
+		if (node->m_op == "!=")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UNE, left, right);
+		}
+
+		throw new std::exception();
+	};
+
+	auto value = valueFactory();
+
+	values.push(value);
+
+	return {{ entryPoint, values }};
+}
+
+std::vector<DzResult> Emitter::visitIntegerBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+{
+	auto left = ValueHelper::getScalar(entryPoint, values);
+	auto right = ValueHelper::getScalar(entryPoint, values);
+
+	IRBuilderEx builder(entryPoint);
+
+	auto valueFactory = [&]
+	{
+		if (node->m_op == "+")
+		{
+			return builder.createAdd(left, right);
+		}
+
+		if (node->m_op == "-")
+		{
+			return builder.createSub(left, right);
+		}
+
+		if (node->m_op == "*")
+		{
+			return builder.createMul(left, right);
+		}
+
+		if (node->m_op == "/")
+		{
+			return builder.createSDiv(left, right);
+		}
+
+		if (node->m_op == "<")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLT, left, right);
+		}
+
+		if (node->m_op == "<=")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLE, left, right);
+		}
+
+		if (node->m_op == ">")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGT, left, right);
+		}
+
+		if (node->m_op == ">=")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGE, left, right);
+		}
+
+		if (node->m_op == "==")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right);
+		}
+
+		if (node->m_op == "!=")
+		{
+			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right);
+		}
+
+		if (node->m_op == "%")
+		{
+			return builder.createSRem(left, right);
+		}
+
+		if (node->m_op == "|")
+		{
+			return builder.createOr(left, right);
+		}
+
+		if (node->m_op == "&")
+		{
+			return builder.createAnd(left, right);
+		}
+
+		if (node->m_op == "^")
+		{
+			return builder.createXor(left, right);
+		}
+
+		throw new std::exception();
+	};
+
+	auto value = valueFactory();
+
+	values.push(value);
+
+	return {{ entryPoint, values }};
+}
+
+std::vector<DzResult> Emitter::visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+{
+	auto left = values.peek();
+
+	auto leftType = left->type();
+	auto operators = leftType->operators();
+
+	auto binary = operators->forBinary(node);
+
+	std::vector<DzResult> results;
+
+	for (auto &[resultEntryPoint, resultValues] : binary->accept(*this, entryPoint, values))
+	{
+		for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
+		{
+			results.push_back(result);
+		}
+	}
+
+	return results;
 }
 
 std::vector<DzResult> Emitter::visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const

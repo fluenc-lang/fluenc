@@ -6,9 +6,12 @@
 
 class BaseValue;
 
-class Emitter : public NodeVisitor<BaseValue>
+class Emitter : public NodeVisitor
 {
 	public:
+		std::vector<DzResult> visitBooleanBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> visitFloatBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> visitIntegerBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const override;
 		std::vector<DzResult> visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const override;
 		std::vector<DzResult> visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const override;
 		std::vector<DzResult> visitArrayContinuation(const ArrayContinuationNode *node, const EntryPoint &entryPoint, Stack values) const override;

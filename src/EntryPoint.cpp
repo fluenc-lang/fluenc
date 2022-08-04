@@ -20,7 +20,7 @@ EntryPoint::EntryPoint(int depth
 	, const std::map<std::string, const Node *> &globals
 	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
-	, IteratorStorage *iteratorStorage
+	, IIteratorStorage *iteratorStorage
 	)
 	: m_depth(depth)
 	, m_index(index)
@@ -125,7 +125,7 @@ Stack EntryPoint::values() const
 	return m_values;
 }
 
-IteratorStorage *EntryPoint::iteratorStorage() const
+IIteratorStorage *EntryPoint::iteratorStorage() const
 {
 	return m_iteratorStorage;
 }
@@ -187,7 +187,7 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		);
 }
 
-EntryPoint EntryPoint::withIteratorStorage(IteratorStorage *iteratorStorage) const
+EntryPoint EntryPoint::withIteratorStorage(IIteratorStorage *iteratorStorage) const
 {
 	return EntryPoint(m_depth + 1
 		, m_index

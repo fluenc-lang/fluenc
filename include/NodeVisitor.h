@@ -58,12 +58,12 @@ struct Visitable : public VisitableImpl<TVisitor>...
 	using VisitableImpl<TVisitor>::accept...;
 };
 
-template<typename T>
 class NodeVisitor
 {
 	public:
-		using ReturnType = T;
-
+		virtual std::vector<DzResult> visitBooleanBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitFloatBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
+		virtual std::vector<DzResult> visitIntegerBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
 		virtual std::vector<DzResult> visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
 		virtual std::vector<DzResult> visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
 		virtual std::vector<DzResult> visitArrayContinuation(const ArrayContinuationNode *node, const EntryPoint &entryPoint, Stack values) const = 0;
