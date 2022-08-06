@@ -14,12 +14,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-11 ]
+        os: [ ubuntu-22.04, macos-12 ]
         include:
-          - os: ubuntu-20.04
-            cmake-prefix-path: /usr/lib/llvm-13
-          - os: macos-11
-            cmake-prefix-path: /usr/local/opt/llvm@13
+          - os: ubuntu-22.04
+            cmake-prefix-path: /usr/lib/llvm-14
+          - os: macos-12
+            cmake-prefix-path: /usr/local/opt/llvm@14
       fail-fast: false
 
     steps:
@@ -27,18 +27,8 @@ jobs:
 
     - name: Install build dependencies
       run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          echo ''
-        elif [ "$RUNNER_OS" == "Linux" ]; then
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - &&
-          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main" | sudo tee -a /etc/apt/sources.list &&
-          echo "deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main" | sudo tee -a /etc/apt/sources.list &&
-          sudo apt-get update && sudo apt-get install llvm-13-dev liblld-13-dev antlr4 libantlr4-runtime-dev
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew install antlr antlr4-cpp-runtime
-        else
-          echo "$RUNNER_OS not supported"
-          exit 1
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update && sudo apt-get install liblld-14-dev
         fi
       shell: bash
 
