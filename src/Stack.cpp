@@ -49,6 +49,18 @@ const BaseValue *Stack::pop()
 	return value;
 }
 
+const BaseValue *Stack::peek()
+{
+	return m_values.back();
+}
+
+Stack &Stack::discard()
+{
+	pop();
+
+	return *this;
+}
+
 void Stack::push(const BaseValue *value)
 {
 	m_values.push_back(value);

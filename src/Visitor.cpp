@@ -24,7 +24,6 @@
 #include "nodes/BlockInstructionNode.h"
 #include "nodes/FunctionNode.h"
 #include "nodes/ImportedFunctionNode.h"
-#include "nodes/BlockStackFrameNode.h"
 #include "nodes/ReturnNode.h"
 #include "nodes/ContinuationNode.h"
 #include "nodes/ExportedFunctionTerminatorNode.h"
@@ -55,11 +54,6 @@
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
-#include "types/Int32Type.h"
-#include "types/Int64Type.h"
-#include "types/BooleanType.h"
-#include "types/StringType.h"
-#include "types/ByteType.h"
 
 class CallableNode;
 class BaseValue;

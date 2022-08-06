@@ -3,13 +3,16 @@
 
 #include <string>
 
+class Analyzer;
 class ScalarValue;
 class IRBuilderEx;
+class BinaryNode;
+class Node;
 
 class IOperatorSet
 {
 	public:
-		virtual const ScalarValue *resolve(const std::string &op, const IRBuilderEx &builder, const ScalarValue *left, const ScalarValue *right) const = 0;
+		virtual const Node *forBinary(const BinaryNode *node) const = 0;
 };
 
 #endif // IOPERATORSET_H

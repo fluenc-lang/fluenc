@@ -1,15 +1,16 @@
 #include "nodes/IteratableNode.h"
 
-#include "values/IIteratable.h"
-
 IteratableNode::IteratableNode(const IIteratable *iteratable)
 	: m_iteratable(iteratable)
 {
 }
 
-std::vector<DzResult> IteratableNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IteratableNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	UNUSED(values);
+	return visitor.visitIteratable(this, entryPoint, values);
+}
 
-	return m_iteratable->build(entryPoint);
+std::vector<DzResult> IteratableNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitIteratable(this, entryPoint, values);
 }

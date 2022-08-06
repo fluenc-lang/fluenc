@@ -9,6 +9,9 @@ class BaseValue;
 
 class FunctionNode : public CallableNode
 {
+	friend class Emitter;
+	friend class Analyzer;
+
 	struct Argument
 	{
 		std::string name;
@@ -28,9 +31,10 @@ class FunctionNode : public CallableNode
 
 		FunctionAttribute attribute() const override;
 
-		int8_t signatureCompatibility(const EntryPoint &entryPoint, const Stack &values) const override;
+		int8_t signatureCompatibility(const EntryPoint &entryPoint, const std::vector<const Type *> &values) const override;
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		std::vector<Argument> handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const;

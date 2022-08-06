@@ -20,7 +20,7 @@ EntryPoint::EntryPoint(int depth
 	, const std::map<std::string, const Node *> &globals
 	, const std::map<std::string, Prototype *> &types
 	, const Stack &values
-	, IteratorStorage *iteratorStorage
+	, IIteratorStorage *iteratorStorage
 	)
 	: m_depth(depth)
 	, m_index(index)
@@ -73,12 +73,15 @@ llvm::Function *EntryPoint::function() const
 
 const ReferenceValue *EntryPoint::alloc(const Type *type, const llvm::Twine &name) const
 {
-	llvm::IRBuilder<> builder(m_alloc, m_alloc->begin());
-
 	auto storageType = type->storageType(*m_context);
 
+	auto dataLayout = m_module->getDataLayout();
+
+	auto align = dataLayout.getPrefTypeAlign(storageType);
+	auto addressSpace = dataLayout.getAllocaAddrSpace();
+
 	return new ReferenceValue(type
-		, builder.CreateAlloca(storageType, nullptr, name)
+		, new llvm::AllocaInst(storageType, addressSpace, nullptr, align, name, &*m_alloc->begin())
 		);
 }
 
@@ -122,7 +125,7 @@ Stack EntryPoint::values() const
 	return m_values;
 }
 
-IteratorStorage *EntryPoint::iteratorStorage() const
+IIteratorStorage *EntryPoint::iteratorStorage() const
 {
 	return m_iteratorStorage;
 }
@@ -184,7 +187,7 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		);
 }
 
-EntryPoint EntryPoint::withIteratorStorage(IteratorStorage *iteratorStorage) const
+EntryPoint EntryPoint::withIteratorStorage(IIteratorStorage *iteratorStorage) const
 {
 	return EntryPoint(m_depth + 1
 		, m_index

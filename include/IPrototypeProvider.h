@@ -1,8 +1,8 @@
 #ifndef IPROTOTYPEPROVIDER_H
 #define IPROTOTYPEPROVIDER_H
 
-#include "Node.h"
-
+class Stack;
+class EntryPoint;
 class IPrototype;
 
 class IPrototypeProvider

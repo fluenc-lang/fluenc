@@ -13,7 +13,12 @@
 #include <llvm/Analysis/CFGPrinter.h>
 #include <llvm/Transforms/Scalar/SimplifyCFG.h>
 #include <llvm/Passes/PassBuilder.h>
+#include <llvm/Config/llvm-config.h>
+#if LLVM_VERSION_MAJOR == 14
+#include <llvm/MC/TargetRegistry.h>
+#else
 #include <llvm/Support/TargetRegistry.h>
+#endif
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetOptions.h>
 
@@ -27,6 +32,7 @@
 #include "CompilerException.h"
 #include "Visitor.h"
 #include "ModuleInfo.h"
+#include "Emitter.h"
 
 #include "nodes/CallableNode.h"
 
@@ -316,9 +322,11 @@ int main(int argc, char **argv)
 
 			try
 			{
+				Emitter emitter;
+
 				for (auto root : module.roots)
 				{
-					root->build(entryPoint, values);
+					root->accept(emitter, entryPoint, values);
 				}
 
 				llvmModule->print(llvm::errs(), nullptr);
@@ -448,7 +456,11 @@ int main(int argc, char **argv)
 		return strcpy(new char[argument.size() + 1], argument.c_str());
 	});
 
+#if LLVM_VERSION_MAJOR == 14
+    lld::elf::link(llvm::makeArrayRef(arguments), llvm::outs(), llvm::errs(), true, false);
+#else
 	lld::elf::link(llvm::makeArrayRef(arguments), true, llvm::outs(), llvm::errs());
+#endif
 
 	return 0;
 }

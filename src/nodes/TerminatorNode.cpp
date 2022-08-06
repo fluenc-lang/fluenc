@@ -1,20 +1,9 @@
-#include <sstream>
-
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/IRBuilder.h>
-
 #include "nodes/TerminatorNode.h"
-#include "EntryPoint.h"
 
 TerminatorNode::TerminatorNode(const std::string &name, FunctionAttribute attribute)
 	: m_name(name)
 	, m_attribute(attribute)
 {
-}
-
-std::vector<DzResult> TerminatorNode::build(const EntryPoint &entryPoint, Stack values) const
-{
-	return {{ entryPoint, values }};
 }
 
 FunctionAttribute TerminatorNode::attribute() const
@@ -27,4 +16,14 @@ TerminatorNode *TerminatorNode::instance()
 	static TerminatorNode instance("pajs", FunctionAttribute::None);
 
 	return &instance;
+}
+
+std::vector<DzResult> TerminatorNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitTerminator(this, entryPoint, values);
+}
+
+std::vector<DzResult> TerminatorNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitTerminator(this, entryPoint, values);
 }

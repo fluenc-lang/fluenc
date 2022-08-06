@@ -7,9 +7,9 @@ function printHelloWorld(int i, int count, int t)
         return 0;
     }
 
-    return printHelloWorld(i + 1
+    return tail printHelloWorld(i + 1
         , count
-        , puts("Hello world!")
+        , puts(@"Hello world!")
         );
 }
 

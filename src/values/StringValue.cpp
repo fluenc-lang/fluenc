@@ -1,5 +1,3 @@
-#include "IRBuilderEx.h"
-
 #include "values/StringValue.h"
 #include "values/ReferenceValue.h"
 #include "values/LazyValue.h"
@@ -24,7 +22,7 @@ const LazyValue *StringValue::iterator() const
 {
 	auto generator = new StringIteratableGenerator(m_node, *m_address, m_id, m_length);
 
-	return new LazyValue(generator);
+	return new LazyValue(generator, EntryPoint());
 }
 
 const Type *StringValue::type() const

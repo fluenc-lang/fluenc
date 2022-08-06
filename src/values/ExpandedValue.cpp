@@ -4,14 +4,20 @@
 
 #include "types/IteratorType.h"
 
-ExpandedValue::ExpandedValue(const Type *iteratorType, const EntryPoint &provider, const Node *node, const Node *chain, const std::vector<const ExpandedValue *> &next)
-	: m_iteratorType(iteratorType)
+ExpandedValue::ExpandedValue(bool isArray, const Type *iteratorType, const EntryPoint &provider, const Node *node, const Node *chain, const std::vector<const ExpandedValue *> &next)
+	: m_isArray(isArray)
+	, m_iteratorType(iteratorType)
 	, m_provider(new EntryPoint(provider))
 	, m_node(node)
 	, m_chain(chain)
 	, m_next(next)
 {
 
+}
+
+bool ExpandedValue::isArray() const
+{
+	return m_isArray;
 }
 
 const Type *ExpandedValue::type() const

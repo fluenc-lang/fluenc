@@ -6,7 +6,7 @@
 class IntegerOperatorSet : public IOperatorSet
 {
 	public:
-		const ScalarValue *resolve(const std::string &op, const IRBuilderEx &builder, const ScalarValue *left, const ScalarValue *right) const override;
+		const Node *forBinary(const BinaryNode *node) const override;
 };
 
 #endif // INTEGEROPERATORSET_H

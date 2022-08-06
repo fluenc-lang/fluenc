@@ -6,16 +6,18 @@
 
 class FunctionCallNode : public Node
 {
+	friend class Emitter;
+	friend class Analyzer;
+
 	public:
 		FunctionCallNode(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names, const Node *evaluation);
 
 		int order(const EntryPoint &entryPoint) const override;
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		const CallableNode *findFunction(const EntryPoint &entryPoint, Stack values) const;
-
 		std::shared_ptr<peg::Ast> m_ast;
 		std::vector<std::string> m_names;
 

@@ -1,6 +1,4 @@
 #include "FunctionHelper.h"
-#include "ZipIterator.h"
-#include "ValueHelper.h"
 
 #include "iterators/ExtremitiesIterator.h"
 

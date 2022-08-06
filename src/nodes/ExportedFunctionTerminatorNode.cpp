@@ -1,35 +1,11 @@
-#include <llvm/IR/IRBuilder.h>
-
-#include "EntryPoint.h"
-#include "IRBuilderEx.h"
-#include "Utility.h"
-#include "ValueHelper.h"
-
 #include "nodes/ExportedFunctionTerminatorNode.h"
 
-#include "values/ScalarValue.h"
-#include "values/ReferenceValue.h"
-
-std::vector<DzResult> ExportedFunctionTerminatorNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ExportedFunctionTerminatorNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	auto context = entryPoint.context();
+	return visitor.visitExportedFunctionTerminator(this, entryPoint, values);
+}
 
-	auto function = entryPoint.function();
-	auto previous = entryPoint.block();
-
-	insertBlock(previous, function);
-
-	auto block = llvm::BasicBlock::Create(*context, "entry", function);
-
-	linkBlocks(previous, block);
-
-	auto ep = entryPoint
-		.withBlock(block);
-
-	auto returnValue = ValueHelper::getScalar(ep, values);
-
-	IRBuilderEx builder(ep);
-	builder.createRet(*returnValue);
-
-	return {{ ep, values }};
+std::vector<DzResult> ExportedFunctionTerminatorNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitExportedFunctionTerminator(this, entryPoint, values);
 }

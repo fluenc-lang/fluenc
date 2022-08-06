@@ -13,10 +13,11 @@
 class Stack
 {
 	public:
-		typedef std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator const_iterator;
-		typedef std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator const_reverse_iterator;
+		using const_iterator = typename std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator;
+		using const_reverse_iterator = typename std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator;
 
 		Stack() = default;
+
 		Stack(const std::vector<const BaseValue *> &values);
 		Stack(const BaseValue *value);
 		Stack(const Stack &other) = default;
@@ -30,25 +31,21 @@ class Stack
 		const_reverse_iterator rend() const;
 
 		const BaseValue *pop();
+		const BaseValue *peek();
 
-		Stack &discard()
-		{
-			pop();
+		Stack &discard();
 
-			return *this;
-		}
-
-		template<typename T>
-		const T *require(const std::shared_ptr<peg::Ast> &ast)
+		template<typename TValue>
+		const TValue *require(const std::shared_ptr<peg::Ast> &ast)
 		{
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const T *>(value))
+			if (auto casted = dynamic_cast<const TValue *>(value))
 			{
 				return casted;
 			}
 
-			auto &expectedMetadata = T::staticMetadata();
+			auto &expectedMetadata = TValue::staticMetadata();
 			auto &actualMetadata = value->metadata();
 
 			throw new InvalidTypeException(ast
@@ -57,8 +54,8 @@ class Stack
 				);
 		}
 
-		template<typename T>
-		const T *request()
+		template<typename TValue>
+		const TValue *request()
 		{
 			if (size() <= 0)
 			{
@@ -67,7 +64,7 @@ class Stack
 
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const T *>(value))
+			if (auto casted = dynamic_cast<const TValue *>(value))
 			{
 				return casted;
 			}

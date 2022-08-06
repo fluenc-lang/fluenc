@@ -5,10 +5,7 @@
 #include <numeric>
 
 #include "BaseValue.h"
-#include "Utility.h"
 #include "Stack.h"
-
-#include "types/TupleType.h"
 
 #include "metadata/TupleValueMetadata.h"
 
@@ -26,8 +23,12 @@ class TupleValue : public BaseValueWithMetadata<TupleValueMetadata>
 
 		Stack values() const;
 
+		bool isArray() const;
+
 	private:
 		std::vector<const BaseValue *> m_values;
+
+		bool m_isArray;
 };
 
 #endif // TUPLEVALUE_H

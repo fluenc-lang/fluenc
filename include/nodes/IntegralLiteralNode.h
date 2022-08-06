@@ -9,10 +9,14 @@ class ITypeName;
 
 class IntegralLiteralNode : public Node
 {
+	friend class Emitter;
+	friend class Analyzer;
+
 	public:
 		IntegralLiteralNode(const Node *consumer, ITypeName *type, const std::string &value);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		llvm::ConstantInt *getValue(llvm::Type *storageType) const;

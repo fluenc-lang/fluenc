@@ -11,7 +11,9 @@ class Node;
 class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 {
 	public:
-		ExpandedValue(const Type *iteratorType, const EntryPoint &provider, const Node *node, const Node *chain, const std::vector<const ExpandedValue *> &next);
+		ExpandedValue(bool isArray, const Type *iteratorType, const EntryPoint &provider, const Node *node, const Node *chain, const std::vector<const ExpandedValue *> &next);
+
+		bool isArray() const;
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
@@ -23,6 +25,8 @@ class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 		std::vector<const ExpandedValue *> next() const;
 
 	private:
+		bool m_isArray;
+
 		const Type *m_iteratorType;
 		const EntryPoint *m_provider;
 		const Node *m_node;

@@ -5,22 +5,16 @@
 
 class JunctionNode : public Node
 {
-	struct SingleResult
-	{
-		const EntryPoint entryPoint;
-		const BaseValue *value;
-	};
+	friend class Emitter;
+	friend class Analyzer;
 
 	public:
 		JunctionNode(const Node *subject);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
-		const BaseValue *join(const std::vector<SingleResult> &range, const EntryPoint &entryPoint) const;
-
-		SingleResult tryJoin(const std::vector<SingleResult> &values, const EntryPoint &entryPoint) const;
-
 		const Node *m_subject;
 };
 

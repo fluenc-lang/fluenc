@@ -17,10 +17,13 @@ class IteratorType;
 class ExpandableValue : public BaseValueWithMetadata<ExpandableValueMetadata>
 {
 	public:
-		ExpandableValue(const Type *iteratorType
+		ExpandableValue(bool isArray
+			, const Type *iteratorType
 			, const EntryPoint &provider
 			, const Node *chain
 			);
+
+		bool isArray() const;
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
@@ -29,6 +32,8 @@ class ExpandableValue : public BaseValueWithMetadata<ExpandableValueMetadata>
 		const Node *chain() const;
 
 	private:
+		bool m_isArray;
+
 		const Type *m_iteratorType;
 		const EntryPoint *m_provider;
 		const Node *m_chain;

@@ -12,7 +12,7 @@ class IIteratable;
 class LazyValue : public BaseValueWithMetadata<LazyValueMetadata>
 {
 	public:
-		LazyValue(const ILazyValueGenerator *generator);
+		LazyValue(const ILazyValueGenerator *generator, const EntryPoint &entryPoint);
 
 		const Type *type() const override;
 
@@ -21,10 +21,11 @@ class LazyValue : public BaseValueWithMetadata<LazyValueMetadata>
 
 		const IIteratable *generate(const EntryPoint &entryPoint) const;
 
-		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source) const;
+		EntryPoint assignFrom(const EntryPoint &entryPoint, const LazyValue *source, const Emitter &emitter) const;
 
 	private:
 		const ILazyValueGenerator *m_generator;
+		const EntryPoint *m_entryPoint;
 };
 
 #endif // LAZYVALUE_H

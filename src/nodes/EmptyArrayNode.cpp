@@ -1,15 +1,16 @@
 #include "nodes/EmptyArrayNode.h"
 
-#include "values/WithoutValue.h"
-
 EmptyArrayNode::EmptyArrayNode(const Node *consumer)
 	: m_consumer(consumer)
 {
 }
 
-std::vector<DzResult> EmptyArrayNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> EmptyArrayNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	values.push(WithoutValue::instance());
+	return visitor.visitEmptyArray(this, entryPoint, values);
+}
 
-	return m_consumer->build(entryPoint, values);
+std::vector<DzResult> EmptyArrayNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitEmptyArray(this, entryPoint, values);
 }

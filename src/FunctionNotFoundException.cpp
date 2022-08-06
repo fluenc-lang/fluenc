@@ -6,7 +6,7 @@
 
 FunctionNotFoundException::FunctionNotFoundException(const std::shared_ptr<peg::Ast> &ast
 	, const std::string &name
-	, const Stack &values
+	, const std::vector<const Type *> &values
 	)
 	: CompilerException(ast)
 	, m_name(name)
@@ -23,19 +23,17 @@ std::string FunctionNotFoundException::message() const
 	{
 		stream << " with signature (";
 
-		for (auto i = m_values.rbegin()
-			; i != m_values.rend()
+		for (auto i = m_values.begin()
+			; i != m_values.end()
 			; i++
 			)
 		{
-			if (i != m_values.rbegin())
+			if (i != m_values.begin())
 			{
 				stream << ", ";
 			}
 
-			auto type = (*i)->type();
-
-			stream << type->name();
+			stream << (*i)->name();
 		}
 
 		stream << ")";

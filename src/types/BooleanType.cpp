@@ -1,8 +1,6 @@
 #include "types/BooleanType.h"
 #include "types/BooleanOperatorSet.h"
 
-#include "Utility.h"
-
 std::string BooleanType::name() const
 {
 	return "bool";

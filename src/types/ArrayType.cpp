@@ -73,7 +73,7 @@ int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) 
 		return -1;
 	}
 
-	if (auto iterator = dynamic_cast<const IteratorType *>(type))
+    if (dynamic_cast<const IteratorType *>(type))
 	{
 		return 0;
 	}

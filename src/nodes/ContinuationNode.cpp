@@ -4,8 +4,6 @@
 
 #include "nodes/ContinuationNode.h"
 #include "Type.h"
-#include "IndexIterator.h"
-#include "ValueHelper.h"
 
 #include "values/ExpandedValue.h"
 #include "values/TupleValue.h"
@@ -42,31 +40,12 @@ ContinuationNode::ContinuationNode(const Node *node, const Type *iteratorType)
 {
 }
 
-std::vector<DzResult> ContinuationNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ContinuationNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	insertBlock(entryPoint.block(), entryPoint.function());
+	return visitor.visitContinuation(this, entryPoint, values);
+}
 
-	auto numberOfArguments = values.size();
-
-	auto inputValues = values;
-	auto tailCallValues = entryPoint.values();
-
-	auto tailCallCandidate = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), entryPoint, [&](auto target, size_t)
-	{
-		return ValueHelper::transferValue(target
-			, inputValues.pop()
-			, tailCallValues.pop()
-			);
-	});
-
-	auto next = findExpandedValues(values);
-
-	auto value = new ExpandedValue(m_iteratorType
-		, tailCallCandidate
-		, m_node
-		, this
-		, next
-		);
-
-	return {{ tailCallCandidate, value }};
+std::vector<DzResult> ContinuationNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitContinuation(this, entryPoint, values);
 }

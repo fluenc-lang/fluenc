@@ -13,8 +13,6 @@ class LazySinkNode : public Node
 			, const Node *subject
 			);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
-
 	private:
 		const Type *m_iteratorType;
 

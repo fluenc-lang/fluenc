@@ -7,10 +7,14 @@
 
 class IndexSinkNode : public Node
 {
+	friend class Emitter;
+	friend class Analyzer;
+
 	public:
 		IndexSinkNode(size_t index, const Node *consumer);
 
-		std::vector<DzResult> build(const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
 
 	private:
 		size_t m_index;

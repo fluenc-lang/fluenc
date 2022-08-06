@@ -1,10 +1,4 @@
-#include <sstream>
-#include <numeric>
-
 #include "nodes/LocalNode.h"
-
-#include "values/UserTypeValue.h"
-#include "values/NamedValue.h"
 
 LocalNode::LocalNode(const Node *consumer, const std::string &name)
 	: m_consumer(consumer)
@@ -12,31 +6,12 @@ LocalNode::LocalNode(const Node *consumer, const std::string &name)
 {
 }
 
-std::vector<DzResult> LocalNode::build(const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> LocalNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
 {
-	auto locals = entryPoint.locals();
+	return visitor.visitLocal(this, entryPoint, values);
+}
 
-	auto value = values.pop();
-
-	if (auto userValue = dynamic_cast<const UserTypeValue * >(value))
-	{
-		auto fields = userValue->fields();
-
-		std::transform(begin(fields), end(fields), std::inserter(locals, begin(locals)), [=](auto field) -> std::pair<std::string, const BaseValue *>
-		{
-			std::stringstream ss;
-			ss << m_name;
-			ss << ".";
-			ss << field->name();
-
-			return { ss.str(), field->value() };
-		});
-	}
-
-	locals[m_name] = value;
-
-	auto ep = entryPoint
-		.withLocals(locals);
-
-	return m_consumer->build(ep, values);
+std::vector<DzResult > LocalNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+{
+	return visitor.visitLocal(this, entryPoint, values);
 }

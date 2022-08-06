@@ -5,7 +5,12 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Config/llvm-config.h>
+#if LLVM_VERSION_MAJOR == 14
+#include <llvm/MC/TargetRegistry.h>
+#else
 #include <llvm/Support/TargetRegistry.h>
+#endif
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
@@ -15,13 +20,11 @@
 
 #include "KaleidoscopeJIT.h"
 #include "Visitor.h"
-#include "Utility.h"
 #include "EntryPoint.h"
 #include "ModuleInfo.h"
 #include "Visitor.h"
 
 #include "nodes/CallableNode.h"
-#include "nodes/GlobalNode.h"
 
 INCTXT(Grammar, "fluenc.peg");
 
@@ -70,11 +73,11 @@ const BaseValue *compileValue(std::string source)
 
 	for (auto &[name, global] : moduleInfo.globals)
 	{
-		auto context = std::make_unique<llvm::LLVMContext>();
-		auto module = std::make_unique<llvm::Module>("dz", *context);
+		auto context = new llvm::LLVMContext();
+		auto module = new llvm::Module("dz", *context);
 
 		auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(*context), false);
-		auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module.get());
+		auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module);
 
 		auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
 		auto block = llvm::BasicBlock::Create(*context, "block", function);
@@ -86,8 +89,8 @@ const BaseValue *compileValue(std::string source)
 			, block
 			, alloc
 			, function
-			, module.get()
-			, context.get()
+			, module
+			, context
 			, "entry"
 			, moduleInfo.functions
 			, moduleInfo.locals
@@ -97,7 +100,9 @@ const BaseValue *compileValue(std::string source)
 			, nullptr
 			);
 
-		for (auto &[_, values] : global->build(entryPoint, Stack()))
+		Emitter emitter;
+
+		for (auto &[_, values] : global->accept(emitter, entryPoint, Stack()))
 		{
 			return *values.begin();
 		}
@@ -187,9 +192,11 @@ int exec(std::string source)
 		, nullptr
 		);
 
+	Emitter emitter;
+
 	for (auto root : moduleInfo.roots)
 	{
-		root->build(entryPoint, Stack());
+		root->accept(emitter, entryPoint, Stack());
 	}
 
 	module->print(llvm::errs(), nullptr);
