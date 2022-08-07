@@ -1,6 +1,5 @@
 use "array.fc"
 use "algorithms.fc"
-use "math.fc"
 
 import f32 intToFloat(int value);
 import int floatToInt(f32 value);

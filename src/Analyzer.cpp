@@ -9,6 +9,7 @@
 #include "IPrototypeProvider.h"
 #include "DzArgument.h"
 #include "DzTupleArgument.h"
+#include "DummyIteratorStorage.h"
 
 #include "types/IOperatorSet.h"
 #include "types/BooleanType.h"
@@ -653,9 +654,12 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 		return {{ entryPoint, values }};
 	};
 
+	auto ep = entryPoint
+		.withIteratorStorage(new DummyIteratorStorage());
+
 	std::vector<DzResult> results;
 
-	for (auto &[resultEntryPoint, resultValues] : digestDepth(entryPoint, values, digestDepth))
+	for (auto &[resultEntryPoint, resultValues] : digestDepth(ep, values, digestDepth))
 	{
 		for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
 		{
@@ -1160,16 +1164,16 @@ std::vector<DzResult> Analyzer::visitExportedFunctionTerminator(const ExportedFu
 
 std::vector<DzResult> Analyzer::visitImportedFunction(const ImportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const
 {
+	UNUSED(values);
+
 	auto returnType = node->m_returnType->resolve(entryPoint);
 
 	if (returnType != VoidType::instance())
 	{
-		auto returnValue = new DummyValue(returnType);
-
-		values.push(returnValue);
+		return {{ entryPoint, new DummyValue(returnType) }};
 	}
 
-	return {{ entryPoint, values }};
+	return {{ entryPoint, Stack() }};
 }
 
 std::vector<DzResult> Analyzer::visitGlobal(const GlobalNode *node, const EntryPoint &entryPoint, Stack values) const
