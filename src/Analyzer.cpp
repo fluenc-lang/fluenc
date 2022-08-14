@@ -1,6 +1,7 @@
 #include <llvm/IR/Verifier.h>
 
 #include "Analyzer.h"
+#include "FunctionNotFoundException.h"
 #include "ValueHelper.h"
 #include "ITypeName.h"
 #include "UndeclaredIdentifierException.h"
@@ -730,6 +731,11 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 
 		auto function = findFunction(types);
 
+		if (!function)
+		{
+			throw new FunctionNotFoundException(node->m_ast, node->m_names[0], types);
+		}
+
 		if (function->attribute() == FunctionAttribute::Import)
 		{
 			return function->accept(*this, resultEntryPoint, resultValues);
@@ -901,6 +907,10 @@ std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node
 
 std::vector<DzResult> Analyzer::visitConditional(const ConditionalNode *node, const EntryPoint &entryPoint, Stack values) const
 {
+	auto condition = values.pop();
+
+	UNUSED(condition);
+
 	auto resultsIfTrue = node->m_ifTrue->accept(*this, entryPoint, values);
 	auto resultsIfFalse = node->m_ifFalse->accept(*this, entryPoint, values);
 
@@ -1146,6 +1156,7 @@ std::vector<DzResult> Analyzer::visitFunction(const FunctionNode *node, const En
 	}
 
 	auto ep = pep
+		.withName(node->m_name)
 		.markEntry()
 		.withLocals(locals)
 		.withIteratorStorage(nullptr);
