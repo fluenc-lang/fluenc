@@ -3972,6 +3972,104 @@ BOOST_AUTO_TEST_CASE (scenario102)
 	BOOST_TEST(result == 6);
 }
 
+BOOST_AUTO_TEST_CASE (scenario103)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			children: nothing
+		};
+
+		struct State
+		{
+			ui
+		};
+
+		function layout(any item, any nextItem)
+		{
+			return item;
+		}
+
+		function layout(Item item, Item nextItem)
+		{
+			return item;
+		}
+
+		function layout((Item item, ...items), any nextItem)
+		{
+			return item;
+		}
+
+		function layout(any item, (Item nextItem, ...nextItems))
+		{
+			return nextItem;
+		}
+
+		function layout((Item item, ...items), (Item nextItem, ...nextItems))
+		{
+			return item -> layout(...items, ...nextItems);
+		}
+
+		function solve(Item item, Item nextItem)
+		{
+			return item with
+			{
+				children: layout(item.children, nextItem.children)
+			};
+		}
+
+		function update(Item item, Item nextItem)
+		{
+			return solve(item, nextItem);
+		}
+
+		function update((Item item, ...items), (Item nextItem, ...nextItems))
+		{
+			return solve(item) -> update(...items);
+		}
+
+		function application()
+		{
+			return [
+				Item
+				{
+					children: [
+						Item {},
+						Item {}
+					]
+				}
+			];
+		}
+
+		function foo(State state, int i)
+		{
+			if (i > 1)
+			{
+				return 22;
+			}
+
+			let s = state with
+			{
+				ui: update(state.ui, application())
+			};
+
+			return tail foo(s, i + 1);
+		}
+
+		export int main()
+		{
+			let state = State
+			{
+				ui: application()
+			};
+
+			return foo(state, 0);
+		}
+	)");
+
+	BOOST_TEST(result == 22);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

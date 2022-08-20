@@ -10,7 +10,6 @@
 
 #include "nodes/ArrayElementNode.h"
 
-#include "types/Int64Type.h"
 #include "types/ArrayType.h"
 #include "types/IteratorType.h"
 

@@ -87,6 +87,14 @@ const Type *LazyValue::type() const
 
 		auto index = resultEntryPoint.index();
 
+		if (auto existing = typesByIndex.find(index); existing != end(typesByIndex))
+		{
+			if (existing->second->compatibility(type, entryPoint) != 0)
+			{
+				return m_generator->type();
+			}
+		}
+
 		typesByIndex[index] = type;
 	}
 
