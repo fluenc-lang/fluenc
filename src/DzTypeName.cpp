@@ -80,7 +80,7 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 			return IteratorType::instance();
 		}
 
-		auto types = entryPoint.types();
+		auto &types = entryPoint.types();
 
 		auto iterator = types.find(name);
 

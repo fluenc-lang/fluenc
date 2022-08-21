@@ -1,5 +1,5 @@
 #include "nodes/FunctionCallNode.h"
-#include "nodes/FunctionNode.h"
+#include "nodes/CallableNode.h"
 
 FunctionCallNode::FunctionCallNode(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names, const Node *evaluation)
 	: m_ast(ast)
@@ -10,7 +10,7 @@ FunctionCallNode::FunctionCallNode(const std::shared_ptr<peg::Ast> &ast, const s
 
 int FunctionCallNode::order(const EntryPoint &entryPoint) const
 {
-	auto functions = entryPoint.functions();
+	auto &functions = entryPoint.functions();
 
 	for (auto &name : m_names)
 	{

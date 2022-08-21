@@ -15,11 +15,11 @@ EntryPoint::EntryPoint(int depth
 	, llvm::Module *module
 	, llvm::LLVMContext *context
 	, const std::string &name
-	, const std::multimap<std::string, CallableNode *> &functions
-	, const std::map<std::string, const BaseValue *> &locals
-	, const std::map<std::string, const Node *> &globals
-	, const std::map<std::string, Prototype *> &types
-	, const Stack &values
+	, immer::box<std::multimap<std::string, CallableNode *>> functions
+	, immer::box<std::map<std::string, const BaseValue *>> locals
+	, immer::box<std::map<std::string, const Node *>> globals
+	, immer::box<std::map<std::string, Prototype *>> types
+	, immer::box<Stack> values
 	, IIteratorStorage *iteratorStorage
 	)
 	: m_depth(depth)
@@ -100,29 +100,29 @@ std::string EntryPoint::name() const
 	return m_name;
 }
 
-std::multimap<std::string, CallableNode *> EntryPoint::functions() const
+const std::multimap<std::string, CallableNode *> &EntryPoint::functions() const
 {
-	return m_functions;
+	return m_functions.get();
 }
 
-std::map<std::string, const BaseValue *> EntryPoint::locals() const
+const std::map<std::string, const BaseValue *> &EntryPoint::locals() const
 {
-	return m_locals;
+	return m_locals.get();
 }
 
-std::map<std::string, const Node *> EntryPoint::globals() const
+const std::map<std::string, const Node *> &EntryPoint::globals() const
 {
-	return m_globals;
+	return m_globals.get();
 }
 
-std::map<std::string, Prototype *> EntryPoint::types() const
+const std::map<std::string, Prototype *> &EntryPoint::types() const
 {
-	return m_types;
+	return m_types.get();
 }
 
-Stack EntryPoint::values() const
+const Stack &EntryPoint::values() const
 {
-	return m_values;
+	return m_values.get();
 }
 
 IIteratorStorage *EntryPoint::iteratorStorage() const

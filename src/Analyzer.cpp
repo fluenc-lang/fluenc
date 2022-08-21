@@ -452,9 +452,9 @@ std::vector<DzResult> Analyzer::visitNothing(const NothingNode *node, const Entr
 
 std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	auto locals = entryPoint.locals();
-	auto functions = entryPoint.functions();
-	auto globals = entryPoint.globals();
+	auto &locals = entryPoint.locals();
+	auto &functions = entryPoint.functions();
+	auto &globals = entryPoint.globals();
 
 	for (auto &name : node->m_names)
 	{
@@ -675,8 +675,8 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 {
 	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
 	{
-		auto functions = entryPoint.functions();
-		auto locals = entryPoint.locals();
+		auto &functions = entryPoint.functions();
+		auto &locals = entryPoint.locals();
 
 		for (auto &name : node->m_names)
 		{
@@ -720,7 +720,7 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 
 	for (auto &[resultEntryPoint, resultValues] : node->m_evaluation->accept(*this, entryPoint, values))
 	{
-		auto locals = resultEntryPoint.locals();
+		auto &locals = resultEntryPoint.locals();
 
 		std::vector<const Type *> types;
 
@@ -811,7 +811,7 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 
 std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	auto functions = entryPoint.functions();
+	auto &functions = entryPoint.functions();
 
 	for (auto &name : node->m_names)
 	{
@@ -1022,9 +1022,6 @@ std::vector<DzResult> Analyzer::visitLocal(const LocalNode *node, const EntryPoi
 
 std::vector<DzResult> Analyzer::visitContinuation(const ContinuationNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	auto inputValues = values;
-	auto tailCallValues = entryPoint.values();
-
 	auto next = ValueHelper::extractValues<ExpandedValue>(values);
 
 	auto isArray = accumulate(begin(next), end(next), next.size() > 0, [](auto accumulated, auto value)

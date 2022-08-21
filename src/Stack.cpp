@@ -1,7 +1,7 @@
 #include "Stack.h"
 
 Stack::Stack(const std::vector<const BaseValue *> &values)
-	: m_values(values)
+	: m_values(std::begin(values), std::end(values))
 {
 }
 
@@ -44,7 +44,7 @@ const BaseValue *Stack::pop()
 
 	auto value = m_values.back();
 
-	m_values.pop_back();
+	m_values = m_values.take(m_values.size() - 1);
 
 	return value;
 }
@@ -63,5 +63,5 @@ Stack &Stack::discard()
 
 void Stack::push(const BaseValue *value)
 {
-	m_values.push_back(value);
+	m_values = m_values.push_back(value);
 }

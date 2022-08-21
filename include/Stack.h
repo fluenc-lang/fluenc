@@ -6,6 +6,8 @@
 #include <stack>
 #include <vector>
 
+#include "immer/vector.hpp"
+
 #include "exceptions/InvalidTypeException.h"
 
 #include "values/BaseValue.h"
@@ -13,8 +15,8 @@
 class Stack
 {
 	public:
-		using const_iterator = typename std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_iterator;
-		using const_reverse_iterator = typename std::vector<const BaseValue *, std::allocator<const BaseValue *>>::const_reverse_iterator;
+		using const_iterator = typename immer::detail::rbts::rbtree_iterator<const BaseValue *, immer::default_memory_policy, immer::default_bits, immer::detail::rbts::derive_bits_leaf<const BaseValue *, immer::default_memory_policy, immer::default_bits>>;
+		using const_reverse_iterator = typename std::reverse_iterator<const_iterator>;
 
 		Stack() = default;
 
@@ -75,7 +77,7 @@ class Stack
 		void push(const BaseValue *value);
 
 	private:
-		std::vector<const BaseValue *> m_values;
+		immer::vector<const BaseValue *> m_values;
 };
 
 #endif // STACK_H

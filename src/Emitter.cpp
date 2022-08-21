@@ -582,9 +582,9 @@ std::vector<DzResult> Emitter::visitNothing(const NothingNode *node, const Entry
 
 std::vector<DzResult> Emitter::visitMemberAccess(const MemberAccessNode *node, const EntryPoint &entryPoint, Stack values) const
 {
-	auto locals = entryPoint.locals();
-	auto functions = entryPoint.functions();
-	auto globals = entryPoint.globals();
+	auto &locals = entryPoint.locals();
+	auto &functions = entryPoint.functions();
+	auto &globals = entryPoint.globals();
 
 	for (auto &name : node->m_names)
 	{
@@ -895,8 +895,8 @@ std::vector<DzResult> Emitter::visitFunctionCall(const FunctionCallNode *node, c
 {
 	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
 	{
-		auto functions = entryPoint.functions();
-		auto locals = entryPoint.locals();
+		auto &functions = entryPoint.functions();
+		auto &locals = entryPoint.locals();
 
 		for (auto &name : node->m_names)
 		{
@@ -966,7 +966,6 @@ std::vector<DzResult> Emitter::visitFunctionCall(const FunctionCallNode *node, c
 
 	for (auto &[resultEntryPoint, resultValues] : node->m_evaluation->accept(*this, entryPoint, values))
 	{
-		auto locals = resultEntryPoint.locals();
 		auto parent = resultEntryPoint.function();
 		auto block = resultEntryPoint.block();
 
@@ -1110,7 +1109,7 @@ std::vector<DzResult> Emitter::visitFunctionCallProxy(const FunctionCallProxyNod
 
 	insertBlock(block, function);
 
-	auto functions = entryPoint.functions();
+	auto &functions = entryPoint.functions();
 
 	for (auto &name : node->m_names)
 	{

@@ -6,6 +6,8 @@
 
 #include <map>
 
+#include "immer/box.hpp"
+
 #include "Stack.h"
 
 class CallableNode;
@@ -29,11 +31,11 @@ class EntryPoint
 			, llvm::Module *module
 			, llvm::LLVMContext *context
 			, const std::string &name
-			, const std::multimap<std::string, CallableNode *> &functions
-			, const std::map<std::string, const BaseValue *> &locals
-			, const std::map<std::string, const Node *> &globals
-			, const std::map<std::string, Prototype *> &types
-			, const Stack &values
+			, immer::box<std::multimap<std::string, CallableNode *>> functions
+			, immer::box<std::map<std::string, const BaseValue *>> locals
+			, immer::box<std::map<std::string, const Node *>> globals
+			, immer::box<std::map<std::string, Prototype *>> types
+			, immer::box<Stack> values
 			, IIteratorStorage *iteratorStorage
 			);
 
@@ -55,12 +57,12 @@ class EntryPoint
 		std::string name() const;
 		std::string tag() const;
 
-		std::multimap<std::string, CallableNode *> functions() const;
-		std::map<std::string, const BaseValue *> locals() const;
-		std::map<std::string, const Node *> globals() const;
-		std::map<std::string, Prototype *> types() const;
+		const std::multimap<std::string, CallableNode *> &functions() const;
+		const std::map<std::string, const BaseValue *> &locals() const;
+		const std::map<std::string, const Node *> &globals() const;
+		const std::map<std::string, Prototype *> &types() const;
 
-		Stack values() const;
+		const Stack &values() const;
 
 		IIteratorStorage *iteratorStorage() const;
 
@@ -96,12 +98,11 @@ class EntryPoint
 
 		std::string m_name;
 
-		std::multimap<std::string, CallableNode *> m_functions;
-		std::map<std::string, const BaseValue *> m_locals;
-		std::map<std::string, const Node *> m_globals;
-		std::map<std::string, Prototype *> m_types;
-
-		Stack m_values;
+		immer::box<std::multimap<std::string, CallableNode *>> m_functions;
+		immer::box<std::map<std::string, const BaseValue *>> m_locals;
+		immer::box<std::map<std::string, const Node *>> m_globals;
+		immer::box<std::map<std::string, Prototype *>> m_types;
+		immer::box<Stack> m_values;
 
 		IIteratorStorage *m_iteratorStorage;
 };
