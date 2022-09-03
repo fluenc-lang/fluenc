@@ -6,12 +6,12 @@ ConditionalNode::ConditionalNode(const Node *ifFalse, const Node *ifTrue)
 {
 }
 
-std::vector<DzResult> ConditionalNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ConditionalNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitConditional(this, entryPoint, values);
+	return visitor.visitConditional(this, context);
 }
 
-std::vector<DzResult> ConditionalNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ConditionalNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitConditional(this, entryPoint, values);
+	return visitor.visitConditional(this, context);
 }

@@ -5,12 +5,12 @@ LazyEvaluationNode::LazyEvaluationNode(const Node *consumer)
 {
 }
 
-std::vector<DzResult> LazyEvaluationNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> LazyEvaluationNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitLazyEvaluation(this, entryPoint, values);
+	return visitor.visitLazyEvaluation(this, context);
 }
 
-std::vector<DzResult> LazyEvaluationNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> LazyEvaluationNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitLazyEvaluation(this, entryPoint, values);
+	return visitor.visitLazyEvaluation(this, context);
 }

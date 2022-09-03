@@ -5,12 +5,12 @@ IteratableNode::IteratableNode(const IIteratable *iteratable)
 {
 }
 
-std::vector<DzResult> IteratableNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IteratableNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIteratable(this, entryPoint, values);
+	return visitor.visitIteratable(this, context);
 }
 
-std::vector<DzResult> IteratableNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IteratableNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIteratable(this, entryPoint, values);
+	return visitor.visitIteratable(this, context);
 }

@@ -7,12 +7,12 @@ ArrayContinuationNode::ArrayContinuationNode(const ReferenceValue *index, const 
 {
 }
 
-std::vector<DzResult> ArrayContinuationNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ArrayContinuationNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArrayContinuation(this, entryPoint, values);
+	return visitor.visitArrayContinuation(this, context);
 }
 
-std::vector<DzResult > ArrayContinuationNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult > ArrayContinuationNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArrayContinuation(this, entryPoint, values);
+	return visitor.visitArrayContinuation(this, context);
 }

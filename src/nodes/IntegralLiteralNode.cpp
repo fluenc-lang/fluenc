@@ -7,12 +7,12 @@ IntegralLiteralNode::IntegralLiteralNode(const Node *consumer, ITypeName *type, 
 {
 }
 
-std::vector<DzResult> IntegralLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IntegralLiteralNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIntegralLiteral(this, entryPoint, values);
+	return visitor.visitIntegralLiteral(this, context);
 }
 
-std::vector<DzResult> IntegralLiteralNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IntegralLiteralNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIntegralLiteral(this, entryPoint, values);
+	return visitor.visitIntegralLiteral(this, context);
 }

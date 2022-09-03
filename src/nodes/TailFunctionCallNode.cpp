@@ -11,12 +11,12 @@ int TailFunctionCallNode::order(const EntryPoint &entryPoint) const
 	return m_regularCall->order(entryPoint);
 }
 
-std::vector<DzResult> TailFunctionCallNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> TailFunctionCallNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitTailFunctionCall(this, entryPoint, values);
+	return visitor.visitTailFunctionCall(this, context);
 }
 
-std::vector<DzResult> TailFunctionCallNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> TailFunctionCallNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitTailFunctionCall(this, entryPoint, values);
+	return visitor.visitTailFunctionCall(this, context);
 }

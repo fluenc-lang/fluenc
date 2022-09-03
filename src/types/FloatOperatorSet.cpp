@@ -4,5 +4,5 @@
 
 const Node *FloatOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new TypedOperatorNode<BinaryNode, &NodeVisitor::visitFloatBinary>(node);
+	return new TypedOperatorNode<BinaryNode, &DefaultNodeVisitor::visitFloatBinary>(node);
 }

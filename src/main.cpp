@@ -326,7 +326,7 @@ int main(int argc, char **argv)
 
 				for (auto root : module.roots)
 				{
-					root->accept(emitter, entryPoint, values);
+					root->accept(emitter, { entryPoint, values });
 				}
 
 				llvmModule->print(llvm::errs(), nullptr);

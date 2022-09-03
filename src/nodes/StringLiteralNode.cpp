@@ -6,12 +6,12 @@ StringLiteralNode::StringLiteralNode(const Node *consumer, const std::string &va
 {
 }
 
-std::vector<DzResult> StringLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> StringLiteralNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitStringLiteral(this, entryPoint, values);
+	return visitor.visitStringLiteral(this, context);
 }
 
-std::vector<DzResult> StringLiteralNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> StringLiteralNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitStringLiteral(this, entryPoint, values);
+	return visitor.visitStringLiteral(this, context);
 }

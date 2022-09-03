@@ -7,12 +7,12 @@ ArrayElementNode::ArrayElementNode(const Type *arrayType, const Node *node, cons
 {
 }
 
-std::vector<DzResult > ArrayElementNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult > ArrayElementNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArrayElement(this, entryPoint, values);
+	return visitor.visitArrayElement(this, context);
 }
 
-std::vector<DzResult > ArrayElementNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult > ArrayElementNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArrayElement(this, entryPoint, values);
+	return visitor.visitArrayElement(this, context);
 }

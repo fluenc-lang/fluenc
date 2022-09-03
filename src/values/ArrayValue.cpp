@@ -16,14 +16,14 @@ ArrayValue::ArrayValue(const ReferenceValue *index
 {
 }
 
-std::vector<DzResult> ArrayValue::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ArrayValue::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArrayValue(this, entryPoint, values);
+	return visitor.visitArrayValue(this, context);
 }
 
-std::vector<DzResult > ArrayValue::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult > ArrayValue::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArrayValue(this, entryPoint, values);
+	return visitor.visitArrayValue(this, context);
 }
 
 const Node *ArrayValue::createIterator(const IIteratable *parent, const Type *type, size_t size)

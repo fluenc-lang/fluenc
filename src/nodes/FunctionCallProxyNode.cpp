@@ -10,12 +10,12 @@ FunctionCallProxyNode::FunctionCallProxyNode(const std::vector<std::string> &nam
 {
 }
 
-std::vector<DzResult> FunctionCallProxyNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FunctionCallProxyNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitFunctionCallProxy(this, entryPoint, values);
+	return visitor.visitFunctionCallProxy(this, context);
 }
 
-std::vector<DzResult> FunctionCallProxyNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FunctionCallProxyNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitFunctionCallProxy(this, entryPoint, values);
+	return visitor.visitFunctionCallProxy(this, context);
 }

@@ -13,8 +13,8 @@ class BinaryNode : public Node
 	public:
 		BinaryNode(const Node *consumer, const std::string &op);
 
-		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const override;
+		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node * m_consumer;

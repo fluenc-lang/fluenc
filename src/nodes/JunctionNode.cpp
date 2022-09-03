@@ -5,12 +5,12 @@ JunctionNode::JunctionNode(const Node *subject)
 {
 }
 
-std::vector<DzResult> JunctionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> JunctionNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitJunction(this, entryPoint, values);
+	return visitor.visitJunction(this, context);
 }
 
-std::vector<DzResult> JunctionNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> JunctionNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitJunction(this, entryPoint, values);
+	return visitor.visitJunction(this, context);
 }

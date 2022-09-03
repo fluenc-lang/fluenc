@@ -40,12 +40,12 @@ ContinuationNode::ContinuationNode(const Node *node, const Type *iteratorType)
 {
 }
 
-std::vector<DzResult> ContinuationNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ContinuationNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitContinuation(this, entryPoint, values);
+	return visitor.visitContinuation(this, context);
 }
 
-std::vector<DzResult> ContinuationNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ContinuationNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitContinuation(this, entryPoint, values);
+	return visitor.visitContinuation(this, context);
 }

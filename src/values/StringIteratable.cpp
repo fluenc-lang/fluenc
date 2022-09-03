@@ -8,12 +8,12 @@ StringIteratable::StringIteratable(const ReferenceValue *index, const Node *node
 {
 }
 
-std::vector<DzResult > StringIteratable::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult > StringIteratable::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitStringIteratable(this, entryPoint, values);
+	return visitor.visitStringIteratable(this, context);
 }
 
-std::vector<DzResult > StringIteratable::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult > StringIteratable::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitStringIteratable(this, entryPoint, values);
+	return visitor.visitStringIteratable(this, context);
 }

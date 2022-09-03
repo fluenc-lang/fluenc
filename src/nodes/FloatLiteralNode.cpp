@@ -7,12 +7,12 @@ FloatLiteralNode::FloatLiteralNode(const Node *consumer, const ITypeName *type, 
 {
 }
 
-std::vector<DzResult> FloatLiteralNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FloatLiteralNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitFloatLiteral(this, entryPoint, values);
+	return visitor.visitFloatLiteral(this, context);
 }
 
-std::vector<DzResult> FloatLiteralNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> FloatLiteralNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitFloatLiteral(this, entryPoint, values);
+	return visitor.visitFloatLiteral(this, context);
 }

@@ -11,12 +11,12 @@ bool BlockInstructionNode::containsIterator() const
 	return m_containsIterator;
 }
 
-std::vector<DzResult> BlockInstructionNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> BlockInstructionNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitBlockInstruction(this, entryPoint, values);
+	return visitor.visitBlockInstruction(this, context);
 }
 
-std::vector<DzResult> BlockInstructionNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> BlockInstructionNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitBlockInstruction(this, entryPoint, values);
+	return visitor.visitBlockInstruction(this, context);
 }

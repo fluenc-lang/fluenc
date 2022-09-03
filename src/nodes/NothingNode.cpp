@@ -5,12 +5,12 @@ NothingNode::NothingNode(const Node *consumer)
 {
 }
 
-std::vector<DzResult> NothingNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> NothingNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitNothing(this, entryPoint, values);
+	return visitor.visitNothing(this, context);
 }
 
-std::vector<DzResult> NothingNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> NothingNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitNothing(this, entryPoint, values);
+	return visitor.visitNothing(this, context);
 }

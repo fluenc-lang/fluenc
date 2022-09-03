@@ -10,12 +10,12 @@ ArraySinkNode::ArraySinkNode(size_t size
 {
 }
 
-std::vector<DzResult> ArraySinkNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ArraySinkNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArraySink(this, entryPoint, values);
+	return visitor.visitArraySink(this, context);
 }
 
-std::vector<DzResult> ArraySinkNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> ArraySinkNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitArraySink(this, entryPoint, values);
+	return visitor.visitArraySink(this, context);
 }

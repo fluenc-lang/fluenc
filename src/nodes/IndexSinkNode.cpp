@@ -6,12 +6,12 @@ IndexSinkNode::IndexSinkNode(size_t index, const Node *consumer)
 {
 }
 
-std::vector<DzResult> IndexSinkNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IndexSinkNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIndexSink(this, entryPoint, values);
+	return visitor.visitIndexSink(this, context);
 }
 
-std::vector<DzResult> IndexSinkNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> IndexSinkNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIndexSink(this, entryPoint, values);
+	return visitor.visitIndexSink(this, context);
 }

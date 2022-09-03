@@ -5,12 +5,12 @@ EmptyArrayNode::EmptyArrayNode(const Node *consumer)
 {
 }
 
-std::vector<DzResult> EmptyArrayNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> EmptyArrayNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitEmptyArray(this, entryPoint, values);
+	return visitor.visitEmptyArray(this, context);
 }
 
-std::vector<DzResult> EmptyArrayNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> EmptyArrayNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitEmptyArray(this, entryPoint, values);
+	return visitor.visitEmptyArray(this, context);
 }

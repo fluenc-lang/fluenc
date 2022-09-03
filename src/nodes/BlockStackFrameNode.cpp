@@ -1,5 +1,3 @@
-#include "Utility.h"
-
 #include "nodes/BlockStackFrameNode.h"
 
 BlockStackFrameNode::BlockStackFrameNode(Node *consumer)
@@ -7,16 +5,12 @@ BlockStackFrameNode::BlockStackFrameNode(Node *consumer)
 {
 }
 
-std::vector<DzResult> BlockStackFrameNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> BlockStackFrameNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
-	return visitor.visitBlockStackFrame(this, entryPoint, Stack());
+	return visitor.visitBlockStackFrame(this, { context.entryPoint, Stack() });
 }
 
-std::vector<DzResult> BlockStackFrameNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> BlockStackFrameNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
-	return visitor.visitBlockStackFrame(this, entryPoint, Stack());
+	return visitor.visitBlockStackFrame(this, { context.entryPoint, Stack() });
 }

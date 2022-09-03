@@ -4,5 +4,5 @@
 
 const Node *IntegerOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new TypedOperatorNode<BinaryNode, &NodeVisitor::visitIntegerBinary>(node);
+	return new TypedOperatorNode<BinaryNode, &DefaultNodeVisitor::visitIntegerBinary>(node);
 }

@@ -6,12 +6,12 @@ BinaryNode::BinaryNode(const Node *consumer, const std::string &op)
 {
 }
 
-std::vector<DzResult> BinaryNode::accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> BinaryNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitBinary(this, entryPoint, values);
+	return visitor.visitBinary(this, context);
 }
 
-std::vector<DzResult> BinaryNode::accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> BinaryNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitBinary(this, entryPoint, values);
+	return visitor.visitBinary(this, context);
 }

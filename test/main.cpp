@@ -2576,7 +2576,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, entryPoint, Stack());
+	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2619,7 +2619,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, entryPoint, Stack());
+	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2657,7 +2657,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, entryPoint, Stack());
+	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2668,6 +2668,54 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 	auto lazy = functionValues.require<LazyValue>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "...");
+}
+
+BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
+{
+	auto entryPoint = compile(R"(
+		function foo((any item, ...items))
+		{
+			return item -> foo(...items);
+		}
+
+		function foo(any item)
+		{
+			return item;
+		}
+
+		function foo(without item)
+		{
+			return nothing;
+		}
+
+		function application()
+		{
+			return [1, 2, 3];
+		}
+
+		function bar()
+		{
+			return foo(application());
+		}
+	)");
+
+	auto functions = entryPoint.functions();
+
+	auto [_1, function] = *functions.find("bar");
+
+	Emitter emitter;
+
+	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+
+	BOOST_TEST(functionResults.size() == 1);
+
+	auto [_2, functionValues] = functionResults[0];
+
+	BOOST_TEST(functionValues.size() == 1);
+
+	auto lazy = functionValues.require<LazyValue>(nullptr);
+
+	BOOST_TEST(lazy->type()->name() == "[int, int, int]");
 }
 
 BOOST_AUTO_TEST_CASE (scenario71)

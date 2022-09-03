@@ -5,7 +5,7 @@
 #include "Node.h"
 
 template<typename TNode>
-using VisitorFunction = std::vector<DzResult> (NodeVisitor::*)(const TNode *node, const EntryPoint &entryPoint, Stack values) const;
+using VisitorFunction = std::vector<DzResult> (DefaultNodeVisitor::*)(const TNode *node, DefaultVisitorContext context) const;
 
 template<typename TNode, VisitorFunction<TNode> TFunction>
 class TypedOperatorNode : public Node
@@ -16,14 +16,14 @@ class TypedOperatorNode : public Node
 		{
 		}
 
-		std::vector<DzResult> accept(const Emitter &visitor, const EntryPoint &entryPoint, Stack values) const
+		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const
 		{
-			return (visitor.*TFunction)(m_node, entryPoint, values);
+			return (visitor.*TFunction)(m_node, context);
 		}
 
-		std::vector<DzResult> accept(const Analyzer &visitor, const EntryPoint &entryPoint, Stack values) const
+		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const
 		{
-			return (visitor.*TFunction)(m_node, entryPoint, values);
+			return (visitor.*TFunction)(m_node, context);
 		}
 
 	private:

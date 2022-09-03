@@ -109,17 +109,17 @@ class DummyValue : public BaseValueWithMetadata<DummyValueMetadata>
 		const Type *m_type;
 };
 
-std::vector<DzResult> Analyzer::visitBooleanBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitBooleanBinary(const BinaryNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 
-	return {{ entryPoint, values.discard() }};
+	return {{ context.entryPoint, context.values.discard() }};
 }
 
-std::vector<DzResult> Analyzer::visitFloatBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitFloatBinary(const BinaryNode *node, DefaultVisitorContext context) const
 {
-	auto left = values.pop();
-	auto right = values.pop();
+	auto left = context.values.pop();
+	auto right = context.values.pop();
 
 	UNUSED(right);
 
@@ -180,15 +180,15 @@ std::vector<DzResult> Analyzer::visitFloatBinary(const BinaryNode *node, const E
 
 	auto value = valueFactory();
 
-	values.push(value);
+	context.values.push(value);
 
-	return {{ entryPoint, values }};
+	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitIntegerBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitIntegerBinary(const BinaryNode *node, DefaultVisitorContext context) const
 {
-	auto left = values.pop();
-	auto right = values.pop();
+	auto left = context.values.pop();
+	auto right = context.values.pop();
 
 	UNUSED(right);
 
@@ -269,14 +269,14 @@ std::vector<DzResult> Analyzer::visitIntegerBinary(const BinaryNode *node, const
 
 	auto value = valueFactory();
 
-	values.push(value);
+	context.values.push(value);
 
-	return {{ entryPoint, values }};
+	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, DefaultVisitorContext context) const
 {
-	auto left = values.peek();
+	auto left = context.values.peek();
 
 	auto leftType = left->type();
 	auto operators = leftType->operators();
@@ -285,9 +285,9 @@ std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, const EntryP
 
 	std::vector<DzResult> results;
 
-	for (auto &[resultEntryPoint, resultValues] : binary->accept(*this, entryPoint, values))
+	for (auto &[resultEntryPoint, resultValues] : binary->accept(*this, context))
 	{
-		for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
+		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
 			results.push_back(result);
 		}
@@ -296,45 +296,42 @@ std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, const EntryP
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitExportedFunction(const ExportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitExportedFunction(const ExportedFunctionNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
-	UNUSED(entryPoint);
-	UNUSED(values);
+	UNUSED(context);
 
 	return std::vector<DzResult>();
 }
 
-std::vector<DzResult> Analyzer::visitArrayContinuation(const ArrayContinuationNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitArrayContinuation(const ArrayContinuationNode *node, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
 	auto value = new ExpandedValue(true
 		, node->m_iteratorType
-		, entryPoint
+		, context.entryPoint
 		, node->m_node
 		, node
 		, std::vector<const ExpandedValue *>()
 		);
 
-	return {{ entryPoint, value }};
+	return {{ context.entryPoint, value }};
 }
 
-std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, DefaultVisitorContext context) const
 {
-	auto value = values.require<IndexedValue>(nullptr);
+	auto value = context.values.require<IndexedValue>(nullptr);
 
-	auto ep = entryPoint
+	auto ep = context.entryPoint
 		.withIndex(value->index());
 
 	if (node->m_next)
 	{
 		auto continuation = new ArrayContinuationNode(nullptr, node->m_node, IteratorType::instance());
-		auto expandable = new ExpandableValue(true, node->m_arrayType, entryPoint, continuation);
+		auto expandable = new ExpandableValue(true, node->m_arrayType, context.entryPoint, continuation);
 
 		auto tuple = new TupleValue({ expandable, value->subject() });
 
-		auto resultsIfFalse = node->m_next->accept(*this, ep, values);
+		auto resultsIfFalse = node->m_next->accept(*this, { ep, context.values });
 
 		std::vector<DzResult> result = {{ ep, tuple }};
 
@@ -343,17 +340,17 @@ std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, 
 		return result;
 	}
 
-	values.push(value->subject());
+	context.values.push(value->subject());
 
-	return {{ ep, values }};
+	return {{ ep, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitIntegralLiteral(const IntegralLiteralNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitIntegralLiteral(const IntegralLiteralNode *node, DefaultVisitorContext context) const
 {
-	auto context = entryPoint.context();
+	auto llvmContext = context.entryPoint.context();
 
-	auto type = node->m_type->resolve(entryPoint);
-	auto storageType = type->storageType(*context);
+	auto type = node->m_type->resolve(context.entryPoint);
+	auto storageType = type->storageType(*llvmContext);
 
 	auto valueProvider = [&]
 	{
@@ -371,35 +368,35 @@ std::vector<DzResult> Analyzer::visitIntegralLiteral(const IntegralLiteralNode *
 		, valueProvider()
 		);
 
-	values.push(value);
+	context.values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitFloatLiteral(const FloatLiteralNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitFloatLiteral(const FloatLiteralNode *node, DefaultVisitorContext context) const
 {
-	auto context = entryPoint.context();
+	auto llvmContext = context.entryPoint.context();
 
-	auto type = node->m_type->resolve(entryPoint);
-	auto storageType = type->storageType(*context);
+	auto type = node->m_type->resolve(context.entryPoint);
+	auto storageType = type->storageType(*llvmContext);
 
 	auto value = new ScalarValue(type
 		, llvm::ConstantFP::get(storageType, node->m_value)
 		);
 
-	values.push(value);
+	context.values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitBooleanLiteral(const BooleanLiteralNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitBooleanLiteral(const BooleanLiteralNode *node, DefaultVisitorContext context) const
 {
-	auto context = entryPoint.context();
+	auto llvmContext = context.entryPoint.context();
 
 	auto valueProvider = [&]
 	{
 		auto type = BooleanType::instance();
-		auto storageType = type->storageType(*context);
+		auto storageType = type->storageType(*llvmContext);
 
 		if (node->m_value == "true")
 		{
@@ -416,45 +413,45 @@ std::vector<DzResult> Analyzer::visitBooleanLiteral(const BooleanLiteralNode *no
 
 	auto value = valueProvider();
 
-	values.push(value);
+	context.values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitStringLiteral(const StringLiteralNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitStringLiteral(const StringLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto stringType = StringType::get(node->m_value.size());
 
 	auto string = new DummyValue(stringType);
 
-	values.push(string);
+	context.values.push(string);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitCharacterLiteral(const CharacterLiteralNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitCharacterLiteral(const CharacterLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto type = Int32Type::instance();
 
 	auto value = new DummyValue(type);
 
-	values.push(value);
+	context.values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitNothing(const NothingNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitNothing(const NothingNode *node, DefaultVisitorContext context) const
 {
-	values.push(WithoutValue::instance());
+	context.values.push(WithoutValue::instance());
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, DefaultVisitorContext context) const
 {
-	auto &locals = entryPoint.locals();
-	auto &functions = entryPoint.functions();
-	auto &globals = entryPoint.globals();
+	auto &locals = context.entryPoint.locals();
+	auto &functions = context.entryPoint.functions();
+	auto &globals = context.entryPoint.globals();
 
 	for (auto &name : node->m_names)
 	{
@@ -464,20 +461,20 @@ std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, 
 		{
 			auto forwarded = localsIterator->second->forward(node->id());
 
-			values.push(forwarded);
+			context.values.push(forwarded);
 
-			return node->m_consumer->accept(*this, entryPoint, values);
+			return node->m_consumer->accept(*this, context);
 		}
 
 		auto functionsIterator = functions.find(name);
 
 		if (functionsIterator != functions.end())
 		{
-			auto value = new FunctionValue(functionsIterator->second, entryPoint);
+			auto value = new FunctionValue(functionsIterator->second, context.entryPoint);
 
-			values.push(value);
+			context.values.push(value);
 
-			return node->m_consumer->accept(*this, entryPoint, values);
+			return node->m_consumer->accept(*this, context);
 		}
 
 		auto globalsIterator = globals.find(name);
@@ -486,9 +483,9 @@ std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, 
 		{
 			std::vector<DzResult> results;
 
-			for (auto &[resultEntryPoint, resultValues] : globalsIterator->second->accept(*this, entryPoint, values))
+			for (auto &[resultEntryPoint, resultValues] : globalsIterator->second->accept(*this, context))
 			{
-				for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
+				for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
 				{
 					results.push_back(result);
 				}
@@ -501,12 +498,12 @@ std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, 
 	throw new UndeclaredIdentifierException(node->m_ast, node->m_names[0]);
 }
 
-std::vector<DzResult> Analyzer::visitReferenceSink(const ReferenceSinkNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitReferenceSink(const ReferenceSinkNode *node, DefaultVisitorContext context) const
 {
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *node, DefaultVisitorContext context) const
 {
 	auto digestDepth = [this](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
 	{
@@ -543,7 +540,7 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 
 				std::vector<DzResult> results;
 
-				for (auto &[resultEntryPoint, resultValues] : iteratable->accept(*this, entryPoint, Stack()))
+				for (auto &[resultEntryPoint, resultValues] : iteratable->accept(*this, { entryPoint, Stack() }))
 				{
 					auto forwardedValues = values;
 
@@ -582,7 +579,7 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 
 						std::vector<DzResult> results;
 
-						for (auto &[resultEntryPoint, resultValues] : node->accept(*this, entryPoint, values))
+						for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { entryPoint, values }))
 						{
 							auto forwardedValues = values;
 
@@ -655,14 +652,14 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 		return {{ entryPoint, values }};
 	};
 
-	auto ep = entryPoint
+	auto ep = context.entryPoint
 		.withIteratorStorage(new DummyIteratorStorage());
 
 	std::vector<DzResult> results;
 
-	for (auto &[resultEntryPoint, resultValues] : digestDepth(ep, values, digestDepth))
+	for (auto &[resultEntryPoint, resultValues] : digestDepth(ep, context.values, digestDepth))
 	{
-		for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
+		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
 			results.push_back(result);
 		}
@@ -671,12 +668,12 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, DefaultVisitorContext context) const
 {
 	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
 	{
-		auto &functions = entryPoint.functions();
-		auto &locals = entryPoint.locals();
+		auto &functions = context.entryPoint.functions();
+		auto &locals = context.entryPoint.locals();
 
 		for (auto &name : node->m_names)
 		{
@@ -695,7 +692,7 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 			{
 				auto function = i->second;
 
-				auto score = function->signatureCompatibility(entryPoint, types);
+				auto score = function->signatureCompatibility(context.entryPoint, types);
 
 				if (score < 0)
 				{
@@ -718,10 +715,8 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 
 	std::vector<DzResult> result;
 
-	for (auto &[resultEntryPoint, resultValues] : node->m_evaluation->accept(*this, entryPoint, values))
+	for (auto &[resultEntryPoint, resultValues] : node->m_evaluation->accept(*this, context))
 	{
-		auto &locals = resultEntryPoint.locals();
-
 		std::vector<const Type *> types;
 
 		std::transform(resultValues.rbegin(), resultValues.rend(), std::back_inserter(types), [](auto value)
@@ -738,10 +733,10 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 
 		if (function->attribute() == FunctionAttribute::Import)
 		{
-			return function->accept(*this, resultEntryPoint, resultValues);
+			return function->accept(*this, { resultEntryPoint, resultValues });
 		}
 
-		auto functionResults = function->accept(*this, resultEntryPoint, resultValues);
+		auto functionResults = function->accept(*this, { resultEntryPoint, resultValues });
 
 		for (const auto &[lastEntryPoint, returnValue] : functionResults)
 		{
@@ -755,10 +750,10 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 	return result;
 }
 
-std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, DefaultVisitorContext context) const
 {
 	std::vector<DzResult> result;
-	std::vector<DzResult> input = {{ entryPoint, Stack() }};
+	std::vector<DzResult> input = {{ context.entryPoint, Stack() }};
 
 	auto subjectResults = std::accumulate(rbegin(node->m_values), rend(node->m_values), input, [&](auto accumulator, auto argument)
 	{
@@ -766,7 +761,7 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 
 		for (auto &[accumulatorEntryPoint, accumulatorValues] : accumulator)
 		{
-			auto result = argument->accept(*this, accumulatorEntryPoint, Stack());
+			auto result = argument->accept(*this, { accumulatorEntryPoint, Stack() });
 
 			for (auto &[resultEntryPoint, resultValues] : result)
 			{
@@ -786,18 +781,18 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 
 	for (auto &[subjectEntryPoint, subjectValues] : subjectResults)
 	{
-		auto callResults = node->m_call->accept(*this, subjectEntryPoint, subjectValues);
+		auto callResults = node->m_call->accept(*this, { subjectEntryPoint, subjectValues });
 
 		for (auto &[callEntryPoint, callValues] : callResults)
 		{
-			auto forwardedValues = values;
+			auto forwardedValues = context.values;
 
 			for (auto &value : callValues)
 			{
 				forwardedValues.push(value);
 			}
 
-			auto consumerResults = node->m_consumer->accept(*this, callEntryPoint, forwardedValues);
+			auto consumerResults = node->m_consumer->accept(*this, { callEntryPoint, forwardedValues });
 
 			for (auto &consumerResult : consumerResults)
 			{
@@ -809,9 +804,9 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 	return result;
 }
 
-std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
 {
-	auto &functions = entryPoint.functions();
+	auto &functions = context.entryPoint.functions();
 
 	for (auto &name : node->m_names)
 	{
@@ -822,16 +817,16 @@ std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNo
 			// Naive. Really naive.
 			if (function->attribute() == FunctionAttribute::Iterator)
 			{
-				auto generator = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, entryPoint);
-				auto lazy = new LazyValue(generator, entryPoint);
+				auto generator = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, context.entryPoint);
+				auto lazy = new LazyValue(generator, context.entryPoint);
 
-				auto forwardedValues = values;
+				auto forwardedValues = context.values;
 
 				forwardedValues.push(lazy);
 
 				std::vector<DzResult> results;
 
-				for (auto &result : node->m_consumer->accept(*this, entryPoint, forwardedValues))
+				for (auto &result : node->m_consumer->accept(*this, { context.entryPoint, forwardedValues }))
 				{
 					results.push_back(result);
 				}
@@ -843,9 +838,9 @@ std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNo
 
 	std::vector<DzResult> results;
 
-	for (auto &[resultEntryPoint, resultValues] : node->m_regularCall->accept(*this, entryPoint, values))
+	for (auto &[resultEntryPoint, resultValues] : node->m_regularCall->accept(*this, context))
 	{
-		for (auto &result : node->m_consumer->accept(*this, resultEntryPoint, resultValues))
+		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
 			results.push_back(result);
 		}
@@ -854,18 +849,17 @@ std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNo
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitJunction(const JunctionNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitJunction(const JunctionNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
-	UNUSED(entryPoint);
-	UNUSED(values);
+	UNUSED(context);
 
 	return std::vector<DzResult>();
 }
 
-std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node, DefaultVisitorContext context) const
 {
-	auto module = entryPoint.module();
+	auto module = context.entryPoint.module();
 
 	auto dataLayout = module->getDataLayout();
 
@@ -873,12 +867,12 @@ std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node
 
 	std::transform(begin(node->m_fields), end(node->m_fields), std::inserter(valuesByName, begin(valuesByName)), [&](auto field)
 	{
-		return std::make_pair(field, values.pop());
+		return std::make_pair(field, context.values.pop());
 	});
 
-	auto prototype = node->m_prototypeProvider->provide(entryPoint, values);
+	auto prototype = node->m_prototypeProvider->provide(context.entryPoint, context.values);
 
-	auto prototypeFields = prototype->fields(entryPoint);
+	auto prototypeFields = prototype->fields(context.entryPoint);
 
 	std::vector<const NamedValue *> namedValues;
 
@@ -900,19 +894,19 @@ std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node
 
 	auto userTypeValue = new UserTypeValue(prototype, namedValues);
 
-	values.push(userTypeValue);
+	context.values.push(userTypeValue);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitConditional(const ConditionalNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitConditional(const ConditionalNode *node, DefaultVisitorContext context) const
 {
-	auto condition = values.pop();
+	auto condition = context.values.pop();
 
 	UNUSED(condition);
 
-	auto resultsIfTrue = node->m_ifTrue->accept(*this, entryPoint, values);
-	auto resultsIfFalse = node->m_ifFalse->accept(*this, entryPoint, values);
+	auto resultsIfTrue = node->m_ifTrue->accept(*this, context);
+	auto resultsIfFalse = node->m_ifFalse->accept(*this, context);
 
 	std::vector<DzResult> immediateResults;
 
@@ -922,43 +916,43 @@ std::vector<DzResult> Analyzer::visitConditional(const ConditionalNode *node, co
 	return immediateResults;
 }
 
-std::vector<DzResult> Analyzer::visitBlockInstruction(const BlockInstructionNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitBlockInstruction(const BlockInstructionNode *node, DefaultVisitorContext context) const
 {
-	return node->m_subject->accept(*this, entryPoint, values);
+	return node->m_subject->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitEmptyArray(const EmptyArrayNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitEmptyArray(const EmptyArrayNode *node, DefaultVisitorContext context) const
 {
-	values.push(WithoutValue::instance());
+	context.values.push(WithoutValue::instance());
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitIndexSink(const IndexSinkNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitIndexSink(const IndexSinkNode *node, DefaultVisitorContext context) const
 {
-	auto value = values.pop();
+	auto value = context.values.pop();
 
 	auto indexed = new IndexedValue(node->m_index, value);
 
-	values.push(indexed);
+	context.values.push(indexed);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitArraySink(const ArraySinkNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitArraySink(const ArraySinkNode *node, DefaultVisitorContext context) const
 {
-	auto arrayContents = node->m_firstValue->accept(*this, entryPoint, Stack());
+	auto arrayContents = node->m_firstValue->accept(*this, { context.entryPoint, Stack() });
 
 	auto generator = new ArrayValueGenerator(arrayContents, node->id(), node->m_size);
-	auto lazy = new LazyValue(generator, entryPoint);
+	auto lazy = new LazyValue(generator, context.entryPoint);
 
-	values.push(lazy);
+	context.values.push(lazy);
 
 	std::vector<DzResult> results;
 
 	for (auto &[arrayEntryPoint, _] : arrayContents)
 	{
-		for (auto &result : node->m_consumer->accept(*this, arrayEntryPoint, values))
+		for (auto &result : node->m_consumer->accept(*this, { arrayEntryPoint, context.values }))
 		{
 			results.push_back(result);
 		}
@@ -967,14 +961,14 @@ std::vector<DzResult> Analyzer::visitArraySink(const ArraySinkNode *node, const 
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitExpansion(const ExpansionNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitExpansion(const ExpansionNode *node, DefaultVisitorContext context) const
 {
-	auto expandable = values.require<ExpandableValue>(node->m_ast);
+	auto expandable = context.values.require<ExpandableValue>(node->m_ast);
 
 	auto continuation = expandable->chain();
 	auto provider = expandable->provider();
 
-	auto result = continuation->accept(*this, *provider, Stack());
+	auto result = continuation->accept(*this, { *provider, Stack() });
 
 	for (auto &[targetEntryPoint, continuationValues] : result)
 	{
@@ -983,19 +977,19 @@ std::vector<DzResult> Analyzer::visitExpansion(const ExpansionNode *node, const 
 
 		auto tuple = new TupleValue({ value, PlaceholderValue::instance() });
 
-		values.push(tuple);
+		context.values.push(tuple);
 
-		return node->m_consumer->accept(*this, entryPoint, values);
+		return node->m_consumer->accept(*this, context);
 	}
 
 	throw new std::exception();
 }
 
-std::vector<DzResult> Analyzer::visitLocal(const LocalNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitLocal(const LocalNode *node, DefaultVisitorContext context) const
 {
-	auto locals = entryPoint.locals();
+	auto locals = context.entryPoint.locals();
 
-	auto value = values.pop();
+	auto value = context.values.pop();
 
 	if (auto userValue = dynamic_cast<const UserTypeValue * >(value))
 	{
@@ -1014,15 +1008,15 @@ std::vector<DzResult> Analyzer::visitLocal(const LocalNode *node, const EntryPoi
 
 	locals[node->m_name] = value;
 
-	auto ep = entryPoint
+	auto ep = context.entryPoint
 		.withLocals(locals);
 
-	return node->m_consumer->accept(*this, ep, values);
+	return node->m_consumer->accept(*this, { ep, context.values });
 }
 
-std::vector<DzResult> Analyzer::visitContinuation(const ContinuationNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitContinuation(const ContinuationNode *node, DefaultVisitorContext context) const
 {
-	auto next = ValueHelper::extractValues<ExpandedValue>(values);
+	auto next = ValueHelper::extractValues<ExpandedValue>(context.values);
 
 	auto isArray = accumulate(begin(next), end(next), next.size() > 0, [](auto accumulated, auto value)
 	{
@@ -1031,18 +1025,18 @@ std::vector<DzResult> Analyzer::visitContinuation(const ContinuationNode *node, 
 
 	auto value = new ExpandedValue(isArray
 		, node->m_iteratorType
-		, entryPoint
+		, context.entryPoint
 		, node->m_node
 		, node
 		, next
 		);
 
-	return {{ entryPoint, value }};
+	return {{ context.entryPoint, value }};
 }
 
-std::vector<DzResult> Analyzer::visitUnary(const UnaryNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitUnary(const UnaryNode *node, DefaultVisitorContext context) const
 {
-	auto operand = values.pop();
+	auto operand = context.values.pop();
 
 	auto resolveOp = [&]
 	{
@@ -1056,14 +1050,14 @@ std::vector<DzResult> Analyzer::visitUnary(const UnaryNode *node, const EntryPoi
 
 	auto value = resolveOp();
 
-	values.push(value);
+	context.values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitTailFunctionCall(const TailFunctionCallNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitTailFunctionCall(const TailFunctionCallNode *node, DefaultVisitorContext context) const
 {
-	auto [score, tailCallTarget, targetValues] = FunctionHelper::tryCreateTailCall(entryPoint, values, begin(node->m_names), end(node->m_names));
+	auto [score, tailCallTarget, targetValues] = FunctionHelper::tryCreateTailCall(context.entryPoint, context.values, begin(node->m_names), end(node->m_names));
 
 	if (score == 0)
 	{
@@ -1075,10 +1069,10 @@ std::vector<DzResult> Analyzer::visitTailFunctionCall(const TailFunctionCallNode
 		throw new std::exception(); // TODO
 	}
 
-	return node->m_regularCall->accept(*this, entryPoint, values);
+	return node->m_regularCall->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitFunction(const FunctionNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitFunction(const FunctionNode *node, DefaultVisitorContext context) const
 {
 	struct Argument
 	{
@@ -1139,14 +1133,14 @@ std::vector<DzResult> Analyzer::visitFunction(const FunctionNode *node, const En
 		throw new std::exception();
 	};
 
-	auto pep = entryPoint
-		.withValues(values);
+	auto pep = context.entryPoint
+		.withValues(context.values);
 
 	std::map<std::string, const BaseValue *> locals;
 
 	for (const auto &argument : node->m_arguments)
 	{
-		for (auto &[name, value] : handleArgument(argument, values.pop(), handleArgument))
+		for (auto &[name, value] : handleArgument(argument, context.values.pop(), handleArgument))
 		{
 			locals[name] = value;
 		}
@@ -1158,96 +1152,87 @@ std::vector<DzResult> Analyzer::visitFunction(const FunctionNode *node, const En
 		.withLocals(locals)
 		.withIteratorStorage(nullptr);
 
-	return node->m_block->accept(*this, ep, values);
+	return node->m_block->accept(*this, { ep, context.values });
 }
 
-std::vector<DzResult> Analyzer::visitExportedFunctionTerminator(const ExportedFunctionTerminatorNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitExportedFunctionTerminator(const ExportedFunctionTerminatorNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
-	UNUSED(entryPoint);
-	UNUSED(values);
+	UNUSED(context);
 
 	return std::vector<DzResult>();
 }
 
-std::vector<DzResult> Analyzer::visitImportedFunction(const ImportedFunctionNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitImportedFunction(const ImportedFunctionNode *node, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
-	auto returnType = node->m_returnType->resolve(entryPoint);
+	auto returnType = node->m_returnType->resolve(context.entryPoint);
 
 	if (returnType != VoidType::instance())
 	{
-		return {{ entryPoint, new DummyValue(returnType) }};
+		return {{ context.entryPoint, new DummyValue(returnType) }};
 	}
 
-	return {{ entryPoint, Stack() }};
+	return {{ context.entryPoint, Stack() }};
 }
 
-std::vector<DzResult> Analyzer::visitGlobal(const GlobalNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitGlobal(const GlobalNode *node, DefaultVisitorContext context) const
 {
-	return node->m_value->accept(*this, entryPoint, values);
+	return node->m_value->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitReturn(const ReturnNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitReturn(const ReturnNode *node, DefaultVisitorContext context) const
 {
-	auto value = values.pop();
+	auto value = context.values.pop();
 
 	if (node->m_chained)
 	{
-		auto expandable = new ExpandableValue(false, node->m_iteratorType, entryPoint, node->m_chained);
+		auto expandable = new ExpandableValue(false, node->m_iteratorType, context.entryPoint, node->m_chained);
 		auto tuple = new TupleValue({ expandable, value });
 
-		values.push(tuple);
+		context.values.push(tuple);
 
-		return node->m_consumer->accept(*this, entryPoint, values);
+		return node->m_consumer->accept(*this, context);
 	}
 
-	values.push(value);
+	context.values.push(value);
 
-	return node->m_consumer->accept(*this, entryPoint, values);
+	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitParentInjector(const ParentInjectorNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitParentInjector(const ParentInjectorNode *node, DefaultVisitorContext context) const
 {
-	return node->m_subject->accept(*this, entryPoint, values);
+	return node->m_subject->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitBlockStackFrame(const BlockStackFrameNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitBlockStackFrame(const BlockStackFrameNode *node, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
-	return node->m_consumer->accept(*this, entryPoint, Stack());
+	return node->m_consumer->accept(*this, { context.entryPoint, Stack() });
 }
 
-std::vector<DzResult> Analyzer::visitTerminator(const TerminatorNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitTerminator(const TerminatorNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 
-	return {{ entryPoint, values }};
+	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitIteratable(const IteratableNode *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitIteratable(const IteratableNode *node, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
-	return node->m_iteratable->accept(*this, entryPoint, values);
+	return node->m_iteratable->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitArrayValue(const ArrayValue *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitArrayValue(const ArrayValue *node, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
 	std::vector<DzResult> results;
 
 	for (auto [_, elementValues] : node->m_values)
 	{
-		auto iteratorEntryPoint = entryPoint
+		auto iteratorEntryPoint = context.entryPoint
 			.withName("__array")
 			.markEntry()
 			;
 
-		for (auto &result : node->m_iterator->accept(*this, iteratorEntryPoint, elementValues))
+		for (auto &result : node->m_iterator->accept(*this, { iteratorEntryPoint, elementValues }))
 		{
 			results.push_back(result);
 		}
@@ -1256,11 +1241,9 @@ std::vector<DzResult> Analyzer::visitArrayValue(const ArrayValue *node, const En
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitIteratorValue(const IteratorValue *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitIteratorValue(const IteratorValue *node, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
-	auto locals = entryPoint.locals();
+	auto locals = context.entryPoint.locals();
 
 	for (auto &[key, value] : node->m_entryPoint->locals())
 	{
@@ -1269,16 +1252,14 @@ std::vector<DzResult> Analyzer::visitIteratorValue(const IteratorValue *node, co
 
 	auto ep = (*node->m_entryPoint)
 		.withLocals(locals)
-		.withIteratorStorage(entryPoint.iteratorStorage());
+		.withIteratorStorage(context.entryPoint.iteratorStorage());
 
-	return node->m_subject->accept(*this, ep, Stack());
+	return node->m_subject->accept(*this, { ep, Stack() });
 }
 
-std::vector<DzResult> Analyzer::visitStringIteratable(const StringIteratable *node, const EntryPoint &entryPoint, Stack values) const
+std::vector<DzResult> Analyzer::visitStringIteratable(const StringIteratable *node, DefaultVisitorContext context) const
 {
-	UNUSED(values);
-
-	auto iteratorEntryPoint = entryPoint
+	auto iteratorEntryPoint = context.entryPoint
 		.withName("__iterator")
 		.markEntry();
 

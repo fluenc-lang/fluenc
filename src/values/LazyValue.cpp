@@ -36,7 +36,7 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 
 			Analyzer analyzer;
 
-			auto chainResult = chain->accept(analyzer, *provider, Stack());
+			auto chainResult = chain->accept(analyzer, { *provider, Stack() });
 
 			auto [_, chainValues] = *chainResult.begin();
 
@@ -72,7 +72,7 @@ const Type *LazyValue::type() const
 
 	Analyzer analyzer;
 
-	auto results = iteratable->accept(analyzer, entryPoint, Stack());
+	auto results = iteratable->accept(analyzer, { entryPoint, Stack() });
 
 	std::map<int, const Type *> typesByIndex;
 
@@ -161,7 +161,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		throw new std::exception();
 	}
 
-	auto iteratableResults = iteratable->accept(emitter, entryPoint, Stack());
+	auto iteratableResults = iteratable->accept(emitter, { entryPoint, Stack() });
 
 	for (auto i = 0u; i < iteratableResults.size(); i++)
 	{
@@ -193,7 +193,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 			auto sourceContinuationEntryPoint = sourceProvider->withBlock(resultEntryPoint.block());
 
-			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, sourceContinuationEntryPoint, Stack()))
+			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, { sourceContinuationEntryPoint, Stack() }))
 			{
 				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, chainValues);
 
