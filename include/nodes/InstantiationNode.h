@@ -11,7 +11,7 @@
 class DzAssignment;
 class IPrototypeProvider;
 
-class InstantiationNode : public Node
+class InstantiationNode : public VisitableNode<InstantiationNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -22,9 +22,6 @@ class InstantiationNode : public Node
 			, const std::shared_ptr<peg::Ast> &ast
 			, const std::vector<std::string> &fields
 			);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_consumer;

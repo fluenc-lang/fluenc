@@ -5,7 +5,6 @@
 #include "ValueHelper.h"
 #include "ITypeName.h"
 #include "UndeclaredIdentifierException.h"
-#include "IteratorStorage.h"
 #include "FunctionHelper.h"
 #include "IPrototypeProvider.h"
 #include "DzArgument.h"
@@ -109,14 +108,14 @@ class DummyValue : public BaseValueWithMetadata<DummyValueMetadata>
 		const Type *m_type;
 };
 
-std::vector<DzResult> Analyzer::visitBooleanBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const BooleanBinaryNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 
 	return {{ context.entryPoint, context.values.discard() }};
 }
 
-std::vector<DzResult> Analyzer::visitFloatBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const FloatBinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = context.values.pop();
 	auto right = context.values.pop();
@@ -185,7 +184,7 @@ std::vector<DzResult> Analyzer::visitFloatBinary(const BinaryNode *node, Default
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitIntegerBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const IntegerBinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = context.values.pop();
 	auto right = context.values.pop();
@@ -274,7 +273,7 @@ std::vector<DzResult> Analyzer::visitIntegerBinary(const BinaryNode *node, Defau
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const BinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = context.values.peek();
 
@@ -296,7 +295,7 @@ std::vector<DzResult> Analyzer::visitBinary(const BinaryNode *node, DefaultVisit
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitExportedFunction(const ExportedFunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ExportedFunctionNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 	UNUSED(context);
@@ -304,7 +303,7 @@ std::vector<DzResult> Analyzer::visitExportedFunction(const ExportedFunctionNode
 	return std::vector<DzResult>();
 }
 
-std::vector<DzResult> Analyzer::visitArrayContinuation(const ArrayContinuationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ArrayContinuationNode *node, DefaultVisitorContext context) const
 {
 	auto value = new ExpandedValue(true
 		, node->m_iteratorType
@@ -317,7 +316,7 @@ std::vector<DzResult> Analyzer::visitArrayContinuation(const ArrayContinuationNo
 	return {{ context.entryPoint, value }};
 }
 
-std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ArrayElementNode *node, DefaultVisitorContext context) const
 {
 	auto value = context.values.require<IndexedValue>(nullptr);
 
@@ -345,7 +344,7 @@ std::vector<DzResult> Analyzer::visitArrayElement(const ArrayElementNode *node, 
 	return {{ ep, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitIntegralLiteral(const IntegralLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const IntegralLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -373,7 +372,7 @@ std::vector<DzResult> Analyzer::visitIntegralLiteral(const IntegralLiteralNode *
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitFloatLiteral(const FloatLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const FloatLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -389,7 +388,7 @@ std::vector<DzResult> Analyzer::visitFloatLiteral(const FloatLiteralNode *node, 
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitBooleanLiteral(const BooleanLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const BooleanLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -418,7 +417,7 @@ std::vector<DzResult> Analyzer::visitBooleanLiteral(const BooleanLiteralNode *no
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitStringLiteral(const StringLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const StringLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto stringType = StringType::get(node->m_value.size());
 
@@ -429,7 +428,7 @@ std::vector<DzResult> Analyzer::visitStringLiteral(const StringLiteralNode *node
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitCharacterLiteral(const CharacterLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const CharacterLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto type = Int32Type::instance();
 
@@ -440,14 +439,14 @@ std::vector<DzResult> Analyzer::visitCharacterLiteral(const CharacterLiteralNode
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitNothing(const NothingNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const NothingNode *node, DefaultVisitorContext context) const
 {
 	context.values.push(WithoutValue::instance());
 
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const MemberAccessNode *node, DefaultVisitorContext context) const
 {
 	auto &locals = context.entryPoint.locals();
 	auto &functions = context.entryPoint.functions();
@@ -498,12 +497,12 @@ std::vector<DzResult> Analyzer::visitMemberAccess(const MemberAccessNode *node, 
 	throw new UndeclaredIdentifierException(node->m_ast, node->m_names[0]);
 }
 
-std::vector<DzResult> Analyzer::visitReferenceSink(const ReferenceSinkNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ReferenceSinkNode *node, DefaultVisitorContext context) const
 {
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const LazyEvaluationNode *node, DefaultVisitorContext context) const
 {
 	auto digestDepth = [this](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
 	{
@@ -668,7 +667,7 @@ std::vector<DzResult> Analyzer::visitLazyEvaluation(const LazyEvaluationNode *no
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const FunctionCallNode *node, DefaultVisitorContext context) const
 {
 	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
 	{
@@ -750,7 +749,7 @@ std::vector<DzResult> Analyzer::visitFunctionCall(const FunctionCallNode *node, 
 	return result;
 }
 
-std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const StackSegmentNode *node, DefaultVisitorContext context) const
 {
 	std::vector<DzResult> result;
 	std::vector<DzResult> input = {{ context.entryPoint, Stack() }};
@@ -804,7 +803,7 @@ std::vector<DzResult> Analyzer::visitStackSegment(const StackSegmentNode *node, 
 	return result;
 }
 
-std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
 {
 	auto &functions = context.entryPoint.functions();
 
@@ -849,7 +848,7 @@ std::vector<DzResult> Analyzer::visitFunctionCallProxy(const FunctionCallProxyNo
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitJunction(const JunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const JunctionNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 	UNUSED(context);
@@ -857,7 +856,7 @@ std::vector<DzResult> Analyzer::visitJunction(const JunctionNode *node, DefaultV
 	return std::vector<DzResult>();
 }
 
-std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const InstantiationNode *node, DefaultVisitorContext context) const
 {
 	auto module = context.entryPoint.module();
 
@@ -899,7 +898,7 @@ std::vector<DzResult> Analyzer::visitInstantiation(const InstantiationNode *node
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitConditional(const ConditionalNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ConditionalNode *node, DefaultVisitorContext context) const
 {
 	auto condition = context.values.pop();
 
@@ -916,19 +915,19 @@ std::vector<DzResult> Analyzer::visitConditional(const ConditionalNode *node, De
 	return immediateResults;
 }
 
-std::vector<DzResult> Analyzer::visitBlockInstruction(const BlockInstructionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const BlockInstructionNode *node, DefaultVisitorContext context) const
 {
 	return node->m_subject->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitEmptyArray(const EmptyArrayNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const EmptyArrayNode *node, DefaultVisitorContext context) const
 {
 	context.values.push(WithoutValue::instance());
 
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitIndexSink(const IndexSinkNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const IndexSinkNode *node, DefaultVisitorContext context) const
 {
 	auto value = context.values.pop();
 
@@ -939,7 +938,7 @@ std::vector<DzResult> Analyzer::visitIndexSink(const IndexSinkNode *node, Defaul
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitArraySink(const ArraySinkNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ArraySinkNode *node, DefaultVisitorContext context) const
 {
 	auto arrayContents = node->m_firstValue->accept(*this, { context.entryPoint, Stack() });
 
@@ -961,7 +960,7 @@ std::vector<DzResult> Analyzer::visitArraySink(const ArraySinkNode *node, Defaul
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitExpansion(const ExpansionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ExpansionNode *node, DefaultVisitorContext context) const
 {
 	auto expandable = context.values.require<ExpandableValue>(node->m_ast);
 
@@ -985,7 +984,7 @@ std::vector<DzResult> Analyzer::visitExpansion(const ExpansionNode *node, Defaul
 	throw new std::exception();
 }
 
-std::vector<DzResult> Analyzer::visitLocal(const LocalNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const LocalNode *node, DefaultVisitorContext context) const
 {
 	auto locals = context.entryPoint.locals();
 
@@ -1014,7 +1013,7 @@ std::vector<DzResult> Analyzer::visitLocal(const LocalNode *node, DefaultVisitor
 	return node->m_consumer->accept(*this, { ep, context.values });
 }
 
-std::vector<DzResult> Analyzer::visitContinuation(const ContinuationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ContinuationNode *node, DefaultVisitorContext context) const
 {
 	auto next = ValueHelper::extractValues<ExpandedValue>(context.values);
 
@@ -1034,7 +1033,7 @@ std::vector<DzResult> Analyzer::visitContinuation(const ContinuationNode *node, 
 	return {{ context.entryPoint, value }};
 }
 
-std::vector<DzResult> Analyzer::visitUnary(const UnaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const UnaryNode *node, DefaultVisitorContext context) const
 {
 	auto operand = context.values.pop();
 
@@ -1055,7 +1054,7 @@ std::vector<DzResult> Analyzer::visitUnary(const UnaryNode *node, DefaultVisitor
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitTailFunctionCall(const TailFunctionCallNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const TailFunctionCallNode *node, DefaultVisitorContext context) const
 {
 	auto [score, tailCallTarget, targetValues] = FunctionHelper::tryCreateTailCall(context.entryPoint, context.values, begin(node->m_names), end(node->m_names));
 
@@ -1072,7 +1071,7 @@ std::vector<DzResult> Analyzer::visitTailFunctionCall(const TailFunctionCallNode
 	return node->m_regularCall->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitFunction(const FunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const FunctionNode *node, DefaultVisitorContext context) const
 {
 	struct Argument
 	{
@@ -1155,7 +1154,7 @@ std::vector<DzResult> Analyzer::visitFunction(const FunctionNode *node, DefaultV
 	return node->m_block->accept(*this, { ep, context.values });
 }
 
-std::vector<DzResult> Analyzer::visitExportedFunctionTerminator(const ExportedFunctionTerminatorNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ExportedFunctionTerminatorNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 	UNUSED(context);
@@ -1163,7 +1162,7 @@ std::vector<DzResult> Analyzer::visitExportedFunctionTerminator(const ExportedFu
 	return std::vector<DzResult>();
 }
 
-std::vector<DzResult> Analyzer::visitImportedFunction(const ImportedFunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ImportedFunctionNode *node, DefaultVisitorContext context) const
 {
 	auto returnType = node->m_returnType->resolve(context.entryPoint);
 
@@ -1175,12 +1174,12 @@ std::vector<DzResult> Analyzer::visitImportedFunction(const ImportedFunctionNode
 	return {{ context.entryPoint, Stack() }};
 }
 
-std::vector<DzResult> Analyzer::visitGlobal(const GlobalNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const GlobalNode *node, DefaultVisitorContext context) const
 {
 	return node->m_value->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitReturn(const ReturnNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ReturnNode *node, DefaultVisitorContext context) const
 {
 	auto value = context.values.pop();
 
@@ -1199,29 +1198,29 @@ std::vector<DzResult> Analyzer::visitReturn(const ReturnNode *node, DefaultVisit
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitParentInjector(const ParentInjectorNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ParentInjectorNode *node, DefaultVisitorContext context) const
 {
 	return node->m_subject->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitBlockStackFrame(const BlockStackFrameNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const BlockStackFrameNode *node, DefaultVisitorContext context) const
 {
 	return node->m_consumer->accept(*this, { context.entryPoint, Stack() });
 }
 
-std::vector<DzResult> Analyzer::visitTerminator(const TerminatorNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const TerminatorNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Analyzer::visitIteratable(const IteratableNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const IteratableNode *node, DefaultVisitorContext context) const
 {
 	return node->m_iteratable->accept(*this, context);
 }
 
-std::vector<DzResult> Analyzer::visitArrayValue(const ArrayValue *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const ArrayValue *node, DefaultVisitorContext context) const
 {
 	std::vector<DzResult> results;
 
@@ -1241,7 +1240,7 @@ std::vector<DzResult> Analyzer::visitArrayValue(const ArrayValue *node, DefaultV
 	return results;
 }
 
-std::vector<DzResult> Analyzer::visitIteratorValue(const IteratorValue *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const IteratorValue *node, DefaultVisitorContext context) const
 {
 	auto locals = context.entryPoint.locals();
 
@@ -1257,7 +1256,7 @@ std::vector<DzResult> Analyzer::visitIteratorValue(const IteratorValue *node, De
 	return node->m_subject->accept(*this, { ep, Stack() });
 }
 
-std::vector<DzResult> Analyzer::visitStringIteratable(const StringIteratable *node, DefaultVisitorContext context) const
+std::vector<DzResult> Analyzer::visit(const StringIteratable *node, DefaultVisitorContext context) const
 {
 	auto iteratorEntryPoint = context.entryPoint
 		.withName("__iterator")

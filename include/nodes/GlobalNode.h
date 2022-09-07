@@ -3,7 +3,7 @@
 
 #include "Node.h"
 
-class GlobalNode : public Node
+class GlobalNode : public VisitableNode<GlobalNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -12,9 +12,6 @@ class GlobalNode : public Node
 		GlobalNode(Node *value, const std::string &name);
 
 		std::string name() const;
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		Node *m_value;

@@ -3,16 +3,13 @@
 
 #include "Node.h"
 
-class JunctionNode : public Node
+class JunctionNode : public VisitableNode<JunctionNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		JunctionNode(const Node *subject);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_subject;

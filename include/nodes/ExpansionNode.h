@@ -4,16 +4,13 @@
 #include "Node.h"
 #include "TokenInfo.h"
 
-class ExpansionNode : public Node
+class ExpansionNode : public VisitableNode<ExpansionNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		ExpansionNode(const Node *consumer, const std::shared_ptr<peg::Ast> &ast);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_consumer;

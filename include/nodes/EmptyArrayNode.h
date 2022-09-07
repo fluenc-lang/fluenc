@@ -3,16 +3,13 @@
 
 #include "Node.h"
 
-class EmptyArrayNode : public Node
+class EmptyArrayNode : public VisitableNode<EmptyArrayNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		EmptyArrayNode(const Node *consumer);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_consumer;

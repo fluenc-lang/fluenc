@@ -11,13 +11,3 @@ InstantiationNode::InstantiationNode(const Node *consumer
 	, m_fields(fields)
 {
 }
-
-std::vector<DzResult> InstantiationNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitInstantiation(this, context);
-}
-
-std::vector<DzResult> InstantiationNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitInstantiation(this, context);
-}

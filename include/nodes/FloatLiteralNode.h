@@ -5,16 +5,13 @@
 
 class ITypeName;
 
-class FloatLiteralNode : public Node
+class FloatLiteralNode : public VisitableNode<FloatLiteralNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		FloatLiteralNode(const Node *consumer, const ITypeName *type, const std::string &value);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_consumer;

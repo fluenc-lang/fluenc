@@ -5,16 +5,13 @@
 
 #include "Node.h"
 
-class TailFunctionCallNode : public Node
+class TailFunctionCallNode : public VisitableNode<TailFunctionCallNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		TailFunctionCallNode(const std::vector<std::string> &names, const Node *regularCall);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 		int order(const EntryPoint &entryPoint) const override;
 

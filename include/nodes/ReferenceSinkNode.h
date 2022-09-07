@@ -3,7 +3,7 @@
 
 #include "Node.h"
 
-class ReferenceSinkNode : public Node
+class ReferenceSinkNode : public VisitableNode<ReferenceSinkNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -12,9 +12,6 @@ class ReferenceSinkNode : public Node
 		ReferenceSinkNode(const Node *consumer);
 
 		const BaseValue *makeReference(const BaseValue *value, const EntryPoint &entryPoint) const;
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_consumer;

@@ -1,8 +1,8 @@
 #include "types/IntegerOperatorSet.h"
 
-#include "nodes/TypedOperatorNode.h"
+#include "nodes/BinaryNode.h"
 
 const Node *IntegerOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new TypedOperatorNode<BinaryNode, &DefaultNodeVisitor::visitIntegerBinary>(node);
+	return new IntegerBinaryNode(node);
 }

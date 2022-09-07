@@ -9,13 +9,3 @@ ArraySinkNode::ArraySinkNode(size_t size
 	, m_firstValue(firstValue)
 {
 }
-
-std::vector<DzResult> ArraySinkNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitArraySink(this, context);
-}
-
-std::vector<DzResult> ArraySinkNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitArraySink(this, context);
-}

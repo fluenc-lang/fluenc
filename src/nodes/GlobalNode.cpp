@@ -10,13 +10,3 @@ std::string GlobalNode::name() const
 {
 	return m_name;
 }
-
-std::vector<DzResult> GlobalNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitGlobal(this, context);
-}
-
-std::vector<DzResult> GlobalNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitGlobal(this, context);
-}

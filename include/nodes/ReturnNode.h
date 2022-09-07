@@ -5,7 +5,7 @@
 
 class Type;
 
-class ReturnNode : public Node
+class ReturnNode : public VisitableNode<ReturnNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -15,9 +15,6 @@ class ReturnNode : public Node
 			, const Node *consumer
 			, const Node *chained
 			);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Type *m_iteratorType;

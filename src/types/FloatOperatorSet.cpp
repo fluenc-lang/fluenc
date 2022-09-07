@@ -1,8 +1,8 @@
 #include "types/FloatOperatorSet.h"
 
-#include "nodes/TypedOperatorNode.h"
+#include "nodes/BinaryNode.h"
 
 const Node *FloatOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new TypedOperatorNode<BinaryNode, &DefaultNodeVisitor::visitFloatBinary>(node);
+	return new FloatBinaryNode(node);
 }

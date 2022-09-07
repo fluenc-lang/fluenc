@@ -5,7 +5,7 @@
 
 class Type;
 
-class ArraySinkNode : public Node
+class ArraySinkNode : public VisitableNode<ArraySinkNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -15,9 +15,6 @@ class ArraySinkNode : public Node
 			, const Node *consumer
 			, const Node *firstValue
 			);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		size_t m_size;

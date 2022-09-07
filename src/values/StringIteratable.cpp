@@ -10,10 +10,10 @@ StringIteratable::StringIteratable(const ReferenceValue *index, const Node *node
 
 std::vector<DzResult > StringIteratable::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitStringIteratable(this, context);
+	return visitor.visit(this, context);
 }
 
 std::vector<DzResult > StringIteratable::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitStringIteratable(this, context);
+	return visitor.visit(this, context);
 }

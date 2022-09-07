@@ -3,7 +3,7 @@
 
 #include "Node.h"
 
-class FunctionCallProxyNode : public Node
+class FunctionCallProxyNode : public VisitableNode<FunctionCallProxyNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -13,9 +13,6 @@ class FunctionCallProxyNode : public Node
 			, const Node *regularCall
 			, const Node *consumer
 			);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		std::vector<std::string> m_names;

@@ -3,16 +3,13 @@
 
 #include "Node.h"
 
-class ConditionalNode : public Node
+class ConditionalNode : public VisitableNode<ConditionalNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		ConditionalNode(const Node *ifFalse, const Node *ifTrue);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_ifTrue;

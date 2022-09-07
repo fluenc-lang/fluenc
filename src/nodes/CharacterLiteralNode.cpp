@@ -5,13 +5,3 @@ CharacterLiteralNode::CharacterLiteralNode(const Node *consumer, const std::stri
 	, m_value(value)
 {
 }
-
-std::vector<DzResult> CharacterLiteralNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitCharacterLiteral(this, context);
-}
-
-std::vector<DzResult> CharacterLiteralNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitCharacterLiteral(this, context);
-}

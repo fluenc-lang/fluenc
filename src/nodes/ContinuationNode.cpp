@@ -39,13 +39,3 @@ ContinuationNode::ContinuationNode(const Node *node, const Type *iteratorType)
 	, m_iteratorType(iteratorType)
 {
 }
-
-std::vector<DzResult> ContinuationNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitContinuation(this, context);
-}
-
-std::vector<DzResult> ContinuationNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitContinuation(this, context);
-}

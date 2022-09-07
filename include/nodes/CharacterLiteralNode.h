@@ -5,16 +5,13 @@
 
 #include "Node.h"
 
-class CharacterLiteralNode : public Node
+class CharacterLiteralNode : public VisitableNode<CharacterLiteralNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		CharacterLiteralNode(const Node *consumer, const std::string &value);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		llvm::ConstantInt *getValue(llvm::Type *storageType) const;

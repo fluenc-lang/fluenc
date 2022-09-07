@@ -4,6 +4,7 @@
 #include "NodeVisitor.h"
 #include "Emitter.h"
 #include "Analyzer.h"
+#include "Visitable.h"
 
 class Node : public Visitable<Emitter, Analyzer>
 {
@@ -16,6 +17,11 @@ class Node : public Visitable<Emitter, Analyzer>
 
 	private:
 		size_t m_id;
+};
+
+template<typename TSelf>
+class VisitableNode : public VisitableExpansion<Node, TSelf, typename Node::VisitorType>
+{
 };
 
 #endif // DZVALUE_H

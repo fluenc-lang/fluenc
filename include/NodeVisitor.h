@@ -5,6 +5,9 @@
 #include "DzResult.h"
 
 class BinaryNode;
+class IntegerBinaryNode;
+class FloatBinaryNode;
+class BooleanBinaryNode;
 class ExportedFunctionNode;
 class ArrayContinuationNode;
 class ArrayElementNode;
@@ -53,18 +56,6 @@ struct DefaultVisitorContext
 	Stack values;
 };
 
-template<typename TVisitor>
-struct VisitableImpl
-{
-	virtual std::vector<DzResult> accept(const TVisitor &visitor, DefaultVisitorContext context) const = 0;
-};
-
-template<typename ...TVisitor>
-struct Visitable : public VisitableImpl<TVisitor>...
-{
-	using VisitableImpl<TVisitor>::accept...;
-};
-
 struct DummyVisitorContext
 {
 };
@@ -73,49 +64,52 @@ template<typename TReturn, typename TContext>
 class NodeVisitor
 {
 	public:
-		virtual TReturn visitBooleanBinary(const BinaryNode *node, TContext context) const = 0;
-		virtual TReturn visitFloatBinary(const BinaryNode *node, TContext context) const = 0;
-		virtual TReturn visitIntegerBinary(const BinaryNode *node, TContext context) const = 0;
-		virtual TReturn visitBinary(const BinaryNode *node, TContext context) const = 0;
-		virtual TReturn visitExportedFunction(const ExportedFunctionNode *node, TContext context) const = 0;
-		virtual TReturn visitArrayContinuation(const ArrayContinuationNode *node, TContext context) const = 0;
-		virtual TReturn visitArrayElement(const ArrayElementNode *node, TContext context) const = 0;
-		virtual TReturn visitIntegralLiteral(const IntegralLiteralNode *node, TContext context) const = 0;
-		virtual TReturn visitFloatLiteral(const FloatLiteralNode *node, TContext context) const = 0;
-		virtual TReturn visitBooleanLiteral(const BooleanLiteralNode *node, TContext context) const = 0;
-		virtual TReturn visitStringLiteral(const StringLiteralNode *node, TContext context) const = 0;
-		virtual TReturn visitCharacterLiteral(const CharacterLiteralNode *node, TContext context) const = 0;
-		virtual TReturn visitNothing(const NothingNode *node, TContext context) const = 0;
-		virtual TReturn visitMemberAccess(const MemberAccessNode *node, TContext context) const = 0;
-		virtual TReturn visitReferenceSink(const ReferenceSinkNode *node, TContext context) const = 0;
-		virtual TReturn visitLazyEvaluation(const LazyEvaluationNode *node, TContext context) const = 0;
-		virtual TReturn visitFunctionCall(const FunctionCallNode *node, TContext context) const = 0;
-		virtual TReturn visitStackSegment(const StackSegmentNode *node, TContext context) const = 0;
-		virtual TReturn visitFunctionCallProxy(const FunctionCallProxyNode *node, TContext context) const = 0;
-		virtual TReturn visitJunction(const JunctionNode *node, TContext context) const = 0;
-		virtual TReturn visitInstantiation(const InstantiationNode *node, TContext context) const = 0;
-		virtual TReturn visitConditional(const ConditionalNode *node, TContext context) const = 0;
-		virtual TReturn visitBlockInstruction(const BlockInstructionNode *node, TContext context) const = 0;
-		virtual TReturn visitEmptyArray(const EmptyArrayNode *node, TContext context) const = 0;
-		virtual TReturn visitIndexSink(const IndexSinkNode *node, TContext context) const = 0;
-		virtual TReturn visitArraySink(const ArraySinkNode *node, TContext context) const = 0;
-		virtual TReturn visitExpansion(const ExpansionNode *node, TContext context) const = 0;
-		virtual TReturn visitLocal(const LocalNode *node, TContext context) const = 0;
-		virtual TReturn visitContinuation(const ContinuationNode *node, TContext context) const = 0;
-		virtual TReturn visitUnary(const UnaryNode *node, TContext context) const = 0;
-		virtual TReturn visitTailFunctionCall(const TailFunctionCallNode *node, TContext context) const = 0;
-		virtual TReturn visitFunction(const FunctionNode *node, TContext context) const = 0;
-		virtual TReturn visitExportedFunctionTerminator(const ExportedFunctionTerminatorNode *node, TContext context) const = 0;
-		virtual TReturn visitImportedFunction(const ImportedFunctionNode *node, TContext context) const = 0;
-		virtual TReturn visitGlobal(const GlobalNode *node, TContext context) const = 0;
-		virtual TReturn visitReturn(const ReturnNode *node, TContext context) const = 0;
-		virtual TReturn visitParentInjector(const ParentInjectorNode *node, TContext context) const = 0;
-		virtual TReturn visitBlockStackFrame(const BlockStackFrameNode *node, TContext context) const = 0;
-		virtual TReturn visitTerminator(const TerminatorNode *node, TContext context) const = 0;
-		virtual TReturn visitIteratable(const IteratableNode *node, TContext context) const = 0;
-		virtual TReturn visitArrayValue(const ArrayValue *node, TContext context) const = 0;
-		virtual TReturn visitIteratorValue(const IteratorValue *node, TContext context) const = 0;
-		virtual TReturn visitStringIteratable(const StringIteratable *node, TContext context) const = 0;
+		using ReturnType = TReturn;
+		using ContextType = TContext;
+
+		virtual TReturn visit(const BooleanBinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const FloatBinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const IntegerBinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const BinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ExportedFunctionNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ArrayContinuationNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ArrayElementNode *node, TContext context) const = 0;
+		virtual TReturn visit(const IntegralLiteralNode *node, TContext context) const = 0;
+		virtual TReturn visit(const FloatLiteralNode *node, TContext context) const = 0;
+		virtual TReturn visit(const BooleanLiteralNode *node, TContext context) const = 0;
+		virtual TReturn visit(const StringLiteralNode *node, TContext context) const = 0;
+		virtual TReturn visit(const CharacterLiteralNode *node, TContext context) const = 0;
+		virtual TReturn visit(const NothingNode *node, TContext context) const = 0;
+		virtual TReturn visit(const MemberAccessNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ReferenceSinkNode *node, TContext context) const = 0;
+		virtual TReturn visit(const LazyEvaluationNode *node, TContext context) const = 0;
+		virtual TReturn visit(const FunctionCallNode *node, TContext context) const = 0;
+		virtual TReturn visit(const StackSegmentNode *node, TContext context) const = 0;
+		virtual TReturn visit(const FunctionCallProxyNode *node, TContext context) const = 0;
+		virtual TReturn visit(const JunctionNode *node, TContext context) const = 0;
+		virtual TReturn visit(const InstantiationNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ConditionalNode *node, TContext context) const = 0;
+		virtual TReturn visit(const BlockInstructionNode *node, TContext context) const = 0;
+		virtual TReturn visit(const EmptyArrayNode *node, TContext context) const = 0;
+		virtual TReturn visit(const IndexSinkNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ArraySinkNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ExpansionNode *node, TContext context) const = 0;
+		virtual TReturn visit(const LocalNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ContinuationNode *node, TContext context) const = 0;
+		virtual TReturn visit(const UnaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const TailFunctionCallNode *node, TContext context) const = 0;
+		virtual TReturn visit(const FunctionNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ExportedFunctionTerminatorNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ImportedFunctionNode *node, TContext context) const = 0;
+		virtual TReturn visit(const GlobalNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ReturnNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ParentInjectorNode *node, TContext context) const = 0;
+		virtual TReturn visit(const BlockStackFrameNode *node, TContext context) const = 0;
+		virtual TReturn visit(const TerminatorNode *node, TContext context) const = 0;
+		virtual TReturn visit(const IteratableNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ArrayValue *node, TContext context) const = 0;
+		virtual TReturn visit(const IteratorValue *node, TContext context) const = 0;
+		virtual TReturn visit(const StringIteratable *node, TContext context) const = 0;
 };
 
 using DefaultNodeVisitor = NodeVisitor<std::vector<DzResult>, DefaultVisitorContext>;

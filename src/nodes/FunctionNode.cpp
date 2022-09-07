@@ -70,10 +70,10 @@ int8_t FunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const 
 
 std::vector<DzResult> FunctionNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitFunction(this, context);
+	return visitor.visit(this, context);
 }
 
 std::vector<DzResult > FunctionNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitFunction(this, context);
+	return visitor.visit(this, context);
 }

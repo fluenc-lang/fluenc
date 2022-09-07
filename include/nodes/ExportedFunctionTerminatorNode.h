@@ -3,11 +3,8 @@
 
 #include "Node.h"
 
-class ExportedFunctionTerminatorNode : public Node
+class ExportedFunctionTerminatorNode : public VisitableNode<ExportedFunctionTerminatorNode>
 {
-	public:
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 };
 
 #endif // EXPORTEDFUNCTIONTERMINATORNODE_H

@@ -5,16 +5,13 @@
 
 class IIteratable;
 
-class IteratableNode : public Node
+class IteratableNode : public VisitableNode<IteratableNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		IteratableNode(const IIteratable *iteratable);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const IIteratable *m_iteratable;

@@ -5,16 +5,13 @@
 
 class Node;
 
-class UnaryNode : public Node
+class UnaryNode : public VisitableNode<UnaryNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		UnaryNode(const Node *consumer, const std::string &op);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const BaseValue *resolveOp(const BaseValue *value) const;

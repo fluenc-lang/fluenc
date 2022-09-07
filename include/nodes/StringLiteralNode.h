@@ -3,16 +3,13 @@
 
 #include "Node.h"
 
-class StringLiteralNode : public Node
+class StringLiteralNode : public VisitableNode<StringLiteralNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		StringLiteralNode(const Node *consumer, const std::string &value);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node *m_consumer;

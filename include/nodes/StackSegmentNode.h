@@ -3,7 +3,7 @@
 
 #include "Node.h"
 
-class StackSegmentNode : public Node
+class StackSegmentNode : public VisitableNode<StackSegmentNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -12,9 +12,6 @@ class StackSegmentNode : public Node
 		StackSegmentNode(std::vector<Node *> values, const Node *call, const Node *consumer);
 
 		int order(const EntryPoint &entryPoint) const override;
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		std::vector<Node *> m_values;

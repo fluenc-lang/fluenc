@@ -1,8 +1,8 @@
 #include "types/BooleanOperatorSet.h"
 
-#include "nodes/TypedOperatorNode.h"
+#include "nodes/BinaryNode.h"
 
 const Node *BooleanOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new TypedOperatorNode<BinaryNode, &DefaultNodeVisitor::visitBooleanBinary>(node);
+	return new BooleanBinaryNode(node);
 }

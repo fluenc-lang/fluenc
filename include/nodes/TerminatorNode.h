@@ -4,13 +4,10 @@
 #include "Node.h"
 #include "FunctionAttribute.h"
 
-class TerminatorNode : public Node
+class TerminatorNode : public VisitableNode<TerminatorNode>
 {
 	public:
 		TerminatorNode(const std::string &name, FunctionAttribute attribute);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 		FunctionAttribute attribute() const;
 

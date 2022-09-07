@@ -9,13 +9,3 @@ MemberAccessNode::MemberAccessNode(const Node *consumer
 	, m_names(names)
 {
 }
-
-std::vector<DzResult> MemberAccessNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitMemberAccess(this, context);
-}
-
-std::vector<DzResult> MemberAccessNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitMemberAccess(this, context);
-}

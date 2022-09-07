@@ -4,7 +4,7 @@
 #include "Node.h"
 #include "TokenInfo.h"
 
-class MemberAccessNode : public Node
+class MemberAccessNode : public VisitableNode<MemberAccessNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
@@ -14,9 +14,6 @@ class MemberAccessNode : public Node
 			, const std::shared_ptr<peg::Ast> &ast
 			, const std::vector<std::string> &names
 			);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Node * m_consumer;

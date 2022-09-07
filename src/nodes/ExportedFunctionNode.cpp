@@ -35,10 +35,10 @@ int8_t ExportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 
 std::vector<DzResult> ExportedFunctionNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitExportedFunction(this, context);
+	return visitor.visit(this, context);
 }
 
 std::vector<DzResult > ExportedFunctionNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitExportedFunction(this, context);
+	return visitor.visit(this, context);
 }

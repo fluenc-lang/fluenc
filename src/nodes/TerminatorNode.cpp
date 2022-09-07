@@ -17,13 +17,3 @@ TerminatorNode *TerminatorNode::instance()
 
 	return &instance;
 }
-
-std::vector<DzResult> TerminatorNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitTerminator(this, context);
-}
-
-std::vector<DzResult> TerminatorNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitTerminator(this, context);
-}

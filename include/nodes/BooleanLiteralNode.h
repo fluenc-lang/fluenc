@@ -5,16 +5,13 @@
 
 class ScalarValue;
 
-class BooleanLiteralNode : public Node
+class BooleanLiteralNode : public VisitableNode<BooleanLiteralNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		BooleanLiteralNode(const Node *consumer, const std::string &value);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const ScalarValue *resolveValue(const EntryPoint &entryPoint) const;

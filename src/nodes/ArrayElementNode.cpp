@@ -6,13 +6,3 @@ ArrayElementNode::ArrayElementNode(const Type *arrayType, const Node *node, cons
 	, m_next(next)
 {
 }
-
-std::vector<DzResult > ArrayElementNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitArrayElement(this, context);
-}
-
-std::vector<DzResult > ArrayElementNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitArrayElement(this, context);
-}

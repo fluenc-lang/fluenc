@@ -6,13 +6,3 @@ ArrayContinuationNode::ArrayContinuationNode(const ReferenceValue *index, const 
 	, m_iteratorType(iteratorType)
 {
 }
-
-std::vector<DzResult> ArrayContinuationNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitArrayContinuation(this, context);
-}
-
-std::vector<DzResult > ArrayContinuationNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visitArrayContinuation(this, context);
-}

@@ -7,16 +7,13 @@
 
 class Type;
 
-class ArrayElementNode : public Node
+class ArrayElementNode : public VisitableNode<ArrayElementNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		ArrayElementNode(const Type *arrayType, const Node *node, const Node *next);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const Type *m_arrayType;

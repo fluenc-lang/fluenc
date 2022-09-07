@@ -10,10 +10,10 @@ IteratorValue::IteratorValue(const EntryPoint *entryPoint
 
 std::vector<DzResult > IteratorValue::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIteratorValue(this, context);
+	return visitor.visit(this, context);
 }
 
 std::vector<DzResult > IteratorValue::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitIteratorValue(this, context);
+	return visitor.visit(this, context);
 }

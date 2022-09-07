@@ -88,7 +88,7 @@
 #include "exceptions/MissingFieldException.h"
 #include "exceptions/InvalidArgumentTypeException.h"
 
-std::vector<DzResult> Emitter::visitBooleanBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = ValueHelper::getScalar(context.entryPoint, context.values);
 	auto right = ValueHelper::getScalar(context.entryPoint, context.values);
@@ -127,7 +127,7 @@ std::vector<DzResult> Emitter::visitBooleanBinary(const BinaryNode *node, Defaul
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Emitter::visitFloatBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const FloatBinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = ValueHelper::getScalar(context.entryPoint, context.values);
 	auto right = ValueHelper::getScalar(context.entryPoint, context.values);
@@ -196,7 +196,7 @@ std::vector<DzResult> Emitter::visitFloatBinary(const BinaryNode *node, DefaultV
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Emitter::visitIntegerBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const IntegerBinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = ValueHelper::getScalar(context.entryPoint, context.values);
 	auto right = ValueHelper::getScalar(context.entryPoint, context.values);
@@ -285,7 +285,7 @@ std::vector<DzResult> Emitter::visitIntegerBinary(const BinaryNode *node, Defaul
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Emitter::visitBinary(const BinaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = context.values.peek();
 
@@ -307,7 +307,7 @@ std::vector<DzResult> Emitter::visitBinary(const BinaryNode *node, DefaultVisito
 	return results;
 }
 
-std::vector<DzResult> Emitter::visitExportedFunction(const ExportedFunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVisitorContext context) const
 {
 	auto module = context.entryPoint.module();
 	auto llvmContext = context.entryPoint.context();
@@ -337,7 +337,7 @@ std::vector<DzResult> Emitter::visitExportedFunction(const ExportedFunctionNode 
 	return result;
 }
 
-std::vector<DzResult> Emitter::visitArrayContinuation(const ArrayContinuationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ArrayContinuationNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -366,7 +366,7 @@ std::vector<DzResult> Emitter::visitArrayContinuation(const ArrayContinuationNod
 	return {{ context.entryPoint, value }};
 }
 
-std::vector<DzResult> Emitter::visitArrayElement(const ArrayElementNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ArrayElementNode *node, DefaultVisitorContext context) const
 {
 	Stack valuesIfTrue;
 
@@ -439,7 +439,7 @@ std::vector<DzResult> Emitter::visitArrayElement(const ArrayElementNode *node, D
 	return {{ ep, context.values }};
 }
 
-std::vector<DzResult> Emitter::visitIntegralLiteral(const IntegralLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const IntegralLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -467,7 +467,7 @@ std::vector<DzResult> Emitter::visitIntegralLiteral(const IntegralLiteralNode *n
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitFloatLiteral(const FloatLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const FloatLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -483,7 +483,7 @@ std::vector<DzResult> Emitter::visitFloatLiteral(const FloatLiteralNode *node, D
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitBooleanLiteral(const BooleanLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const BooleanLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -512,7 +512,7 @@ std::vector<DzResult> Emitter::visitBooleanLiteral(const BooleanLiteralNode *nod
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitStringLiteral(const StringLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const StringLiteralNode *node, DefaultVisitorContext context) const
 {
 	IRBuilderEx builder(context.entryPoint);
 
@@ -531,7 +531,7 @@ std::vector<DzResult> Emitter::visitStringLiteral(const StringLiteralNode *node,
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitCharacterLiteral(const CharacterLiteralNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const CharacterLiteralNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -571,14 +571,14 @@ std::vector<DzResult> Emitter::visitCharacterLiteral(const CharacterLiteralNode 
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitNothing(const NothingNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const NothingNode *node, DefaultVisitorContext context) const
 {
 	context.values.push(WithoutValue::instance());
 
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitMemberAccess(const MemberAccessNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisitorContext context) const
 {
 	auto &locals = context.entryPoint.locals();
 	auto &functions = context.entryPoint.functions();
@@ -640,7 +640,7 @@ std::vector<DzResult> Emitter::visitMemberAccess(const MemberAccessNode *node, D
 	throw new UndeclaredIdentifierException(node->m_ast, node->m_names[0]);
 }
 
-std::vector<DzResult> Emitter::visitReferenceSink(const ReferenceSinkNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisitorContext context) const
 {
 	auto makeReference = [&](const BaseValue *value, auto &recurse) -> const BaseValue *
 	{
@@ -708,7 +708,7 @@ std::vector<DzResult> Emitter::visitReferenceSink(const ReferenceSinkNode *node,
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitLazyEvaluation(const LazyEvaluationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisitorContext context) const
 {
 	auto digestDepth = [this](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
 	{
@@ -889,7 +889,7 @@ std::vector<DzResult> Emitter::visitLazyEvaluation(const LazyEvaluationNode *nod
 	return results;
 }
 
-std::vector<DzResult> Emitter::visitFunctionCall(const FunctionCallNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisitorContext context) const
 {
 	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
 	{
@@ -1016,7 +1016,7 @@ std::vector<DzResult> Emitter::visitFunctionCall(const FunctionCallNode *node, D
 	return result;
 }
 
-std::vector<DzResult> Emitter::visitStackSegment(const StackSegmentNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisitorContext context) const
 {
 	std::vector<DzResult> result;
 	std::vector<DzResult> input = {{ context.entryPoint, Stack() }};
@@ -1100,7 +1100,7 @@ std::vector<DzResult> Emitter::visitStackSegment(const StackSegmentNode *node, D
 	return result;
 }
 
-std::vector<DzResult> Emitter::visitFunctionCallProxy(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
 {
 	auto function = context.entryPoint.function();
 	auto block = context.entryPoint.block();
@@ -1152,7 +1152,7 @@ std::vector<DzResult> Emitter::visitFunctionCallProxy(const FunctionCallProxyNod
 	return results;
 }
 
-std::vector<DzResult> Emitter::visitJunction(const JunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorContext context) const
 {
 	struct SingleResult
 	{
@@ -1263,7 +1263,7 @@ std::vector<DzResult> Emitter::visitJunction(const JunctionNode *node, DefaultVi
 	return outputResults;
 }
 
-std::vector<DzResult> Emitter::visitInstantiation(const InstantiationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 	auto module = context.entryPoint.module();
@@ -1361,7 +1361,7 @@ std::vector<DzResult> Emitter::visitInstantiation(const InstantiationNode *node,
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitConditional(const ConditionalNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ConditionalNode *node, DefaultVisitorContext context) const
 {
 	struct SingleResult
 	{
@@ -1474,19 +1474,19 @@ std::vector<DzResult> Emitter::visitConditional(const ConditionalNode *node, Def
 	return mergedResults;
 }
 
-std::vector<DzResult> Emitter::visitBlockInstruction(const BlockInstructionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const BlockInstructionNode *node, DefaultVisitorContext context) const
 {
 	return node->m_subject->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitEmptyArray(const EmptyArrayNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const EmptyArrayNode *node, DefaultVisitorContext context) const
 {
 	context.values.push(WithoutValue::instance());
 
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitIndexSink(const IndexSinkNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const IndexSinkNode *node, DefaultVisitorContext context) const
 {
 	auto value = context.values.pop();
 
@@ -1497,7 +1497,7 @@ std::vector<DzResult> Emitter::visitIndexSink(const IndexSinkNode *node, Default
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitArraySink(const ArraySinkNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ArraySinkNode *node, DefaultVisitorContext context) const
 {
 	auto arrayContents = node->m_firstValue->accept(*this, { context.entryPoint, Stack() });
 
@@ -1519,7 +1519,7 @@ std::vector<DzResult> Emitter::visitArraySink(const ArraySinkNode *node, Default
 	return results;
 }
 
-std::vector<DzResult> Emitter::visitExpansion(const ExpansionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ExpansionNode *node, DefaultVisitorContext context) const
 {
 	auto block = context.entryPoint.block();
 
@@ -1549,7 +1549,7 @@ std::vector<DzResult> Emitter::visitExpansion(const ExpansionNode *node, Default
 	throw new std::exception();
 }
 
-std::vector<DzResult> Emitter::visitLocal(const LocalNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContext context) const
 {
 	auto locals = context.entryPoint.locals();
 
@@ -1578,7 +1578,7 @@ std::vector<DzResult> Emitter::visitLocal(const LocalNode *node, DefaultVisitorC
 	return node->m_consumer->accept(*this, { ep, context.values });
 }
 
-std::vector<DzResult> Emitter::visitContinuation(const ContinuationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisitorContext context) const
 {
 	insertBlock(context.entryPoint.block(), context.entryPoint.function());
 
@@ -1614,7 +1614,7 @@ std::vector<DzResult> Emitter::visitContinuation(const ContinuationNode *node, D
 	return {{ tailCallCandidate, value }};
 }
 
-std::vector<DzResult> Emitter::visitUnary(const UnaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContext context) const
 {
 	auto operand = context.values.pop();
 
@@ -1635,7 +1635,7 @@ std::vector<DzResult> Emitter::visitUnary(const UnaryNode *node, DefaultVisitorC
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitTailFunctionCall(const TailFunctionCallNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVisitorContext context) const
 {
 	auto function = context.entryPoint.function();
 	auto block = context.entryPoint.block();
@@ -1670,7 +1670,7 @@ std::vector<DzResult> Emitter::visitTailFunctionCall(const TailFunctionCallNode 
 	return junction->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitFunction(const FunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const FunctionNode *node, DefaultVisitorContext context) const
 {
 	struct Argument
 	{
@@ -1753,7 +1753,7 @@ std::vector<DzResult> Emitter::visitFunction(const FunctionNode *node, DefaultVi
 	return node->m_block->accept(*this, { ep, context.values });
 }
 
-std::vector<DzResult> Emitter::visitExportedFunctionTerminator(const ExportedFunctionTerminatorNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ExportedFunctionTerminatorNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 
@@ -1779,7 +1779,7 @@ std::vector<DzResult> Emitter::visitExportedFunctionTerminator(const ExportedFun
 	return {{ ep, context.values }};
 }
 
-std::vector<DzResult> Emitter::visitImportedFunction(const ImportedFunctionNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVisitorContext context) const
 {
 	auto module = context.entryPoint.module();
 	auto llvmContext = context.entryPoint.context();
@@ -1845,12 +1845,12 @@ std::vector<DzResult> Emitter::visitImportedFunction(const ImportedFunctionNode 
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Emitter::visitGlobal(const GlobalNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const GlobalNode *node, DefaultVisitorContext context) const
 {
 	return node->m_value->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitReturn(const ReturnNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ReturnNode *node, DefaultVisitorContext context) const
 {
 	auto fetchValue = [&]() -> const BaseValue *
 	{
@@ -1894,29 +1894,29 @@ std::vector<DzResult> Emitter::visitReturn(const ReturnNode *node, DefaultVisito
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitParentInjector(const ParentInjectorNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ParentInjectorNode *node, DefaultVisitorContext context) const
 {
 	return node->m_subject->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitBlockStackFrame(const BlockStackFrameNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const BlockStackFrameNode *node, DefaultVisitorContext context) const
 {
 	return node->m_consumer->accept(*this, { context.entryPoint, Stack() });
 }
 
-std::vector<DzResult> Emitter::visitTerminator(const TerminatorNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const TerminatorNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 
 	return {{ context.entryPoint, context.values }};
 }
 
-std::vector<DzResult> Emitter::visitIteratable(const IteratableNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const IteratableNode *node, DefaultVisitorContext context) const
 {
 	return node->m_iteratable->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visitArrayValue(const ArrayValue *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const ArrayValue *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 
@@ -1950,7 +1950,7 @@ std::vector<DzResult> Emitter::visitArrayValue(const ArrayValue *node, DefaultVi
 	return results;
 }
 
-std::vector<DzResult> Emitter::visitIteratorValue(const IteratorValue *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const IteratorValue *node, DefaultVisitorContext context) const
 {
 	auto locals = context.entryPoint.locals();
 
@@ -1967,7 +1967,7 @@ std::vector<DzResult> Emitter::visitIteratorValue(const IteratorValue *node, Def
 	return node->m_subject->accept(*this, { ep, Stack() });
 }
 
-std::vector<DzResult> Emitter::visitStringIteratable(const StringIteratable *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
 

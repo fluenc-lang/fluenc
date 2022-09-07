@@ -63,10 +63,10 @@ int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 
 std::vector<DzResult > ImportedFunctionNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitImportedFunction(this, context);
+	return visitor.visit(this, context);
 }
 
 std::vector<DzResult > ImportedFunctionNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
 {
-	return visitor.visitImportedFunction(this, context);
+	return visitor.visit(this, context);
 }

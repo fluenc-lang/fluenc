@@ -7,16 +7,13 @@
 
 class ITypeName;
 
-class IntegralLiteralNode : public Node
+class IntegralLiteralNode : public VisitableNode<IntegralLiteralNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
 
 	public:
 		IntegralLiteralNode(const Node *consumer, ITypeName *type, const std::string &value);
-
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		llvm::ConstantInt *getValue(llvm::Type *storageType) const;

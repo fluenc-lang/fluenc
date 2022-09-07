@@ -3,6 +3,7 @@
 
 #include "Emitter.h"
 #include "Analyzer.h"
+#include "Visitable.h"
 
 class EntryPoint;
 
