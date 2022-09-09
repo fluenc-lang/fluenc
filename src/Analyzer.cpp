@@ -124,52 +124,52 @@ std::vector<DzResult> Analyzer::visit(const FloatBinaryNode *node, DefaultVisito
 
 	auto valueFactory = [&]() -> const BaseValue *
 	{
-		if (node->m_op == "+")
+		if (node->op == "+")
 		{
 			return left;
 		}
 
-		if (node->m_op == "-")
+		if (node->op == "-")
 		{
 			return left;
 		}
 
-		if (node->m_op == "*")
+		if (node->op == "*")
 		{
 			return left;
 		}
 
-		if (node->m_op == "/")
+		if (node->op == "/")
 		{
 			return left;
 		}
 
-		if (node->m_op == "<")
+		if (node->op == "<")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == "<=")
+		if (node->op == "<=")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == ">")
+		if (node->op == ">")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == ">=")
+		if (node->op == ">=")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == "==")
+		if (node->op == "==")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == "!=")
+		if (node->op == "!=")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
@@ -193,72 +193,72 @@ std::vector<DzResult> Analyzer::visit(const IntegerBinaryNode *node, DefaultVisi
 
 	auto valueFactory = [&]() -> const BaseValue *
 	{
-		if (node->m_op == "+")
+		if (node->op == "+")
 		{
 			return left;
 		}
 
-		if (node->m_op == "-")
+		if (node->op == "-")
 		{
 			return left;
 		}
 
-		if (node->m_op == "*")
+		if (node->op == "*")
 		{
 			return left;
 		}
 
-		if (node->m_op == "/")
+		if (node->op == "/")
 		{
 			return left;
 		}
 
-		if (node->m_op == "<")
+		if (node->op == "<")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == "<=")
+		if (node->op == "<=")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == ">")
+		if (node->op == ">")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == ">=")
+		if (node->op == ">=")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == "==")
+		if (node->op == "==")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == "!=")
+		if (node->op == "!=")
 		{
 			return new DummyValue(BooleanType::instance());
 		}
 
-		if (node->m_op == "%")
+		if (node->op == "%")
 		{
 			return left;
 		}
 
-		if (node->m_op == "|")
+		if (node->op == "|")
 		{
 			return left;
 		}
 
-		if (node->m_op == "&")
+		if (node->op == "&")
 		{
 			return left;
 		}
 
-		if (node->m_op == "^")
+		if (node->op == "^")
 		{
 			return left;
 		}
@@ -286,7 +286,7 @@ std::vector<DzResult> Analyzer::visit(const BinaryNode *node, DefaultVisitorCont
 
 	for (auto &[resultEntryPoint, resultValues] : binary->accept(*this, context))
 	{
-		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
+		for (auto &result : node->consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
 			results.push_back(result);
 		}

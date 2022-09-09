@@ -4,10 +4,11 @@
 #include "Utility.h"
 #include "DzResult.h"
 
-class BinaryNode;
-class IntegerBinaryNode;
-class FloatBinaryNode;
-class BooleanBinaryNode;
+struct BinaryNode;
+struct IntegerBinaryNode;
+struct FloatBinaryNode;
+struct BooleanBinaryNode;
+
 class ExportedFunctionNode;
 class ArrayContinuationNode;
 class ArrayElementNode;

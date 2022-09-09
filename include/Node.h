@@ -1,7 +1,6 @@
 #ifndef DZVALUE_H
 #define DZVALUE_H
 
-#include "NodeVisitor.h"
 #include "Emitter.h"
 #include "Analyzer.h"
 #include "Visitable.h"

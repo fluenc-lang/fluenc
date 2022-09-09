@@ -4,5 +4,9 @@
 
 const Node *IntegerOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new IntegerBinaryNode(node);
+	auto result = new IntegerBinaryNode();
+	result->consumer = node->consumer;
+	result->op = node->op;
+
+	return result;
 }

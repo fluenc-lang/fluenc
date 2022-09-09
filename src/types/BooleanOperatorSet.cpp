@@ -4,5 +4,9 @@
 
 const Node *BooleanOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new BooleanBinaryNode(node);
+	auto result = new BooleanBinaryNode();
+	result->consumer = node->consumer;
+	result->op = node->op;
+
+	return result;
 }

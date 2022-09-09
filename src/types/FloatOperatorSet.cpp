@@ -4,5 +4,9 @@
 
 const Node *FloatOperatorSet::forBinary(const BinaryNode *node) const
 {
-	return new FloatBinaryNode(node);
+	auto result = new FloatBinaryNode();
+	result->consumer = node->consumer;
+	result->op = node->op;
+
+	return result;
 }

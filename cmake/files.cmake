@@ -203,7 +203,6 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/nodes/ArrayContinuationNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/ArrayElementNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/ArraySinkNode.cpp"
-    "${PROJECT_SRC_DIR}/nodes/BinaryNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/BlockInstructionNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/BlockStackFrameNode.cpp"
     "${PROJECT_SRC_DIR}/nodes/BooleanLiteralNode.cpp"

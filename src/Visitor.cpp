@@ -426,9 +426,9 @@ Node *Visitor::visitNothingLiteral(const std::shared_ptr<peg::Ast> &ast) const
 
 Node *Visitor::visitBinary(const std::shared_ptr<peg::Ast> &ast) const
 {
-	auto binary = new BinaryNode(m_alpha
-		, visitId(ast->nodes[1])
-		);
+	auto binary = new BinaryNode();
+	binary->op = visitId(ast->nodes[1]);
+	binary->consumer = m_alpha;
 
 	Visitor leftVisitor(m_namespaces, m_iteratorType, m_parent, binary, nullptr);
 

@@ -5,57 +5,28 @@
 
 class ScalarValue;
 
-class BinaryNodeBase
+template<typename TSelf>
+struct BinaryNodeBase : public VisitableNode<TSelf>
 {
-	public:
-		BinaryNodeBase(const Node *consumer, const std::string &op)
-			: m_consumer(consumer)
-			, m_op(op)
-		{
-		}
+	const Node *consumer;
 
-		const Node * m_consumer;
-
-		std::string m_op;
+	std::string op;
 };
 
-class IntegerBinaryNode
-	: public VisitableNode<IntegerBinaryNode>
-	, public BinaryNodeBase
+struct IntegerBinaryNode : public BinaryNodeBase<IntegerBinaryNode>
 {
-	public:
-		IntegerBinaryNode(const BinaryNodeBase *other)
-			: BinaryNodeBase(other->m_consumer, other->m_op)
-		{
-		}
 };
 
-class BooleanBinaryNode
-	: public VisitableNode<BooleanBinaryNode>
-	, public BinaryNodeBase
+struct BooleanBinaryNode : BinaryNodeBase<BooleanBinaryNode>
 {
-	public:
-		BooleanBinaryNode(const BinaryNodeBase *other)
-			: BinaryNodeBase(other->m_consumer, other->m_op)
-		{
-		}
 };
 
-class FloatBinaryNode
-	: public VisitableNode<FloatBinaryNode>
-	, public BinaryNodeBase
+struct FloatBinaryNode : public BinaryNodeBase<FloatBinaryNode>
 {
-	public:
-		FloatBinaryNode(const BinaryNodeBase *other)
-			: BinaryNodeBase(other->m_consumer, other->m_op)
-		{
-		}
 };
 
-class BinaryNode : public VisitableNode<BinaryNode>, public BinaryNodeBase
+struct BinaryNode : public BinaryNodeBase<BinaryNode>
 {
-	public:
-		BinaryNode(const Node *consumer, const std::string &op);
 };
 
 #endif // BINARYNODE_H

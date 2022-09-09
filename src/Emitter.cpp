@@ -97,22 +97,22 @@ std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisit
 
 	auto valueFactory = [&]
 	{
-		if (node->m_op == "==")
+		if (node->op == "==")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right);
 		}
 
-		if (node->m_op == "!=")
+		if (node->op == "!=")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right);
 		}
 
-		if (node->m_op == "&&")
+		if (node->op == "&&")
 		{
 			return builder.createLogicalAnd(left, right);
 		}
 
-		if (node->m_op == "||")
+		if (node->op == "||")
 		{
 			return builder.createLogicalOr(left, right);
 		}
@@ -136,52 +136,52 @@ std::vector<DzResult> Emitter::visit(const FloatBinaryNode *node, DefaultVisitor
 
 	auto valueFactory = [&]
 	{
-		if (node->m_op == "+")
+		if (node->op == "+")
 		{
 			return builder.createFAdd(left, right);
 		}
 
-		if (node->m_op == "-")
+		if (node->op == "-")
 		{
 			return builder.createFSub(left, right);
 		}
 
-		if (node->m_op == "*")
+		if (node->op == "*")
 		{
 			return builder.createFMul(left, right);
 		}
 
-		if (node->m_op == "/")
+		if (node->op == "/")
 		{
 			return builder.createFDiv(left, right);
 		}
 
-		if (node->m_op == "<")
+		if (node->op == "<")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_ULT, left, right);
 		}
 
-		if (node->m_op == "<=")
+		if (node->op == "<=")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_ULE, left, right);
 		}
 
-		if (node->m_op == ">")
+		if (node->op == ">")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UGT, left, right);
 		}
 
-		if (node->m_op == ">=")
+		if (node->op == ">=")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UGE, left, right);
 		}
 
-		if (node->m_op == "==")
+		if (node->op == "==")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UEQ, left, right);
 		}
 
-		if (node->m_op == "!=")
+		if (node->op == "!=")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UNE, left, right);
 		}
@@ -205,72 +205,72 @@ std::vector<DzResult> Emitter::visit(const IntegerBinaryNode *node, DefaultVisit
 
 	auto valueFactory = [&]
 	{
-		if (node->m_op == "+")
+		if (node->op == "+")
 		{
 			return builder.createAdd(left, right);
 		}
 
-		if (node->m_op == "-")
+		if (node->op == "-")
 		{
 			return builder.createSub(left, right);
 		}
 
-		if (node->m_op == "*")
+		if (node->op == "*")
 		{
 			return builder.createMul(left, right);
 		}
 
-		if (node->m_op == "/")
+		if (node->op == "/")
 		{
 			return builder.createSDiv(left, right);
 		}
 
-		if (node->m_op == "<")
+		if (node->op == "<")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLT, left, right);
 		}
 
-		if (node->m_op == "<=")
+		if (node->op == "<=")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SLE, left, right);
 		}
 
-		if (node->m_op == ">")
+		if (node->op == ">")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGT, left, right);
 		}
 
-		if (node->m_op == ">=")
+		if (node->op == ">=")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_SGE, left, right);
 		}
 
-		if (node->m_op == "==")
+		if (node->op == "==")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, left, right);
 		}
 
-		if (node->m_op == "!=")
+		if (node->op == "!=")
 		{
 			return builder.createCmp(llvm::CmpInst::Predicate::ICMP_NE, left, right);
 		}
 
-		if (node->m_op == "%")
+		if (node->op == "%")
 		{
 			return builder.createSRem(left, right);
 		}
 
-		if (node->m_op == "|")
+		if (node->op == "|")
 		{
 			return builder.createOr(left, right);
 		}
 
-		if (node->m_op == "&")
+		if (node->op == "&")
 		{
 			return builder.createAnd(left, right);
 		}
 
-		if (node->m_op == "^")
+		if (node->op == "^")
 		{
 			return builder.createXor(left, right);
 		}
@@ -298,7 +298,7 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 
 	for (auto &[resultEntryPoint, resultValues] : binary->accept(*this, context))
 	{
-		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
+		for (auto &result : node->consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
 			results.push_back(result);
 		}
@@ -356,7 +356,7 @@ std::vector<DzResult> Emitter::visit(const ArrayContinuationNode *node, DefaultV
 	builder.createStore(add, node->m_index);
 
 	auto value = new ExpandedValue(true
-	, node->m_iteratorType
+		, node->m_iteratorType
 		, context.entryPoint
 		, node->m_node
 		, node
