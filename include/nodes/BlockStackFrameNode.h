@@ -7,6 +7,7 @@ class BlockStackFrameNode : public VisitableNode<BlockStackFrameNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		BlockStackFrameNode(Node *consumer);

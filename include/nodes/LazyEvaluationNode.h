@@ -10,6 +10,7 @@ class LazyEvaluationNode : public VisitableNode<LazyEvaluationNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		LazyEvaluationNode(const Node *consumer);

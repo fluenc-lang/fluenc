@@ -3,9 +3,10 @@
 
 #include "Emitter.h"
 #include "Analyzer.h"
+#include "NodeLocator.h"
 #include "Visitable.h"
 
-class Node : public Visitable<Emitter, Analyzer>
+class Node : public Visitable<Emitter, Analyzer, NodeLocator>
 {
 	public:
 		Node();

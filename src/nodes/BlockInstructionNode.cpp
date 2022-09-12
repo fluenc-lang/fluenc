@@ -20,3 +20,8 @@ std::vector<DzResult> BlockInstructionNode::accept(const Analyzer &visitor, Defa
 {
 	return visitor.visit(this, context);
 }
+
+const Node *BlockInstructionNode::accept(const NodeLocator &visitor, DummyVisitorContext context) const
+{
+	return visitor.visit(this, context);
+}

@@ -8,6 +8,7 @@ class MemberAccessNode : public VisitableNode<MemberAccessNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		MemberAccessNode(const Node *consumer

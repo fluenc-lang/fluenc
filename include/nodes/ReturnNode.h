@@ -9,6 +9,7 @@ class ReturnNode : public VisitableNode<ReturnNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		ReturnNode(const Type *iteratorType

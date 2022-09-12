@@ -7,6 +7,7 @@ class ContinuationNode : public VisitableNode<ContinuationNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		ContinuationNode(const Node *node, const Type *iteratorType);

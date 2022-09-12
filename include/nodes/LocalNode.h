@@ -7,6 +7,7 @@ class LocalNode : public VisitableNode<LocalNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		LocalNode(const Node *consumer, const std::string &name);

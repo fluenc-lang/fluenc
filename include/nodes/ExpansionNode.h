@@ -8,6 +8,7 @@ class ExpansionNode : public VisitableNode<ExpansionNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		ExpansionNode(const Node *consumer, const std::shared_ptr<peg::Ast> &ast);

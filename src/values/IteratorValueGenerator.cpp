@@ -35,3 +35,8 @@ const Type *IteratorValueGenerator::type() const
 {
 	return m_iteratorType;
 }
+
+const Node *IteratorValueGenerator::subject() const
+{
+	return m_subject;
+}

@@ -7,6 +7,7 @@ class BlockInstructionNode : public IBlockInstruction
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		BlockInstructionNode(const Node *subject, bool containsIterator);
@@ -15,6 +16,8 @@ class BlockInstructionNode : public IBlockInstruction
 
 		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
 		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
+
+		const Node *accept(const NodeLocator &visitor, DummyVisitorContext context) const override;
 
 	private:
 		const Node *m_subject;

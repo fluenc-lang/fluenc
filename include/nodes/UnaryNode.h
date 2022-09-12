@@ -9,6 +9,7 @@ class UnaryNode : public VisitableNode<UnaryNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		UnaryNode(const Node *consumer, const std::string &op);

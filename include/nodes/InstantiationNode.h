@@ -15,6 +15,7 @@ class InstantiationNode : public VisitableNode<InstantiationNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		InstantiationNode(const Node *consumer

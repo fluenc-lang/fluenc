@@ -7,6 +7,7 @@ class FunctionCallProxyNode : public VisitableNode<FunctionCallProxyNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		FunctionCallProxyNode(const std::vector<std::string> &names

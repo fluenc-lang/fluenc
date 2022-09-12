@@ -7,6 +7,7 @@ class ReferenceSinkNode : public VisitableNode<ReferenceSinkNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		ReferenceSinkNode(const Node *consumer);

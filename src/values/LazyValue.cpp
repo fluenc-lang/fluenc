@@ -2,6 +2,7 @@
 #include "ValueHelper.h"
 #include "IteratorStorage.h"
 #include "FunctionHelper.h"
+#include "NodeLocator.h"
 
 #include "types/ArrayType.h"
 
@@ -9,8 +10,11 @@
 #include "values/ILazyValueGenerator.h"
 #include "values/IIteratable.h"
 #include "values/ArrayValueGenerator.h"
+#include "values/IteratorValueGenerator.h"
 #include "values/TupleValue.h"
 #include "values/ExpandableValue.h"
+
+#include "nodes/ArraySinkNode.h"
 
 using ElementType = std::pair<bool, const Type *>;
 
@@ -154,12 +158,49 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 	auto iteratable = source->generate(sourceEntryPoint);
 
-	auto array = dynamic_cast<const ArrayValueGenerator *>(m_generator);
-
-	if (!array)
+	auto arrayProvider = [&, this]
 	{
+		auto array = dynamic_cast<const ArrayValueGenerator *>(m_generator);
+
+		if (array)
+		{
+			return array;
+		}
+
+		auto iterator = dynamic_cast<const IteratorValueGenerator *>(m_generator);
+
+		if (!iterator)
+		{
+			throw new std::exception();
+		}
+
+		NodeLocator locator([](auto node)
+		{
+			return dynamic_cast<const ArraySinkNode *>(node);
+		});
+
+		auto subject = iterator->subject();
+		auto sink = subject->accept(locator, DummyVisitorContext());
+
+		if (!sink)
+		{
+			throw new std::exception();
+		}
+
+		for (auto [_, values] : sink->accept(emitter, { entryPoint, Stack() }))
+		{
+			auto value = values.require<LazyValue>(nullptr);
+
+			if (auto generator = dynamic_cast<const ArrayValueGenerator *>(value->m_generator))
+			{
+				return generator;
+			}
+		}
+
 		throw new std::exception();
-	}
+	};
+
+	auto array = arrayProvider();
 
 	auto iteratableResults = iteratable->accept(emitter, { entryPoint, Stack() });
 

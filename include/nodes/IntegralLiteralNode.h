@@ -11,6 +11,7 @@ class IntegralLiteralNode : public VisitableNode<IntegralLiteralNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		IntegralLiteralNode(const Node *consumer, ITypeName *type, const std::string &value);

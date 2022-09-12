@@ -30,6 +30,8 @@ class ImportedFunctionNode : public CallableNode
 		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
 		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
+		const Node *accept(const NodeLocator &visitor, DummyVisitorContext context) const override;
+
 	private:
 		ITypeName *m_returnType;
 

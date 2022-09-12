@@ -19,6 +19,8 @@ class IteratorValueGenerator : public ILazyValueGenerator
 
 		const Type *type() const override;
 
+		const Node *subject() const;
+
 	private:
 		const Type *m_iteratorType;
 		const Node *m_subject;

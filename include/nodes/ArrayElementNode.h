@@ -11,6 +11,7 @@ class ArrayElementNode : public VisitableNode<ArrayElementNode>
 {
 	friend class Emitter;
 	friend class Analyzer;
+	friend class NodeLocator;
 
 	public:
 		ArrayElementNode(const Type *arrayType, const Node *node, const Node *next);
