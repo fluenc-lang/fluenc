@@ -61,7 +61,7 @@ std::vector<DzResult> ParentInjectorNode::accept(const Analyzer &visitor, Defaul
 	return visitor.visit(this, context);
 }
 
-const Node *ParentInjectorNode::accept(const NodeLocator &visitor, DummyVisitorContext context) const
+const Node *ParentInjectorNode::accept(const NodeLocator &visitor, EntryPoint context) const
 {
 	return visitor.visit(this, context);
 }

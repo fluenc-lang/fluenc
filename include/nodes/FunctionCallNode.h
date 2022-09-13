@@ -18,7 +18,7 @@ class FunctionCallNode : public Node
 		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
 		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
-		const Node *accept(const NodeLocator &visitor, DummyVisitorContext context) const override;
+		const Node *accept(const NodeLocator &visitor, EntryPoint context) const override;
 
 	private:
 		std::shared_ptr<peg::Ast> m_ast;

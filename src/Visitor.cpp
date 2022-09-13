@@ -98,8 +98,8 @@ std::vector<std::string> qualifiedNames(const std::vector<std::string> &namespac
 
 void populateInstructions(const std::vector<std::string> &namespaces
 	, const std::vector<std::any> &instructions
-	, std::vector<CallableNode *> &roots
-	, std::multimap<std::string, CallableNode *> &functions
+	, std::vector<const CallableNode *> &roots
+	, std::multimap<std::string, const CallableNode *> &functions
 	, std::map<std::string, const BaseValue *> &locals
 	, std::map<std::string, const Node *> &globals
 	, std::map<std::string, Prototype *> &types
@@ -177,8 +177,8 @@ void populateInstructions(const std::vector<std::string> &namespaces
 
 ModuleInfo Visitor::visit(const std::shared_ptr<peg::Ast> &ast) const
 {
-	std::vector<CallableNode *> roots;
-	std::multimap<std::string, CallableNode *> functions;
+	std::vector<const CallableNode *> roots;
+	std::multimap<std::string, const CallableNode *> functions;
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, const Node *> globals;
 	std::map<std::string, Prototype *> types;

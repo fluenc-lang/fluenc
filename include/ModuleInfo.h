@@ -13,8 +13,8 @@ class Prototype;
 
 struct ModuleInfo
 {
-	std::vector<CallableNode *> roots;
-	std::multimap<std::string, CallableNode *> functions;
+	std::vector<const CallableNode *> roots;
+	std::multimap<std::string, const CallableNode *> functions;
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, const Node *> globals;
 	std::map<std::string, Prototype *> types;

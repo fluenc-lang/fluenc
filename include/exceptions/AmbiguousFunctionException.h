@@ -12,14 +12,14 @@ class AmbiguousFunctionException : public CompilerException
 {
 	public:
 		AmbiguousFunctionException(const std::shared_ptr<peg::Ast> &ast
-			, const std::vector<CallableNode *> &functions
+			, const std::vector<const CallableNode *> &functions
 			, const EntryPoint &entryPoint
 			);
 
 		std::string message() const override;
 
 	private:
-		std::vector<CallableNode *> m_functions;
+		std::vector<const CallableNode *> m_functions;
 
 		const EntryPoint *m_entryPoint;
 };

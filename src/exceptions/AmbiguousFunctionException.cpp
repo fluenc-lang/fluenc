@@ -8,7 +8,7 @@
 #include "nodes/CallableNode.h"
 
 AmbiguousFunctionException::AmbiguousFunctionException(const std::shared_ptr<peg::Ast> &ast
-	, const std::vector<CallableNode *> &functions
+	, const std::vector<const CallableNode *> &functions
 	, const EntryPoint &entryPoint
 	)
 	: CompilerException(ast)

@@ -28,7 +28,7 @@
 
 INCTXT(Grammar, "fluenc.peg");
 
-CallableNode *compileFunction(std::string source)
+const CallableNode *compileFunction(std::string source)
 {
 	peg::parser parser(gGrammarData);
 

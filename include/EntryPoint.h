@@ -31,7 +31,7 @@ class EntryPoint
 			, llvm::Module *module
 			, llvm::LLVMContext *context
 			, const std::string &name
-			, immer::box<std::multimap<std::string, CallableNode *>> functions
+			, immer::box<std::multimap<std::string, const CallableNode *>> functions
 			, immer::box<std::map<std::string, const BaseValue *>> locals
 			, immer::box<std::map<std::string, const Node *>> globals
 			, immer::box<std::map<std::string, Prototype *>> types
@@ -57,7 +57,7 @@ class EntryPoint
 		std::string name() const;
 		std::string tag() const;
 
-		const std::multimap<std::string, CallableNode *> &functions() const;
+		const std::multimap<std::string, const CallableNode *> &functions() const;
 		const std::map<std::string, const BaseValue *> &locals() const;
 		const std::map<std::string, const Node *> &globals() const;
 		const std::map<std::string, Prototype *> &types() const;
@@ -98,7 +98,7 @@ class EntryPoint
 
 		std::string m_name;
 
-		immer::box<std::multimap<std::string, CallableNode *>> m_functions;
+		immer::box<std::multimap<std::string, const CallableNode *>> m_functions;
 		immer::box<std::map<std::string, const BaseValue *>> m_locals;
 		immer::box<std::map<std::string, const Node *>> m_globals;
 		immer::box<std::map<std::string, Prototype *>> m_types;

@@ -912,7 +912,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 				return value->function();
 			}
 
-			std::map<int8_t, CallableNode *> candidates;
+			std::map<int8_t, const CallableNode *> candidates;
 
 			for (auto [i, end] = functions.equal_range(name); i != end; i++)
 			{
@@ -929,7 +929,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 				if (candidate != candidates.end())
 				{
-					std::vector<CallableNode *> functions = { candidate->second, function };
+					std::vector<const CallableNode *> functions = { candidate->second, function };
 
 					throw new AmbiguousFunctionException(node->m_ast
 						, functions

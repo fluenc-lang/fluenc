@@ -38,12 +38,14 @@
 #include "nodes/TerminatorNode.h"
 #include "nodes/IteratableNode.h"
 
+#include "values/FunctionValue.h"
+
 NodeLocator::NodeLocator(Predicate predicate)
 	: m_predicate(predicate)
 {
 }
 
-const Node *NodeLocator::visit(const BooleanBinaryNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const BooleanBinaryNode *node, EntryPoint context) const
 {
 	UNUSED(node);
 	UNUSED(context);
@@ -51,7 +53,7 @@ const Node *NodeLocator::visit(const BooleanBinaryNode *node, DummyVisitorContex
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const FloatBinaryNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const FloatBinaryNode *node, EntryPoint context) const
 {
 	UNUSED(node);
 	UNUSED(context);
@@ -59,7 +61,7 @@ const Node *NodeLocator::visit(const FloatBinaryNode *node, DummyVisitorContext 
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const IntegerBinaryNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const IntegerBinaryNode *node, EntryPoint context) const
 {
 	UNUSED(node);
 	UNUSED(context);
@@ -67,7 +69,7 @@ const Node *NodeLocator::visit(const IntegerBinaryNode *node, DummyVisitorContex
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const BinaryNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const BinaryNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -77,7 +79,7 @@ const Node *NodeLocator::visit(const BinaryNode *node, DummyVisitorContext conte
 	return node->consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ExportedFunctionNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ExportedFunctionNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -87,7 +89,7 @@ const Node *NodeLocator::visit(const ExportedFunctionNode *node, DummyVisitorCon
 	return node->m_block->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ArrayContinuationNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ArrayContinuationNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -97,7 +99,7 @@ const Node *NodeLocator::visit(const ArrayContinuationNode *node, DummyVisitorCo
 	return node->m_node->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ArrayElementNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ArrayElementNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -112,7 +114,7 @@ const Node *NodeLocator::visit(const ArrayElementNode *node, DummyVisitorContext
 	return node->m_next->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const IntegralLiteralNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const IntegralLiteralNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -122,7 +124,7 @@ const Node *NodeLocator::visit(const IntegralLiteralNode *node, DummyVisitorCont
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const FloatLiteralNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const FloatLiteralNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -132,7 +134,7 @@ const Node *NodeLocator::visit(const FloatLiteralNode *node, DummyVisitorContext
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const BooleanLiteralNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const BooleanLiteralNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -142,7 +144,7 @@ const Node *NodeLocator::visit(const BooleanLiteralNode *node, DummyVisitorConte
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const StringLiteralNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const StringLiteralNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -152,7 +154,7 @@ const Node *NodeLocator::visit(const StringLiteralNode *node, DummyVisitorContex
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const CharacterLiteralNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const CharacterLiteralNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -162,7 +164,7 @@ const Node *NodeLocator::visit(const CharacterLiteralNode *node, DummyVisitorCon
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const NothingNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const NothingNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -172,7 +174,7 @@ const Node *NodeLocator::visit(const NothingNode *node, DummyVisitorContext cont
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const MemberAccessNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const MemberAccessNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -182,7 +184,7 @@ const Node *NodeLocator::visit(const MemberAccessNode *node, DummyVisitorContext
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ReferenceSinkNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ReferenceSinkNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -192,7 +194,7 @@ const Node *NodeLocator::visit(const ReferenceSinkNode *node, DummyVisitorContex
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const LazyEvaluationNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const LazyEvaluationNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -202,17 +204,54 @@ const Node *NodeLocator::visit(const LazyEvaluationNode *node, DummyVisitorConte
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const FunctionCallNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const FunctionCallNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
 		return node;
 	}
 
-	return node->m_evaluation->accept(*this, context);
+	auto &functions = context.functions();
+	auto &locals = context.locals();
+
+	auto findFunctions = [&](auto name) -> std::vector<const CallableNode *>
+	{
+		auto local = locals.find(name);
+
+		if (local != locals.end())
+		{
+			auto value = dynamic_cast<const FunctionValue *>(local->second);
+
+			return { value->function() };
+		}
+
+		auto [i, end] = functions.equal_range(name);
+
+		std::vector<const CallableNode *> functions;
+
+		std::transform(i, end, back_inserter(functions), [](auto pair)
+		{
+			return pair.second;
+		});
+
+		return functions;
+	};
+
+	for (auto &name : node->m_names)
+	{
+		for (auto function : findFunctions(name))
+		{
+			if (auto result = function->accept(*this, context))
+			{
+				return result;
+			}
+		}
+	}
+
+	return nullptr;
 }
 
-const Node *NodeLocator::visit(const StackSegmentNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const StackSegmentNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -235,7 +274,7 @@ const Node *NodeLocator::visit(const StackSegmentNode *node, DummyVisitorContext
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const FunctionCallProxyNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const FunctionCallProxyNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -250,7 +289,7 @@ const Node *NodeLocator::visit(const FunctionCallProxyNode *node, DummyVisitorCo
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const JunctionNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const JunctionNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -260,7 +299,7 @@ const Node *NodeLocator::visit(const JunctionNode *node, DummyVisitorContext con
 	return node->m_subject->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const InstantiationNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const InstantiationNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -270,7 +309,7 @@ const Node *NodeLocator::visit(const InstantiationNode *node, DummyVisitorContex
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ConditionalNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ConditionalNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -285,7 +324,7 @@ const Node *NodeLocator::visit(const ConditionalNode *node, DummyVisitorContext 
 	return node->m_ifFalse->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const BlockInstructionNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const BlockInstructionNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -295,7 +334,7 @@ const Node *NodeLocator::visit(const BlockInstructionNode *node, DummyVisitorCon
 	return node->m_subject->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const EmptyArrayNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const EmptyArrayNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -305,7 +344,7 @@ const Node *NodeLocator::visit(const EmptyArrayNode *node, DummyVisitorContext c
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const IndexSinkNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const IndexSinkNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -315,7 +354,7 @@ const Node *NodeLocator::visit(const IndexSinkNode *node, DummyVisitorContext co
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ArraySinkNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ArraySinkNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -330,7 +369,7 @@ const Node *NodeLocator::visit(const ArraySinkNode *node, DummyVisitorContext co
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ExpansionNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ExpansionNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -340,7 +379,7 @@ const Node *NodeLocator::visit(const ExpansionNode *node, DummyVisitorContext co
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const LocalNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const LocalNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -350,7 +389,7 @@ const Node *NodeLocator::visit(const LocalNode *node, DummyVisitorContext contex
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ContinuationNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ContinuationNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -360,7 +399,7 @@ const Node *NodeLocator::visit(const ContinuationNode *node, DummyVisitorContext
 	return node->m_node->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const UnaryNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const UnaryNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -370,7 +409,7 @@ const Node *NodeLocator::visit(const UnaryNode *node, DummyVisitorContext contex
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const TailFunctionCallNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const TailFunctionCallNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -380,7 +419,7 @@ const Node *NodeLocator::visit(const TailFunctionCallNode *node, DummyVisitorCon
 	return node->m_regularCall->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const FunctionNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const FunctionNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -390,7 +429,7 @@ const Node *NodeLocator::visit(const FunctionNode *node, DummyVisitorContext con
 	return node->m_block->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ExportedFunctionTerminatorNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ExportedFunctionTerminatorNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -400,7 +439,7 @@ const Node *NodeLocator::visit(const ExportedFunctionTerminatorNode *node, Dummy
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const ImportedFunctionNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ImportedFunctionNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -410,7 +449,7 @@ const Node *NodeLocator::visit(const ImportedFunctionNode *node, DummyVisitorCon
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const GlobalNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const GlobalNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -420,7 +459,7 @@ const Node *NodeLocator::visit(const GlobalNode *node, DummyVisitorContext conte
 	return node->m_value->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ReturnNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ReturnNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -438,7 +477,7 @@ const Node *NodeLocator::visit(const ReturnNode *node, DummyVisitorContext conte
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const ParentInjectorNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ParentInjectorNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -448,7 +487,7 @@ const Node *NodeLocator::visit(const ParentInjectorNode *node, DummyVisitorConte
 	return node->m_subject->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const BlockStackFrameNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const BlockStackFrameNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -458,7 +497,7 @@ const Node *NodeLocator::visit(const BlockStackFrameNode *node, DummyVisitorCont
 	return node->m_consumer->accept(*this, context);
 }
 
-const Node *NodeLocator::visit(const TerminatorNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const TerminatorNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -468,7 +507,7 @@ const Node *NodeLocator::visit(const TerminatorNode *node, DummyVisitorContext c
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const IteratableNode *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const IteratableNode *node, EntryPoint context) const
 {
 	if (m_predicate(node))
 	{
@@ -478,17 +517,17 @@ const Node *NodeLocator::visit(const IteratableNode *node, DummyVisitorContext c
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const ArrayValue *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const ArrayValue *node, EntryPoint context) const
 {
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const IteratorValue *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const IteratorValue *node, EntryPoint context) const
 {
 	return nullptr;
 }
 
-const Node *NodeLocator::visit(const StringIteratable *node, DummyVisitorContext context) const
+const Node *NodeLocator::visit(const StringIteratable *node, EntryPoint context) const
 {
 	return nullptr;
 }

@@ -685,7 +685,7 @@ std::vector<DzResult> Analyzer::visit(const FunctionCallNode *node, DefaultVisit
 				return value->function();
 			}
 
-			std::map<int8_t, CallableNode *> candidates;
+			std::map<int8_t, const CallableNode *> candidates;
 
 			for (auto [i, end] = functions.equal_range(name); i != end; i++)
 			{

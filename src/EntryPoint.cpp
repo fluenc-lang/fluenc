@@ -15,7 +15,7 @@ EntryPoint::EntryPoint(int depth
 	, llvm::Module *module
 	, llvm::LLVMContext *context
 	, const std::string &name
-	, immer::box<std::multimap<std::string, CallableNode *>> functions
+	, immer::box<std::multimap<std::string, const CallableNode *> > functions
 	, immer::box<std::map<std::string, const BaseValue *>> locals
 	, immer::box<std::map<std::string, const Node *>> globals
 	, immer::box<std::map<std::string, Prototype *>> types
@@ -100,7 +100,7 @@ std::string EntryPoint::name() const
 	return m_name;
 }
 
-const std::multimap<std::string, CallableNode *> &EntryPoint::functions() const
+const std::multimap<std::string, const CallableNode *> &EntryPoint::functions() const
 {
 	return m_functions.get();
 }
