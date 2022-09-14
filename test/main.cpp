@@ -4212,6 +4212,58 @@ BOOST_AUTO_TEST_CASE (scenario105)
 	BOOST_TEST(result == 22);
 }
 
+BOOST_AUTO_TEST_CASE (scenario106)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			values
+		};
+
+		function array()
+		{
+			return [1, 2, 3];
+		}
+
+		function foo((any item, ...items))
+		{
+			return item -> foo(...items);
+		}
+
+		function foo(any item)
+		{
+			return item;
+		}
+
+		function bar(int count, State s)
+		{
+			if (count > 0)
+			{
+				return 22;
+			}
+
+			return tail bar(count + 1, s);
+		}
+
+		function boo(function() a)
+		{
+			let state = State
+			{
+				values: foo(a())
+			};
+
+			return bar(0, state);
+		}
+
+		export int main()
+		{
+			return boo(array);
+		}
+	)");
+
+	BOOST_TEST(result == 22);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

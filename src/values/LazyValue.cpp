@@ -180,7 +180,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		});
 
 		auto subject = iterator->subject();
-		auto sink = subject->accept(locator, entryPoint);
+		auto sink = subject->accept(locator, *m_entryPoint);
 
 		if (!sink)
 		{
