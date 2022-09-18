@@ -871,7 +871,7 @@ std::vector<DzResult> Analyzer::visit(const InstantiationNode *node, DefaultVisi
 
 	auto prototype = node->m_prototypeProvider->provide(context.entryPoint, context.values);
 
-	auto prototypeFields = prototype->fields(context.entryPoint);
+	auto prototypeFields = prototype->fields(context.entryPoint, *this);
 
 	std::vector<const NamedValue *> namedValues;
 

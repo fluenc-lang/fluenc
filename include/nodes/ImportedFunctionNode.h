@@ -27,8 +27,7 @@ class ImportedFunctionNode : public CallableNode
 
 		int8_t signatureCompatibility(const EntryPoint &entryPoint, const std::vector<const Type *> &values) const override;
 
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 
 		const Node *accept(const NodeLocator &visitor, EntryPoint context) const override;
 

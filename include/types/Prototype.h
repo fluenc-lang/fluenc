@@ -17,7 +17,7 @@ class Prototype : public IPrototype
 		const IPrototype *root() const override;
 
 		std::string name() const override;
-		std::vector<PrototypeField> fields(const EntryPoint &entryPoint) const override;
+		std::vector<PrototypeField> fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 

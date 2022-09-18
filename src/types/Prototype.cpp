@@ -25,7 +25,7 @@ std::string Prototype::name() const
 	return m_tag;
 }
 
-std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint) const
+std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const
 {
 	std::vector<PrototypeField> fields;
 
@@ -35,9 +35,7 @@ std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint) cons
 
 		if (defaultValue)
 		{
-			Emitter emitter;
-
-			auto defaultResults = defaultValue->accept(emitter, { entryPoint, Stack() });
+			auto defaultResults = defaultValue->accept(visitor, { entryPoint, Stack() });
 
 			auto &[_, defaultValues] = *defaultResults.begin();
 
@@ -50,7 +48,7 @@ std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint) cons
 	for (auto type : m_parentTypes)
 	{
 		auto prototype = (Prototype *)type->resolve(entryPoint);
-		auto parentFields = prototype->fields(entryPoint);
+		auto parentFields = prototype->fields(entryPoint, visitor);
 
 		fields.insert(end(fields), begin(parentFields), end(parentFields));
 	}

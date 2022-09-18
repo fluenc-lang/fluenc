@@ -4264,6 +4264,63 @@ BOOST_AUTO_TEST_CASE (scenario106)
 	BOOST_TEST(result == 22);
 }
 
+BOOST_AUTO_TEST_CASE (scenario107)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			values
+		};
+
+		struct Color
+		{
+			r: 0,
+			g: 0,
+			b: 0
+		};
+
+		struct Rectangle
+		{
+			color: Color {}
+		};
+
+		function foo((any item, ...items))
+		{
+			return item -> foo(...items);
+		}
+
+		function foo(any item)
+		{
+			return item;
+		}
+
+		function bar(int count, State s)
+		{
+			if (count >= 1)
+			{
+				return 45;
+			}
+
+			return tail bar(count + 1, s);
+		}
+
+		export int main()
+		{
+			let state = State
+			{
+				values: foo([
+					Rectangle {},
+					Rectangle {}
+				])
+			};
+
+			return bar(0, state);
+		}
+	)");
+
+	BOOST_TEST(result == 45);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

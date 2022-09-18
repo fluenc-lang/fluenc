@@ -20,9 +20,10 @@ std::string WithPrototype::name() const
 	return m_value->type()->name();
 }
 
-std::vector<PrototypeField> WithPrototype::fields(const EntryPoint &entryPoint) const
+std::vector<PrototypeField> WithPrototype::fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const
 {
 	UNUSED(entryPoint);
+	UNUSED(visitor);
 
 	auto fields = m_value->fields();
 

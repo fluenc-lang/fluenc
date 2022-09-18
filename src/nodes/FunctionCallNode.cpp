@@ -28,12 +28,7 @@ int FunctionCallNode::order(const EntryPoint &entryPoint) const
 	return -1;
 }
 
-std::vector<DzResult> FunctionCallNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visit(this, context);
-}
-
-std::vector<DzResult> FunctionCallNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
+std::vector<DzResult> FunctionCallNode::accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const
 {
 	return visitor.visit(this, context);
 }

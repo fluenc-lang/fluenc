@@ -32,7 +32,9 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 
 	if (auto prototype = dynamic_cast<const IPrototype *>(type))
 	{
-		auto fields = prototype->fields(entryPoint);
+		Emitter emitter;
+
+		auto fields = prototype->fields(entryPoint, emitter);
 
 		std::vector<llvm::Type *> types;
 

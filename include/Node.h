@@ -6,7 +6,7 @@
 #include "NodeLocator.h"
 #include "Visitable.h"
 
-class Node : public Visitable<Emitter, Analyzer, NodeLocator>
+class Node : public Visitable<DefaultNodeVisitor, NodeLocator>
 {
 	public:
 		Node();

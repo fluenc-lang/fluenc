@@ -61,12 +61,7 @@ int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 	return max;
 }
 
-std::vector<DzResult > ImportedFunctionNode::accept(const Emitter &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visit(this, context);
-}
-
-std::vector<DzResult > ImportedFunctionNode::accept(const Analyzer &visitor, DefaultVisitorContext context) const
+std::vector<DzResult > ImportedFunctionNode::accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const
 {
 	return visitor.visit(this, context);
 }
