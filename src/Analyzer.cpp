@@ -1,5 +1,7 @@
 #include <llvm/IR/Verifier.h>
 
+#include <unordered_map>
+
 #include "Analyzer.h"
 #include "FunctionNotFoundException.h"
 #include "ValueHelper.h"
