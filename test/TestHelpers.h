@@ -79,8 +79,10 @@ const BaseValue *compileValue(std::string source)
 		auto functionType = llvm::FunctionType::get(llvm::Type::getVoidTy(*context), false);
 		auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, "dummy", module);
 
-		auto alloc = llvm::BasicBlock::Create(*context, "alloc", function);
-		auto block = llvm::BasicBlock::Create(*context, "block", function);
+		auto alloc = llvm::BasicBlock::Create(*context, "alloc");
+		auto block = llvm::BasicBlock::Create(*context, "block");
+
+		linkBlocks(alloc, block);
 
 		EntryPoint entryPoint(0
 			, -1

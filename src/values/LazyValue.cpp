@@ -145,8 +145,6 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 	auto function = entryPoint.function();
 
-	insertBlock(block, function);
-
 	auto dataLayout = module->getDataLayout();
 
 	auto exitBlock = llvm::BasicBlock::Create(*context, "exit");
@@ -210,8 +208,6 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 		auto sourceBlock = sourceResultEntryPoint.block();
 
-		insertBlock(sourceBlock, function);
-
 		auto sourceValue = sourceResultValues.pop();
 		auto targetValue = array->elementAt(sourceResultEntryPoint.index());
 
@@ -254,8 +250,6 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 			linkBlocks(resultEntryPoint.block(), exitBlock);
 		}
 	}
-
-	exitBlock->insertInto(function);
 
 	return entryPoint.withBlock(exitBlock);
 }

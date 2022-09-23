@@ -76,6 +76,7 @@
 #include "nodes/ParentInjectorNode.h"
 #include "nodes/BlockStackFrameNode.h"
 #include "nodes/IteratableNode.h"
+#include "nodes/DistributorNode.h"
 
 class DummyValueMetadata : public ValueMetadata
 {
@@ -1276,4 +1277,19 @@ std::vector<DzResult> Analyzer::visit(const StringIteratable *node, DefaultVisit
 		{ iteratorEntryPoint, tuple },
 		{ iteratorEntryPoint, value },
 	};
+}
+
+std::vector<DzResult> Analyzer::visit(const DistributorNode *node, DefaultVisitorContext context) const
+{
+	std::vector<DzResult> results;
+
+	for (auto &[entryPoint, values] : node->m_subject->accept(*this, context))
+	{
+		for (auto &result : node->m_consumer->accept(*this, { entryPoint, values }))
+		{
+			results.push_back(result);
+		}
+	}
+
+	return results;
 }

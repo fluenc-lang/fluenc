@@ -68,6 +68,7 @@ set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/nodes/CharacterLiteralNode.h"
     "${PROJECT_HEADER_DIR}/nodes/ConditionalNode.h"
     "${PROJECT_HEADER_DIR}/nodes/ContinuationNode.h"
+	"${PROJECT_HEADER_DIR}/nodes/DistributorNode.h"
     "${PROJECT_HEADER_DIR}/nodes/EmptyArrayNode.h"
     "${PROJECT_HEADER_DIR}/nodes/ExpansionNode.h"
     "${PROJECT_HEADER_DIR}/nodes/ExportedFunctionNode.h"

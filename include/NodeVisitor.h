@@ -49,6 +49,7 @@ class ArrayValue;
 class IteratorValue;
 class StringIteratable;
 class EntryPoint;
+class DistributorNode;
 
 struct DefaultVisitorContext
 {
@@ -111,6 +112,7 @@ class NodeVisitor
 		virtual TReturn visit(const ArrayValue *node, TContext context) const = 0;
 		virtual TReturn visit(const IteratorValue *node, TContext context) const = 0;
 		virtual TReturn visit(const StringIteratable *node, TContext context) const = 0;
+		virtual TReturn visit(const DistributorNode *node, TContext context) const = 0;
 };
 
 using DefaultNodeVisitor = NodeVisitor<std::vector<DzResult>, DefaultVisitorContext>;

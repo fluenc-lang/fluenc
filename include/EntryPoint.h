@@ -42,6 +42,8 @@ class EntryPoint
 		EntryPoint() = default;
 		EntryPoint(const EntryPoint &) = default;
 
+		void incorporate();
+
 		int depth() const;
 		int index() const;
 

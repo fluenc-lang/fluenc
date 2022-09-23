@@ -19,14 +19,6 @@ void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target)
 	builder.CreateBr(target);
 }
 
-void insertBlock(llvm::BasicBlock *block, llvm::Function *function)
-{
-	if (!block->getParent())
-	{
-		block->insertInto(function);
-	}
-}
-
 void guardBranch(llvm::BasicBlock *block)
 {
 	for (auto &instruction : *block)
