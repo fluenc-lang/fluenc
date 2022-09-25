@@ -53,6 +53,7 @@ class NodeLocator : public NodeVisitor<const Node *, EntryPoint>
 		const Node *visit(const ArrayValue *node, EntryPoint context) const override;
 		const Node *visit(const IteratorValue *node, EntryPoint context) const override;
 		const Node *visit(const StringIteratable *node, EntryPoint context) const override;
+		const Node *visit(const DistributorNode *node, EntryPoint context) const override;
 
 	private:
 		Predicate m_predicate;

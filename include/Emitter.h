@@ -52,6 +52,7 @@ class Emitter : public DefaultNodeVisitor
 		std::vector<DzResult> visit(const ArrayValue *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const IteratorValue *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const StringIteratable *node, DefaultVisitorContext context) const override;
+		std::vector<DzResult> visit(const DistributorNode *node, DefaultVisitorContext context) const override;
 };
 
 #endif // EMITTER_H

@@ -14,7 +14,6 @@ void UNUSED(T &&)
 std::ostream& operator<<(std::ostream &stream, const llvm::StringRef &string);
 
 void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target);
-void insertBlock(llvm::BasicBlock *source, llvm::Function *function);
 void guardBranch(llvm::BasicBlock *block);
 
 template<typename TKey, typename TValue>

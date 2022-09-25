@@ -51,6 +51,8 @@
 #include "nodes/FunctionCallProxyNode.h"
 #include "nodes/ParentInjectorNode.h"
 #include "nodes/FloatLiteralNode.h"
+#include "nodes/JunctionNode.h"
+#include "nodes/DistributorNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -722,11 +724,14 @@ CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &as
 
 	auto terminator = new ExportedFunctionTerminatorNode();
 
-	Visitor visitor(m_namespaces, nullptr, m_parent, terminator, nullptr);
+	Visitor visitor(m_namespaces, nullptr, m_parent, TerminatorNode::instance(), nullptr);
 
 	auto block = visitor.visitBlock(*ast->nodes.rbegin());
 
-	return new ExportedFunctionNode(name, block, returnType);
+	auto junction = new JunctionNode(block);
+	auto distributor = new DistributorNode(junction, terminator);
+
+	return new ExportedFunctionNode(name, distributor, returnType);
 }
 
 CallableNode *Visitor::visitImportedFunction(const std::shared_ptr<peg::Ast> &ast) const

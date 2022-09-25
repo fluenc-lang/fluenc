@@ -531,3 +531,8 @@ const Node *NodeLocator::visit(const StringIteratable *node, EntryPoint context)
 {
 	return nullptr;
 }
+
+const Node *NodeLocator::visit(const DistributorNode *node, EntryPoint context) const
+{
+	return nullptr;
+}

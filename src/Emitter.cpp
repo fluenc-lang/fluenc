@@ -80,6 +80,7 @@
 #include "nodes/ParentInjectorNode.h"
 #include "nodes/BlockStackFrameNode.h"
 #include "nodes/IteratableNode.h"
+#include "nodes/DistributorNode.h"
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/MissingTailCallException.h"
@@ -320,7 +321,7 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 	auto functionType = llvm::FunctionType::get(storageType, argumentTypes, false);
 	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, node->m_name, module);
 
-	auto alloc = llvm::BasicBlock::Create(*llvmContext, "alloc", function);
+	auto alloc = llvm::BasicBlock::Create(*llvmContext, "alloc");
 	auto block = llvm::BasicBlock::Create(*llvmContext);
 
 	linkBlocks(alloc, block);
@@ -384,8 +385,6 @@ std::vector<DzResult> Emitter::visit(const ArrayElementNode *node, DefaultVisito
 	if (node->m_next)
 	{
 		auto valuesIfFalse = context.values;
-
-		insertBlock(block, function);
 
 		auto indexType = index->type();
 		auto storageType = indexType->storageType(*llvmContext);
@@ -981,8 +980,6 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 			throw new FunctionNotFoundException(node->m_ast, node->m_names[0], types);
 		}
 
-		insertBlock(block, parent);
-
 		auto functionBlock = llvm::BasicBlock::Create(*llvmContext);
 
 		linkBlocks(block, functionBlock);
@@ -999,8 +996,6 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 		for (const auto &[lastEntryPoint, returnValue] : functionResults)
 		{
-			insertBlock(lastEntryPoint.block(), parent);
-
 			auto consumerBlock = llvm::BasicBlock::Create(*llvmContext);
 
 			linkBlocks(lastEntryPoint.block(), consumerBlock);
@@ -1105,8 +1100,6 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 	auto function = context.entryPoint.function();
 	auto block = context.entryPoint.block();
 
-	insertBlock(block, function);
-
 	auto &functions = context.entryPoint.functions();
 
 	for (auto &name : node->m_names)
@@ -1176,7 +1169,6 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 			{
 				auto transferEntryPoint = ValueHelper::transferValue(resultEntryPoint, value, alloc, *this);
 
-				insertBlock(transferEntryPoint.block(), function);
 				linkBlocks(transferEntryPoint.block(), entryPoint.block());
 			}
 
@@ -1191,7 +1183,6 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 		{
 			auto transferEntryPoint = ValueHelper::transferValue(resultEntryPoint, value, alloc, *this);
 
-			insertBlock(transferEntryPoint.block(), function);
 			linkBlocks(transferEntryPoint.block(), entryPoint.block());
 		}
 
@@ -1379,8 +1370,6 @@ std::vector<DzResult> Emitter::visit(const ConditionalNode *node, DefaultVisitor
 
 	block->setName("condition");
 
-	insertBlock(block, function);
-
 	auto ifTrue = llvm::BasicBlock::Create(*llvmContext);
 	auto ifFalse = llvm::BasicBlock::Create(*llvmContext);
 
@@ -1442,7 +1431,7 @@ std::vector<DzResult> Emitter::visit(const ConditionalNode *node, DefaultVisitor
 
 		auto alloc = context.entryPoint.alloc(type);
 
-		auto mergeBlock = llvm::BasicBlock::Create(*llvmContext, "merge", function);
+		auto mergeBlock = llvm::BasicBlock::Create(*llvmContext, "merge");
 
 		for (auto i = range.first; i != range.second; i++)
 		{
@@ -1580,8 +1569,6 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 
 std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisitorContext context) const
 {
-	insertBlock(context.entryPoint.block(), context.entryPoint.function());
-
 	auto numberOfArguments = context.values.size();
 
 	auto inputValues = context.values;
@@ -1639,8 +1626,6 @@ std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVi
 {
 	auto function = context.entryPoint.function();
 	auto block = context.entryPoint.block();
-
-	insertBlock(block, function);
 
 	auto [score, tailCallTarget, targetValues] = FunctionHelper::tryCreateTailCall(context.entryPoint, context.values, begin(node->m_names), end(node->m_names));
 
@@ -1762,14 +1747,14 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionTerminatorNode *node,
 	auto function = context.entryPoint.function();
 	auto previous = context.entryPoint.block();
 
-	insertBlock(previous, function);
-
-	auto block = llvm::BasicBlock::Create(*llvmContext, "entry", function);
+	auto block = llvm::BasicBlock::Create(*llvmContext, "entry");
 
 	linkBlocks(previous, block);
 
 	auto ep = context.entryPoint
 		.withBlock(block);
+
+	ep.incorporate();
 
 	auto returnValue = ValueHelper::getScalar(ep, context.values);
 
@@ -1875,8 +1860,6 @@ std::vector<DzResult> Emitter::visit(const ReturnNode *node, DefaultVisitorConte
 	auto function = context.entryPoint.function();
 	auto block = context.entryPoint.block();
 
-	insertBlock(block, function);
-
 	auto value = fetchValue();
 
 	if (node->m_chained)
@@ -1922,8 +1905,6 @@ std::vector<DzResult> Emitter::visit(const ArrayValue *node, DefaultVisitorConte
 
 	auto block = context.entryPoint.block();
 	auto function = context.entryPoint.function();
-
-	insertBlock(block, function);
 
 	std::vector<DzResult> results;
 
@@ -1974,9 +1955,7 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 	auto block = context.entryPoint.block();
 	auto function = context.entryPoint.function();
 
-	insertBlock(block, function);
-
-	auto iteratorBlock = llvm::BasicBlock::Create(*llvmContext, "iterator", function);
+	auto iteratorBlock = llvm::BasicBlock::Create(*llvmContext, "iterator");
 
 	linkBlocks(block, iteratorBlock);
 
@@ -2030,4 +2009,19 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 		{ epIfTrue, tuple },
 		{ epIfFalse, value },
 	};
+}
+
+std::vector<DzResult> Emitter::visit(const DistributorNode *node, DefaultVisitorContext context) const
+{
+	std::vector<DzResult> results;
+
+	for (auto &[entryPoint, values] : node->m_subject->accept(*this, context))
+	{
+		for (auto &result : node->m_consumer->accept(*this, { entryPoint, values }))
+		{
+			results.push_back(result);
+		}
+	}
+
+	return results;
 }
