@@ -6,7 +6,6 @@
 class DistributorNode : public VisitableNode<DistributorNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
 
 	public:
 		DistributorNode(const Node *subject, const Node *consumer)

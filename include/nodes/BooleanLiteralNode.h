@@ -8,8 +8,6 @@ class ScalarValue;
 class BooleanLiteralNode : public VisitableNode<BooleanLiteralNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		BooleanLiteralNode(const Node *consumer, const std::string &value);

@@ -37,8 +37,3 @@ std::vector<DzResult> ExportedFunctionNode::accept(const DefaultNodeVisitor &vis
 {
 	return visitor.visit(this, context);
 }
-
-const Node *ExportedFunctionNode::accept(const NodeLocator &visitor, EntryPoint context) const
-{
-	return visitor.visit(this, context);
-}

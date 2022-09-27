@@ -2,11 +2,9 @@
 #define DZVALUE_H
 
 #include "Emitter.h"
-#include "Analyzer.h"
-#include "NodeLocator.h"
 #include "Visitable.h"
 
-class Node : public Visitable<DefaultNodeVisitor, NodeLocator>
+class Node : public Visitable<DefaultNodeVisitor>
 {
 	public:
 		Node();

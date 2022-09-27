@@ -8,8 +8,6 @@
 class IndexSinkNode : public VisitableNode<IndexSinkNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		IndexSinkNode(size_t index, const Node *consumer);

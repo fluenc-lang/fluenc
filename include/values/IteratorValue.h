@@ -10,7 +10,6 @@ class ITypeName;
 class IteratorValue : public IIteratable
 {
 	friend class Emitter;
-	friend class Analyzer;
 
 	public:
 		IteratorValue(const EntryPoint *entryPoint
@@ -18,7 +17,6 @@ class IteratorValue : public IIteratable
 			);
 
 		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
-		std::vector<DzResult> accept(const Analyzer &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const EntryPoint *m_entryPoint;

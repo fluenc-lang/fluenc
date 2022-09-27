@@ -8,8 +8,6 @@ class Type;
 class ArraySinkNode : public VisitableNode<ArraySinkNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		ArraySinkNode(size_t size

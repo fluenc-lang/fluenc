@@ -8,8 +8,6 @@
 class TailFunctionCallNode : public VisitableNode<TailFunctionCallNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		TailFunctionCallNode(const std::vector<std::string> &names, const Node *regularCall);

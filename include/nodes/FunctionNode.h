@@ -10,8 +10,6 @@ class BaseValue;
 class FunctionNode : public CallableNode
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	struct Argument
 	{
@@ -35,8 +33,6 @@ class FunctionNode : public CallableNode
 		int8_t signatureCompatibility(const EntryPoint &entryPoint, const std::vector<const Type *> &values) const override;
 
 		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
-
-		const Node *accept(const NodeLocator &visitor, EntryPoint context) const override;
 
 	private:
 		std::vector<Argument> handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const;

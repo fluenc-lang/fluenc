@@ -12,8 +12,3 @@ std::vector<DzResult > IteratorValue::accept(const Emitter &visitor, DefaultVisi
 {
 	return visitor.visit(this, context);
 }
-
-std::vector<DzResult > IteratorValue::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visit(this, context);
-}

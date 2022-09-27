@@ -8,8 +8,6 @@ class ITypeName;
 class FloatLiteralNode : public VisitableNode<FloatLiteralNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		FloatLiteralNode(const Node *consumer, const ITypeName *type, const std::string &value);

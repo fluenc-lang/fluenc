@@ -8,8 +8,6 @@ class IIteratable;
 class IteratableNode : public VisitableNode<IteratableNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		IteratableNode(const IIteratable *iteratable);

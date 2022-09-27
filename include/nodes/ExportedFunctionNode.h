@@ -8,8 +8,6 @@ class ITypeName;
 class ExportedFunctionNode : public CallableNode
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		ExportedFunctionNode(const std::string &name, Node *block, ITypeName *returnType);
@@ -22,8 +20,6 @@ class ExportedFunctionNode : public CallableNode
 		int8_t signatureCompatibility(const EntryPoint &entryPoint, const std::vector<const Type *> &values) const override;
 
 		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
-
-		const Node *accept(const NodeLocator &visitor, EntryPoint context) const override;
 
 	private:
 		std::string m_name;

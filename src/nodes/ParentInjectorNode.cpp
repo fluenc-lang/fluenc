@@ -55,8 +55,3 @@ std::vector<DzResult> ParentInjectorNode::accept(const DefaultNodeVisitor &visit
 {
 	return visitor.visit(this, context);
 }
-
-const Node *ParentInjectorNode::accept(const NodeLocator &visitor, EntryPoint context) const
-{
-	return visitor.visit(this, context);
-}

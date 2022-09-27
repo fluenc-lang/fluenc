@@ -8,8 +8,6 @@ class ReferenceValue;
 class ArrayContinuationNode : public VisitableNode<ArrayContinuationNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		ArrayContinuationNode(const ReferenceValue *index, const Node *node, const Type *iteratorType);

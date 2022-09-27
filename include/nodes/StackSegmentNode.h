@@ -6,8 +6,6 @@
 class StackSegmentNode : public VisitableNode<StackSegmentNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		StackSegmentNode(std::vector<Node *> values, const Node *call, const Node *consumer);

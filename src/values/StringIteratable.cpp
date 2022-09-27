@@ -12,8 +12,3 @@ std::vector<DzResult > StringIteratable::accept(const Emitter &visitor, DefaultV
 {
 	return visitor.visit(this, context);
 }
-
-std::vector<DzResult > StringIteratable::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visit(this, context);
-}

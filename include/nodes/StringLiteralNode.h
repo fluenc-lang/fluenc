@@ -6,8 +6,6 @@
 class StringLiteralNode : public VisitableNode<StringLiteralNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		StringLiteralNode(const Node *consumer, const std::string &value);

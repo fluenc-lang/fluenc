@@ -6,8 +6,6 @@
 class ParentInjectorNode : public IBlockInstruction
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		ParentInjectorNode(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType>>> &nodes
@@ -20,8 +18,6 @@ class ParentInjectorNode : public IBlockInstruction
 		bool containsIterator() const override;
 
 		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
-
-		const Node *accept(const NodeLocator &visitor, EntryPoint context) const override;
 
 	private:
 		static const IBlockInstruction *inject(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType>>> &nodes

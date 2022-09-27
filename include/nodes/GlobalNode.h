@@ -6,8 +6,6 @@
 class GlobalNode : public VisitableNode<GlobalNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		GlobalNode(Node *value, const std::string &name);

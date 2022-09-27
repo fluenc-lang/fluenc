@@ -6,8 +6,6 @@
 class JunctionNode : public VisitableNode<JunctionNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		JunctionNode(const Node *subject);

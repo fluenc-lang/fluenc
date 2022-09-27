@@ -21,11 +21,6 @@ std::vector<DzResult> ArrayValue::accept(const Emitter &visitor, DefaultVisitorC
 	return visitor.visit(this, context);
 }
 
-std::vector<DzResult > ArrayValue::accept(const Analyzer &visitor, DefaultVisitorContext context) const
-{
-	return visitor.visit(this, context);
-}
-
 const Node *ArrayValue::createIterator(const IIteratable *parent, const Type *type, size_t size)
 {
 	return std::accumulate(index_iterator(0u), index_iterator(size), (Node *)nullptr, [&](auto next, auto)

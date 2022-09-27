@@ -7,8 +7,6 @@
 class FunctionCallNode : public Node
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		FunctionCallNode(const std::shared_ptr<peg::Ast> &ast, const std::vector<std::string> &names, const Node *evaluation);
@@ -16,8 +14,6 @@ class FunctionCallNode : public Node
 		int order(const EntryPoint &entryPoint) const override;
 
 		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
-
-		const Node *accept(const NodeLocator &visitor, EntryPoint context) const override;
 
 	private:
 		std::shared_ptr<peg::Ast> m_ast;

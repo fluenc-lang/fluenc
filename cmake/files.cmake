@@ -1,6 +1,5 @@
 set(LIB_HEADER_FILES
     "${PROJECT_HEADER_DIR}/AllIterator.h"
-	"${PROJECT_HEADER_DIR}/Analyzer.h"
 	"${PROJECT_HEADER_DIR}/BuildConfiguration.h"
     "${PROJECT_HEADER_DIR}/CompilerException.h"
     "${PROJECT_HEADER_DIR}/DefaultPrototypeProvider.h"
@@ -28,7 +27,6 @@ set(LIB_HEADER_FILES
 	"${PROJECT_HEADER_DIR}/ModuleInfo.h"
     "${PROJECT_HEADER_DIR}/Namespace.h"
     "${PROJECT_HEADER_DIR}/Node.h"
-	"${PROJECT_HEADER_DIR}/NodeLocator.h"
 	"${PROJECT_HEADER_DIR}/NodeVisitor.h"
     "${PROJECT_HEADER_DIR}/Stack.h"
     "${PROJECT_HEADER_DIR}/TokenInfo.h"
@@ -163,7 +161,6 @@ set(LIB_HEADER_FILES
 
 set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/AllIterator.cpp"
-	"${PROJECT_SRC_DIR}/Analyzer.cpp"
     "${PROJECT_SRC_DIR}/CompilerException.cpp"
     "${PROJECT_SRC_DIR}/DefaultPrototypeProvider.cpp"
 	"${PROJECT_SRC_DIR}/DummyIteratorStorage.cpp"
@@ -181,7 +178,6 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/IteratorStorage.cpp"
     "${PROJECT_SRC_DIR}/Namespace.cpp"
     "${PROJECT_SRC_DIR}/Node.cpp"
-	"${PROJECT_SRC_DIR}/NodeLocator.cpp"
     "${PROJECT_SRC_DIR}/Stack.cpp"
     "${PROJECT_SRC_DIR}/Type.cpp"
     "${PROJECT_SRC_DIR}/UndeclaredIdentifierException.cpp"

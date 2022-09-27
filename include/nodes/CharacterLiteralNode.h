@@ -8,8 +8,6 @@
 class CharacterLiteralNode : public VisitableNode<CharacterLiteralNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		CharacterLiteralNode(const Node *consumer, const std::string &value);

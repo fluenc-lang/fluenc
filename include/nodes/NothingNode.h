@@ -6,8 +6,6 @@
 class NothingNode : public VisitableNode<NothingNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		NothingNode(const Node *consumer);

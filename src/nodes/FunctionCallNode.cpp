@@ -32,8 +32,3 @@ std::vector<DzResult> FunctionCallNode::accept(const DefaultNodeVisitor &visitor
 {
 	return visitor.visit(this, context);
 }
-
-const Node *FunctionCallNode::accept(const NodeLocator &visitor, EntryPoint context) const
-{
-	return visitor.visit(this, context);
-}

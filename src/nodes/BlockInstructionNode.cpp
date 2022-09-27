@@ -15,8 +15,3 @@ std::vector<DzResult> BlockInstructionNode::accept(const DefaultNodeVisitor &vis
 {
 	return visitor.visit(this, context);
 }
-
-const Node *BlockInstructionNode::accept(const NodeLocator &visitor, EntryPoint context) const
-{
-	return visitor.visit(this, context);
-}

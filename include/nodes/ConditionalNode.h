@@ -6,8 +6,6 @@
 class ConditionalNode : public VisitableNode<ConditionalNode>
 {
 	friend class Emitter;
-	friend class Analyzer;
-	friend class NodeLocator;
 
 	public:
 		ConditionalNode(const Node *ifFalse, const Node *ifTrue);
