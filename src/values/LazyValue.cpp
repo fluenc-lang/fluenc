@@ -38,9 +38,11 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 			auto chain = expandable->chain();
 			auto provider = expandable->provider();
 
-			Analyzer analyzer;
+			auto continuationEntryPoint = provider->withBlock(entryPoint.block());
 
-			auto chainResult = chain->accept(analyzer, { *provider, Stack() });
+			Emitter analyzer;
+
+			auto chainResult = chain->accept(analyzer, { continuationEntryPoint, Stack() });
 
 			auto [_, chainValues] = *chainResult.begin();
 
@@ -65,7 +67,7 @@ const Type *LazyValue::type() const
 
 	linkBlocks(alloc, block);
 
-	auto iteratorStorage = new DummyIteratorStorage();
+	auto iteratorStorage = new IteratorStorage();
 
 	auto entryPoint = (*m_entryPoint)
 		.withBlock(block)
@@ -74,7 +76,7 @@ const Type *LazyValue::type() const
 
 	auto iteratable = m_generator->generate(entryPoint);
 
-	Analyzer analyzer;
+	Emitter analyzer;
 
 	auto results = iteratable->accept(analyzer, { entryPoint, Stack() });
 
@@ -138,78 +140,49 @@ const IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
 
 EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *source, const Emitter &emitter) const
 {
-	auto block = entryPoint.block();
-
 	auto context = entryPoint.context();
-	auto module = entryPoint.module();
-
-	auto function = entryPoint.function();
-
-	auto dataLayout = module->getDataLayout();
-
-	auto exitBlock = llvm::BasicBlock::Create(*context, "exit");
 
 	IteratorStorage iteratorStorage;
 
-	auto sourceEntryPoint = entryPoint
+	auto iteratorEntryPoint = entryPoint
 		.withIteratorStorage(&iteratorStorage);
 
-	auto iteratable = source->generate(sourceEntryPoint);
+	auto sourceIteratable = source->generate(iteratorEntryPoint);
+	auto targetIteratable = m_generator->generate(iteratorEntryPoint);
 
-	auto arrayProvider = [&, this]
+	auto targetResults = targetIteratable->accept(emitter, { iteratorEntryPoint, Stack() });
+
+	std::unordered_map<uint32_t, const BaseValue *> indexedResults;
+
+	auto targetExitBlock = llvm::BasicBlock::Create(*context, "targetExit");
+
+	for (auto [resultEntryPoint, resultValues] : targetResults)
 	{
-		auto array = dynamic_cast<const ArrayValueGenerator *>(m_generator);
+		auto values =  ValueHelper::extractValues<BaseValue>(resultValues);
 
-		if (array)
-		{
-			return array;
-		}
-
-		auto iterator = dynamic_cast<const IteratorValueGenerator *>(m_generator);
-
-		if (!iterator)
+		if (values.size() <= 0)
 		{
 			throw new std::exception();
 		}
 
-		NodeLocator locator([](auto node)
-		{
-			return dynamic_cast<const ArraySinkNode *>(node);
-		});
+		indexedResults.insert({ resultEntryPoint.index(), values[0] });
 
-		auto subject = iterator->subject();
-		auto sink = subject->accept(locator, *m_entryPoint);
+		linkBlocks(resultEntryPoint.block(), targetExitBlock);
+	}
 
-		if (!sink)
-		{
-			throw new std::exception();
-		}
+	auto sourceEntryPoint = entryPoint
+		.withBlock(targetExitBlock);
 
-		for (auto [_, values] : sink->accept(emitter, { entryPoint, Stack() }))
-		{
-			auto value = values.require<LazyValue>(nullptr);
+	auto sourceExitBlock = llvm::BasicBlock::Create(*context, "sourceExit");
 
-			if (auto generator = dynamic_cast<const ArrayValueGenerator *>(value->m_generator))
-			{
-				return generator;
-			}
-		}
+	auto sourceResults = sourceIteratable->accept(emitter, { sourceEntryPoint, Stack() });
 
-		throw new std::exception();
-	};
-
-	auto array = arrayProvider();
-
-	auto iteratableResults = iteratable->accept(emitter, { entryPoint, Stack() });
-
-	for (auto i = 0u; i < iteratableResults.size(); i++)
+	for (auto i = 0u; i < sourceResults.size(); i++)
 	{
-		auto [sourceResultEntryPoint, sourceResultValues] = iteratableResults[i];
-
-		auto sourceBlock = sourceResultEntryPoint.block();
+		auto [sourceResultEntryPoint, sourceResultValues] = sourceResults[i];
 
 		auto sourceValue = sourceResultValues.pop();
-		auto targetValue = array->elementAt(sourceResultEntryPoint.index());
+		auto targetValue = indexedResults[sourceResultEntryPoint.index()];
 
 		auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
 
@@ -247,9 +220,9 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 				, emitter
 				);
 
-			linkBlocks(resultEntryPoint.block(), exitBlock);
+			linkBlocks(resultEntryPoint.block(), sourceExitBlock);
 		}
 	}
 
-	return entryPoint.withBlock(exitBlock);
+	return entryPoint.withBlock(sourceExitBlock);
 }
