@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="16" height="14" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" name="sheet_9" tilewidth="16" tileheight="16" tilecount="136" columns="17">
+  <image source="../../../../../../Downloads/sheet_9.png" width="272" height="128"/>
+ </tileset>
+ <layer id="1" name="Tile Layer 1" width="16" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFlABOCrHsKB7RGADUgQ8R
+  </data>
+ </layer>
+ <layer id="2" name="Tile Layer 2" width="16" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAfkEWjKTFjFIyC4QAABr8AWA==
+  </data>
+ </layer>
+</map>

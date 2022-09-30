@@ -1,0 +1,114 @@
+namespace tmx
+{
+	import void tmxInit(long renderer);
+
+	import long tmx_load(string path);
+	import long getTilesetImage(long tileset);
+
+	import bool hasNextLayer(tmx_layer layer);
+	import bool hasTileAt(long map, tmx_layer layer, int x, int y);
+
+	import tmx_layer getNextLayer(tmx_layer layer);
+	import tmx_layer beginLayerIteration(long map);
+
+	import tmx_tile getTileAt(long map, tmx_layer layer, int x, int y);
+
+	import int mapWidth(long map);
+	import int mapHeight(long map);
+
+	global L_NONE: 0x0;
+	global L_LAYER: 0x1;
+	global L_OBJGR: 0x2;
+	global L_IMAGE: 0x3;
+	global L_GROUP: 0x4;
+
+	struct tmx_layer
+	{
+		int id,
+		string name,
+		long opacity,
+		int visible,
+		int offsetx,
+		int offsety,
+		long parallaxx,
+		long parallaxy,
+		uint tintcolor,
+		int type,
+		long content,
+		long user_data,
+		long properties,
+		long next
+	};
+
+	struct tmx_tile
+	{
+		uint id,
+		long tileset,
+		uint ul_x,
+		uint ul_y,
+		long image,
+		long collision,
+		uint animation_len,
+		long animation,
+		byte type,
+		long properties,
+		long user_data
+	};
+
+	struct Tile
+	{
+		position: Vec2 {},
+		uv: Vec2 {},
+
+		image
+	};
+
+	function getLayers(long map)
+	{
+		return getLayers(beginLayerIteration(map));
+	}
+
+	function getLayers(tmx_layer layer)
+	{
+		if (hasNextLayer(layer))
+		{
+			return layer -> getLayers(getNextLayer(layer));
+		}
+
+		return layer;
+	}
+
+	function getTile(int x, int y, long map, tmx::tmx_layer layer)
+	{
+		if (tmx::hasTileAt(map, layer, x, y))
+		{
+			let tile = tmx::getTileAt(map, layer, x, y);
+
+			return Tile
+			{
+				position: Vec2 { x: x, y: y },
+				uv: Vec2 { x: tile.ul_x, y: tile.ul_y },
+				image: getTilesetImage(tile.tileset)
+			};
+		}
+
+		return nothing;
+	}
+
+	function getTiles(int x, int y, long map, tmx::tmx_layer layer)
+	{
+		let tile = getTile(x, y, map, layer);
+
+		if ((x + 1) < tmx::mapWidth(map))
+		{
+			return tile -> getTiles(x + 1, y, map, layer);
+		}
+
+		if ((y + 1) == tmx::mapHeight(map))
+		{
+			return tile;
+		}
+
+		return tile -> getTiles(0, y + 1, map, layer);
+	}
+}

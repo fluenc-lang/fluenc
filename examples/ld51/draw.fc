@@ -1,0 +1,83 @@
+use "player.fc"
+use "sdl.fc"
+
+function drawPlayer(long renderer, Player player)
+{
+	SDL::SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
+	SDL::SDL_RenderFillRect(renderer, rect(player));
+
+	return nothing;
+}
+
+function drawLayer(long renderer, long map, (tmx::tmx_layer layer, ...layers))
+{
+	drawLayer(renderer, map, layer);
+
+	return tail drawLayer(renderer, map, ...layers);
+}
+
+function drawTile(long renderer, (any tile, ...tiles))
+{
+	drawTile(renderer, tile);
+
+	return tail drawTile(renderer, ...tiles);
+}
+
+function drawTile(long renderer, without tile)
+{
+	return nothing;
+}
+
+function drawTile(long renderer, tmx::Tile tile)
+{
+	let target = SDL::Rect
+	{
+		x: x(tile.position) * 16,
+		y: y(tile.position) * 16,
+		width: 16,
+		height: 16
+	};
+
+	let source = SDL::Rect
+	{
+		x: x(tile.uv),
+		y: y(tile.uv),
+		width: 16,
+		height: 16
+	};
+
+	SDL::SDL_RenderCopy(renderer, tile.image, source, target);
+
+	return nothing;
+}
+
+function drawLayer(long renderer, long map, tmx::tmx_layer layer)
+{
+	puts(layer.name);
+
+	if (layer.type == tmx::L_LAYER)
+	{
+		let tiles = tmx::getTiles(0, 0, map, layer);
+
+		return drawTile(renderer, tiles);
+	}
+
+	return nothing;
+}
+
+function drawLayers(long renderer, long map)
+{
+	let layers = tmx::getLayers(map);
+
+	drawLayer(renderer, map, layers);
+
+	return nothing;
+}
+
+function handleDraw(State state)
+{
+	drawPlayer(state.renderer, state.player);
+	drawLayers(state.renderer, state.map);
+
+	return nothing;
+}

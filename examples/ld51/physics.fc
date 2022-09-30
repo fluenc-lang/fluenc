@@ -1,0 +1,38 @@
+use "vec2.fc"
+use "math.fc"
+
+global gravity: Vec2 { x: 0.0, y: 0.001 };
+
+function apply(Vec2 position, Vec2 velocity)
+{
+	return Vec2
+	{
+		x: position.x + velocity.x,
+		y: position.y + velocity.y
+	};
+}
+
+function handleCollision(Vec2 position)
+{
+	return position with
+	{
+		y: min(position.y, 200.0)
+	};
+}
+
+function handlePhysics(Player player)
+{
+	return player with
+	{
+		position: handleCollision(apply(player.position, player.velocity)),
+		velocity: apply(player.velocity, gravity)
+	};
+}
+
+function handlePhysics(State state)
+{
+	return state with
+	{
+		player: handlePhysics(state.player)
+	};
+}

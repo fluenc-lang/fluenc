@@ -1,0 +1,65 @@
+use "sdl.fc"
+use "player.fc"
+
+function createEventState()
+{
+    return SDL::EventState
+    {
+        key: SDL::KeyboardEvent {},
+        motion: SDL::MouseMotionEvent {},
+        button: SDL::MouseButtonEvent {}
+    };
+}
+
+function handleInput(SDL::KeyboardEvent keyboard, Player player)
+{
+	if (keyboard.sym == SDL::SDLK_a)
+	{
+		return player with
+		{
+			velocity: player.velocity with
+			{
+				x: -0.2
+			}
+		};
+	}
+
+	if (keyboard.sym == SDL::SDLK_d)
+	{
+		return player with
+		{
+			velocity: player.velocity with
+			{
+				x: 0.2
+			}
+		};
+	}
+
+	if (keyboard.sym == SDL::SDLK_space)
+	{
+		if (isJumping(player))
+		{
+			return player;
+		}
+
+		return player with
+		{
+			velocity: player.velocity with
+			{
+				y: -0.5
+			}
+		};
+	}
+
+	return player;
+}
+
+function handleInput(State state)
+{
+	let events = SDL::SDL_WaitEventEx(createEventState());
+
+	return state with
+	{
+		player: handleInput(events.key, state.player)
+	};
+}

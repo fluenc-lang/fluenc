@@ -1,0 +1,23 @@
+use "vec2.fc"
+
+struct Player
+{
+	position: Vec2 {},
+	velocity: Vec2 {}
+};
+
+function isJumping(Player player)
+{
+	return y(player.velocity) < 0.5;
+}
+
+function rect(Player player)
+{
+	return SDL::Rect
+	{
+		x: floatToInt(x(player.position)),
+		y: floatToInt(y(player.position)),
+		width: 32,
+		height: 32
+	};
+}

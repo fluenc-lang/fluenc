@@ -1,0 +1,2 @@
+target = "ld51"
+libs = [ "sdl.o", "tmx_err.o", "tmx_hash.o", "tmx_mem.o", "tmx_utils.o", "tmx_xml.o", "tmx.o", "tmx_helpers.o", "-lSDL2", "-lSDL2_image", "-lxml2", "-lz" ]

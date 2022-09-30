@@ -1,0 +1,9 @@
+function min(f32 value1, f32 value2)
+{
+	if (value1 < value2)
+	{
+		return value1;
+	}
+
+	return value2;
+}

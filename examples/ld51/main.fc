@@ -1,0 +1,57 @@
+use "sdl.fc"
+use "player.fc"
+use "misc.fc"
+use "physics.fc"
+use "input.fc"
+use "draw.fc"
+use "tmx.fc"
+
+import int puts(string str);
+import int rand();
+
+import void srand(int seed);
+import void printnum(int num);
+
+global Width: 1280;
+global Height: 720;
+
+struct State
+{
+	renderer,
+	player,
+	map
+};
+
+function mainLoop(State state)
+{
+	SDL::SDL_SetRenderDrawColor(state.renderer, 0, 0, 0, 0);
+	SDL::SDL_RenderClear(state.renderer);
+
+	handleDraw(state);
+
+	SDL::SDL_RenderPresent(state.renderer);
+
+	let withInput = handleInput(state);
+	let withPhysics = handlePhysics(withInput);
+
+	return tail mainLoop(withPhysics);
+}
+
+export int main()
+{
+	SDL::SDL_Init(SDL::INIT_VIDEO | SDL::INIT_AUDIO);
+
+	let window = SDL::SDL_CreateWindow(@"ld51", 0, 0, Width, Height, SDL::WINDOW_RESIZABLE);
+	let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
+
+	tmx::tmxInit(renderer);
+
+	let state = State
+	{
+		renderer: renderer,
+		player: Player {},
+		map: tmx::tmx_load(@"map.tmx")
+	};
+
+	return mainLoop(state);
+}

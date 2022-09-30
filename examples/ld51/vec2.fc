@@ -1,0 +1,15 @@
+struct Vec2
+{
+	x: 0.0,
+	y: 0.0
+};
+
+function x(Vec2 position)
+{
+	return position.x;
+}
+
+function y(Vec2 position)
+{
+	return position.y;
+}
