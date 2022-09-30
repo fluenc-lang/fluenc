@@ -35,6 +35,7 @@ class EntryPoint
 			, immer::box<std::map<std::string, const BaseValue *>> locals
 			, immer::box<std::map<std::string, const Node *>> globals
 			, immer::box<std::map<std::string, Prototype *>> types
+			, immer::box<std::vector<const CallableNode *>> roots
 			, immer::box<Stack> values
 			, IIteratorStorage *iteratorStorage
 			);
@@ -63,6 +64,7 @@ class EntryPoint
 		const std::map<std::string, const BaseValue *> &locals() const;
 		const std::map<std::string, const Node *> &globals() const;
 		const std::map<std::string, Prototype *> &types() const;
+		const std::vector<const CallableNode *> &roots() const;
 
 		const Stack &values() const;
 
@@ -104,6 +106,7 @@ class EntryPoint
 		immer::box<std::map<std::string, const BaseValue *>> m_locals;
 		immer::box<std::map<std::string, const Node *>> m_globals;
 		immer::box<std::map<std::string, Prototype *>> m_types;
+		immer::box<std::vector<const CallableNode *>> m_roots;
 		immer::box<Stack> m_values;
 
 		IIteratorStorage *m_iteratorStorage;

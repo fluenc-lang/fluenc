@@ -316,6 +316,7 @@ int main(int argc, char **argv)
 				, module.locals
 				, module.globals
 				, module.types
+				, module.roots
 				, values
 				, nullptr
 				);

@@ -333,6 +333,8 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 
 	auto result = node->m_block->accept(*this, { ep, context.values });
 
+	ep.incorporate();
+
 	verifyFunction(*function, &llvm::errs());
 
 	return result;
@@ -1624,9 +1626,6 @@ std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContex
 
 std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVisitorContext context) const
 {
-	auto function = context.entryPoint.function();
-	auto block = context.entryPoint.block();
-
 	auto [score, tailCallTarget, targetValues] = FunctionHelper::tryCreateTailCall(context.entryPoint, context.values, begin(node->m_names), end(node->m_names));
 
 	if (score == 0)
@@ -1743,8 +1742,6 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionTerminatorNode *node,
 	UNUSED(node);
 
 	auto llvmContext = context.entryPoint.context();
-
-	auto function = context.entryPoint.function();
 	auto previous = context.entryPoint.block();
 
 	auto block = llvm::BasicBlock::Create(*llvmContext, "entry");
@@ -1753,8 +1750,6 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionTerminatorNode *node,
 
 	auto ep = context.entryPoint
 		.withBlock(block);
-
-	ep.incorporate();
 
 	auto returnValue = ValueHelper::getScalar(ep, context.values);
 

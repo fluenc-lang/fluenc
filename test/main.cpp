@@ -4465,6 +4465,34 @@ BOOST_AUTO_TEST_CASE (scenario109)
 	BOOST_TEST(result == 45);
 }
 
+BOOST_AUTO_TEST_CASE (scenario110)
+{
+	auto result = compile(R"(
+		function loop()
+		{
+			return tail loop();
+		}
+
+		export int main()
+		{
+			return loop();
+		}
+	)");
+
+	Emitter emitter;
+
+	for (auto &root : result.roots())
+	{
+		root->accept(emitter, { result, Stack() });
+	}
+
+	auto module = result.module();
+
+	module->print(llvm::errs(), nullptr);
+
+	BOOST_TEST(module->getFunction("main"));
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

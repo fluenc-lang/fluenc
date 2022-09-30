@@ -98,6 +98,7 @@ const BaseValue *compileValue(std::string source)
 			, moduleInfo.locals
 			, moduleInfo.globals
 			, moduleInfo.types
+			, moduleInfo.roots
 			, Stack()
 			, nullptr
 			);
@@ -152,6 +153,7 @@ EntryPoint compile(std::string source)
 		, moduleInfo.locals
 		, moduleInfo.globals
 		, moduleInfo.types
+		, moduleInfo.roots
 		, Stack()
 		, nullptr
 		);
@@ -190,6 +192,7 @@ int exec(std::string source)
 		, moduleInfo.locals
 		, moduleInfo.globals
 		, moduleInfo.types
+		, moduleInfo.roots
 		, Stack()
 		, nullptr
 		);
