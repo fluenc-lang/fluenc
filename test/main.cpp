@@ -4526,9 +4526,9 @@ BOOST_AUTO_TEST_CASE (scenario111)
 	auto type1 = types[0];
 	auto type2 = types[1];
 
-	auto compatibility = type1->compatibility(type2, result);
-
-	BOOST_TEST(compatibility == -1);
+	BOOST_TEST(type1->compatibility(type2, result) == -1);
+	BOOST_TEST(type1->compatibility(type1, result) == 0);
+	BOOST_TEST(type2->compatibility(type2, result) == 0);
 }
 
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )

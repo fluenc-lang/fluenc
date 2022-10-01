@@ -72,6 +72,7 @@ class EntryPoint
 
 		const EntryPoint *byName(const std::string &name) const;
 		const EntryPoint *entry() const;
+		const EntryPoint *parent() const;
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;

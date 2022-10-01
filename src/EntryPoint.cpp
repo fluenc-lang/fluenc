@@ -88,6 +88,11 @@ const EntryPoint *EntryPoint::entry() const
 	return this;
 }
 
+const EntryPoint *EntryPoint::parent() const
+{
+	return m_parent;
+}
+
 llvm::Function *EntryPoint::function() const
 {
 	return m_function;
