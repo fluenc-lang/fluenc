@@ -68,6 +68,13 @@ int8_t UserType::compatibility(const Type *type, const EntryPoint &entryPoint) c
 		return -1;
 	}
 
+	auto prototypeCompatibility = m_prototype->compatibility(type, entryPoint);
+
+	if (prototypeCompatibility < 0)
+	{
+		return prototypeCompatibility;
+	}
+
 	int8_t min = 0;
 	int8_t max = 0;
 
@@ -78,7 +85,7 @@ int8_t UserType::compatibility(const Type *type, const EntryPoint &entryPoint) c
 
 	if (min < 0 || max > 0)
 	{
-		return m_prototype->compatibility(type, entryPoint);
+		return prototypeCompatibility;
 	}
 
 	return 0;

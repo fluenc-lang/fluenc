@@ -4493,6 +4493,44 @@ BOOST_AUTO_TEST_CASE (scenario110)
 	BOOST_TEST(module->getFunction("main"));
 }
 
+BOOST_AUTO_TEST_CASE (scenario111)
+{
+	auto result = compile(R"(
+		struct Stage;
+		struct Water : Stage;
+		struct Moon : Stage;
+
+		global water: Water {};
+		global moon: Moon {};
+	)");
+
+	Emitter emitter;
+
+	std::vector<const Type *> types;
+
+	for (auto &[name, global] : result.globals())
+	{
+		for (auto &[ep, values] : global->accept(emitter, { result, Stack() }))
+		{
+			for (auto &value : values)
+			{
+				auto type = value->type();
+
+				types.push_back(type);
+			}
+		}
+	}
+
+	BOOST_TEST(types.size() == 2);
+
+	auto type1 = types[0];
+	auto type2 = types[1];
+
+	auto compatibility = type1->compatibility(type2, result);
+
+	BOOST_TEST(compatibility == -1);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
