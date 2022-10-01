@@ -4531,6 +4531,62 @@ BOOST_AUTO_TEST_CASE (scenario111)
 	BOOST_TEST(type2->compatibility(type2, result) == 0);
 }
 
+BOOST_AUTO_TEST_CASE (scenario112)
+{
+	auto result = compile(R"(
+		struct State
+		{
+			callback
+		}
+
+		function func1()
+		{
+			return 1;
+		}
+
+		function func2()
+		{
+			return 2;
+		}
+
+		global instance1: State
+		{
+			callback: func1
+		}
+
+		global instance2: State
+		{
+			callback: func2
+		}
+	)");
+
+	Emitter emitter;
+
+	std::vector<const Type *> types;
+
+	for (auto &[name, global] : result.globals())
+	{
+		for (auto &[ep, values] : global->accept(emitter, { result, Stack() }))
+		{
+			for (auto &value : values)
+			{
+				auto type = value->type();
+
+				types.push_back(type);
+			}
+		}
+	}
+
+	BOOST_TEST(types.size() == 2);
+
+	auto type1 = types[0];
+	auto type2 = types[1];
+
+	BOOST_TEST(type1->compatibility(type2, result) == 1);
+	BOOST_TEST(type1->compatibility(type1, result) == 0);
+	BOOST_TEST(type2->compatibility(type2, result) == 0);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

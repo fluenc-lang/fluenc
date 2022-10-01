@@ -7,8 +7,9 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
-FunctionType::FunctionType(const std::vector<const Type *> &types)
+FunctionType::FunctionType(const std::vector<const Type *> &types, const CallableNode *function)
 	: m_types(types)
+	, m_function(function)
 {
 }
 
@@ -91,19 +92,24 @@ int8_t FunctionType::compatibility(const Type *type, const EntryPoint &entryPoin
 		return min;
 	}
 
+	if (m_function != other->m_function)
+	{
+		return std::max(static_cast<int8_t>(1), max);
+	}
+
 	return max;
 }
 
-FunctionType *FunctionType::get(const std::vector<const Type *> &types)
+FunctionType *FunctionType::get(const std::vector<const Type *> &types, const CallableNode *function)
 {
 	static std::unordered_map<size_t, FunctionType> cache;
 
-	auto hash = std::accumulate(begin(types), end(types), 14695981039346656037u, [](auto accumulator, auto type)
+	auto hash = std::accumulate(begin(types), end(types), reinterpret_cast<size_t>(function), [](auto accumulator, auto type)
 	{
 		return (accumulator ^ (size_t)type) * 1099511628211;
 	});
 
-	auto [iterator, _] = cache.try_emplace(hash, types);
+	auto [iterator, _] = cache.try_emplace(hash, types, function);
 
 	return &iterator->second;
 }

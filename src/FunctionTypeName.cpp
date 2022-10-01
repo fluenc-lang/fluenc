@@ -16,5 +16,5 @@ Type *FunctionTypeName::resolve(const EntryPoint &entryPoint) const
 		return type->resolve(entryPoint);
 	});
 
-	return new FunctionType(types);
+	return new FunctionType(types, nullptr);
 }
