@@ -1,0 +1,39 @@
+use "sdl.fc"
+
+function calculateGap()
+{
+	if ((rand() % 100) > 80)
+	{
+		return 200;
+	}
+
+	return 0;
+}
+
+function generateTerrain(Stages::Water stage, DefaultContext context)
+{
+	let width = 70 + (rand() % 50);
+	let height = 20 + (rand() % 10) * 10;
+	let gap = calculateGap();
+	let offset = -100 + (rand() % 200);
+
+	let rect = SDL::Rect
+	{
+		x: context.current,
+		y: ((Height - height) / 2) + offset,
+		width: width,
+		height: height
+	};
+
+	if (context.current > context.target)
+	{
+		return rect;
+	}
+
+	let c = context with
+	{
+		current: context.current + width + gap
+	};
+
+	return rect -> generateTerrain(stage, c);
+}

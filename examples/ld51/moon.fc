@@ -1,0 +1,254 @@
+struct MoonContext
+{
+	current: 0,
+	target: 0,
+	width: 0,
+	generator: 0
+}
+
+function createSeed(Stages::Moon stage)
+{
+	let x = (stage.round * RoundLength) - CameraOffset;
+
+	return MoonContext
+	{
+		current: x,
+		target: x + Length
+	};
+}
+
+struct MoonGeneratorResult
+{
+	context,
+	rect
+};
+
+function generateMoonFloor(MoonContext context)
+{
+	let width = 50 + (rand() % 50);
+	let height = 70 + (rand() % 10) * 20;
+
+	let rect = SDL::Rect
+	{
+		x: context.current,
+		y: Height - height,
+		width: width,
+		height: height
+	};
+
+	return MoonGeneratorResult
+	{
+		rect: rect,
+		context: context with
+		{
+			width: width,
+			generator: 1,
+
+		}
+	};
+}
+
+function generateMoonRoof(MoonContext context)
+{
+	let height = 70 + (rand() % 10) * 20;
+
+	let rect = SDL::Rect
+	{
+		x: context.current,
+		y: 0,
+		width: context.width,
+		height: height
+	};
+
+	return MoonGeneratorResult
+	{
+		rect: rect,
+		context: context with
+		{
+			current: context.current + context.width,
+			generator: 0,
+		}
+	};
+}
+
+function invoke(int generator, MoonContext context)
+{
+	if (generator == 0)
+	{
+		return generateMoonFloor(context);
+	}
+
+	return generateMoonRoof(context);
+}
+
+function current(MoonContext context)
+{
+	return context.current;
+}
+
+function target(MoonContext context)
+{
+	return context.target;
+}
+
+function generateTerrain(Stages::Moon stage, MoonContext context)
+{
+	let result = invoke(context.generator, context);
+
+	if (current(result.context) > target(result.context))
+	{
+		return result.rect;
+	}
+
+	return result.rect -> generateTerrain(stage, result.context);
+}
+
+function finalize(without v1, without v2)
+{
+	return nothing;
+}
+
+function finalize(without v1, f32 v2)
+{
+	return v2;
+}
+
+function finalize(f32 v1, without v2)
+{
+	return Finalized
+	{
+		value: v1
+	};
+}
+
+function finalize(f32 v1, f32 v2)
+{
+	return Finalized
+	{
+		value: min(v1, v2);
+	};
+}
+
+struct Finalized
+{
+	value
+};
+
+function hitTest(Vec2 position, SDL::Rect rect)
+{
+	let playerRight = floatToInt(position.x + 32.0);
+	let playerLeft = floatToInt(position.x);
+
+	let rightOverlapping = (rect.x < playerRight) && (rect.x + rect.width) > playerRight;
+	let leftOverlapping = (rect.x < playerLeft) && (rect.x + rect.width) > playerLeft;
+
+	if ((rightOverlapping == false) && (leftOverlapping == false))
+	{
+		return nothing;
+	}
+
+	let center = rect.y + (rect.height / 2);
+
+	if (center < (Height / 2))
+	{
+		// is roof
+
+		let y = intToFloat(rect.y + rect.height);
+
+		if (position.y < y)
+		{
+			return y;
+		}
+
+		return nothing;
+	}
+
+	let y = intToFloat(rect.y - 32);
+
+	if (position.y > y)
+	{
+		return y;
+	}
+
+	return nothing;
+}
+
+function handleCollision(any accumulated, Vec2 position, (SDL::Rect rect, ...rects))
+{
+	let y = finalize(accumulated
+		, hitTest(position, rect)
+		);
+
+	return tail handleCollision(y, position, ...rects);
+}
+
+function handleCollision(Finalized accumulated, Vec2 position, (SDL::Rect rect, ...rects))
+{
+	return accumulated;
+}
+
+function handleCollision(Finalized accumulated, Vec2 position, SDL::Rect rect)
+{
+	return accumulated;
+}
+
+function handleCollision(any accumulated, Vec2 position, SDL::Rect rect)
+{
+	return finalize(accumulated
+		, hitTest(position, rect)
+		);
+}
+
+function cancelGravity(Vec2 velocity)
+{
+	if (velocity.y > 0.0)
+	{
+		return Vec2 {};
+	}
+
+	return velocity;
+}
+
+function processCollision(Finalized y, Player player)
+{
+	let velocity = cancelGravity(player.velocity);
+
+	return player with
+	{
+		velocity: velocity,
+		position: player.position with
+		{
+			y: y.value + velocity.y
+		}
+	};
+}
+
+function processCollision(any v, Player player)
+{
+	return player with
+	{
+		velocity: apply(player.velocity, gravity),
+		position: player.position with
+		{
+			y: y(player.position) + y(player.velocity)
+		}
+	};
+}
+
+function handlePhysics(Player player, Stages::Moon stage)
+{
+	let p = player with
+	{
+		position: player.position with
+		{
+			x: intToFloat(SDL::SDL_GetTicks() / 10)
+		}
+	};
+
+	srand(stage.seed);
+
+	let terrain = generateTerrain(stage, createSeed(stage));
+	let collision = handleCollision(nothing, p.position, terrain);
+
+	return processCollision(collision, p);
+}

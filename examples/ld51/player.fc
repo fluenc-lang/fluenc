@@ -8,7 +8,7 @@ struct Player
 
 function isJumping(Player player)
 {
-	return y(player.velocity) < 0.5;
+	return y(player.velocity) < 0.0;
 }
 
 function rect(Player player)

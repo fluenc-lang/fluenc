@@ -20,11 +20,17 @@ function handleCollision(Vec2 position)
 	};
 }
 
-function handlePhysics(Player player)
+function handlePhysics(Player player, Stages::Stage stage)
 {
 	return player with
 	{
-		position: handleCollision(apply(player.position, player.velocity)),
+// 		apply(player.position, player.velocity),
+		position: Vec2
+		{
+			x: intToFloat(SDL::SDL_GetTicks()),
+			y: y(player.position) + y(player.velocity)
+		},
+// 		position: handleCollision(apply(player.position, player.velocity)),
 		velocity: apply(player.velocity, gravity)
 	};
 }
@@ -33,6 +39,6 @@ function handlePhysics(State state)
 {
 	return state with
 	{
-		player: handlePhysics(state.player)
+		player: handlePhysics(state.player, state.stage)
 	};
 }

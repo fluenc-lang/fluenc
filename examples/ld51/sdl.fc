@@ -9,6 +9,7 @@ namespace SDL
 	import int SDL_SetRenderDrawBlendMode(long renderer, int blendMode);
 	import int SDL_RenderSetViewport(long renderer, Rect rect);
 	import int SDL_RenderCopy(long renderer, long texture, Rect srcrect, Rect dstrect);
+	import int SDL_RenderSetScale(long renderer, f32 scaleX, f32 scaleY);
 
     import long SDL_CreateRenderer(long window, int index, int flags);
     import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);

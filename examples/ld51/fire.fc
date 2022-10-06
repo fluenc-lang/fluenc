@@ -1,0 +1,105 @@
+struct FireContext
+{
+	current: 0,
+	target: 0,
+	width: 0,
+	generator: 0
+}
+
+function createSeed(Stages::Fire stage)
+{
+	let x = (state.rounds * RoundLength) - CameraOffset;
+
+	return FireContext
+	{
+		current: x,
+		target: x + Length
+	};
+}
+
+struct FireGeneratorResult
+{
+	context,
+	rect
+};
+
+function generateFireFloor(FireContext context)
+{
+	let width = 50 + (rand() % 50);
+	let height = 100 + (rand() % 10) * 25;
+
+	let rect = SDL::Rect
+	{
+		x: context.current,
+		y: Height - height,
+		width: width,
+		height: height
+	};
+
+	return FireGeneratorResult
+	{
+		rect: rect,
+		context: context with
+		{
+			width: width,
+			generator: 1,
+
+		}
+	};
+}
+
+function generateFireRoof(FireContext context)
+{
+	let height = 100 + (rand() % 10) * 25;
+
+	let rect = SDL::Rect
+	{
+		x: context.current,
+		y: 0,
+		width: context.width,
+		height: height
+	};
+
+	return FireGeneratorResult
+	{
+		rect: rect,
+		context: context with
+		{
+			current: context.current + context.width,
+			generator: 0,
+
+		}
+	};
+}
+
+function invoke(int generator, FireContext context)
+{
+	if (generator == 0)
+	{
+		return generateFireFloor(context);
+	}
+
+	return generateFireRoof(context);
+}
+
+function current(FireContext context)
+{
+	return context.current;
+}
+
+function target(FireContext context)
+{
+	return context.target;
+}
+
+function generateTerrain(Stages::Fire stage, FireContext context)
+{
+	let result = invoke(context.generator, context);
+
+	if (current(result.context) > target(result.context))
+	{
+		return result.rect;
+	}
+
+	return result.rect -> generateTerrain(stage, result.context);
+}
