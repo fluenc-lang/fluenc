@@ -11,7 +11,13 @@ class Node;
 class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 {
 	public:
-		ExpandedValue(bool isArray, const Type *iteratorType, const EntryPoint &provider, const Node *node, const Node *chain, const std::vector<const ExpandedValue *> &next);
+		ExpandedValue(bool isArray
+			, const Type *iteratorType
+			, const EntryPoint &provider
+			, const Node *node
+			, const Node *chain
+			, const std::vector<const ExpandedValue *> &next
+			);
 
 		bool isArray() const;
 

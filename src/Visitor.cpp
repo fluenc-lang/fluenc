@@ -49,10 +49,10 @@
 #include "nodes/LocalNode.h"
 #include "nodes/UnaryNode.h"
 #include "nodes/FunctionCallProxyNode.h"
-#include "nodes/ParentInjectorNode.h"
 #include "nodes/FloatLiteralNode.h"
 #include "nodes/JunctionNode.h"
 #include "nodes/DistributorNode.h"
+#include "nodes/BlockStackFrameNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -705,16 +705,7 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 
 	auto iteratorType = new IteratorType();
 
-	Visitor visitor(m_namespaces, iteratorType, m_parent, TerminatorNode::instance(), nullptr);
-
-	auto block = visitor.visitBlock(*ast->nodes.rbegin());
-
-	if (block->containsIterator())
-	{
-		return new FunctionNode(FunctionAttribute::Iterator, name, arguments, block);
-	}
-
-	return new FunctionNode(FunctionAttribute::None, name, arguments, block);
+	return new FunctionNode(name, arguments, ast->nodes, m_namespaces, iteratorType);
 }
 
 CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const
@@ -864,12 +855,32 @@ IBlockInstruction *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast) co
 
 IBlockInstruction *Visitor::visitBlock(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return new ParentInjectorNode(ast->nodes
-		, m_namespaces
-		, m_iteratorType
-		, m_alpha
-		, m_beta
-		);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, m_alpha, m_beta);
+
+	auto first = rbegin(ast->nodes);
+
+	auto ret = visitor.visitReturn(*first);
+
+	return std::accumulate(first + 1, rend(ast->nodes), ret, [&](IBlockInstruction *consumer, auto expression) -> IBlockInstruction *
+	{
+		auto stackFrame = new BlockStackFrameNode(consumer);
+
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, stackFrame, m_alpha);
+
+		auto value = visitor
+			.visitExpression(expression);
+
+		if (auto instruction = dynamic_cast<const IBlockInstruction *>(value))
+		{
+			return new BlockInstructionNode(instruction
+				, instruction->containsIterator() || consumer->containsIterator()
+				);
+		}
+
+		return new BlockInstructionNode(value
+			, consumer->containsIterator()
+			);
+	});
 }
 
 ITypeName *Visitor::visitTypeName(const std::shared_ptr<peg::Ast> &ast) const

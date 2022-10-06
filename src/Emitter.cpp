@@ -784,11 +784,16 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 				{
 					if (auto expanded = dynamic_cast<const ExpandedValue *>(element))
 					{
+						auto block = llvm::BasicBlock::Create(*entryPoint.context());
+
+						linkBlocks(entryPoint.block(), block);
+
 						auto node = expanded->node();
+						auto provider = expanded->provider();
 
 						std::vector<DzResult> results;
 
-						for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { entryPoint, values }))
+						for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { provider->withBlock(block), provider->values() }))
 						{
 							auto forwardedValues = values;
 
@@ -797,8 +802,8 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 								forwardedValues.push(resultValue);
 							}
 
-							auto forwardedEntryPoint = resultEntryPoint
-								.withIteratorStorage(entryPoint.iteratorStorage());
+							auto forwardedEntryPoint = entryPoint
+								.withBlock(resultEntryPoint.block());
 
 							for (auto &result : recurse(forwardedEntryPoint, forwardedValues, recurse))
 							{

@@ -29,10 +29,12 @@ class IBlockInstruction;
 class ContinuationNode;
 class ITypeName;
 class ParentInjectorNode;
+class FunctionNode;
 
 class Visitor
 {
 	friend ParentInjectorNode;
+	friend FunctionNode;
 
 	public:
 		Visitor(const std::vector<std::string> &namespaces

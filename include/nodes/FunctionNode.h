@@ -6,6 +6,7 @@
 class DzArgument;
 class DzBaseArgument;
 class BaseValue;
+class IBlockInstruction;
 
 class FunctionNode : public CallableNode
 {
@@ -19,10 +20,11 @@ class FunctionNode : public CallableNode
 	};
 
 	public:
-		FunctionNode(FunctionAttribute attribute
-			, const std::string &name
+		FunctionNode(const std::string &name
 			, const std::vector<DzBaseArgument *> &arguments
-			, Node *block
+			, const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType> > > &nodes
+			, const std::vector<std::string> &namespaces
+			, const Type *iteratorType
 			);
 
 		std::string name() const override;
@@ -35,14 +37,18 @@ class FunctionNode : public CallableNode
 		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 
 	private:
-		std::vector<Argument> handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const;
+		static IBlockInstruction *inject(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType>>> &nodes
+			, const std::vector<std::string> &namespaces
+			, const Type *iteratorType
+			, const Node *self
+			);
 
-		FunctionAttribute m_attribute;
+		std::vector<Argument> handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const;
 
 		std::string m_name;
 		std::vector<DzBaseArgument *> m_arguments;
 
-		Node *m_block;
+		IBlockInstruction *m_block;
 };
 
 

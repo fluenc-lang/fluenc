@@ -2,19 +2,33 @@
 #include <numeric>
 
 #include "nodes/FunctionNode.h"
+#include "nodes/TerminatorNode.h"
+#include "nodes/IBlockInstruction.h"
 
-#include "DzArgument.h"
+#include "Visitor.h"
+#include "DzBaseArgument.h"
 
-FunctionNode::FunctionNode(FunctionAttribute attribute
-	, const std::string &name
+FunctionNode::FunctionNode(const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
-	, Node *block
+	, const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType> > > &nodes
+	, const std::vector<std::string> &namespaces
+	, const Type *iteratorType
 	)
-	: m_attribute(attribute)
-	, m_name(name)
+	: m_name(name)
 	, m_arguments(arguments)
-	, m_block(block)
+	, m_block(inject(nodes, namespaces, iteratorType, this))
 {
+}
+
+IBlockInstruction *FunctionNode::inject(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType>>> &nodes
+	, const std::vector<std::string> &namespaces
+	, const Type *iteratorType
+	, const Node *self
+	)
+{
+	Visitor visitor(namespaces, iteratorType, self, TerminatorNode::instance(), nullptr);
+
+	return visitor.visitBlock(*nodes.rbegin());
 }
 
 std::string FunctionNode::name() const
@@ -29,7 +43,12 @@ std::vector<DzBaseArgument *> FunctionNode::arguments() const
 
 FunctionAttribute FunctionNode::attribute() const
 {
-	return m_attribute;
+	if (m_block->containsIterator())
+	{
+		return FunctionAttribute::Iterator;
+	}
+
+	return FunctionAttribute::None;
 }
 
 int8_t FunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const std::vector<const Type *> &values) const

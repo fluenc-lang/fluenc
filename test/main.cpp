@@ -4587,6 +4587,50 @@ BOOST_AUTO_TEST_CASE (scenario112)
 	BOOST_TEST(type2->compatibility(type2, result) == 0);
 }
 
+BOOST_AUTO_TEST_CASE (scenario113)
+{
+	auto result = exec(R"(
+		function generator(int i, int count)
+		{
+			if (i < count)
+			{
+				return i -> generator(i + 1, count);
+			}
+
+			return i;
+		}
+
+		function add(without v1, int v2)
+		{
+			return v2;
+		}
+
+		function add(int v1, int v2)
+		{
+			return v1 + v2;
+		}
+
+		function foo(any accumulated, (int value, ...values))
+		{
+			let added = add(accumulated, value);
+
+			return tail foo(added, ...values);
+		}
+
+		function foo(any accumulated, int value)
+		{
+			return add(accumulated, value);
+		}
+
+		export int main()
+		{
+			return foo(nothing, generator(0, 3));
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
