@@ -1642,7 +1642,7 @@ std::vector<DzResult> Emitter::visit(const BooleanUnaryNode *node, DefaultVisito
 
 	context.values.push(value);
 
-	return node->consumer->accept(*this, context);
+	return {{ context.entryPoint, context.values }};
 }
 
 std::vector<DzResult> Emitter::visit(const FloatUnaryNode *node, DefaultVisitorContext context) const
