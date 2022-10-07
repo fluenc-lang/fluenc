@@ -91,7 +91,10 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 
 	std::shared_ptr<peg::Ast> ast;
 
-	parser.parse(*source, ast, file.c_str());
+	if (!parser.parse(*source, ast, file.c_str()))
+	{
+		throw new std::exception();
+	}
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
@@ -281,48 +284,46 @@ int main(int argc, char **argv)
 
 	std::vector<std::string> objectFiles;
 
-	auto success = std::accumulate(begin(jobs), end(jobs), true, [&](auto result, auto pair)
+	try
 	{
-		auto &[_, job] = pair;
-
-		if (job.module.roots.empty())
+		for (auto &[_, job] : jobs)
 		{
-			std::cout << "File " << job.sourceFile << " has no roots, skipping" << std::endl;
-
-			return result;
-		}
-
-		if (isStale(job, jobs))
-		{
-			auto module = processUses(job, jobs);
-
-			std::cout << "Building " << job.sourceFile << "..." << std::endl;
-
-			auto llvmModule = std::make_unique<llvm::Module>(job.name, *llvmContext);
-
-			Stack values;
-
-			EntryPoint entryPoint(0
-				, -1
-				, nullptr
-				, nullptr
-				, nullptr
-				, nullptr
-				, nullptr
-				, llvmModule.get()
-				, llvmContext.get()
-				, "term"
-				, module.functions
-				, module.locals
-				, module.globals
-				, module.types
-				, module.roots
-				, values
-				, nullptr
-				);
-
-			try
+			if (job.module.roots.empty())
 			{
+				std::cout << "File " << job.sourceFile << " has no roots, skipping" << std::endl;
+
+				continue;
+			}
+
+			if (isStale(job, jobs))
+			{
+				auto module = processUses(job, jobs);
+
+				std::cout << "Building " << job.sourceFile << "..." << std::endl;
+
+				auto llvmModule = std::make_unique<llvm::Module>(job.name, *llvmContext);
+
+				Stack values;
+
+				EntryPoint entryPoint(0
+					, -1
+					, nullptr
+					, nullptr
+					, nullptr
+					, nullptr
+					, nullptr
+					, llvmModule.get()
+					, llvmContext.get()
+					, "term"
+					, module.functions
+					, module.locals
+					, module.globals
+					, module.types
+					, module.roots
+					, values
+					, nullptr
+					);
+
 				Emitter emitter;
 
 				for (auto root : module.roots)
@@ -358,74 +359,65 @@ int main(int argc, char **argv)
 
 				destination.flush();
 			}
-			catch (CompilerException *exception)
-			{
-				std::cout << exception->file() << ":" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
-				std::cout << std::setw(5) << exception->row() << " | ";
 
-				std::ifstream stream;
+			objectFiles.push_back(job.objectFile);
+		}
+	}
+	catch (CompilerException *exception)
+	{
+		std::cout << exception->file() << ":" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
+		std::cout << std::setw(5) << exception->row() << " | ";
 
-				stream.open(exception->file());
+		std::ifstream stream;
 
-				std::string line;
+		stream.open(exception->file());
 
-				for (size_t i = 0u; i < exception->row(); i++)
-				{
-					std::getline(stream, line);
-				}
+		std::string line;
 
-				auto trimmed = std::find_if(begin(line), end(line), [](unsigned char ch)
-				{
-					return !std::isspace(ch);
-				});
-
-				for (auto i = trimmed; i != end(line); i++)
-				{
-					std::cout << *i;
-				}
-
-				std::cout << std::endl;
-				std::cout << std::setw(8) << "| ";
-
-				for (auto i = trimmed; i != end(line); i++)
-				{
-					auto tokenSelector = [&]
-					{
-						if (i == begin(line) + exception->column())
-						{
-							return "^";
-						}
-
-						if (i < begin(line) + exception->column())
-						{
-							return " ";
-						}
-
-						if (i > begin(line) + exception->column() + exception->length())
-						{
-							return " ";
-						}
-
-						return "~";
-					};
-
-					std::cout << tokenSelector();
-				}
-
-				std::cout << std::endl;
-
-				return false;
-			}
+		for (size_t i = 0u; i < exception->row(); i++)
+		{
+			std::getline(stream, line);
 		}
 
-		objectFiles.push_back(job.objectFile);
+		auto trimmed = std::find_if(begin(line), end(line), [](unsigned char ch)
+		{
+			return !std::isspace(ch);
+		});
 
-		return result;
-	});
+		for (auto i = trimmed; i != end(line); i++)
+		{
+			std::cout << *i;
+		}
 
-	if (!success)
-	{
-		std::cout << "Build failed" << std::endl;
+		std::cout << std::endl;
+		std::cout << std::setw(8) << "| ";
+
+		for (auto i = trimmed; i != end(line); i++)
+		{
+			auto tokenSelector = [&]
+			{
+				if (i == begin(line) + exception->column())
+				{
+					return "^";
+				}
+
+				if (i < begin(line) + exception->column())
+				{
+					return " ";
+				}
+
+				if (i > begin(line) + exception->column() + exception->length())
+				{
+					return " ";
+				}
+
+				return "~";
+			};
+
+			std::cout << tokenSelector();
+		}
+
+		std::cout << std::endl;
 
 		return 1;
 	}
