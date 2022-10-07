@@ -16,6 +16,7 @@
 #include "DzTupleArgument.h"
 #include "InteropHelper.h"
 
+#include "exceptions/InvalidOperatorException.h"
 #include "types/IOperatorSet.h"
 #include "types/Int64Type.h"
 #include "types/BooleanType.h"
@@ -1619,7 +1620,10 @@ std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContex
 			return new ForwardedValue(operand);
 		}
 
-		throw new std::exception(); // TODO
+		auto operandType = operand->type();
+		auto operandTypeName = operandType->name();
+
+		throw new InvalidOperatorException(node->m_ast, node->m_op, operandTypeName);
 	};
 
 	auto value = resolveOp();

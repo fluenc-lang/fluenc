@@ -639,7 +639,8 @@ Node *Visitor::visitUnary(const std::shared_ptr<peg::Ast> &ast) const
 {
 	UNUSED(ast);
 
-	auto unary = new UnaryNode(m_alpha
+	auto unary = new UnaryNode(ast
+		, m_alpha
 		, visitId(ast->nodes[0])
 		);
 
