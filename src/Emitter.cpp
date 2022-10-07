@@ -16,7 +16,6 @@
 #include "DzTupleArgument.h"
 #include "InteropHelper.h"
 
-#include "exceptions/InvalidOperatorException.h"
 #include "types/IOperatorSet.h"
 #include "types/Int64Type.h"
 #include "types/BooleanType.h"
@@ -89,6 +88,7 @@
 #include "exceptions/MissingDefaultValueException.h"
 #include "exceptions/MissingFieldException.h"
 #include "exceptions/InvalidArgumentTypeException.h"
+#include "exceptions/InvalidOperatorException.h"
 
 std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisitorContext context) const
 {
@@ -285,6 +285,16 @@ std::vector<DzResult> Emitter::visit(const IntegerBinaryNode *node, DefaultVisit
 	context.values.push(value);
 
 	return {{ context.entryPoint, context.values }};
+}
+
+std::vector<DzResult> Emitter::visit(const StringBinaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = context.values.pop();
+
+	auto operandType = operand->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorContext context) const
@@ -1609,13 +1619,59 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 	return {{ tailCallCandidate, value }};
 }
 
-std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const BooleanUnaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = ValueHelper::getScalar(context.entryPoint, context.values);
+
+	IRBuilderEx builder(context.entryPoint);
+
+	auto valueFactory = [&]
+	{
+		if (node->op == "!")
+		{
+			return builder.createNot(operand);
+		}
+
+		auto operandType = operand->type();
+		auto operandTypeName = operandType->name();
+
+		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	};
+
+	auto value = valueFactory();
+
+	context.values.push(value);
+
+	return node->consumer->accept(*this, context);
+}
+
+std::vector<DzResult> Emitter::visit(const FloatUnaryNode *node, DefaultVisitorContext context) const
 {
 	auto operand = context.values.pop();
 
-	auto resolveOp = [&]
+	auto operandType = operand->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+}
+
+std::vector<DzResult> Emitter::visit(const IntegerUnaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = context.values.pop();
+
+	auto operandType = operand->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+}
+
+std::vector<DzResult> Emitter::visit(const StringUnaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = context.values.pop();
+
+	auto valueFactory = [&]
 	{
-		if (node->m_op == "@")
+		if (node->op == "@")
 		{
 			return new ForwardedValue(operand);
 		}
@@ -1623,14 +1679,36 @@ std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContex
 		auto operandType = operand->type();
 		auto operandTypeName = operandType->name();
 
-		throw new InvalidOperatorException(node->m_ast, node->m_op, operandTypeName);
+		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
-	auto value = resolveOp();
+	auto value = valueFactory();
 
 	context.values.push(value);
 
-	return node->m_consumer->accept(*this, context);
+	return node->consumer->accept(*this, context);
+}
+
+std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = context.values.peek();
+
+	auto operandType = operand->type();
+	auto operators = operandType->operators();
+
+	auto unary = operators->forUnary(node);
+
+	std::vector<DzResult> results;
+
+	for (auto &[resultEntryPoint, resultValues] : unary->accept(*this, context))
+	{
+		for (auto &result : node->consumer->accept(*this, { resultEntryPoint, resultValues }))
+		{
+			results.push_back(result);
+		}
+	}
+
+	return results;
 }
 
 std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVisitorContext context) const
@@ -1957,7 +2035,6 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 	auto llvmContext = context.entryPoint.context();
 
 	auto block = context.entryPoint.block();
-	auto function = context.entryPoint.function();
 
 	auto iteratorBlock = llvm::BasicBlock::Create(*llvmContext, "iterator");
 

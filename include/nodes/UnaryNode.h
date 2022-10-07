@@ -5,21 +5,34 @@
 
 class Node;
 
-class UnaryNode : public VisitableNode<UnaryNode>
+template<typename TSelf>
+struct UnaryNodeBase : public VisitableNode<TSelf>
 {
-	friend class Emitter;
+	std::shared_ptr<peg::Ast> ast;
 
-	public:
-		UnaryNode(const std::shared_ptr<peg::Ast> &ast, const Node *consumer, const std::string &op);
+	const Node *consumer;
 
-	private:
-		const BaseValue *resolveOp(const BaseValue *value) const;
+	std::string op;
+};
 
-		const std::shared_ptr<peg::Ast> m_ast;
+struct IntegerUnaryNode : public UnaryNodeBase<IntegerUnaryNode>
+{
+};
 
-		const Node *m_consumer;
+struct BooleanUnaryNode : UnaryNodeBase<BooleanUnaryNode>
+{
+};
 
-		std::string m_op;
+struct FloatUnaryNode : public UnaryNodeBase<FloatUnaryNode>
+{
+};
+
+struct StringUnaryNode : public UnaryNodeBase<StringUnaryNode>
+{
+};
+
+struct UnaryNode : public UnaryNodeBase<UnaryNode>
+{
 };
 
 #endif // UNARYNODE_H

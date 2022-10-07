@@ -3,7 +3,6 @@
 
 #include "Type.h"
 #include "Utility.h"
-#include "IteratorType.h"
 #include "AnyType.h"
 
 template<typename T>

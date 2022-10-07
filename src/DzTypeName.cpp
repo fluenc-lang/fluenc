@@ -12,6 +12,7 @@
 #include "types/ByteType.h"
 #include "types/AnyType.h"
 #include "types/Float32Type.h"
+#include "types/IteratorType.h"
 
 #include "exceptions/UnknownTypeException.h"
 

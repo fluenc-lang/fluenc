@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include <llvm/IR/Instructions.h>
 
 #include "IteratorStorage.h"

@@ -4631,6 +4631,25 @@ BOOST_AUTO_TEST_CASE (scenario113)
 	BOOST_TEST(result == 6);
 }
 
+BOOST_AUTO_TEST_CASE (scenario114)
+{
+	auto result = exec(R"(
+		export int main()
+		{
+			let predicate = 1 > 2;
+
+			if (!predicate)
+			{
+				return 1;
+			}
+
+			return 2;
+		}
+	)");
+
+	BOOST_TEST(result == 1);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

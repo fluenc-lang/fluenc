@@ -15,6 +15,8 @@ class StringType : public BuiltinType<StringType>
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
+		IOperatorSet *operators() const override;
+
 		static StringType *get(size_t length);
 
 	private:

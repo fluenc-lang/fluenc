@@ -429,6 +429,7 @@ Node *Visitor::visitNothingLiteral(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitBinary(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto binary = new BinaryNode();
+	binary->ast = ast;
 	binary->op = visitId(ast->nodes[1]);
 	binary->consumer = m_alpha;
 
@@ -639,10 +640,10 @@ Node *Visitor::visitUnary(const std::shared_ptr<peg::Ast> &ast) const
 {
 	UNUSED(ast);
 
-	auto unary = new UnaryNode(ast
-		, m_alpha
-		, visitId(ast->nodes[0])
-		);
+	auto unary = new UnaryNode();
+	unary->ast = ast;
+	unary->consumer = m_alpha;
+	unary->op = visitId(ast->nodes[0]);
 
 	Visitor visitor(m_namespaces, m_iteratorType, m_parent, unary, nullptr);
 

@@ -8,6 +8,8 @@ class ScalarValue;
 template<typename TSelf>
 struct BinaryNodeBase : public VisitableNode<TSelf>
 {
+	std::shared_ptr<peg::Ast> ast;
+
 	const Node *consumer;
 
 	std::string op;
@@ -22,6 +24,10 @@ struct BooleanBinaryNode : BinaryNodeBase<BooleanBinaryNode>
 };
 
 struct FloatBinaryNode : public BinaryNodeBase<FloatBinaryNode>
+{
+};
+
+struct StringBinaryNode : public BinaryNodeBase<StringBinaryNode>
 {
 };
 

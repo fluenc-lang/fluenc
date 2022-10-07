@@ -1,13 +1,18 @@
 #ifndef NODEVISITOR_H
 #define NODEVISITOR_H
 
-#include "Utility.h"
 #include "DzResult.h"
 
 struct BinaryNode;
 struct IntegerBinaryNode;
 struct FloatBinaryNode;
 struct BooleanBinaryNode;
+struct StringBinaryNode;
+struct UnaryNode;
+struct IntegerUnaryNode;
+struct FloatUnaryNode;
+struct BooleanUnaryNode;
+struct StringUnaryNode;
 
 class ExportedFunctionNode;
 class ArrayContinuationNode;
@@ -34,7 +39,6 @@ class ArraySinkNode;
 class ExpansionNode;
 class LocalNode;
 class ContinuationNode;
-class UnaryNode;
 class TailFunctionCallNode;
 class FunctionNode;
 class ExportedFunctionTerminatorNode;
@@ -72,6 +76,7 @@ class NodeVisitor
 		virtual TReturn visit(const BooleanBinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const FloatBinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const IntegerBinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const StringBinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const BinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const ExportedFunctionNode *node, TContext context) const = 0;
 		virtual TReturn visit(const ArrayContinuationNode *node, TContext context) const = 0;
@@ -98,6 +103,10 @@ class NodeVisitor
 		virtual TReturn visit(const ExpansionNode *node, TContext context) const = 0;
 		virtual TReturn visit(const LocalNode *node, TContext context) const = 0;
 		virtual TReturn visit(const ContinuationNode *node, TContext context) const = 0;
+		virtual TReturn visit(const BooleanUnaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const FloatUnaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const IntegerUnaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const StringUnaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const UnaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const TailFunctionCallNode *node, TContext context) const = 0;
 		virtual TReturn visit(const FunctionNode *node, TContext context) const = 0;

@@ -7,6 +7,7 @@ class FloatOperatorSet : public IOperatorSet
 {
 	public:
 		const Node *forBinary(const BinaryNode *node) const override;
+		const Node *forUnary(const UnaryNode *node) const override;
 };
 
 #endif // FLOATOPERATORSET_H

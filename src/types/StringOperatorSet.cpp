@@ -1,11 +1,11 @@
-#include "types/IntegerOperatorSet.h"
+#include "types/StringOperatorSet.h"
 
 #include "nodes/BinaryNode.h"
 #include "nodes/UnaryNode.h"
 
-const Node *IntegerOperatorSet::forBinary(const BinaryNode *node) const
+const Node *StringOperatorSet::forBinary(const BinaryNode *node) const
 {
-	auto result = new IntegerBinaryNode();
+	auto result = new StringBinaryNode();
 	result->ast = node->ast;
 	result->consumer = node->consumer;
 	result->op = node->op;
@@ -13,9 +13,9 @@ const Node *IntegerOperatorSet::forBinary(const BinaryNode *node) const
 	return result;
 }
 
-const Node *IntegerOperatorSet::forUnary(const UnaryNode *node) const
+const Node *StringOperatorSet::forUnary(const UnaryNode *node) const
 {
-	auto result = new IntegerUnaryNode();
+	auto result = new StringUnaryNode();
 	result->ast = node->ast;
 	result->consumer = node->consumer;
 	result->op = node->op;

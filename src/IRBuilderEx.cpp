@@ -249,6 +249,19 @@ const ScalarValue *IRBuilderEx::createXor(const ScalarValue *lhs, const ScalarVa
 		);
 }
 
+const ScalarValue *IRBuilderEx::createNot(const ScalarValue *value, const llvm::Twine &name) const
+{
+	auto block = m_entryPoint.block();
+
+	guardBranch(block);
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(value->type()
+		, builder.CreateNot(*value, name)
+		);
+}
+
 llvm::Value *IRBuilderEx::createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse)
 {
 	auto block = m_entryPoint.block();
