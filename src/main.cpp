@@ -36,6 +36,8 @@
 
 #include "nodes/CallableNode.h"
 
+#include "exceptions/ParserException.h"
+
 INCTXT(Grammar, "fluenc.peg");
 
 struct CompilerJob
@@ -90,6 +92,11 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 	auto source = new std::string(buffer.str());
 
 	std::shared_ptr<peg::Ast> ast;
+
+	parser.log = [&](size_t line, size_t col, const std::string &message)
+	{
+		throw new ParserException(file, line, col, message);
+	};
 
 	if (!parser.parse(*source, ast, file.c_str()))
 	{
@@ -192,6 +199,8 @@ ModuleInfo processUses(std::unordered_set<std::string> &processed
 
 		if (childJob == jobs.end())
 		{
+			std::cout << "File " << use << " not found in the include path" << std::endl;
+
 			throw new std::exception(); // TODO
 		}
 
@@ -259,33 +268,33 @@ int main(int argc, char **argv)
 
 	auto workingDirectory = std::filesystem::current_path();
 
-	for (const auto &entry : std::filesystem::recursive_directory_iterator(workingDirectory))
-	{
-		auto path = entry.path();
-
-		if (path.extension() != ".fc")
-		{
-			std::cout << "Skipping file " << path << std::endl;
-
-			continue;
-		}
-
-		std::cout << "Adding file " << path << std::endl;
-
-		auto relative = std::filesystem::relative(path);
-
-		auto relativeStem = relative.parent_path() / relative.stem();
-
-		auto module = analyze(relative, parser);
-		auto job = createJob(module, relativeStem);
-
-		jobs.insert({ job.sourceFile, job});
-	}
-
 	std::vector<std::string> objectFiles;
 
 	try
 	{
+		for (const auto &entry : std::filesystem::recursive_directory_iterator(workingDirectory))
+		{
+			auto path = entry.path();
+
+			if (path.extension() != ".fc")
+			{
+				std::cout << "Skipping file " << path << std::endl;
+
+				continue;
+			}
+
+			std::cout << "Adding file " << path << std::endl;
+
+			auto relative = std::filesystem::relative(path);
+
+			auto relativeStem = relative.parent_path() / relative.stem();
+
+			auto module = analyze(relative, parser);
+			auto job = createJob(module, relativeStem);
+
+			jobs.insert({ job.sourceFile, job});
+		}
+
 		for (auto &[_, job] : jobs)
 		{
 			if (job.module.roots.empty())
