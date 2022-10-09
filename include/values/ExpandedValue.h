@@ -2,6 +2,7 @@
 #define EXPANDEDVALUE_H
 
 #include "BaseValue.h"
+#include "Stack.h"
 
 #include "metadata/ExpandedValueMetadata.h"
 
@@ -17,6 +18,7 @@ class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 			, const Node *node
 			, const Node *chain
 			, const std::vector<const ExpandedValue *> &next
+			, const Stack &values
 			);
 
 		bool isArray() const;
@@ -30,6 +32,8 @@ class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 
 		std::vector<const ExpandedValue *> next() const;
 
+		Stack values() const;
+
 	private:
 		bool m_isArray;
 
@@ -39,6 +43,8 @@ class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 		const Node *m_chain;
 
 		std::vector<const ExpandedValue *> m_next;
+
+		Stack m_values;
 };
 
 #endif // EXPANDEDVALUE_H

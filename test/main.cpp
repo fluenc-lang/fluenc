@@ -4669,6 +4669,68 @@ BOOST_AUTO_TEST_CASE (scenario115)
 	BOOST_TEST(result == 1);
 }
 
+BOOST_AUTO_TEST_CASE (scenario116)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			func
+		}
+
+		function value1()
+		{
+			return 1;
+		}
+
+		function value2()
+		{
+			return 2;
+		}
+
+		function invoke(function() callback)
+		{
+			return callback();
+		}
+
+		function generator(int i, State previous)
+		{
+			if (i == 0)
+			{
+				let s = State
+				{
+					func: value2
+				};
+
+				return 10 -> generator(i + 1, s);
+			}
+
+			return invoke(previous.func);
+		}
+
+		function sum(int product, (int value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function sum(int product, int value)
+		{
+			return product + value;
+		}
+
+		export int main()
+		{
+			let init = State
+			{
+				func: value1
+			};
+
+			return sum(0, generator(0, init));
+		}
+	)");
+
+	BOOST_TEST(result == 12);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

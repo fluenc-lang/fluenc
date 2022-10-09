@@ -2,16 +2,17 @@
 #include <numeric>
 #include <unordered_map>
 
-#include "types/TupleType.h"
+#include "types/ExpandedType.h"
+#include "types/IteratorType.h"
 
 #include "iterators/ExtremitiesIterator.h"
 
-TupleType::TupleType(const std::vector<const Type *> types)
+ExpandedType::ExpandedType(const std::vector<const Type *> types)
 	: m_types(types)
 {
 }
 
-std::string TupleType::name() const
+std::string ExpandedType::name() const
 {
 	std::stringstream ss;
 
@@ -32,7 +33,7 @@ std::string TupleType::name() const
 	return ss.str();
 }
 
-std::string TupleType::fullName() const
+std::string ExpandedType::fullName() const
 {
 	std::stringstream ss;
 
@@ -53,7 +54,7 @@ std::string TupleType::fullName() const
 	return ss.str();
 }
 
-llvm::Type *TupleType::storageType(llvm::LLVMContext &context) const
+llvm::Type *ExpandedType::storageType(llvm::LLVMContext &context) const
 {
 	std::vector<llvm::Type *> types;
 
@@ -65,14 +66,19 @@ llvm::Type *TupleType::storageType(llvm::LLVMContext &context) const
 	return llvm::StructType::get(context, types);
 }
 
-int8_t TupleType::compatibility(const Type *type, const EntryPoint &entryPoint) const
+int8_t ExpandedType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
 	if (type == this)
 	{
 		return 0;
 	}
 
-	if (auto tuple = dynamic_cast<const TupleType *>(type))
+	if (auto iterator = dynamic_cast<const IteratorType *>(type))
+	{
+		return 1;
+	}
+
+	if (auto tuple = dynamic_cast<const ExpandedType *>(type))
 	{
 		if (m_types.size() != tuple->m_types.size())
 		{
@@ -98,9 +104,9 @@ int8_t TupleType::compatibility(const Type *type, const EntryPoint &entryPoint) 
 	return -1;
 }
 
-TupleType *TupleType::get(const std::vector<const Type *> &types)
+ExpandedType *ExpandedType::get(const std::vector<const Type *> &types)
 {
-	static std::unordered_map<size_t, TupleType> cache;
+	static std::unordered_map<size_t, ExpandedType> cache;
 
 	auto hash = std::accumulate(begin(types), end(types), 14695981039346656037u, [](auto accumulator, auto type)
 	{
@@ -110,4 +116,9 @@ TupleType *TupleType::get(const std::vector<const Type *> &types)
 	auto [iterator, _] = cache.try_emplace(hash, types);
 
 	return &iterator->second;
+}
+
+const Type *ExpandedType::iteratorType() const
+{
+	return m_types[0];
 }

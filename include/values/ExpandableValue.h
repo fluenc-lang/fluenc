@@ -13,6 +13,7 @@ class Type;
 class EntryPoint;
 class Node;
 class IteratorType;
+class ExpandedType;
 
 class ExpandableValue : public BaseValueWithMetadata<ExpandableValueMetadata>
 {
@@ -30,6 +31,7 @@ class ExpandableValue : public BaseValueWithMetadata<ExpandableValueMetadata>
 
 		const EntryPoint *provider() const;
 		const Node *chain() const;
+		const ExpandedType *expandedType() const;
 
 	private:
 		bool m_isArray;

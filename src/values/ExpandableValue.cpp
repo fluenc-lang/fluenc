@@ -1,7 +1,7 @@
 #include "values/ExpandableValue.h"
 #include "EntryPoint.h"
 
-#include "types/IteratorType.h"
+#include "types/ExpandedType.h"
 
 ExpandableValue::ExpandableValue(bool isArray
 	, const Type *iteratorType
@@ -40,4 +40,9 @@ const EntryPoint *ExpandableValue::provider() const
 const Node *ExpandableValue::chain() const
 {
 	return m_chain;
+}
+
+const ExpandedType *ExpandableValue::expandedType() const
+{
+	return dynamic_cast<const ExpandedType *>(m_iteratorType);
 }

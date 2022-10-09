@@ -17,6 +17,7 @@ class IIteratorStorage;
 class Node;
 class ReferenceValue;
 class Type;
+class ExpandedType;
 
 class EntryPoint
 {
@@ -38,6 +39,7 @@ class EntryPoint
 			, immer::box<std::vector<const CallableNode *>> roots
 			, immer::box<Stack> values
 			, IIteratorStorage *iteratorStorage
+			, const ExpandedType *iteratorType
 			);
 
 		EntryPoint() = default;
@@ -74,6 +76,8 @@ class EntryPoint
 		const EntryPoint *entry() const;
 		const EntryPoint *parent() const;
 
+		const ExpandedType *iteratorType() const;
+
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
 		EntryPoint withIteratorStorage(IIteratorStorage *iteratorStorage) const;
@@ -85,6 +89,7 @@ class EntryPoint
 		EntryPoint withValues(const Stack &values) const;
 		EntryPoint withDepth(int depth) const;
 		EntryPoint withIndex(int index) const;
+		EntryPoint withIteratorType(const ExpandedType *iteratorType) const;
 
 	private:
 		int m_depth;
@@ -111,6 +116,8 @@ class EntryPoint
 		immer::box<Stack> m_values;
 
 		IIteratorStorage *m_iteratorStorage;
+
+		const ExpandedType *m_iteratorType;
 };
 
 #endif // ENTRYPOINT_H

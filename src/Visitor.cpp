@@ -600,8 +600,9 @@ Node *Visitor::visitLocal(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitContinuation(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto continuation = new ContinuationNode(m_parent, m_iteratorType);
+	auto sink = new ReferenceSinkNode(continuation);
 
-	return std::accumulate(begin(ast->nodes) + 1, end(ast->nodes), static_cast<Node *>(continuation), [this](Node *consumer, auto parameter)
+	return std::accumulate(begin(ast->nodes) + 1, end(ast->nodes), static_cast<Node *>(sink), [this](Node *consumer, auto parameter)
 	{
 		Visitor visitor(m_namespaces, m_iteratorType, m_parent, consumer, nullptr);
 

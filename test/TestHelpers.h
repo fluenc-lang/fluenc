@@ -101,6 +101,7 @@ const BaseValue *compileValue(std::string source)
 			, moduleInfo.roots
 			, Stack()
 			, nullptr
+			, nullptr
 			);
 
 		Emitter emitter;
@@ -156,6 +157,7 @@ EntryPoint compile(std::string source)
 		, moduleInfo.roots
 		, Stack()
 		, nullptr
+		, nullptr
 		);
 }
 
@@ -194,6 +196,7 @@ int exec(std::string source)
 		, moduleInfo.types
 		, moduleInfo.roots
 		, Stack()
+		, nullptr
 		, nullptr
 		);
 

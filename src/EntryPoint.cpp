@@ -22,6 +22,7 @@ EntryPoint::EntryPoint(int depth
 	, immer::box<std::vector<const CallableNode *> > roots
 	, immer::box<Stack> values
 	, IIteratorStorage *iteratorStorage
+	, const ExpandedType *iteratorType
 	)
 	: m_depth(depth)
 	, m_index(index)
@@ -40,6 +41,7 @@ EntryPoint::EntryPoint(int depth
 	, m_roots(roots)
 	, m_values(values)
 	, m_iteratorStorage(iteratorStorage)
+	, m_iteratorType(iteratorType)
 {
 }
 
@@ -91,6 +93,11 @@ const EntryPoint *EntryPoint::entry() const
 const EntryPoint *EntryPoint::parent() const
 {
 	return m_parent;
+}
+
+const ExpandedType *EntryPoint::iteratorType() const
+{
+	return m_iteratorType;
 }
 
 llvm::Function *EntryPoint::function() const
@@ -196,6 +203,7 @@ EntryPoint EntryPoint::withBlock(llvm::BasicBlock *block) const
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -218,6 +226,7 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -240,6 +249,7 @@ EntryPoint EntryPoint::withIteratorStorage(IIteratorStorage *iteratorStorage) co
 		, m_roots
 		, m_values
 		, iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -262,6 +272,7 @@ EntryPoint EntryPoint::markEntry() const
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -284,6 +295,7 @@ EntryPoint EntryPoint::withFunction(llvm::Function *function) const
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -306,6 +318,7 @@ EntryPoint EntryPoint::withLocals(const std::map<std::string, const BaseValue *>
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -328,6 +341,7 @@ EntryPoint EntryPoint::withName(const std::string &name) const
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -350,6 +364,7 @@ EntryPoint EntryPoint::withValues(const Stack &values) const
 		, m_roots
 		, values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -372,6 +387,7 @@ EntryPoint EntryPoint::withDepth(int depth) const
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
 		);
 }
 
@@ -394,5 +410,29 @@ EntryPoint EntryPoint::withIndex(int index) const
 		, m_roots
 		, m_values
 		, m_iteratorStorage
+		, m_iteratorType
+		);
+}
+
+EntryPoint EntryPoint::withIteratorType(const ExpandedType *iteratorType) const
+{
+	return EntryPoint(m_depth
+		, m_index
+		, m_parent
+		, m_entry
+		, m_block
+		, m_alloc
+		, m_function
+		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, m_globals
+		, m_types
+		, m_roots
+		, m_values
+		, m_iteratorStorage
+		, iteratorType
 		);
 }

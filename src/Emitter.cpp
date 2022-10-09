@@ -23,6 +23,7 @@
 #include "types/Int32Type.h"
 #include "types/IPrototype.h"
 #include "types/VoidType.h"
+#include "types/ExpandedType.h"
 
 #include "values/ScalarValue.h"
 #include "values/ExpandedValue.h"
@@ -375,6 +376,7 @@ std::vector<DzResult> Emitter::visit(const ArrayContinuationNode *node, DefaultV
 		, node->m_node
 		, node
 		, std::vector<const ExpandedValue *>()
+		, Stack()
 		);
 
 	return {{ context.entryPoint, value }};
@@ -386,9 +388,6 @@ std::vector<DzResult> Emitter::visit(const ArrayElementNode *node, DefaultVisito
 
 	auto llvmContext = context.entryPoint.context();
 	auto module = context.entryPoint.module();
-
-	auto block = context.entryPoint.block();
-	auto function = context.entryPoint.function();
 
 	auto dataLayout = module->getDataLayout();
 
@@ -804,7 +803,7 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 
 						std::vector<DzResult> results;
 
-						for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { provider->withBlock(block), provider->values() }))
+						for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { provider->withBlock(block), expanded->values() }))
 						{
 							auto forwardedValues = values;
 
@@ -981,7 +980,6 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 	for (auto &[resultEntryPoint, resultValues] : node->m_evaluation->accept(*this, context))
 	{
-		auto parent = resultEntryPoint.function();
 		auto block = resultEntryPoint.block();
 
 		std::vector<const Type *> types;
@@ -1534,7 +1532,10 @@ std::vector<DzResult> Emitter::visit(const ExpansionNode *node, DefaultVisitorCo
 
 	auto continuation = expandable->chain();
 	auto provider = expandable->provider();
-	auto continuationEntryPoint = provider->withBlock(block);
+
+	auto continuationEntryPoint = (*provider)
+		.withBlock(block)
+		.withIteratorType(expandable->expandedType());
 
 	auto result = continuation->accept(*this, { continuationEntryPoint, Stack() });
 
@@ -1591,6 +1592,14 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 
 	auto inputValues = context.values;
 	auto tailCallValues = context.entryPoint.values();
+	auto iteratorType = context.entryPoint.iteratorType();
+
+	std::vector<const Type *> types = { iteratorType->iteratorType() };
+
+	std::transform(inputValues.begin(), inputValues.end(), back_inserter(types), [](auto value)
+	{
+		return value->type();
+	});
 
 	auto tailCallCandidate = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), context.entryPoint, [&](auto target, size_t)
 	{
@@ -1609,11 +1618,12 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 	});
 
 	auto value = new ExpandedValue(isArray
-		, node->m_iteratorType
+		, ExpandedType::get(types)
 		, tailCallCandidate
 		, node->m_node
 		, node
 		, next
+		, context.values
 		);
 
 	return {{ tailCallCandidate, value }};
@@ -1802,8 +1812,16 @@ std::vector<DzResult> Emitter::visit(const FunctionNode *node, DefaultVisitorCon
 		throw new std::exception();
 	};
 
+	std::vector<const Type *> types = { new IteratorType() };
+
+	std::transform(context.values.begin(), context.values.end(), back_inserter(types), [](auto value)
+	{
+		return value->type();
+	});
+
 	auto pep = context.entryPoint
-		.withValues(context.values);
+		.withValues(context.values)
+		.withIteratorType(ExpandedType::get(types));
 
 	std::map<std::string, const BaseValue *> locals;
 
@@ -1939,14 +1957,22 @@ std::vector<DzResult> Emitter::visit(const ReturnNode *node, DefaultVisitorConte
 		return value;
 	};
 
-	auto function = context.entryPoint.function();
-	auto block = context.entryPoint.block();
-
 	auto value = fetchValue();
 
 	if (node->m_chained)
 	{
-		auto expandable = new ExpandableValue(false, node->m_iteratorType, context.entryPoint, node->m_chained);
+		auto values = context.entryPoint.values();
+
+		std::vector<const Type *> types = { node->m_iteratorType };
+
+		std::transform(values.begin(), values.end(), back_inserter(types), [](auto value)
+		{
+			return value->type();
+		});
+
+		auto type = ExpandedType::get(types);
+
+		auto expandable = new ExpandableValue(false, type, context.entryPoint, node->m_chained);
 		auto tuple = new TupleValue({ expandable, value });
 
 		context.values.push(tuple);

@@ -26,7 +26,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 
 		if (!referenceStorage)
 		{
-			return entryPoint;
+			return entryPoint; // Throw??
 		}
 
 		IRBuilderEx builder(entryPoint);

@@ -331,6 +331,7 @@ int main(int argc, char **argv)
 					, module.roots
 					, values
 					, nullptr
+					, nullptr
 					);
 
 				Emitter emitter;
