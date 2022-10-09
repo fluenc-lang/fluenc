@@ -32,7 +32,7 @@ class ExpandedValue : public BaseValueWithMetadata<ExpandedValueMetadata>
 
 		std::vector<const ExpandedValue *> next() const;
 
-		Stack values() const;
+		const Stack &values() const;
 
 	private:
 		bool m_isArray;

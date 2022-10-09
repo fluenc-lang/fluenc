@@ -53,7 +53,7 @@ std::vector<const ExpandedValue *> ExpandedValue::next() const
 	return m_next;
 }
 
-Stack ExpandedValue::values() const
+const Stack &ExpandedValue::values() const
 {
 	return m_values;
 }

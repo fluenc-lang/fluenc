@@ -6,7 +6,6 @@
 
 #include "values/ReferenceValue.h"
 #include "values/UserTypeValue.h"
-#include "values/ArrayValue.h"
 #include "values/LazyValue.h"
 #include "values/NamedValue.h"
 #include "values/ScalarValue.h"

@@ -794,16 +794,46 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 				{
 					if (auto expanded = dynamic_cast<const ExpandedValue *>(element))
 					{
-						auto block = llvm::BasicBlock::Create(*entryPoint.context());
+						auto process = [&](auto exp, const EntryPoint &entryPoint, auto rec) -> std::vector<DzResult>
+						{
+							std::vector<DzResult> results;
 
-						linkBlocks(entryPoint.block(), block);
+							auto next = exp->next();
 
-						auto node = expanded->node();
-						auto provider = expanded->provider();
+							auto ep = std::accumulate(begin(next), end(next), entryPoint, [&](auto nextEntryPoint, auto nextValue)
+							{
+								auto nextResults = rec(nextValue, entryPoint, rec);
+
+								return std::accumulate(begin(nextResults), end(nextResults), nextEntryPoint, [&](auto accumulatedEntryPoint, auto result)
+								{
+									auto &[resultEntryPoint, _] = result;
+
+									linkBlocks(accumulatedEntryPoint.block(), resultEntryPoint.block());
+
+									results.push_back(result);
+
+									return resultEntryPoint;
+								});
+							});
+
+							auto block = llvm::BasicBlock::Create(*entryPoint.context());
+
+							linkBlocks(ep.block(), block);
+
+							auto node = expanded->node();
+							auto provider = expanded->provider();
+
+							for (auto &result : node->accept(*this, { provider->withBlock(block), expanded->values() }))
+							{
+								results.push_back(result);
+							}
+
+							return results;
+						};
 
 						std::vector<DzResult> results;
 
-						for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { provider->withBlock(block), expanded->values() }))
+						for (auto &[resultEntryPoint, resultValues] : process(expanded, entryPoint, process))
 						{
 							auto forwardedValues = values;
 
