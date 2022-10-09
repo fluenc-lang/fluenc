@@ -41,6 +41,7 @@ include(cmake/files.cmake)
 
 add_library(fluenc-lang OBJECT ${LIB_SOURCE_FILES} ${LIB_HEADER_FILES})
 target_link_libraries(fluenc-lang LLVM)
+target_compile_definitions(fluenc-lang PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 
 
 if (${FLUENC_BUILD_TESTS})

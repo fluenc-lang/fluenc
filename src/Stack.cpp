@@ -44,7 +44,11 @@ const BaseValue *Stack::pop()
 
 	auto value = m_values.back();
 
+#ifndef DEBUG
 	m_values = m_values.take(m_values.size() - 1);
+#else
+	m_values.pop_back();
+#endif
 
 	return value;
 }
@@ -63,5 +67,9 @@ Stack &Stack::discard()
 
 void Stack::push(const BaseValue *value)
 {
+#ifndef DEBUG
 	m_values = m_values.push_back(value);
+#else
+	m_values.push_back(value);
+#endif
 }
