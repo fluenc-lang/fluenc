@@ -105,7 +105,7 @@ void populateInstructions(const std::vector<std::string> &namespaces
 	, std::map<std::string, const BaseValue *> &locals
 	, std::map<std::string, const Node *> &globals
 	, std::map<std::string, Prototype *> &types
-	, std::unordered_set<std::string> &uses
+	, std::unordered_map<std::string, Use *> &uses
 	)
 {
 	for (auto &instruction : instructions)
@@ -171,7 +171,7 @@ void populateInstructions(const std::vector<std::string> &namespaces
 			{
 				auto use = std::any_cast<Use *>(instruction);
 
-				uses.insert(use->fileName());
+				uses.insert({ use->fileName(), use });
 			}
 		}
 	}
@@ -184,7 +184,7 @@ ModuleInfo Visitor::visit(const std::shared_ptr<peg::Ast> &ast) const
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, const Node *> globals;
 	std::map<std::string, Prototype *> types;
-	std::unordered_set<std::string> uses;
+	std::unordered_map<std::string, Use *> uses;
 
 	std::vector<std::any> results;
 
@@ -827,7 +827,7 @@ Namespace *Visitor::visitNamespace(const std::shared_ptr<peg::Ast> &ast) const
 
 Use *Visitor::visitUse(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return new Use(visitString(ast->nodes[0]));
+	return new Use(ast, visitString(ast->nodes[0]));
 }
 
 IBlockInstruction *Visitor::visitReturn(const std::shared_ptr<peg::Ast> &ast) const

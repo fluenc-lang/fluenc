@@ -37,6 +37,7 @@
 #include "nodes/CallableNode.h"
 
 #include "exceptions/ParserException.h"
+#include "exceptions/FileNotFoundException.h"
 
 INCTXT(Grammar, "fluenc.peg");
 
@@ -98,10 +99,7 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 		throw new ParserException(file, line, col, message);
 	};
 
-	if (!parser.parse(*source, ast, file.c_str()))
-	{
-		throw new std::exception();
-	}
+	parser.parse(*source, ast, file.c_str());
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
@@ -143,12 +141,12 @@ bool isStale(std::unordered_set<std::string> &processed
 
 	for (auto &use : current.module.uses)
 	{
-		auto translated = translateUse(use, current);
+		auto translated = translateUse(use.first, current);
 		auto childJob = jobs.find(translated);
 
 		if (childJob == jobs.end())
 		{
-			throw new std::exception(); // TODO
+			throw new FileNotFoundException(use.second);
 		}
 
 		if (isStale(processed, job, childJob->second, jobs))
@@ -194,14 +192,12 @@ ModuleInfo processUses(std::unordered_set<std::string> &processed
 
 	for (auto &use : job.module.uses)
 	{
-		auto translated = translateUse(use, job);
+		auto translated = translateUse(use.first, job);
 		auto childJob = jobs.find(translated);
 
 		if (childJob == jobs.end())
 		{
-			std::cout << "File " << use << " not found in the include path" << std::endl;
-
-			throw new std::exception(); // TODO
+			throw new FileNotFoundException(use.second);
 		}
 
 		auto source = processUses(processed, childJob->second, jobs);

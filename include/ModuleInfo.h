@@ -3,13 +3,14 @@
 
 #include <vector>
 #include <map>
-#include <unordered_set>
+#include <unordered_map>
 #include <string>
 
 class CallableNode;
 class BaseValue;
 class Node;
 class Prototype;
+class Use;
 
 struct ModuleInfo
 {
@@ -18,7 +19,7 @@ struct ModuleInfo
 	std::map<std::string, const BaseValue *> locals;
 	std::map<std::string, const Node *> globals;
 	std::map<std::string, Prototype *> types;
-	std::unordered_set<std::string> uses;
+	std::unordered_map<std::string, Use *> uses;
 };
 
 #endif // MODULEINFO_H
