@@ -25,7 +25,7 @@ class Stack
 
 	public:
 		using const_iterator = decltype(m_values)::const_iterator;
-		using const_reverse_iterator = decltype(m_values)::const_reverse_iterator;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 		Stack() = default;
 
