@@ -90,6 +90,7 @@
 #include "exceptions/MissingFieldException.h"
 #include "exceptions/InvalidArgumentTypeException.h"
 #include "exceptions/InvalidOperatorException.h"
+#include "exceptions/TypeMismatchException.h"
 
 std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisitorContext context) const
 {
@@ -120,7 +121,10 @@ std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisit
 			return builder.createLogicalOr(left, right);
 		}
 
-		throw new std::exception();
+		auto operandType = left->type();
+		auto operandTypeName = operandType->name();
+
+		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -300,9 +304,22 @@ std::vector<DzResult> Emitter::visit(const StringBinaryNode *node, DefaultVisito
 
 std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorContext context) const
 {
-	auto left = context.values.peek();
+	auto values = context.values;
+
+	auto left = values.pop();
+	auto right = values.pop();
 
 	auto leftType = left->type();
+	auto rightType = right->type();
+
+	if (leftType->compatibility(rightType, context.entryPoint) != 0)
+	{
+		throw new TypeMismatchException(node->ast
+			, leftType->name()
+			, rightType->name()
+			);
+	}
+
 	auto operators = leftType->operators();
 
 	auto binary = operators->forBinary(node);

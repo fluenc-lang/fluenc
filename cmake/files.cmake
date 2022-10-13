@@ -161,6 +161,7 @@ set(LIB_HEADER_FILES
 	"${PROJECT_HEADER_DIR}/exceptions/MissingTailCallException.h"
     "${PROJECT_HEADER_DIR}/exceptions/MissingTypeDeclarationException.h"
     "${PROJECT_HEADER_DIR}/exceptions/ParserException.h"
+    "${PROJECT_HEADER_DIR}/exceptions/TypeMismatchException.h"
     "${PROJECT_HEADER_DIR}/exceptions/UnknownTypeException.h"
     )
 
@@ -300,6 +301,7 @@ set(LIB_SOURCE_FILES
 	"${PROJECT_SRC_DIR}/exceptions/MissingTailCallException.cpp"
     "${PROJECT_SRC_DIR}/exceptions/MissingTypeDeclarationException.cpp"
     "${PROJECT_SRC_DIR}/exceptions/ParserException.cpp"
+    "${PROJECT_SRC_DIR}/exceptions/TypeMismatchException.cpp"
     "${PROJECT_SRC_DIR}/exceptions/UnknownTypeException.cpp"
     )
 
