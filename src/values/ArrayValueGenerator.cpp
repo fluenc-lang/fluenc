@@ -13,8 +13,9 @@
 #include "types/ArrayType.h"
 #include "types/IteratorType.h"
 
-ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult > &values, size_t id, size_t size)
+ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult > &values, const std::shared_ptr<peg::Ast> &ast, size_t id, size_t size)
 	: m_values(values)
+	, m_ast(ast)
 	, m_id(id)
 	, m_size(size)
 {
@@ -27,7 +28,7 @@ const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint) c
 
 	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
 
-	return new ArrayValue(index, type(), m_values, m_size);
+	return new ArrayValue(m_ast, index, type(), m_values, m_size);
 }
 
 const Type *ArrayValueGenerator::type() const
@@ -86,7 +87,7 @@ const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoi
 			return value->clone(entryPoint);
 		});
 
-		return new ArrayValueGenerator({{ inputEntryPoint, clonedValues }}, m_id, m_size);
+		return new ArrayValueGenerator({{ inputEntryPoint, clonedValues }}, m_ast, m_id, m_size);
 	}
 
 	throw new std::exception();
@@ -94,5 +95,5 @@ const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoi
 
 const ILazyValueGenerator *ArrayValueGenerator::forward(size_t id) const
 {
-	return new ArrayValueGenerator(m_values, id, m_size);
+	return new ArrayValueGenerator(m_values, m_ast, id, m_size);
 }

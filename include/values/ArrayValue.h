@@ -13,7 +13,8 @@ class ArrayValue : public IIteratable
 	friend class Emitter;
 
 	public:
-		ArrayValue(const ReferenceValue *index
+		ArrayValue(const std::shared_ptr<peg::Ast> &ast
+			, const ReferenceValue *index
 			, const Type *type
 			, const std::vector<DzResult> &values
 			, size_t size
@@ -22,7 +23,9 @@ class ArrayValue : public IIteratable
 		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
 
 	private:
-		static const Node *createIterator(const IIteratable *parent, const Type *type, size_t size);
+		static const Node *createIterator(const IIteratable *parent, const Type *type, size_t size, const std::shared_ptr<peg::Ast> &ast);
+
+		const std::shared_ptr<peg::Ast> m_ast;
 
 		const ReferenceValue *m_index;
 		const Node *m_iterator;

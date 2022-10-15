@@ -9,7 +9,7 @@ class Node;
 class ArrayValueGenerator : public ILazyValueGenerator
 {
 	public:
-		ArrayValueGenerator(const std::vector<DzResult> &values, size_t id, size_t size);
+		ArrayValueGenerator(const std::vector<DzResult> &values, const std::shared_ptr<peg::Ast> &ast, size_t id, size_t size);
 
 		const IIteratable *generate(const EntryPoint &entryPoint) const override;
 
@@ -24,6 +24,7 @@ class ArrayValueGenerator : public ILazyValueGenerator
 
 	private:
 		const std::vector<DzResult> m_values;
+		const std::shared_ptr<peg::Ast> m_ast;
 
 		size_t m_id;
 		size_t m_size;

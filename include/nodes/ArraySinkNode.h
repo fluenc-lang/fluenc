@@ -11,12 +11,15 @@ class ArraySinkNode : public VisitableNode<ArraySinkNode>
 
 	public:
 		ArraySinkNode(size_t size
+			, const std::shared_ptr<peg::Ast> &ast
 			, const Node *consumer
 			, const Node *firstValue
 			);
 
 	private:
 		size_t m_size;
+
+		const std::shared_ptr<peg::Ast> m_ast;
 
 		const Node *m_consumer;
 		const Node *m_firstValue;

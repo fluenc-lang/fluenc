@@ -568,7 +568,7 @@ Node *Visitor::visitArray(const std::shared_ptr<peg::Ast> &ast) const
 			.visitExpression(expression.value);
 	});
 
-	return new ArraySinkNode(ast->nodes.size(), m_alpha, firstValue);
+	return new ArraySinkNode(ast->nodes.size(), ast, m_alpha, firstValue);
 }
 
 Node *Visitor::visitGroup(const std::shared_ptr<peg::Ast> &ast) const

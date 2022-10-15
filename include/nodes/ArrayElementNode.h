@@ -12,9 +12,15 @@ class ArrayElementNode : public VisitableNode<ArrayElementNode>
 	friend class Emitter;
 
 	public:
-		ArrayElementNode(const Type *arrayType, const Node *node, const Node *next);
+		ArrayElementNode(const std::shared_ptr<peg::Ast> &ast
+			, const Type *arrayType
+			, const Node *node
+			, const Node *next
+			);
 
 	private:
+		const std::shared_ptr<peg::Ast> m_ast;
+
 		const Type *m_arrayType;
 
 		const Node *m_node;

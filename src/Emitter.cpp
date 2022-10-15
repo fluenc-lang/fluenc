@@ -193,7 +193,10 @@ std::vector<DzResult> Emitter::visit(const FloatBinaryNode *node, DefaultVisitor
 			return builder.createCmp(llvm::CmpInst::Predicate::FCMP_UNE, left, right);
 		}
 
-		throw new std::exception();
+		auto operandType = left->type();
+		auto operandTypeName = operandType->name();
+
+		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -282,7 +285,10 @@ std::vector<DzResult> Emitter::visit(const IntegerBinaryNode *node, DefaultVisit
 			return builder.createXor(left, right);
 		}
 
-		throw new std::exception();
+		auto operandType = left->type();
+		auto operandTypeName = operandType->name();
+
+		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -408,8 +414,8 @@ std::vector<DzResult> Emitter::visit(const ArrayElementNode *node, DefaultVisito
 
 	auto dataLayout = module->getDataLayout();
 
-	auto index = context.values.require<ReferenceValue>(nullptr);
-	auto value = context.values.require<IndexedValue>(nullptr);
+	auto index = context.values.require<ReferenceValue>(node->m_ast);
+	auto value = context.values.require<IndexedValue>(node->m_ast);
 
 	if (node->m_next)
 	{
@@ -972,7 +978,16 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 					throw new InvalidFunctionPointerTypeException(node->m_ast, name);
 				}
 
-				return value->function();
+				auto candidate = value->function();
+
+				auto score = candidate->signatureCompatibility(context.entryPoint, types);
+
+				if (score < 0)
+				{
+					return nullptr;
+				}
+
+				return candidate;
 			}
 
 			std::map<int8_t, const CallableNode *> candidates;
@@ -1553,7 +1568,7 @@ std::vector<DzResult> Emitter::visit(const ArraySinkNode *node, DefaultVisitorCo
 {
 	auto arrayContents = node->m_firstValue->accept(*this, { context.entryPoint, Stack() });
 
-	auto generator = new ArrayValueGenerator(arrayContents, node->id(), node->m_size);
+	auto generator = new ArrayValueGenerator(arrayContents, node->m_ast, node->id(), node->m_size);
 	auto lazy = new LazyValue(generator, context.entryPoint);
 
 	context.values.push(lazy);
