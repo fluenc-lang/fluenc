@@ -642,11 +642,18 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 			return node->m_consumer->accept(*this, context);
 		}
 
-		auto functionsIterator = functions.find(name);
+		auto functionsIterator = functions.equal_range(name);
 
-		if (functionsIterator != functions.end())
+		std::vector<const CallableNode *> matchingFunctions;
+
+		std::transform(functionsIterator.first, functionsIterator.second, back_inserter(matchingFunctions), [](auto pair)
 		{
-			auto value = new FunctionValue(functionsIterator->second, context.entryPoint);
+			return pair.second;
+		});
+
+		if (matchingFunctions.size() > 0)
+		{
+			auto value = new FunctionValue(matchingFunctions, context.entryPoint);
 
 			context.values.push(value);
 
@@ -960,42 +967,45 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 
 std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisitorContext context) const
 {
-	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
+	auto functionsForName = [&](const std::string &name)
 	{
 		auto &functions = context.entryPoint.functions();
 		auto &locals = context.entryPoint.locals();
 
-		for (auto &name : node->m_names)
+		auto local = locals.find(name);
+
+		if (local != locals.end())
 		{
-			auto local = locals.find(name);
+			auto value = dynamic_cast<const FunctionValue *>(local->second);
 
-			if (local != locals.end())
+			if (!value)
 			{
-				auto value = dynamic_cast<const FunctionValue *>(local->second);
-
-				if (!value)
-				{
-					throw new InvalidFunctionPointerTypeException(node->m_ast, name);
-				}
-
-				auto candidate = value->function();
-
-				auto score = candidate->signatureCompatibility(context.entryPoint, types);
-
-				if (score < 0)
-				{
-					return nullptr;
-				}
-
-				return candidate;
+				throw new InvalidFunctionPointerTypeException(node->m_ast, name);
 			}
 
+			return value->functions();
+		}
+
+		auto matchingFunctions = functions.equal_range(name);
+
+		std::vector<const CallableNode *> result;
+
+		std::transform(matchingFunctions.first, matchingFunctions.second, back_inserter(result), [](auto pair)
+		{
+			return pair.second;
+		});
+
+		return result;
+	};
+
+	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
+	{
+		for (auto &name : node->m_names)
+		{
 			std::map<int8_t, const CallableNode *> candidates;
 
-			for (auto [i, end] = functions.equal_range(name); i != end; i++)
+			for (auto &function : functionsForName(name))
 			{
-				auto function = i->second;
-
 				auto score = function->signatureCompatibility(context.entryPoint, types);
 
 				if (score < 0)

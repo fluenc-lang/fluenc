@@ -7,25 +7,33 @@
 #include "nodes/CallableNode.h"
 
 #include "types/FunctionType.h"
+#include "types/AggregateType.h"
 
-FunctionValue::FunctionValue(const CallableNode *function, const EntryPoint &entryPoint)
-	: m_function(function)
+FunctionValue::FunctionValue(const std::vector<const CallableNode *> functions, const EntryPoint &entryPoint)
+	: m_functions(functions)
 	, m_entryPoint(new EntryPoint(entryPoint))
 {
 }
 
 const Type *FunctionValue::type() const
 {
-	auto arguments = m_function->arguments();
+	std::vector<const Type *> functionTypes;
 
-	std::vector<const Type *> types;
-
-	std::transform(begin(arguments), end(arguments), std::back_inserter(types), [this](auto argument)
+	std::transform(begin(m_functions), end(m_functions), back_inserter(functionTypes), [this](auto function)
 	{
-		return argument->type(*m_entryPoint);
+		auto arguments = function->arguments();
+
+		std::vector<const Type *> argumentTypes;
+
+		std::transform(begin(arguments), end(arguments), std::back_inserter(argumentTypes), [this](auto argument)
+		{
+			return argument->type(*m_entryPoint);
+		});
+
+		return FunctionType::get(argumentTypes, function);
 	});
 
-	return FunctionType::get(types, m_function);
+	return AggregateType::get(functionTypes);
 }
 
 const BaseValue *FunctionValue::clone(const EntryPoint &entryPoint) const
@@ -35,7 +43,7 @@ const BaseValue *FunctionValue::clone(const EntryPoint &entryPoint) const
 	return this;
 }
 
-const CallableNode *FunctionValue::function() const
+std::vector<const CallableNode *> FunctionValue::functions() const
 {
-	return m_function;
+	return m_functions;
 }

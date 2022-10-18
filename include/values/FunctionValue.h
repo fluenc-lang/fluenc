@@ -11,15 +11,16 @@ class EntryPoint;
 class FunctionValue : public BaseValueWithMetadata<FunctionValueMetadata>
 {
 	public:
-		FunctionValue(const CallableNode *function, const EntryPoint &entryPoint);
+		FunctionValue(const std::vector<const CallableNode *> functions, const EntryPoint &entryPoint);
 
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint) const override;
 
-		const CallableNode *function() const;
+		std::vector<const CallableNode *> functions() const;
 
 	private:
-		const CallableNode *m_function;
+		const std::vector<const CallableNode *> m_functions;
+
 		const EntryPoint *m_entryPoint;
 };
 #endif // FUNCTIONVALUE_H
