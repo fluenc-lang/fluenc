@@ -1,3 +1,5 @@
+#include <unordered_map>
+
 #include "types/AggregateType.h"
 
 AggregateType::AggregateType(const std::vector<const Type *> &subjects)
