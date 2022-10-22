@@ -1185,9 +1185,6 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 
 std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
 {
-	auto function = context.entryPoint.function();
-	auto block = context.entryPoint.block();
-
 	auto &functions = context.entryPoint.functions();
 
 	for (auto &name : node->m_names)
@@ -1243,8 +1240,6 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 
 	auto join = [this](const std::vector<SingleResult> &range, const EntryPoint &entryPoint) -> const BaseValue *
 	{
-		auto function = entryPoint.function();
-
 		auto [_, first] = *range.begin();
 
 		if (auto templateValue = dynamic_cast<const ScalarValue *>(first))
@@ -2120,10 +2115,8 @@ std::vector<DzResult> Emitter::visit(const IteratorValue *node, DefaultVisitorCo
 		locals[key] = value;
 	}
 
-	auto ep = (*node->m_entryPoint)
-		.withBlock(context.entryPoint.block())
-		.withLocals(locals)
-		.withIteratorStorage(context.entryPoint.iteratorStorage());
+	auto ep = context.entryPoint
+		.withLocals(locals);
 
 	return node->m_subject->accept(*this, { ep, Stack() });
 }

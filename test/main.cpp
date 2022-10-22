@@ -4731,6 +4731,89 @@ BOOST_AUTO_TEST_CASE (scenario116)
 	BOOST_TEST(result == 12);
 }
 
+BOOST_AUTO_TEST_CASE (scenario117)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			ui,
+			user
+		}
+
+		struct User;
+
+		struct Item
+		{
+			children: []
+		}
+
+		function application()
+		{
+			return [
+				Item {},
+			];
+		}
+
+		function foo((any item, ...items))
+		{
+			return item -> foo(...items);
+		}
+
+		function foo(any item)
+		{
+			return item;
+		}
+
+		function mainLoop(int index, State state)
+		{
+			if (index > 0)
+			{
+				return 32;
+			}
+
+			let s = state with
+			{
+				user: process(state, state.ui)
+			};
+
+			return tail mainLoop(index + 1, s);
+		}
+
+		function process(State state, (Item item, ...controls))
+		{
+			let s = state with
+			{
+				user: process(state, item.children)
+			};
+
+			return tail process(s, ...controls);
+		}
+
+		function process(State state, Item item)
+		{
+			return process(state, item.children);
+		}
+
+		function process(State state, without item)
+		{
+			return state.user;
+		}
+
+		export int main()
+		{
+			let state = State
+			{
+				ui: foo(application()),
+				user: User {}
+			};
+
+			return mainLoop(0, state);
+		}
+	)");
+
+	BOOST_TEST(result == 32);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
