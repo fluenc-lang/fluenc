@@ -1185,41 +1185,48 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 
 std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
 {
-	auto &functions = context.entryPoint.functions();
-
-	for (auto &name : node->m_names)
-	{
-		for (auto [i, end] = functions.equal_range(name); i != end; i++)
-		{
-			auto function = i->second;
-
-			// Naive. Really naive.
-			if (function->attribute() == FunctionAttribute::Iterator)
-			{
-				auto generator = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, context.entryPoint);
-				auto lazy = new LazyValue(generator, context.entryPoint);
-
-				auto forwardedValues = context.values;
-
-				forwardedValues.push(lazy);
-
-				std::vector<DzResult> results;
-
-				for (auto &result : node->m_consumer->accept(*this, { context.entryPoint, forwardedValues }))
-				{
-					results.push_back(result);
-				}
-
-				return results;
-			}
-		}
-	}
+	auto llvmContext = context.entryPoint.context();
+	auto block = context.entryPoint.block();
 
 	std::vector<DzResult> results;
 
+	auto preliminaryBlock = llvm::BasicBlock::Create(*llvmContext);
+
+	auto preliminaryEntryPoint = context.entryPoint
+		.withIteratorStorage(new IteratorStorage())
+		.withBlock(preliminaryBlock);
+
 	auto junction = new JunctionNode(node->m_regularCall);
 
-	for (auto &[resultEntryPoint, resultValues] : junction->accept(*this, context))
+	auto preliminaryResults = junction->accept(*this, { preliminaryEntryPoint, context.values });
+
+	for (auto &[_, preliminaryValues] : preliminaryResults)
+	{
+		auto returnValue = preliminaryValues.peek();
+
+		if (dynamic_cast<const TupleValue *>(returnValue))
+		{
+			auto generator = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, context.entryPoint);
+			auto lazy = new LazyValue(generator, context.entryPoint);
+
+			auto forwardedValues = context.values;
+
+			forwardedValues.push(lazy);
+
+			std::vector<DzResult> results;
+
+			for (auto &result : node->m_consumer->accept(*this, { context.entryPoint, forwardedValues }))
+			{
+				results.push_back(result);
+			}
+
+			return results;
+		}
+	}
+
+	linkBlocks(block, preliminaryBlock);
+
+	for (auto &[resultEntryPoint, resultValues] : preliminaryResults)
 	{
 		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
@@ -1446,7 +1453,6 @@ std::vector<DzResult> Emitter::visit(const ConditionalNode *node, DefaultVisitor
 	auto llvmContext = context.entryPoint.context();
 	auto module = context.entryPoint.module();
 
-	auto function = context.entryPoint.function();
 	auto block = context.entryPoint.block();
 
 	auto dataLayout = module->getDataLayout();
@@ -2077,9 +2083,7 @@ std::vector<DzResult> Emitter::visit(const IteratableNode *node, DefaultVisitorC
 std::vector<DzResult> Emitter::visit(const ArrayValue *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
-
 	auto block = context.entryPoint.block();
-	auto function = context.entryPoint.function();
 
 	std::vector<DzResult> results;
 

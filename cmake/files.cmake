@@ -181,6 +181,7 @@ set(LIB_SOURCE_FILES
     "${PROJECT_SRC_DIR}/FunctionTypeName.cpp"
     "${PROJECT_SRC_DIR}/IndexIterator.cpp"
     "${PROJECT_SRC_DIR}/InteropHelper.cpp"
+    "${PROJECT_SRC_DIR}/ITransferStrategy.h"
     "${PROJECT_SRC_DIR}/IRBuilderEx.cpp"
     "${PROJECT_SRC_DIR}/IteratorStorage.cpp"
     "${PROJECT_SRC_DIR}/Namespace.cpp"

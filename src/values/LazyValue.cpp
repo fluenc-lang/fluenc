@@ -137,6 +137,94 @@ const IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
 	return m_generator->generate(entryPoint);
 }
 
+EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const BaseValue *source, const Emitter &emitter) const
+{
+	auto context = entryPoint.context();
+
+	IteratorStorage iteratorStorage;
+
+	auto iteratorEntryPoint = entryPoint
+		.withIteratorStorage(&iteratorStorage);
+
+	auto targetIteratable = m_generator->generate(iteratorEntryPoint);
+
+	auto targetResults = targetIteratable->accept(emitter, { iteratorEntryPoint, Stack() });
+
+	std::unordered_map<uint32_t, const BaseValue *> indexedResults;
+
+	auto targetExitBlock = llvm::BasicBlock::Create(*context, "targetExit");
+
+	for (auto [resultEntryPoint, resultValues] : targetResults)
+	{
+		auto values =  ValueHelper::extractValues<BaseValue>(resultValues);
+
+		if (values.size() <= 0)
+		{
+			throw new std::exception();
+		}
+
+		indexedResults.insert({ resultEntryPoint.index(), values[0] });
+
+		linkBlocks(resultEntryPoint.block(), targetExitBlock);
+	}
+
+	auto sourceEntryPoint = entryPoint
+		.withBlock(targetExitBlock);
+
+	auto sourceExitBlock = llvm::BasicBlock::Create(*context, "sourceExit");
+
+	std::vector<DzResult> sourceResults = {{ sourceEntryPoint, source }};
+
+	for (auto i = 0u; i < sourceResults.size(); i++)
+	{
+		auto [sourceResultEntryPoint, sourceResultValues] = sourceResults[i];
+
+		auto sourceValue = sourceResultValues.pop();
+		auto targetValue = indexedResults[sourceResultEntryPoint.index()];
+
+		auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+
+		if (sourceTupleValue)
+		{
+			auto sourceTupleValues = sourceTupleValue->values();
+
+			auto resultEntryPoint = ValueHelper::transferValue(sourceResultEntryPoint
+				, sourceTupleValues.pop()
+				, targetValue
+				, emitter
+				);
+
+			auto sourceContinuation = sourceTupleValues.require<ExpandableValue>(nullptr);
+
+			auto sourceChain = sourceContinuation->chain();
+			auto sourceProvider = sourceContinuation->provider();
+
+			auto sourceContinuationEntryPoint = sourceProvider->withBlock(resultEntryPoint.block());
+
+			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, { sourceContinuationEntryPoint, Stack() }))
+			{
+				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, chainValues);
+
+				auto loopTargetEntry = loopTarget->entry();
+
+				linkBlocks(chainEntryPoint.block(), loopTargetEntry->block());
+			}
+		}
+		else
+		{
+			auto resultEntryPoint = ValueHelper::transferValue(sourceResultEntryPoint
+				, sourceValue
+				, targetValue
+				, emitter
+				);
+
+			linkBlocks(resultEntryPoint.block(), sourceExitBlock);
+		}
+	}
+
+	return entryPoint.withBlock(sourceExitBlock);
+}
+
 EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *source, const Emitter &emitter) const
 {
 	auto context = entryPoint.context();
