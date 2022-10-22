@@ -1202,6 +1202,11 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 
 	for (auto &[_, preliminaryValues] : preliminaryResults)
 	{
+		if (preliminaryValues.size() <= 0)
+		{
+			continue;
+		}
+
 		auto returnValue = preliminaryValues.peek();
 
 		if (dynamic_cast<const TupleValue *>(returnValue))
