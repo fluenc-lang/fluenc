@@ -340,10 +340,10 @@ int main(int argc, char **argv)
 				llvmModule->print(llvm::errs(), nullptr);
 				llvmModule->setDataLayout(dataLayout);
 
-				if (verifyModule(*llvmModule, &llvm::errs()))
-				{
-					throw new std::exception();
-				}
+//				if (verifyModule(*llvmModule, &llvm::errs()))
+//				{
+//					throw new std::exception();
+//				}
 
 				std::error_code error;
 
