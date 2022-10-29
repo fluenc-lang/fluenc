@@ -328,6 +328,13 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 
 	auto operators = leftType->operators();
 
+	if (!operators)
+	{
+		auto operandTypeName = leftType->name();
+
+		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	}
+
 	auto binary = operators->forBinary(node);
 
 	std::vector<DzResult> results;
@@ -1186,7 +1193,6 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
-	auto block = context.entryPoint.block();
 
 	std::vector<DzResult> results;
 
@@ -1229,9 +1235,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 		}
 	}
 
-	linkBlocks(block, preliminaryBlock);
-
-	for (auto &[resultEntryPoint, resultValues] : preliminaryResults)
+	for (auto &[resultEntryPoint, resultValues] : junction->accept(*this, context))
 	{
 		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
@@ -1783,6 +1787,13 @@ std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContex
 
 	auto operandType = operand->type();
 	auto operators = operandType->operators();
+
+	if (!operators)
+	{
+		auto operandTypeName = operandType->name();
+
+		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	}
 
 	auto unary = operators->forUnary(node);
 

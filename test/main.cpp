@@ -4814,6 +4814,87 @@ BOOST_AUTO_TEST_CASE (scenario117)
 	BOOST_TEST(result == 32);
 }
 
+BOOST_AUTO_TEST_CASE (scenario118)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			ui
+		}
+
+		struct Item1;
+		struct Item2;
+
+		function application()
+		{
+			return [
+				Item1 {},
+				Item2 {}
+			];
+		}
+
+		function update((Item1 item, ...items), (any nextItem, ...nextItems))
+		{
+			return 1 -> update(...items, ...nextItems);
+		}
+
+		function update(Item1 item, any nextItem)
+		{
+			return 1;
+		}
+
+		function update((Item2 item, ...items), (any nextItem, ...nextItems))
+		{
+			return 2 -> update(...items, ...nextItems);
+		}
+
+		function update(Item2 item, any nextItem)
+		{
+			return 2;
+		}
+
+		function update((any item, ...items), any nextItem)
+		{
+			return 0;
+		}
+
+		function update(any item, (any nextItem, ...nextItems))
+		{
+			return 0;
+		}
+
+		function expand((any item, ...items))
+		{
+			return item -> expand(...items);
+		}
+
+		function expand(any item)
+		{
+			return item;
+		}
+
+		function sum(int product, (int value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function sum(int product, int value)
+		{
+			return product + value;
+		}
+
+		export int main()
+		{
+			let ui = application();
+			let res = update(expand(ui), expand(application()));
+
+			return sum(0, res)
+		}
+	)");
+
+	BOOST_TEST(result == 3);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

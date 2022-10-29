@@ -12,10 +12,11 @@ InvalidOperatorException::InvalidOperatorException(const std::shared_ptr<peg::As
 std::string InvalidOperatorException::message() const
 {
 	std::ostringstream stream;
-	stream << "Operator ";
+	stream << "Operator '";
 	stream << m_op;
-	stream << " is not defined for type ";
+	stream << "' is not defined for type '";
 	stream << m_typeName;
+	stream << "'";
 
 	return stream.str();
 }

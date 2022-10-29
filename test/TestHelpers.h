@@ -1,6 +1,7 @@
 #ifndef TESTHELPERS_H
 #define TESTHELPERS_H
 
+#include <llvm/IR/Verifier.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
@@ -208,6 +209,8 @@ int exec(std::string source)
 	}
 
 	module->print(llvm::errs(), nullptr);
+
+	verifyModule(*module, &llvm::errs());
 
 	auto threadSafeModule = llvm::orc::ThreadSafeModule(
 		std::move(module),
