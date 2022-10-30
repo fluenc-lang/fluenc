@@ -38,7 +38,7 @@ struct SDL_KeyboardEvent
     windowID: 0,
     padding: 0,
     scancode: 0,
-    sym: 0,
+    sym: 0u,
     padding: 0L
 };
 
@@ -151,7 +151,7 @@ function mainLoop(long renderer, Player player)
 
     SDL_RenderPresent(renderer);
 
-    return mainLoop(renderer
+    return tail mainLoop(renderer
         , processEvents(player)
         );
 }
@@ -162,7 +162,7 @@ export int main()
 
     return mainLoop(
         SDL_CreateRenderer(
-            SDL_CreateWindow("test", 0, 0, 800, 600, 0), 0, 0)
+            SDL_CreateWindow(@"test", 0, 0, 800, 600, 0), 0, 0)
             , createPlayer()
         );
 }

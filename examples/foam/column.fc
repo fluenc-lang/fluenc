@@ -73,7 +73,7 @@ struct LayoutSize
 	stretch
 };
 
-function buildLayoutInfo(LayoutInfo info, Item item)
+function buildLayoutInfo(LayoutInfo info, LayoutItem item)
 {
 	return info with
 	{

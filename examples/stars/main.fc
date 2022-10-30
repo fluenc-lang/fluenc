@@ -53,7 +53,7 @@ struct Star
 	y
 };
 
-function drawSkyscraper(int x, int y, int scale, Skyscraper previous, Skyscraper current)
+function drawSkyscraper(long renderer, int x, int y, int scale, Skyscraper previous, Skyscraper current)
 {
 	let right = x + current.width;
 	let height = (current.height * scale) / 100;
@@ -65,16 +65,16 @@ function drawSkyscraper(int x, int y, int scale, Skyscraper previous, Skyscraper
 	return right + 20;
 }
 
-function drawSkyscrapers(int x, int y, int scale, Skyscraper previous, Skyscraper current)
+function drawSkyscrapers(long renderer, int x, int y, int scale, Skyscraper previous, Skyscraper current)
 {
-	return drawSkyscraper(x, y, scale, previous, current);
+	return drawSkyscraper(renderer, x, y, scale, previous, current);
 }
 
-function drawSkyscrapers(int x, int y, int scale, Skyscraper previous, (Skyscraper current, ...next))
+function drawSkyscrapers(long renderer, int x, int y, int scale, Skyscraper previous, (Skyscraper current, ...next))
 {
-	let offset = drawSkyscraper(x, y, scale, previous, current);
+	let offset = drawSkyscraper(renderer, x, y, scale, previous, current);
 
-	return tail drawSkyscrapers(offset, y, scale, current, ...next);
+	return tail drawSkyscrapers(renderer, offset, y, scale, current, ...next);
 }
 
 function skyscrapers(int seed, int total)
@@ -313,13 +313,13 @@ function scene1(long renderer, int episodes)
 
 	SDL::SDL_SetRenderDrawColor(renderer, 55, 55, 72, 255);
 
-	drawSkyscrapers(-50, cameraPan, 130, seed, backgroundLeft);
-	drawSkyscrapers((Width - Target) + 50, cameraPan, 130, seed, backgroundRight);
+	drawSkyscrapers(renderer, -50, cameraPan, 130, seed, backgroundLeft);
+	drawSkyscrapers(renderer, (Width - Target) + 50, cameraPan, 130, seed, backgroundRight);
 
 	SDL::SDL_SetRenderDrawColor(renderer, 83, 83, 108, 255);
 
-	drawSkyscrapers(0, cameraPan, 100, seed, foregroundLeft);
-	drawSkyscrapers((Width - Target), cameraPan, 100, seed, foregroundRight);
+	drawSkyscrapers(renderer, 0, cameraPan, 100, seed, foregroundLeft);
+	drawSkyscrapers(renderer, (Width - Target), cameraPan, 100, seed, foregroundRight);
 
 	SDL::SDL_RenderFillRect(renderer, rect(Target, (Height - 100) + cameraPan, 200, 10));
 

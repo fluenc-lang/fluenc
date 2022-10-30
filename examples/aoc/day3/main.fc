@@ -25,7 +25,7 @@ function nextLine(int number, (int char, ...chars))
         return number;
     }
 
-    return nextLine((number * Base) + (char - '0'), ...chars);
+    return tail nextLine((number * Base) + (char - '0'), ...chars);
 }
 
 function invertInt(int value)
@@ -87,7 +87,7 @@ function count(int position, int value, Row row)
 {
     if (position == 11)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c12: add(row.c12, value) }
             );
@@ -95,7 +95,7 @@ function count(int position, int value, Row row)
 
     if (position == 10)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c11: add(row.c11, value) }
             );
@@ -103,7 +103,7 @@ function count(int position, int value, Row row)
 
     if (position == 9)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c10: add(row.c10, value) }
             );
@@ -111,7 +111,7 @@ function count(int position, int value, Row row)
 
     if (position == 8)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c9: add(row.c9, value) }
             );
@@ -119,7 +119,7 @@ function count(int position, int value, Row row)
 
     if (position == 7)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c8: add(row.c8, value) }
             );
@@ -127,7 +127,7 @@ function count(int position, int value, Row row)
 
     if (position == 6)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c7: add(row.c7, value) }
             );
@@ -135,7 +135,7 @@ function count(int position, int value, Row row)
 
     if (position == 5)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c6: add(row.c6, value) }
             );
@@ -143,7 +143,7 @@ function count(int position, int value, Row row)
 
     if (position == 4)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c5: add(row.c5, value) }
             );
@@ -151,7 +151,7 @@ function count(int position, int value, Row row)
 
     if (position == 3)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c4: add(row.c4, value) }
             );
@@ -159,7 +159,7 @@ function count(int position, int value, Row row)
 
     if (position == 2)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c3: add(row.c3, value) }
         );
@@ -167,7 +167,7 @@ function count(int position, int value, Row row)
 
     if (position == 1)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c2: add(row.c2, value) }
             );
@@ -175,7 +175,7 @@ function count(int position, int value, Row row)
 
     if (position == 0)
     {
-        return count(position + 1
+        return tail count(position + 1
             , value / Base
             , row with { c1: add(row.c1, value) }
             );
@@ -280,7 +280,7 @@ function toDecimal(int accumulation, int value)
 
 function toDecimal(int accumulation, (int value, ...values))
 {
-    return toDecimal((accumulation * 2) + value, ...values);
+    return tail toDecimal((accumulation * 2) + value, ...values);
 }
 
 function process(Row gamma, Row epsilon)
@@ -295,7 +295,7 @@ function part1(int i, Row row, int number)
 
 function part1(int i, Row row, (int number, ...numbers))
 {
-    return part1(i + 1, count(0, number, row), ...numbers);
+    return tail part1(i + 1, count(0, number, row), ...numbers);
 }
 
 function part2()
@@ -313,7 +313,7 @@ function run()
     return bind(
         part1(0, Row {}
             , nextLine(0
-                , readChar(fdopen(open("input", O_RDONLY), "r"))
+                , readChar(fdopen(open(@"input", O_RDONLY), @"r"))
                 )
             ),
         part2()
