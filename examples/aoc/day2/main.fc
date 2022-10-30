@@ -60,15 +60,15 @@ function nextInstruction(int mode, int type, int value, (int char, ...chars))
 
     if (char == ' ') // Space
     {
-        return nextInstruction(Value, type, value, ...chars);
+        return tail nextInstruction(Value, type, value, ...chars);
     }
 
     if (mode == Type)
     {
-        return nextInstruction(mode, type + char, value, ...chars);
+        return tail nextInstruction(mode, type + char, value, ...chars);
     }
 
-    return nextInstruction(mode, type, (value * 10) + (char - '0'), ...chars);
+    return tail nextInstruction(mode, type, (value * 10) + (char - '0'), ...chars);
 }
 
 function part1(int x, int y, without instruction)
@@ -80,20 +80,20 @@ function part1(int x, int y, (Instruction instruction, ...instructions))
 {
     if (instruction.type == Forward)
     {
-        return part1(x + instruction.value, y, ...instructions);
+        return tail part1(x + instruction.value, y, ...instructions);
     }
 
     if (instruction.type == Up)
     {
-        return part1(x, y - instruction.value, ...instructions);
+        return tail part1(x, y - instruction.value, ...instructions);
     }
 
     if (instruction.type == Down)
     {
-        return part1(x, y + instruction.value, ...instructions);
+        return tail part1(x, y + instruction.value, ...instructions);
     }
 
-    return part1(x, y, ...instructions);
+    return tail part1(x, y, ...instructions);
 }
 
 function part2(int x, int y, int aim, without instruction)
@@ -105,7 +105,7 @@ function part2(int x, int y, int aim, (Instruction instruction, ...instructions)
 {
     if (instruction.type == Forward)
     {
-        return part2(x + instruction.value
+        return tail part2(x + instruction.value
             , y + (aim * instruction.value)
             , aim
             , ...instructions
@@ -114,15 +114,15 @@ function part2(int x, int y, int aim, (Instruction instruction, ...instructions)
 
     if (instruction.type == Up)
     {
-        return part2(x, y, aim - instruction.value, ...instructions);
+        return tail part2(x, y, aim - instruction.value, ...instructions);
     }
 
     if (instruction.type == Down)
     {
-        return part2(x, y, aim + instruction.value, ...instructions);
+        return tail part2(x, y, aim + instruction.value, ...instructions);
     }
 
-    return part2(x, y, aim, ...instructions);
+    return tail part2(x, y, aim, ...instructions);
 }
 
 function bind(int result1, int result2)
@@ -136,13 +136,13 @@ function run()
         part1(0, 0
             , nextInstruction(Type
                 , 0, 0
-                , readChar(fdopen(open("input", O_RDONLY), "r"))
+                , readChar(fdopen(open(@"input", O_RDONLY), @"r"))
                 )
             ),
         part2(0, 0, 0
             , nextInstruction(Type
                 , 0, 0
-                , readChar(fdopen(open("input", O_RDONLY), "r"))
+                , readChar(fdopen(open(@"input", O_RDONLY), @"r"))
                 )
             )
     );
@@ -157,7 +157,7 @@ function printNumbers((int number, ...numbers))
 {
     printNumber(number);
 
-    return printNumbers(...numbers);
+    return tail printNumbers(...numbers);
 }
 
 export int main()

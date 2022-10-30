@@ -68,7 +68,7 @@ namespace SDL
         int windowID: 0,
         int padding: 0,
         int scancode: 0,
-        int sym: 0,
+        uint sym: 0,
         long padding: 0L
     };
 

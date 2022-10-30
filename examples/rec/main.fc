@@ -10,7 +10,7 @@ function sum(int product, int v)
 
 function sum(int product, (int v, ...values))
 {
-    return sum(product + v, ...values);
+    return tail sum(product + v, ...values);
 }
 
 function add(int addend, int v)
@@ -55,7 +55,7 @@ function foo(Struct s)
 {
 	if (sum(0, s.values) < 20)
 	{
-		return foo(s with { values: add(1, s.values) });
+		return tail foo(s with { values: add(1, s.values) });
 	}
 
 	return first(s.values);
