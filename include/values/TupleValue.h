@@ -23,12 +23,8 @@ class TupleValue : public BaseValueWithMetadata<TupleValueMetadata>
 
 		Stack values() const;
 
-		bool isArray() const;
-
 	private:
 		std::vector<const BaseValue *> m_values;
-
-		bool m_isArray;
 };
 
 #endif // TUPLEVALUE_H
