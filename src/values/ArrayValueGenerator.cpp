@@ -21,8 +21,10 @@ ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult > &values, c
 {
 }
 
-const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint) const
+const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint, GenerationMode mode) const
 {
+	UNUSED(mode);
+
 	auto iteratorStorage = entryPoint
 		.iteratorStorage();
 

@@ -10,9 +10,10 @@ IteratorValueGenerator::IteratorValueGenerator(const Type *iteratorType, const N
 {
 }
 
-const IIteratable *IteratorValueGenerator::generate(const EntryPoint &entryPoint) const
+const IIteratable *IteratorValueGenerator::generate(const EntryPoint &entryPoint, GenerationMode mode) const
 {
 	UNUSED(entryPoint);
+	UNUSED(mode);
 
 	return new IteratorValue(m_entryPoint, m_subject);
 }

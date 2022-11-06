@@ -13,7 +13,7 @@
 class CallableNode;
 class DzStruct;
 class Prototype;
-class IIteratorStorage;
+class IteratorStorage;
 class Node;
 class ReferenceValue;
 class Type;
@@ -38,7 +38,7 @@ class EntryPoint
 			, immer::box<std::map<std::string, Prototype *>> types
 			, immer::box<std::vector<const CallableNode *>> roots
 			, immer::box<Stack> values
-			, IIteratorStorage *iteratorStorage
+			, IteratorStorage *iteratorStorage
 			, const ExpandedType *iteratorType
 			);
 
@@ -70,7 +70,7 @@ class EntryPoint
 
 		const Stack &values() const;
 
-		IIteratorStorage *iteratorStorage() const;
+		IteratorStorage *iteratorStorage() const;
 
 		const EntryPoint *byName(const std::string &name) const;
 		const EntryPoint *entry() const;
@@ -80,7 +80,7 @@ class EntryPoint
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
-		EntryPoint withIteratorStorage(IIteratorStorage *iteratorStorage) const;
+		EntryPoint withIteratorStorage(IteratorStorage *iteratorStorage) const;
 		EntryPoint markEntry() const;
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
@@ -90,6 +90,9 @@ class EntryPoint
 		EntryPoint withDepth(int depth) const;
 		EntryPoint withIndex(int index) const;
 		EntryPoint withIteratorType(const ExpandedType *iteratorType) const;
+		EntryPoint detach() const;
+
+		void setParent(const EntryPoint &parent);
 
 	private:
 		int m_depth;
@@ -115,7 +118,7 @@ class EntryPoint
 		immer::box<std::vector<const CallableNode *>> m_roots;
 		immer::box<Stack> m_values;
 
-		IIteratorStorage *m_iteratorStorage;
+		IteratorStorage *m_iteratorStorage;
 
 		const ExpandedType *m_iteratorType;
 };

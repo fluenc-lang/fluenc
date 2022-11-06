@@ -21,7 +21,7 @@ EntryPoint::EntryPoint(int depth
 	, immer::box<std::map<std::string, Prototype *>> types
 	, immer::box<std::vector<const CallableNode *> > roots
 	, immer::box<Stack> values
-	, IIteratorStorage *iteratorStorage
+	, IteratorStorage *iteratorStorage
 	, const ExpandedType *iteratorType
 	)
 	: m_depth(depth)
@@ -164,7 +164,7 @@ const Stack &EntryPoint::values() const
 	return m_values.get();
 }
 
-IIteratorStorage *EntryPoint::iteratorStorage() const
+IteratorStorage *EntryPoint::iteratorStorage() const
 {
 	return m_iteratorStorage;
 }
@@ -230,7 +230,7 @@ EntryPoint EntryPoint::withAlloc(llvm::BasicBlock *alloc) const
 		);
 }
 
-EntryPoint EntryPoint::withIteratorStorage(IIteratorStorage *iteratorStorage) const
+EntryPoint EntryPoint::withIteratorStorage(IteratorStorage *iteratorStorage) const
 {
 	return EntryPoint(m_depth + 1
 		, m_index
@@ -435,4 +435,32 @@ EntryPoint EntryPoint::withIteratorType(const ExpandedType *iteratorType) const
 		, m_iteratorStorage
 		, iteratorType
 		);
+}
+
+EntryPoint EntryPoint::detach() const
+{
+	return EntryPoint(m_depth + 1
+		, m_index
+		, this
+		, m_entry
+		, m_block
+		, m_alloc
+		, m_function
+		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, m_globals
+		, m_types
+		, m_roots
+		, m_values
+		, m_iteratorStorage
+		, m_iteratorType
+		);
+}
+
+void EntryPoint::setParent(const EntryPoint &parent)
+{
+	m_parent = new EntryPoint(parent);
 }

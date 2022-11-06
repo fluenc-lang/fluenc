@@ -13,8 +13,10 @@ StringIteratableGenerator::StringIteratableGenerator(const Node *node, llvm::Val
 {
 }
 
-const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPoint) const
+const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPoint, GenerationMode mode) const
 {
+	UNUSED(mode);
+
 	auto iteratorStorage = entryPoint
 		.iteratorStorage();
 

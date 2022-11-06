@@ -24,6 +24,7 @@
 #include "EntryPoint.h"
 #include "ModuleInfo.h"
 #include "Visitor.h"
+#include "IteratorStorage.h"
 
 #include "nodes/CallableNode.h"
 
@@ -101,7 +102,7 @@ const BaseValue *compileValue(std::string source)
 			, moduleInfo.types
 			, moduleInfo.roots
 			, Stack()
-			, nullptr
+			, new IteratorStorage()
 			, nullptr
 			);
 
@@ -157,7 +158,7 @@ EntryPoint compile(std::string source)
 		, moduleInfo.types
 		, moduleInfo.roots
 		, Stack()
-		, nullptr
+		, new IteratorStorage()
 		, nullptr
 		);
 }
@@ -197,7 +198,7 @@ int exec(std::string source)
 		, moduleInfo.types
 		, moduleInfo.roots
 		, Stack()
-		, nullptr
+		, new IteratorStorage()
 		, nullptr
 		);
 

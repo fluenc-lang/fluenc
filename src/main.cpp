@@ -33,6 +33,7 @@
 #include "Visitor.h"
 #include "ModuleInfo.h"
 #include "Emitter.h"
+#include "IteratorStorage.h"
 
 #include "nodes/CallableNode.h"
 
@@ -326,7 +327,7 @@ int main(int argc, char **argv)
 					, module.types
 					, module.roots
 					, values
-					, nullptr
+					, new IteratorStorage()
 					, nullptr
 					);
 
