@@ -20,7 +20,7 @@ const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPo
 	auto iteratorStorage = entryPoint
 		.iteratorStorage();
 
-	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
+	auto index = iteratorStorage->getOrCreate(std::to_string(m_id), entryPoint);
 
 	return new StringIteratable(index, m_node, m_address, m_length);
 }

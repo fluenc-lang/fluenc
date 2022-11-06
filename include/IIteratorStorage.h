@@ -1,7 +1,7 @@
 #ifndef IITERATORSTORAGE_H
 #define IITERATORSTORAGE_H
 
-#include <stddef.h>
+#include <filesystem>
 
 class EntryPoint;
 class ReferenceValue;
@@ -9,7 +9,7 @@ class ReferenceValue;
 class IIteratorStorage
 {
 	public:
-		virtual const ReferenceValue *getOrCreate(size_t id, const EntryPoint &entryPoint) = 0;
+		virtual const ReferenceValue *getOrCreate(std::filesystem::path path, const EntryPoint &entryPoint) = 0;
 };
 
 #endif // IITERATORSTORAGE_H

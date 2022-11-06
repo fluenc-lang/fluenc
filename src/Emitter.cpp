@@ -5,7 +5,7 @@
 #include "IRBuilderEx.h"
 #include "ITypeName.h"
 #include "UndeclaredIdentifierException.h"
-#include "IteratorStorage.h"
+#include "DecoratedIteratorStorage.h"
 #include "FunctionNotFoundException.h"
 #include "FunctionHelper.h"
 #include "Indexed.h"
@@ -1091,7 +1091,9 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisitorContext context) const
 {
-	auto iteratorStorage = new IteratorStorage(*context.entryPoint.iteratorStorage());
+	auto iteratorStorage = new DecoratedIteratorStorage(context.entryPoint.iteratorStorage()
+		, std::to_string(node->id())
+		);
 
 	auto inputEntryPoint = context.entryPoint
 		.withIteratorStorage(iteratorStorage);
@@ -1155,10 +1157,7 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 			pointersToValues.push(value);
 		}
 
-		auto callEntryPoint = subjectEntryPoint
-			.withIteratorStorage(context.entryPoint.iteratorStorage());
-
-		auto callResults = node->m_call->accept(*this, { callEntryPoint, pointersToValues });
+		auto callResults = node->m_call->accept(*this, { subjectEntryPoint, pointersToValues });
 
 		for (auto &[callEntryPoint, callValues] : callResults)
 		{
@@ -1169,7 +1168,10 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 				forwardedValues.push(value);
 			}
 
-			auto consumerResults = node->m_consumer->accept(*this, { callEntryPoint, forwardedValues });
+			auto forwardedEntryPoint = callEntryPoint
+				.withIteratorStorage(context.entryPoint.iteratorStorage());
+
+			auto consumerResults = node->m_consumer->accept(*this, { forwardedEntryPoint, forwardedValues });
 
 			for (auto &consumerResult : consumerResults)
 			{

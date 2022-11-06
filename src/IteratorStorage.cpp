@@ -10,11 +10,11 @@
 
 #include "types/Int64Type.h"
 
-const ReferenceValue *IteratorStorage::getOrCreate(size_t id, const EntryPoint &entryPoint)
+const ReferenceValue *IteratorStorage::getOrCreate(std::filesystem::path path, const EntryPoint &entryPoint)
 {
 	auto indexType = Int64Type::instance();
 
-	auto iterator = m_storage.find(id);
+	auto iterator = m_storage.find(path);
 
 	if (iterator == m_storage.end())
 	{
@@ -29,14 +29,18 @@ const ReferenceValue *IteratorStorage::getOrCreate(size_t id, const EntryPoint &
 			);
 
 		std::ostringstream name;
-		name << "index_";
-		name << id;
+		name << "index";
+
+		for (auto &segment : path)
+		{
+			name << "_" << segment;
+		}
 
 		auto alloc = entryPoint.alloc(indexType, name.str());
 
 		builder.createStore(zero, alloc);
 
-		m_storage.insert({ id, alloc });
+		m_storage.insert({ path, alloc });
 
 		return alloc;
 	}
