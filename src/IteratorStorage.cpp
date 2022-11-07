@@ -14,7 +14,7 @@ const ReferenceValue *IteratorStorage::getOrCreate(std::filesystem::path path, c
 {
 	auto indexType = Int64Type::instance();
 
-	auto iterator = m_storage.find(path);
+	auto iterator = m_storage.find(path.string());
 
 	if (iterator == m_storage.end())
 	{

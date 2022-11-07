@@ -12,7 +12,7 @@ class IteratorStorage : public IIteratorStorage
 		const ReferenceValue *getOrCreate(std::filesystem::path path, const EntryPoint &entryPoint);
 
 	private:
-		std::unordered_map<std::filesystem::path, const ReferenceValue *> m_storage;
+		std::unordered_map<std::string, const ReferenceValue *> m_storage;
 };
 
 #endif // ITERATORSTORAGE_H
