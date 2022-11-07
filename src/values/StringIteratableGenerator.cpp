@@ -13,12 +13,14 @@ StringIteratableGenerator::StringIteratableGenerator(const Node *node, llvm::Val
 {
 }
 
-const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPoint) const
+const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPoint, GenerationMode mode) const
 {
+	UNUSED(mode);
+
 	auto iteratorStorage = entryPoint
 		.iteratorStorage();
 
-	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
+	auto index = iteratorStorage->getOrCreate(std::to_string(m_id), entryPoint);
 
 	return new StringIteratable(index, m_node, m_address, m_length);
 }

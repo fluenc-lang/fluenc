@@ -53,6 +53,7 @@
 #include "nodes/JunctionNode.h"
 #include "nodes/DistributorNode.h"
 #include "nodes/BlockStackFrameNode.h"
+#include "nodes/IteratorStorageBoundary.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -708,7 +709,9 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 
 	auto iteratorType = new IteratorType();
 
-	return new FunctionNode(name, arguments, ast->nodes, m_namespaces, iteratorType);
+	auto function = new FunctionNode(name, arguments, ast->nodes, m_namespaces, iteratorType);
+
+	return new IteratorStorageBoundary(function);
 }
 
 CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const
@@ -725,7 +728,9 @@ CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &as
 	auto junction = new JunctionNode(block);
 	auto distributor = new DistributorNode(junction, terminator);
 
-	return new ExportedFunctionNode(name, distributor, returnType);
+	auto function = new ExportedFunctionNode(name, distributor, returnType);
+
+	return new IteratorStorageBoundary(function);
 }
 
 CallableNode *Visitor::visitImportedFunction(const std::shared_ptr<peg::Ast> &ast) const

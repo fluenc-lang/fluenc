@@ -21,12 +21,14 @@ ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult > &values, c
 {
 }
 
-const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint) const
+const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint, GenerationMode mode) const
 {
+	UNUSED(mode);
+
 	auto iteratorStorage = entryPoint
 		.iteratorStorage();
 
-	auto index = iteratorStorage->getOrCreate(m_id, entryPoint);
+	auto index = iteratorStorage->getOrCreate(std::to_string(m_id), entryPoint);
 
 	return new ArrayValue(m_ast, index, type(), m_values, m_size);
 }

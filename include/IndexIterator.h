@@ -2,6 +2,7 @@
 #define INDEXITERATOR_H
 
 #include <cstddef>
+#include <iterator>
 
 class index_iterator
 {
@@ -10,6 +11,7 @@ class index_iterator
 		index_iterator(size_t index);
 
 		index_iterator &operator ++();
+		index_iterator &operator --();
 		index_iterator &operator =(size_t value);
 
 		size_t operator *();
@@ -19,5 +21,18 @@ class index_iterator
 	private:
 		size_t m_index;
 };
+
+namespace std
+{
+	template<>
+	struct iterator_traits<index_iterator>
+	{
+		using difference_type = size_t;
+		using value_type = size_t;
+		using pointer = size_t*;
+		using reference = const size_t&;
+		using iterator_category = bidirectional_iterator_tag;
+	};
+}
 
 #endif // INDEXITERATOR_H

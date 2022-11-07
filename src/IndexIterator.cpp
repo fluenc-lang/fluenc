@@ -17,6 +17,13 @@ index_iterator &index_iterator::operator ++()
 	return *this;
 }
 
+index_iterator &index_iterator::operator --()
+{
+	m_index--;
+
+	return *this;
+}
+
 index_iterator &index_iterator::operator =(size_t value)
 {
 	m_index = value;

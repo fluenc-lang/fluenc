@@ -22,4 +22,6 @@ bool compareKey(const std::pair<TKey, TValue> &left, const std::pair<TKey, TValu
 	return left.first < right.first;
 };
 
+llvm::BasicBlock *createBlock(llvm::LLVMContext *context);
+
 #endif // UTILITY_H

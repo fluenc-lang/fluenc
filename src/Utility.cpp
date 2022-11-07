@@ -29,3 +29,14 @@ void guardBranch(llvm::BasicBlock *block)
 		}
 	}
 }
+
+llvm::BasicBlock *createBlock(llvm::LLVMContext *context)
+{
+	static int i;
+
+	std::ostringstream name;
+	name << "block_";
+	name << i++;
+
+	return llvm::BasicBlock::Create(*context, name.str());
+}

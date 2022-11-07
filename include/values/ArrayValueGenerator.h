@@ -11,7 +11,7 @@ class ArrayValueGenerator : public ILazyValueGenerator
 	public:
 		ArrayValueGenerator(const std::vector<DzResult> &values, const std::shared_ptr<peg::Ast> &ast, size_t id, size_t size);
 
-		const IIteratable *generate(const EntryPoint &entryPoint) const override;
+		const IIteratable *generate(const EntryPoint &entryPoint, GenerationMode mode) const override;
 
 		const ILazyValueGenerator *clone(const EntryPoint &entryPoint) const override;
 		const ILazyValueGenerator *forward(size_t id) const override;

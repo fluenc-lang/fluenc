@@ -90,6 +90,9 @@ class EntryPoint
 		EntryPoint withDepth(int depth) const;
 		EntryPoint withIndex(int index) const;
 		EntryPoint withIteratorType(const ExpandedType *iteratorType) const;
+		EntryPoint detach() const;
+
+		void setParent(const EntryPoint &parent);
 
 	private:
 		int m_depth;

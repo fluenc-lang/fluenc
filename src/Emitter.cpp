@@ -1,11 +1,14 @@
 #include <llvm/IR/Verifier.h>
 
+#include <unordered_map>
+#include <unordered_set>
+
 #include "Emitter.h"
 #include "ValueHelper.h"
 #include "IRBuilderEx.h"
 #include "ITypeName.h"
 #include "UndeclaredIdentifierException.h"
-#include "IteratorStorage.h"
+#include "DecoratedIteratorStorage.h"
 #include "FunctionNotFoundException.h"
 #include "FunctionHelper.h"
 #include "Indexed.h"
@@ -45,6 +48,7 @@
 #include "values/ArrayValue.h"
 #include "values/IteratorValue.h"
 #include "values/StringIteratable.h"
+#include "values/IteratorValueGeneratorProxy.h"
 
 #include "nodes/BinaryNode.h"
 #include "nodes/ExportedFunctionNode.h"
@@ -82,6 +86,7 @@
 #include "nodes/BlockStackFrameNode.h"
 #include "nodes/IteratableNode.h"
 #include "nodes/DistributorNode.h"
+#include "nodes/RenderedNode.h"
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/MissingTailCallException.h"
@@ -364,7 +369,7 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, node->m_name, module);
 
 	auto alloc = llvm::BasicBlock::Create(*llvmContext, "alloc");
-	auto block = llvm::BasicBlock::Create(*llvmContext);
+	auto block = createBlock(llvmContext);
 
 	linkBlocks(alloc, block);
 
@@ -431,8 +436,8 @@ std::vector<DzResult> Emitter::visit(const ArrayElementNode *node, DefaultVisito
 		auto indexType = index->type();
 		auto storageType = indexType->storageType(*llvmContext);
 
-		auto ifTrue = llvm::BasicBlock::Create(*llvmContext);
-		auto ifFalse = llvm::BasicBlock::Create(*llvmContext);
+		auto ifTrue = createBlock(llvmContext);
+		auto ifFalse = createBlock(llvmContext);
 
 		IRBuilderEx builder(context.entryPoint);
 
@@ -802,10 +807,7 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 						forwardedValues.push(resultValue);
 					}
 
-					auto forwardedEntryPoint = resultEntryPoint
-						.withIteratorStorage(entryPoint.iteratorStorage());
-
-					for (auto &result : recurse(forwardedEntryPoint, forwardedValues, recurse))
+					for (auto &result : recurse(resultEntryPoint, forwardedValues, recurse))
 					{
 						results.push_back(result);
 					}
@@ -853,7 +855,7 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 								});
 							});
 
-							auto block = llvm::BasicBlock::Create(*entryPoint.context());
+							auto block = createBlock(entryPoint.context());
 
 							linkBlocks(ep.block(), block);
 
@@ -943,27 +945,11 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 		return {{ entryPoint, values }};
 	};
 
-	auto tryForkEntryPoint = [&]
-	{
-		if (context.entryPoint.iteratorStorage())
-		{
-			return context.entryPoint;
-		}
-
-		return context.entryPoint
-			.withIteratorStorage(new IteratorStorage());
-	};
-
-	auto forkedEntryPoint = tryForkEntryPoint();
-
 	std::vector<DzResult> results;
 
-	for (auto &[resultEntryPoint, resultValues] : digestDepth(forkedEntryPoint, context.values, digestDepth))
+	for (auto &[resultEntryPoint, resultValues] : digestDepth(context.entryPoint, context.values, digestDepth))
 	{
-		auto consumerEntryPoint = resultEntryPoint
-			.withIteratorStorage(context.entryPoint.iteratorStorage());
-
-		for (auto &result : node->m_consumer->accept(*this, { consumerEntryPoint, resultValues }))
+		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
 		{
 			results.push_back(result);
 		}
@@ -1075,7 +1061,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 			throw new FunctionNotFoundException(node->m_ast, node->m_names[0], types);
 		}
 
-		auto functionBlock = llvm::BasicBlock::Create(*llvmContext);
+		auto functionBlock = createBlock(llvmContext);
 
 		linkBlocks(block, functionBlock);
 
@@ -1091,7 +1077,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 		for (const auto &[lastEntryPoint, returnValue] : functionResults)
 		{
-			auto consumerBlock = llvm::BasicBlock::Create(*llvmContext);
+			auto consumerBlock = createBlock(llvmContext);
 
 			linkBlocks(lastEntryPoint.block(), consumerBlock);
 
@@ -1108,8 +1094,15 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisitorContext context) const
 {
+	auto iteratorStorage = new DecoratedIteratorStorage(context.entryPoint.iteratorStorage()
+		, std::to_string(node->id())
+		);
+
+	auto inputEntryPoint = context.entryPoint
+		.withIteratorStorage(iteratorStorage);
+
 	std::vector<DzResult> result;
-	std::vector<DzResult> input = {{ context.entryPoint, Stack() }};
+	std::vector<DzResult> input = {{ inputEntryPoint, Stack() }};
 
 	std::vector<Indexed<Node *>> orderedValues;
 
@@ -1178,7 +1171,10 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 				forwardedValues.push(value);
 			}
 
-			auto consumerResults = node->m_consumer->accept(*this, { callEntryPoint, forwardedValues });
+			auto forwardedEntryPoint = callEntryPoint
+				.withIteratorStorage(context.entryPoint.iteratorStorage());
+
+			auto consumerResults = node->m_consumer->accept(*this, { forwardedEntryPoint, forwardedValues });
 
 			for (auto &consumerResult : consumerResults)
 			{
@@ -1196,15 +1192,13 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 
 	std::vector<DzResult> results;
 
-	auto preliminaryBlock = llvm::BasicBlock::Create(*llvmContext);
+	auto preliminaryBlock = createBlock(llvmContext);
 
-	auto preliminaryEntryPoint = context.entryPoint
-		.withIteratorStorage(new IteratorStorage())
-		.withBlock(preliminaryBlock);
+	auto preliminaryEntryPoint = new EntryPoint(context.entryPoint
+		.withBlock(preliminaryBlock)
+		);
 
-	auto junction = new JunctionNode(node->m_regularCall);
-
-	auto preliminaryResults = junction->accept(*this, { preliminaryEntryPoint, context.values });
+	auto preliminaryResults = node->m_regularCall->accept(*this, { preliminaryEntryPoint->detach(), context.values });
 
 	for (auto &[_, preliminaryValues] : preliminaryResults)
 	{
@@ -1217,7 +1211,8 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 
 		if (dynamic_cast<const TupleValue *>(returnValue))
 		{
-			auto generator = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, context.entryPoint);
+			auto subject = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, context.entryPoint);
+			auto generator = new IteratorValueGeneratorProxy(subject, preliminaryEntryPoint, preliminaryResults);
 			auto lazy = new LazyValue(generator, context.entryPoint);
 
 			auto forwardedValues = context.values;
@@ -1235,6 +1230,11 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 		}
 	}
 
+	linkBlocks(context.entryPoint.block(), preliminaryBlock);
+
+	auto rendered = new RenderedNode(preliminaryResults);
+	auto junction = new JunctionNode(rendered);
+
 	for (auto &[resultEntryPoint, resultValues] : junction->accept(*this, context))
 	{
 		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
@@ -1248,6 +1248,29 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 
 std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorContext context) const
 {
+	struct type_comparer
+	{
+		bool operator()(const Type *x, const Type *y) const
+		{
+			if (x == y)
+			{
+				return false;
+			}
+
+			if (dynamic_cast<const TupleType *>(x))
+			{
+				return true;
+			}
+
+			if (dynamic_cast<const TupleType *>(y))
+			{
+				return false;
+			}
+
+			return std::less<const Type *>()(x, y);
+		}
+	};
+
 	struct SingleResult
 	{
 		const EntryPoint entryPoint;
@@ -1311,7 +1334,7 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 
 	std::vector<DzResult> outputResults;
 
-	std::multimap<const Type *, SingleResult> groupedResults;
+	std::map<const Type *, std::vector<SingleResult>, type_comparer> groupedResults;
 
 	for (auto &result : inputResults)
 	{
@@ -1326,25 +1349,11 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 
 		auto value = resultValues.pop();
 
-		groupedResults.insert({ value->type(), { resultEntryPoint, value } });
+		groupedResults[value->type()].push_back({ resultEntryPoint, value });
 	}
 
-	for (auto it = begin(groupedResults)
-		 ; it != end(groupedResults)
-		 ; it = upper_bound(it, end(groupedResults), *it, &compareKey<const Type *, SingleResult>)
-		 )
+	for (auto &[type, inputValues] : groupedResults)
 	{
-		auto [type, _] = *it;
-
-		auto range = groupedResults.equal_range(type);
-
-		std::vector<SingleResult> inputValues;
-
-		std::transform(range.first, range.second, std::back_inserter(inputValues), [](auto pair)
-		{
-			return pair.second;
-		});
-
 		auto [joinedEntryPoint, joinedValue] = tryJoin(inputValues, context.entryPoint);
 
 		outputResults.push_back({ joinedEntryPoint, joinedValue });
@@ -1468,8 +1477,8 @@ std::vector<DzResult> Emitter::visit(const ConditionalNode *node, DefaultVisitor
 
 	block->setName("condition");
 
-	auto ifTrue = llvm::BasicBlock::Create(*llvmContext);
-	auto ifFalse = llvm::BasicBlock::Create(*llvmContext);
+	auto ifTrue = createBlock(llvmContext);
+	auto ifFalse = createBlock(llvmContext);
 
 	IRBuilderEx builder(context.entryPoint);
 
@@ -1925,8 +1934,7 @@ std::vector<DzResult> Emitter::visit(const FunctionNode *node, DefaultVisitorCon
 	auto ep = pep
 		.withName(node->m_name)
 		.markEntry()
-		.withLocals(locals)
-		.withIteratorStorage(nullptr);
+		.withLocals(locals);
 
 	return node->m_block->accept(*this, { ep, context.values });
 }
@@ -2107,7 +2115,7 @@ std::vector<DzResult> Emitter::visit(const ArrayValue *node, DefaultVisitorConte
 	{
 		elementValues.push(node->m_index);
 
-		auto arrayBlock = llvm::BasicBlock::Create(*llvmContext);
+		auto arrayBlock = createBlock(llvmContext);
 
 		linkBlocks(block, arrayBlock);
 
@@ -2161,8 +2169,8 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 	auto indexType = node->m_index->type();
 	auto storageType = indexType->storageType(*llvmContext);
 
-	auto ifTrue = llvm::BasicBlock::Create(*llvmContext);
-	auto ifFalse = llvm::BasicBlock::Create(*llvmContext);
+	auto ifTrue = createBlock(llvmContext);
+	auto ifFalse = createBlock(llvmContext);
 
 	auto length = new ScalarValue(indexType
 		, llvm::ConstantInt::get(storageType, node->m_length - 1)

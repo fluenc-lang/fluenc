@@ -61,8 +61,8 @@ const Type *LazyValue::type() const
 {
 	auto context = m_entryPoint->context();
 
-	auto block = llvm::BasicBlock::Create(*context);
-	auto alloc = llvm::BasicBlock::Create(*context);
+	auto block = createBlock(context);
+	auto alloc = createBlock(context);
 
 	linkBlocks(alloc, block);
 
@@ -73,7 +73,7 @@ const Type *LazyValue::type() const
 		.withAlloc(alloc)
 		.withIteratorStorage(iteratorStorage);
 
-	auto iteratable = m_generator->generate(entryPoint);
+	auto iteratable = m_generator->generate(entryPoint, GenerationMode::DryRun);
 
 	Emitter analyzer;
 
@@ -83,7 +83,9 @@ const Type *LazyValue::type() const
 
 	for (auto &[resultEntryPoint, resultValues] : results)
 	{
-		auto [isArrayCompatible, type] = getElementType({ true, nullptr }, resultEntryPoint, resultValues);
+		auto resultBlock = createBlock(context);
+
+		auto [isArrayCompatible, type] = getElementType({ true, nullptr }, resultEntryPoint.withBlock(resultBlock), resultValues);
 
 		if (!isArrayCompatible)
 		{
@@ -134,7 +136,7 @@ const BaseValue *LazyValue::forward(size_t id) const
 
 const IIteratable *LazyValue::generate(const EntryPoint &entryPoint) const
 {
-	return m_generator->generate(entryPoint);
+	return m_generator->generate(entryPoint, GenerationMode::Regular);
 }
 
 EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const BaseValue *source, const Emitter &emitter) const
@@ -146,7 +148,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const BaseValue *
 	auto iteratorEntryPoint = entryPoint
 		.withIteratorStorage(&iteratorStorage);
 
-	auto targetIteratable = m_generator->generate(iteratorEntryPoint);
+	auto targetIteratable = m_generator->generate(iteratorEntryPoint, GenerationMode::Regular);
 
 	auto targetResults = targetIteratable->accept(emitter, { iteratorEntryPoint, Stack() });
 
@@ -235,7 +237,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		.withIteratorStorage(&iteratorStorage);
 
 	auto sourceIteratable = source->generate(iteratorEntryPoint);
-	auto targetIteratable = m_generator->generate(iteratorEntryPoint);
+	auto targetIteratable = m_generator->generate(iteratorEntryPoint, GenerationMode::Regular);
 
 	auto targetResults = targetIteratable->accept(emitter, { iteratorEntryPoint, Stack() });
 

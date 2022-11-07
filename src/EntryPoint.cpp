@@ -436,3 +436,31 @@ EntryPoint EntryPoint::withIteratorType(const ExpandedType *iteratorType) const
 		, iteratorType
 		);
 }
+
+EntryPoint EntryPoint::detach() const
+{
+	return EntryPoint(m_depth + 1
+		, m_index
+		, this
+		, m_entry
+		, m_block
+		, m_alloc
+		, m_function
+		, m_module
+		, m_context
+		, m_name
+		, m_functions
+		, m_locals
+		, m_globals
+		, m_types
+		, m_roots
+		, m_values
+		, m_iteratorStorage
+		, m_iteratorType
+		);
+}
+
+void EntryPoint::setParent(const EntryPoint &parent)
+{
+	m_parent = new EntryPoint(parent);
+}

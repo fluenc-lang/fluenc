@@ -40,8 +40,3 @@ Stack TupleValue::values() const
 {
 	return m_values;
 }
-
-bool TupleValue::isArray() const
-{
-	return m_isArray;
-}

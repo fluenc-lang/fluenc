@@ -4895,6 +4895,155 @@ BOOST_AUTO_TEST_CASE (scenario118)
 	BOOST_TEST(result == 3);
 }
 
+BOOST_AUTO_TEST_CASE (scenario119)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			ui
+		}
+
+		struct Item
+		{
+			children: []
+		}
+
+		struct Item1 : Item;
+
+		struct LayoutItem
+		{
+			item
+		}
+
+		function application()
+		{
+			return [
+				Item {},
+				Item
+				{
+					children: [
+						LayoutItem
+						{
+							item: Item1 {}
+						},
+						Item1 {}
+					]
+				},
+				Item1 {}
+			];
+		}
+
+		function foo(without item)
+		{
+			return 0;
+		}
+
+		function foo(Item1 item)
+		{
+			return 10;
+		}
+
+		function foo((Item item, ...items))
+		{
+			return foo(item) -> foo(...items);
+		}
+
+		function foo(Item item)
+		{
+			return sum(0, foo(item.children));
+		}
+
+		function foo((LayoutItem item, ...items))
+		{
+			return foo(item.item) -> foo(...items);
+		}
+
+		function sum(int product, (int value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function sum(int product, int value)
+		{
+			return product + value;
+		}
+
+		export int main()
+		{
+			let ui = application();
+			let res = foo(ui);
+
+			return sum(0, res)
+		}
+	)");
+
+	BOOST_TEST(result == 30);
+}
+
+BOOST_AUTO_TEST_CASE (scenario120)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			value
+		}
+
+		function createItem(int index)
+		{
+			return Item
+			{
+				value: index
+			};
+		}
+
+		function item((int v, ...vs))
+		{
+			return createItem(v) -> item(...vs);
+		}
+
+		function item(int v)
+		{
+			return createItem(v);
+		}
+
+		function application()
+		{
+			return item([1, 2, 3]);
+		}
+
+		function sum(int product, (Item item, ...items))
+		{
+			return tail sum(product + item.value, ...items);
+		}
+
+		function sum(int product, Item item)
+		{
+			return product + item.value;
+		}
+
+		function consume((Item item, ...items))
+		{
+			return tail consume(...items);
+		}
+
+		function consume(Item item)
+		{
+			return nothing;
+		}
+
+		export int main()
+		{
+			let items = application();
+
+			consume(items);
+
+			return sum(0, items);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
 test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
