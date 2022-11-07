@@ -1,5 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+    cmake_policy(SET CMP0135 NEW)
+endif()
+
+include(FetchContent)
+FetchContent_Declare(_project_options URL https://github.com/aminya/project_options/archive/refs/tags/v0.26.1.zip)
+FetchContent_MakeAvailable(_project_options)
+include(${_project_options_SOURCE_DIR}/Index.cmake)
+
+run_vcpkg(VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg)
+
 project(fluenc LANGUAGES C CXX)
 
 option(FLUENC_BUILD_TESTS "Build the tests for the project" OFF)

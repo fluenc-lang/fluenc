@@ -7,6 +7,9 @@ if (NOT ${FLUENC_BUILD_COMPILER})
 endif ()
 
 find_package(LLD REQUIRED CONFIG)
+find_package(tomlplusplus CONFIG REQUIRED)
+
+find_path(CPP_PEGLIB_INCLUDE_DIRS "peglib.h")
 
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
@@ -17,10 +20,13 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     fluenc-lang
     lldELF
+
+    tomlplusplus::tomlplusplus
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     "."
 
     ${LLD_INCLUDE_DIRS}
+    ${CPP_PEGLIB_INCLUDE_DIRS}
 )

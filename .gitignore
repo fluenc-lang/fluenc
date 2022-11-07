@@ -17,3 +17,6 @@ build/
 
 # Merge stuff
 *.orig
+
+# vcpkg
+vcpkg

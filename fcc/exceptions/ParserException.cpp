@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "../peglib.h"
+#include <peglib.h>
 
 #include "exceptions/ParserException.h"
 

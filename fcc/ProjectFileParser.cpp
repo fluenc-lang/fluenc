@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#include "toml.hpp"
+#include <toml++/toml.h>
 
 #include "ProjectFileParser.h"
 
