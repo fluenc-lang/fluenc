@@ -16,17 +16,16 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
 
-#include "src/peglib.h"
-#include "src/incbin.h"
+#include "peglib.h"
+#include "incbin.h"
 
 #include "KaleidoscopeJIT.h"
 #include "Visitor.h"
 #include "EntryPoint.h"
 #include "ModuleInfo.h"
 #include "Visitor.h"
-#include "IteratorStorage.h"
-
-#include "nodes/CallableNode.h"
+#include "CallableNode.h"
+#include "Utility.h"
 
 INCTXT(Grammar, "fluenc.peg");
 
@@ -102,7 +101,7 @@ const BaseValue *compileValue(std::string source)
 			, moduleInfo.types
 			, moduleInfo.roots
 			, Stack()
-			, new IteratorStorage()
+			, nullptr
 			, nullptr
 			);
 
@@ -158,7 +157,7 @@ EntryPoint compile(std::string source)
 		, moduleInfo.types
 		, moduleInfo.roots
 		, Stack()
-		, new IteratorStorage()
+		, nullptr
 		, nullptr
 		);
 }
@@ -198,7 +197,7 @@ int exec(std::string source)
 		, moduleInfo.types
 		, moduleInfo.roots
 		, Stack()
-		, new IteratorStorage()
+		, nullptr
 		, nullptr
 		);
 
