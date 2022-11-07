@@ -1,5 +1,8 @@
 #include <llvm/IR/Verifier.h>
 
+#include <unordered_map>
+#include <unordered_set>
+
 #include "Emitter.h"
 #include "ValueHelper.h"
 #include "IRBuilderEx.h"
