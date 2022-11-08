@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <fmt/core.h>
+
 #include "exceptions/MissingFieldException.h"
 
 MissingFieldException::MissingFieldException(const std::shared_ptr<peg::Ast> &ast
@@ -14,12 +16,5 @@ MissingFieldException::MissingFieldException(const std::shared_ptr<peg::Ast> &as
 
 std::string MissingFieldException::message() const
 {
-	std::ostringstream stream;
-	stream << "Field '";
-	stream << m_fieldName;
-	stream << "' in type '";
-	stream << m_typeName;
-	stream << "' does not exist";
-
-	return stream.str();
+	return fmt::format("Field '{}' in type '{}' does not exist", m_fieldName, m_typeName);
 }

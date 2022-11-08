@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <fmt/core.h>
+
 #include "Use.h"
 
 #include "exceptions/FileNotFoundException.h"
@@ -12,10 +14,5 @@ FileNotFoundException::FileNotFoundException(Use *use)
 
 std::string FileNotFoundException::message() const
 {
-	std::ostringstream stream;
-	stream << "File '";
-	stream << m_fileName;
-	stream << "' not found in the include path";
-
-	return stream.str();
+	return fmt::format("File '{}' not found in the include path", m_fileName);
 }

@@ -2,6 +2,8 @@
 
 #include <llvm/IR/IRBuilder.h>
 
+#include <fmt/core.h>
+
 #include "Utility.h"
 
 std::ostream& operator<<(std::ostream &stream, const llvm::StringRef &string)
@@ -34,9 +36,7 @@ llvm::BasicBlock *createBlock(llvm::LLVMContext *context)
 {
 	static int i;
 
-	std::ostringstream name;
-	name << "block_";
-	name << i++;
+	auto name = fmt::format("block_{}", i++);
 
-	return llvm::BasicBlock::Create(*context, name.str());
+	return llvm::BasicBlock::Create(*context, name);
 }

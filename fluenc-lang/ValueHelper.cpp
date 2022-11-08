@@ -1,8 +1,9 @@
 #include <numeric>
 
+#include <range/v3/view.hpp>
+
 #include "ValueHelper.h"
 #include "IRBuilderEx.h"
-#include "ZipIterator.h"
 #include "ITransferStrategy.h"
 #include "Utility.h"
 
@@ -57,7 +58,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 			auto valueFields = source->fields();
 			auto storageFields = target->fields();
 
-			auto zipped = zip(valueFields, storageFields);
+			auto zipped = ranges::views::zip(valueFields, storageFields);
 
 			return std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto fields)
 			{
@@ -75,7 +76,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 			auto valueElements = source->values();
 			auto storageElements = target->values();
 
-			auto zipped = zip(valueElements, storageElements);
+			auto zipped = ranges::views::zip(valueElements, storageElements);
 
 			return std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto elements)
 			{

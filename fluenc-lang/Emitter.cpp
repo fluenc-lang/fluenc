@@ -1,5 +1,7 @@
 #include <llvm/IR/Verifier.h>
 
+#include <range/v3/view.hpp>
+
 #include <unordered_map>
 #include <unordered_set>
 
@@ -14,7 +16,6 @@
 #include "Indexed.h"
 #include "IndexIterator.h"
 #include "IPrototypeProvider.h"
-#include "ZipIterator.h"
 #include "DzArgument.h"
 #include "DzTupleArgument.h"
 #include "InteropHelper.h"
@@ -1825,7 +1826,7 @@ std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVi
 
 	if (score == 0)
 	{
-		auto zipped = zip(context.values, targetValues);
+		auto zipped = ranges::views::zip(context.values, targetValues);
 
 		auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), context.entryPoint, [&](auto accumulatedEntryPoint, auto result)
 		{

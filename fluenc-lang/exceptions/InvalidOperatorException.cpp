@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <fmt/core.h>
+
 #include "exceptions/InvalidOperatorException.h"
 
 InvalidOperatorException::InvalidOperatorException(const std::shared_ptr<peg::Ast> &ast, const std::string &op, const std::string &typeName)
@@ -11,12 +13,5 @@ InvalidOperatorException::InvalidOperatorException(const std::shared_ptr<peg::As
 
 std::string InvalidOperatorException::message() const
 {
-	std::ostringstream stream;
-	stream << "Operator '";
-	stream << m_op;
-	stream << "' is not defined for type '";
-	stream << m_typeName;
-	stream << "'";
-
-	return stream.str();
+	return fmt::format("Operator '{}' is not defined for type '{}'", m_op, m_typeName);
 }
