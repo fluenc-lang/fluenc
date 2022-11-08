@@ -13,7 +13,7 @@ run_vcpkg(VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg)
 
 project(fluenc LANGUAGES C CXX)
 
-option(FLUENC_BUILD_TESTS "Build the tests for the project" OFF)
+option(FLUENC_BUILD_TESTS "Build the tests for the project" ON)
 option(FLUENC_BUILD_COMPILER "Build the compiler" ON)
 option(FLUENC_BUILD_SANITIZERS "Build the compiler with ASan and UBSan support" OFF)
 option(FLUENC_BUILD_EXAMPLES "Copy the examples to the build output" OFF)

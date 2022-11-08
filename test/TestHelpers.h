@@ -208,7 +208,9 @@ int exec(std::string source)
 		root->accept(emitter, { entryPoint, Stack() });
 	}
 
+#ifdef DEBUG
 	module->print(llvm::errs(), nullptr);
+#endif
 
 	verifyModule(*module, &llvm::errs());
 

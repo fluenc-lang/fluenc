@@ -6,7 +6,7 @@ if (NOT ${FLUENC_BUILD_TESTS})
     return()
 endif ()
 
-find_package(Boost 1.67 REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
