@@ -4,6 +4,8 @@
   "dependencies": [
     "immer",
     "tomlplusplus",
-    "cpp-peglib"
+    "cpp-peglib",
+    "fmt",
+    "range-v3"
   ]
 }

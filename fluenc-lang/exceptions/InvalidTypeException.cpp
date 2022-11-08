@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <fmt/core.h>
+
 #include "InvalidTypeException.h"
 
 InvalidTypeException::InvalidTypeException(const std::shared_ptr<peg::Ast> &ast
@@ -14,11 +16,5 @@ InvalidTypeException::InvalidTypeException(const std::shared_ptr<peg::Ast> &ast
 
 std::string InvalidTypeException::message() const
 {
-	std::ostringstream stream;
-	stream << "Invalid type. Expected ";
-	stream << m_expectedType;
-	stream << ", got ";
-	stream << m_actualType;
-
-	return stream.str();
+	return fmt::format("Invalid type. Expected '{}', got '{}'", m_expectedType, m_actualType);
 }

@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <fmt/core.h>
+
 #include "exceptions/MissingDefaultValueException.h"
 
 MissingDefaultValueException::MissingDefaultValueException(const std::shared_ptr<peg::Ast> &ast, const std::string &fieldName)
@@ -10,10 +12,5 @@ MissingDefaultValueException::MissingDefaultValueException(const std::shared_ptr
 
 std::string MissingDefaultValueException::message() const
 {
-	std::ostringstream stream;
-	stream << "Field '";
-	stream << m_fieldName;
-	stream << "' has no default value and needs to be initialized";
-
-	return stream.str();
+	return fmt::format("Field '{}' has no default value and needs to be initialized", m_fieldName);
 }

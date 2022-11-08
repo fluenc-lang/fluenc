@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <fmt/core.h>
+
 #include "exceptions/TypeMismatchException.h"
 
 TypeMismatchException::TypeMismatchException(const std::shared_ptr<peg::Ast> &ast
@@ -14,12 +16,5 @@ TypeMismatchException::TypeMismatchException(const std::shared_ptr<peg::Ast> &as
 
 std::string TypeMismatchException::message() const
 {
-	std::ostringstream stream;
-	stream << "Attempted binary operation on values with incompatible types (";
-	stream << m_leftTypeName;
-	stream << " and ";
-	stream << m_rightTypeName;
-	stream << ")";
-
-	return stream.str();
+	return fmt::format("Attempted binary operation on values with incompatible types ({}) and ({})", m_leftTypeName, m_rightTypeName);
 }

@@ -27,6 +27,10 @@ add_subdirectory("fluenc-lang")
 add_subdirectory("fcc")
 add_subdirectory("test")
 
+add_custom_target(vcpkg SOURCES
+	vcpkg.json
+)
+
 if(${FLUENC_BUILD_SANITIZERS})
     add_compile_options(-fsanitize=address,undefined)
     add_link_options(-fsanitize=address,undefined)
