@@ -4488,8 +4488,6 @@ BOOST_AUTO_TEST_CASE (scenario110)
 
 	auto module = result.module();
 
-	module->print(llvm::errs(), nullptr);
-
 	BOOST_TEST(module->getFunction("main"));
 }
 
