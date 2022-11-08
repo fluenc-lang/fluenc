@@ -39,7 +39,11 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Run tests
-      run: ${{github.workspace}}/build/test/test
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          ${{github.workspace}}/build/test/test
+        fi
+      shell: bash
 
     - uses: actions/upload-artifact@v3
       with:
