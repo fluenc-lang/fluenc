@@ -38,6 +38,9 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+    - name: Run tests
+      run: ${{github.workspace}}/build/test/test
+
     - uses: actions/upload-artifact@v3
       with:
         name: ${{runner.os}}-fcc
