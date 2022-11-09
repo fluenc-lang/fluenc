@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <fstream>
 
+#include <fmt/core.h>
+
 #include <lld/Common/Driver.h>
 
 #include <llvm/IR/Instructions.h>
@@ -122,7 +124,7 @@ bool isStale(std::unordered_set<std::string> &processed
 	, const std::unordered_map<std::string, CompilerJob> jobs
 	)
 {
-	std::cout << job.sourceFile << " depends on " << current.sourceFile << std::endl;
+	fmt::print("{} depends on {}\n", job.sourceFile, current.sourceFile);
 
 	auto [_, success] = processed.insert(current.sourceFile);
 
@@ -133,7 +135,7 @@ bool isStale(std::unordered_set<std::string> &processed
 
 	if (current.sourceFileTime > job.objectFileTime)
 	{
-		std::cout << current.sourceFile << " is more recent than " << job.sourceFile << std::endl;
+		fmt::print("{} is more recent than {}\n", current.sourceFile, job.sourceFile);
 
 		return true;
 	}
@@ -163,7 +165,7 @@ bool isStale(const CompilerJob &job
 {
 	if (job.objectFileTime.time_since_epoch() == std::filesystem::file_time_type::duration::zero())
 	{
-		std::cout << "No output found for " << job.sourceFile << std::endl;
+		fmt::print("No output found for {}\n", job.sourceFile);
 
 		return true;
 	}
@@ -178,7 +180,7 @@ ModuleInfo processUses(std::unordered_set<std::string> &processed
 	, const std::unordered_map<std::string, CompilerJob> jobs
 	)
 {
-	std::cout << "Adding info from " << job.sourceFile << std::endl;
+	fmt::print("Adding info from {}\n", job.sourceFile);
 
 	auto [_, success] = processed.insert(job.sourceFile);
 
@@ -273,12 +275,12 @@ int main(int argc, char **argv)
 
 			if (path.extension() != ".fc")
 			{
-				std::cout << "Skipping file " << path << std::endl;
+				fmt::print("Skipping file {}\n", path.string());
 
 				continue;
 			}
 
-			std::cout << "Adding file " << path << std::endl;
+			fmt::print("Adding file {}\n", path.string());
 
 			auto relative = std::filesystem::relative(path);
 
@@ -294,7 +296,7 @@ int main(int argc, char **argv)
 		{
 			if (job.module.roots.empty())
 			{
-				std::cout << "File " << job.sourceFile << " has no roots, skipping" << std::endl;
+				fmt::print("File {} has no roots, skipping\n", job.sourceFile);
 
 				continue;
 			}
@@ -303,7 +305,7 @@ int main(int argc, char **argv)
 			{
 				auto module = processUses(job, jobs);
 
-				std::cout << "Building " << job.sourceFile << "..." << std::endl;
+				fmt::print("Building {}...\n", job.sourceFile);
 
 				auto llvmModule = std::make_unique<llvm::Module>(job.name, *llvmContext);
 
@@ -427,7 +429,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	std::cout << "Linking " << configuration.target << "..." << std::endl;
+	fmt::print("Linking {}...\n", configuration.target);;
 
 	std::vector<std::string> linkerArguments =
 	{
