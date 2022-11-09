@@ -6,13 +6,13 @@
 
 #include "ProjectFileParser.h"
 
-BuildConfiguration ProjectFileParser::parse(const std::string &fileName)
+std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fileName)
 {
 	auto table = toml::parse_file(fileName);
 
 	if (!table)
 	{
-		return BuildConfiguration();
+		return {};
 	}
 
 	return std::accumulate(table.begin(), table.end(), BuildConfiguration(), [](auto accumulation, toml::impl::table_proxy_pair<false> row) -> BuildConfiguration

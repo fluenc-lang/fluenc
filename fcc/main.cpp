@@ -251,6 +251,13 @@ int main(int argc, char **argv)
 
 	auto configuration = projectFileParser.parse("project.toml");
 
+	if (!configuration)
+	{
+		fmt::print("No project.toml file was found in the current directory\n");
+
+		return 1;
+	}
+
 	peg::parser parser(gGrammarData);
 
 	parser.log = [](size_t line, size_t col, const std::string &msg)
@@ -429,7 +436,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	fmt::print("Linking {}...\n", configuration.target);;
+	fmt::print("Linking {}...\n", configuration->target);;
 
 	std::vector<std::string> linkerArguments =
 	{
@@ -443,11 +450,11 @@ int main(int argc, char **argv)
 		"-lc",
 	};
 
-	linkerArguments.insert(end(linkerArguments), begin(configuration.libs), end(configuration.libs));
+	linkerArguments.insert(end(linkerArguments), begin(configuration->libs), end(configuration->libs));
 	linkerArguments.insert(end(linkerArguments), begin(objectFiles), end(objectFiles));
 
 	linkerArguments.push_back("-o");
-	linkerArguments.push_back(configuration.target);
+	linkerArguments.push_back(configuration->target);
 
 	std::vector<const char *> arguments;
 
