@@ -1680,8 +1680,6 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 
 std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisitorContext context) const
 {
-	auto numberOfArguments = context.values.size();
-
 	auto inputValues = context.values;
 	auto tailCallValues = context.entryPoint.values();
 	auto iteratorType = context.entryPoint.iteratorType();
@@ -1693,11 +1691,15 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 		return value->type();
 	});
 
-	auto tailCallCandidate = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), context.entryPoint, [&](auto target, size_t)
+	auto values = ranges::views::zip(inputValues, tailCallValues);
+
+	auto tailCallCandidate = std::accumulate(values.begin(), values.end(), context.entryPoint, [&](auto target, auto pair)
 	{
+		auto &[inputValue, targetValue] = pair;
+
 		return ValueHelper::transferValue(target
-			, inputValues.pop()
-			, tailCallValues.pop()
+			, inputValue
+			, targetValue
 			, *this
 			);
 	});
