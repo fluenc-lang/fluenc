@@ -1673,7 +1673,14 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 		return value->type();
 	});
 
-	auto values = ranges::views::zip(inputValues, tailCallValues);
+	std::vector<const BaseValue *> cloned;
+
+	std::transform(inputValues.begin(), inputValues.end(), back_inserter(cloned), [&](auto value)
+	{
+		return value->clone(context.entryPoint, CloneStrategy::Value);
+	});
+
+	auto values = ranges::views::zip(cloned, tailCallValues);
 
 	auto tailCallCandidate = std::accumulate(values.begin(), values.end(), context.entryPoint, [&](auto target, auto pair)
 	{
@@ -1810,7 +1817,14 @@ std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVi
 
 	if (score == 0)
 	{
-		auto zipped = ranges::views::zip(context.values, targetValues);
+		std::vector<const BaseValue *> cloned;
+
+		std::transform(context.values.begin(), context.values.end(), back_inserter(cloned), [&](auto value)
+		{
+			return value->clone(context.entryPoint, CloneStrategy::Value);
+		});
+
+		auto zipped = ranges::views::zip(cloned, targetValues);
 
 		auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), context.entryPoint, [&](auto accumulatedEntryPoint, auto result)
 		{
