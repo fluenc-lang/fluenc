@@ -120,9 +120,9 @@ const Type *LazyValue::type() const
 	return types[0];
 }
 
-const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *LazyValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
-	auto cloned = m_generator->clone(entryPoint);
+	auto cloned = m_generator->clone(entryPoint, strategy);
 
 	return new LazyValue(cloned, entryPoint);
 }

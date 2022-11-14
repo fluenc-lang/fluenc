@@ -24,7 +24,7 @@ const IIteratable *IteratorValueGeneratorProxy::generate(const EntryPoint &entry
 	return (this->*strategy)(entryPoint, mode);
 }
 
-const ILazyValueGenerator *IteratorValueGeneratorProxy::clone(const EntryPoint &entryPoint) const
+const ILazyValueGenerator *IteratorValueGeneratorProxy::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
 

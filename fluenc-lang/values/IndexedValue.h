@@ -13,7 +13,7 @@ class IndexedValue : public BaseValueWithMetadata<IndexedValueMetadata>
 		size_t index() const;
 
 		const Type *type() const override;
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 
 		const BaseValue *subject() const;
 

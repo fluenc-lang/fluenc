@@ -76,7 +76,7 @@ const BaseValue *ArrayValueGenerator::elementAt(size_t index) const
 	return indexed->subject();
 }
 
-const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoint) const
+const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	if (m_values.size() == 1)
 	{
@@ -86,7 +86,7 @@ const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoi
 
 		std::transform(inputValues.begin(), inputValues.end(), std::back_inserter(clonedValues), [&](auto value)
 		{
-			return value->clone(entryPoint);
+			return value->clone(entryPoint, strategy);
 		});
 
 		return new ArrayValueGenerator({{ inputEntryPoint, clonedValues }}, m_ast, m_id, m_size);

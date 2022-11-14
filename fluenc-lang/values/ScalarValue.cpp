@@ -1,7 +1,9 @@
 #include <llvm/IR/Constant.h>
 
-#include "values/ScalarValue.h"
+#include "ScalarValue.h"
+#include "ReferenceValue.h"
 #include "Utility.h"
+#include "EntryPoint.h"
 
 ScalarValue::ScalarValue(const Type *type, llvm::Value *value)
 	: m_type(type)
@@ -14,9 +16,12 @@ const Type *ScalarValue::type() const
 	return m_type;
 }
 
-const BaseValue *ScalarValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *ScalarValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
-	UNUSED(entryPoint);
+	if (strategy == CloneStrategy::Storage)
+	{
+		return entryPoint.alloc(m_type);
+	}
 
 	return this;
 }

@@ -11,7 +11,7 @@ class ForwardedValue : public BaseValue
 		const BaseValue *subject() const;
 
 		const Type *type() const override;
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 		const ValueMetadata &metadata() const override;
 
 	private:

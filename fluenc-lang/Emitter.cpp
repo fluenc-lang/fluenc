@@ -1282,25 +1282,7 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 	{
 		auto [_, first] = *range.begin();
 
-		if (auto templateValue = dynamic_cast<const ScalarValue *>(first))
-		{
-			auto type = templateValue->type();
-
-			auto alloc = entryPoint.alloc(type);
-
-			for (auto &[resultEntryPoint, value] : range)
-			{
-				auto transferEntryPoint = ValueHelper::transferValue(resultEntryPoint, value, alloc, *this);
-
-				linkBlocks(transferEntryPoint.block(), entryPoint.block());
-			}
-
-			IRBuilderEx junctionBuilder(entryPoint);
-
-			return junctionBuilder.createLoad(alloc, "junctionLoad");
-		}
-
-		auto alloc = first->clone(entryPoint);
+		auto alloc = first->clone(entryPoint, CloneStrategy::Storage);
 
 		for (auto &[resultEntryPoint, value] : range)
 		{

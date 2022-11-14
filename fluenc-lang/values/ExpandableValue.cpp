@@ -27,7 +27,7 @@ const Type *ExpandableValue::type() const
 	return m_iteratorType;
 }
 
-const BaseValue *ExpandableValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *ExpandableValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
 

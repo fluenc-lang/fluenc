@@ -20,7 +20,7 @@ const IIteratable *IteratorValueGenerator::generate(const EntryPoint &entryPoint
 	return new IteratorValue(m_entryPoint, m_subject);
 }
 
-const ILazyValueGenerator *IteratorValueGenerator::clone(const EntryPoint &entryPoint) const
+const ILazyValueGenerator *IteratorValueGenerator::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
 

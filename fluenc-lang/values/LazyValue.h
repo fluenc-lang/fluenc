@@ -16,7 +16,7 @@ class LazyValue : public BaseValueWithMetadata<LazyValueMetadata>
 
 		const Type *type() const override;
 
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 		const BaseValue *forward(size_t id) const override;
 
 		const IIteratable *generate(const EntryPoint &entryPoint) const;

@@ -27,7 +27,7 @@ class ExpandableValue : public BaseValueWithMetadata<ExpandableValueMetadata>
 		bool isArray() const;
 
 		const Type *type() const override;
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 
 		const EntryPoint *provider() const;
 		const Node *chain() const;
