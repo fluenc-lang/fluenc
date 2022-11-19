@@ -14,6 +14,8 @@
 #include "values/ScalarValue.h"
 #include "values/TupleValue.h"
 #include "values/StringValue.h"
+#include "values/ExpandedValue.h"
+#include "values/ExpandableValue.h"
 
 EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *value
@@ -100,6 +102,24 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 			builder.createStore(load, target->reference());
 
 			return entryPoint;
+		}),
+		strategyFor<ExpandedValue, ExpandableValue>([](auto entryPoint, auto source, auto target, auto& emitter)
+		{
+			auto sourceValues = source->values();
+			auto targetValues = target->values();
+
+			auto zipped = ranges::views::zip(sourceValues, targetValues);
+
+			return std::accumulate(zipped.begin(), zipped.end(), entryPoint, [&](auto accumulatedEntryPoint, auto elements)
+			{
+				auto [sourceValue, targetValue] = elements;
+
+				return transferValue(accumulatedEntryPoint
+					, sourceValue
+					, targetValue
+					, emitter
+					);
+			});
 		})
 	};
 

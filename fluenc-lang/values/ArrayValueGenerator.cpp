@@ -7,6 +7,7 @@
 #include "values/ArrayValue.h"
 #include "values/ReferenceValue.h"
 #include "values/IndexedValue.h"
+#include "values/ArrayValueProxy.h"
 
 #include "nodes/ArrayElementNode.h"
 
@@ -30,7 +31,9 @@ const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint, G
 
 	auto index = iteratorStorage->getOrCreate(std::to_string(m_id), entryPoint);
 
-	return new ArrayValue(m_ast, index, type(), m_values, m_size);
+	auto subject = new ArrayValue(m_ast, index, type(), m_values, m_size);
+
+	return new ArrayValueProxy(index, subject);
 }
 
 const Type *ArrayValueGenerator::type() const
