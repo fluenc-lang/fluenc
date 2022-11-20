@@ -35,7 +35,7 @@ const Type *FunctionValue::type() const
 	return AggregateType::get(functionTypes);
 }
 
-const BaseValue *FunctionValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *FunctionValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
 

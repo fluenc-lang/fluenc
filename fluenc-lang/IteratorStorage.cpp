@@ -28,15 +28,7 @@ const ReferenceValue *IteratorStorage::getOrCreate(std::filesystem::path path, c
 			, llvm::ConstantInt::get(storageType, 0)
 			);
 
-		std::ostringstream name;
-		name << "index";
-
-		for (auto &segment : path)
-		{
-			name << "_" << segment;
-		}
-
-		auto alloc = entryPoint.alloc(indexType, name.str());
+		auto alloc = entryPoint.alloc(indexType, "index");
 
 		builder.createStore(zero, alloc);
 

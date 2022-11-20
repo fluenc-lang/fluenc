@@ -15,9 +15,9 @@ const Type *ForwardedValue::type() const
 	return m_subject->type();
 }
 
-const BaseValue *ForwardedValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *ForwardedValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
-	auto subject = m_subject->clone(entryPoint);
+	auto subject = m_subject->clone(entryPoint, strategy);
 
 	return new ForwardedValue(subject);
 }

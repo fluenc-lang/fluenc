@@ -27,13 +27,13 @@ const IPrototype *UserTypeValue::prototype() const
 	return m_type->root();
 }
 
-const BaseValue *UserTypeValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *UserTypeValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	std::vector<const NamedValue *> values;
 
 	std::transform(begin(m_values), end(m_values), std::back_inserter(values), [&](auto value)
 	{
-		auto cloned = value->clone(entryPoint);
+		auto cloned = value->clone(entryPoint, strategy);
 
 		return static_cast<const NamedValue *>(cloned);
 	});

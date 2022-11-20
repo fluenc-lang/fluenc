@@ -1,4 +1,6 @@
 #include <llvm/IR/Verifier.h>
+#include <llvm/Transforms/Scalar/SimplifyCFG.h>
+#include <llvm/Passes/PassBuilder.h>
 
 #include <range/v3/view.hpp>
 
@@ -383,6 +385,14 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 
 	ep.incorporate();
 
+	llvm::FunctionAnalysisManager analysisManager;
+
+	llvm::PassBuilder passBuilder;
+	passBuilder.registerFunctionAnalyses(analysisManager);
+
+	llvm::SimplifyCFGPass pass;
+	pass.run(*function, analysisManager);
+
 	verifyFunction(*function, &llvm::errs());
 
 	return result;
@@ -404,15 +414,13 @@ std::vector<DzResult> Emitter::visit(const ArrayContinuationNode *node, DefaultV
 	auto load = builder.createLoad(node->m_index, "index");
 	auto add = builder.createAdd(load, indexConstant);
 
-	builder.createStore(add, node->m_index);
-
 	auto value = new ExpandedValue(true
 		, node->m_iteratorType
 		, context.entryPoint
 		, node->m_node
 		, node
 		, std::vector<const ExpandedValue *>()
-		, Stack()
+		, add
 		);
 
 	return {{ context.entryPoint, value }};
@@ -463,7 +471,7 @@ std::vector<DzResult> Emitter::visit(const ArrayElementNode *node, DefaultVisito
 		valuesIfFalse.push(index);
 
 		auto continuation = new ArrayContinuationNode(index, node->m_node, IteratorType::instance());
-		auto expandable = new ExpandableValue(true, node->m_arrayType, context.entryPoint, continuation);
+		auto expandable = new ExpandableValue(true, node->m_arrayType, context.entryPoint, continuation, index);
 
 		auto tuple = new TupleValue({ expandable, value->subject() });
 
@@ -637,15 +645,7 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 
 		if (localsIterator != locals.end())
 		{
-			if (auto value = dynamic_cast<const ReferenceValue *>(localsIterator->second))
-			{
-				IRBuilderEx builder(context.entryPoint);
-
-				auto load = builder.createLoad(value, name);
-
-				context.values.push(load);
-			}
-			else if (localsIterator->second)
+			if (localsIterator->second)
 			{
 				auto forwarded = localsIterator->second->forward(node->id());
 
@@ -707,19 +707,6 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 			auto alloc = context.entryPoint.alloc(argumentType);
 
 			builder.createStore(typedValue, alloc);
-
-			return alloc;
-		}
-
-		if (auto referenceValue = dynamic_cast<const ReferenceValue *>(value))
-		{
-			auto argumentType = referenceValue->type();
-
-			auto load = builder.createLoad(referenceValue);
-
-			auto alloc = context.entryPoint.alloc(argumentType);
-
-			builder.createStore(load, alloc);
 
 			return alloc;
 		}
@@ -1282,25 +1269,7 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 	{
 		auto [_, first] = *range.begin();
 
-		if (auto templateValue = dynamic_cast<const ScalarValue *>(first))
-		{
-			auto type = templateValue->type();
-
-			auto alloc = entryPoint.alloc(type);
-
-			for (auto &[resultEntryPoint, value] : range)
-			{
-				auto transferEntryPoint = ValueHelper::transferValue(resultEntryPoint, value, alloc, *this);
-
-				linkBlocks(transferEntryPoint.block(), entryPoint.block());
-			}
-
-			IRBuilderEx junctionBuilder(entryPoint);
-
-			return junctionBuilder.createLoad(alloc, "junctionLoad");
-		}
-
-		auto alloc = first->clone(entryPoint);
+		auto alloc = first->clone(entryPoint, CloneStrategy::Storage);
 
 		for (auto &[resultEntryPoint, value] : range)
 		{
@@ -1680,8 +1649,6 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 
 std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisitorContext context) const
 {
-	auto numberOfArguments = context.values.size();
-
 	auto inputValues = context.values;
 	auto tailCallValues = context.entryPoint.values();
 	auto iteratorType = context.entryPoint.iteratorType();
@@ -1693,13 +1660,11 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 		return value->type();
 	});
 
-	auto tailCallCandidate = std::accumulate(index_iterator(0u), index_iterator(numberOfArguments), context.entryPoint, [&](auto target, size_t)
+	std::vector<const BaseValue *> cloned;
+
+	std::transform(inputValues.begin(), inputValues.end(), back_inserter(cloned), [&](auto value)
 	{
-		return ValueHelper::transferValue(target
-			, inputValues.pop()
-			, tailCallValues.pop()
-			, *this
-			);
+		return value->clone(context.entryPoint, CloneStrategy::Value);
 	});
 
 	auto next = ValueHelper::extractValues<ExpandedValue>(context.values);
@@ -1711,14 +1676,14 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 
 	auto value = new ExpandedValue(isArray
 		, ExpandedType::get(types)
-		, tailCallCandidate
+		, context.entryPoint
 		, node->m_node
 		, node
 		, next
-		, context.values
+		, cloned
 		);
 
-	return {{ tailCallCandidate, value }};
+	return {{ context.entryPoint, value }};
 }
 
 std::vector<DzResult> Emitter::visit(const BooleanUnaryNode *node, DefaultVisitorContext context) const
@@ -1826,7 +1791,14 @@ std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVi
 
 	if (score == 0)
 	{
-		auto zipped = ranges::views::zip(context.values, targetValues);
+		std::vector<const BaseValue *> cloned;
+
+		std::transform(context.values.begin(), context.values.end(), back_inserter(cloned), [&](auto value)
+		{
+			return value->clone(context.entryPoint, CloneStrategy::Value);
+		});
+
+		auto zipped = ranges::views::zip(cloned, targetValues);
 
 		auto resultEntryPoint = std::accumulate(zipped.begin(), zipped.end(), context.entryPoint, [&](auto accumulatedEntryPoint, auto result)
 		{
@@ -2070,7 +2042,7 @@ std::vector<DzResult> Emitter::visit(const ReturnNode *node, DefaultVisitorConte
 
 		auto type = ExpandedType::get(types);
 
-		auto expandable = new ExpandableValue(false, type, context.entryPoint, node->m_chained);
+		auto expandable = new ExpandableValue(false, type, context.entryPoint, node->m_chained, values);
 		auto tuple = new TupleValue({ expandable, value });
 
 		context.values.push(tuple);
@@ -2102,6 +2074,15 @@ std::vector<DzResult> Emitter::visit(const TerminatorNode *node, DefaultVisitorC
 
 std::vector<DzResult> Emitter::visit(const IteratableNode *node, DefaultVisitorContext context) const
 {
+	auto index = context.values.require<ScalarValue>(nullptr);
+	auto alloc = context.entryPoint.alloc(Int64Type::instance());
+
+	IRBuilderEx builder(context.entryPoint);
+
+	builder.createStore(index, alloc);
+
+	context.values.push(alloc);
+
 	return node->m_iteratable->accept(*this, context);
 }
 
@@ -2112,9 +2093,11 @@ std::vector<DzResult> Emitter::visit(const ArrayValue *node, DefaultVisitorConte
 
 	std::vector<DzResult> results;
 
+	auto index = context.values.require<ReferenceValue>(node->m_ast);
+
 	for (auto [_, elementValues] : node->m_values)
 	{
-		elementValues.push(node->m_index);
+		elementValues.push(index);
 
 		auto arrayBlock = createBlock(llvmContext);
 
@@ -2201,7 +2184,7 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 		.withBlock(ifTrue);
 
 	auto continuation = new ArrayContinuationNode(node->m_index, node->m_node, IteratorType::instance());
-	auto expandable = new ExpandableValue(false, IteratorType::instance(), iteratorEntryPoint, continuation);
+	auto expandable = new ExpandableValue(false, IteratorType::instance(), iteratorEntryPoint, continuation, node->m_index);
 
 	auto tuple = new TupleValue({ expandable, value });
 

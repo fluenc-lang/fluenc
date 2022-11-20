@@ -17,7 +17,7 @@ class TupleValue : public BaseValueWithMetadata<TupleValueMetadata>
 		size_t size() const;
 
 		const Type *type() const override;
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 
 		const Type *iteratorType() const;
 

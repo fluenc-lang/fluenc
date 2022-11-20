@@ -45,24 +45,24 @@ EntryPoint::EntryPoint(int depth
 {
 }
 
+void incorporate(llvm::BasicBlock *block, llvm::Function *function)
+{
+	if (block->getParent())
+	{
+		return;
+	}
+
+	block->insertInto(function);
+
+	for (auto successor : llvm::successors(block))
+	{
+		incorporate(successor, function);
+	}
+}
+
 void EntryPoint::incorporate()
 {
-	auto insert = [&](llvm::BasicBlock *block, auto recurse) -> void
-	{
-		if (block->getParent())
-		{
-			return;
-		}
-
-		block->insertInto(m_function);
-
-		for (auto successor : llvm::successors(block))
-		{
-			recurse(successor, recurse);
-		}
-	};
-
-	insert(m_alloc, insert);
+	::incorporate(m_alloc, m_function);
 }
 
 int EntryPoint::depth() const

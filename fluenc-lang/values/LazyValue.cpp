@@ -120,9 +120,9 @@ const Type *LazyValue::type() const
 	return types[0];
 }
 
-const BaseValue *LazyValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *LazyValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
-	auto cloned = m_generator->clone(entryPoint);
+	auto cloned = m_generator->clone(entryPoint, strategy);
 
 	return new LazyValue(cloned, entryPoint);
 }
@@ -205,11 +205,14 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const BaseValue *
 
 			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, { sourceContinuationEntryPoint, Stack() }))
 			{
-				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, chainValues);
+				auto sourceValue = chainValues.require<ExpandedValue>(nullptr);
+
+				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, Stack(sourceValue));
+				auto resultEntryPoint = ValueHelper::transferValue(chainEntryPoint, sourceValue, sourceContinuation, emitter);
 
 				auto loopTargetEntry = loopTarget->entry();
 
-				linkBlocks(chainEntryPoint.block(), loopTargetEntry->block());
+				linkBlocks(resultEntryPoint.block(), loopTargetEntry->block());
 			}
 		}
 		else
@@ -294,11 +297,14 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 			for (auto &[chainEntryPoint, chainValues] : sourceChain->accept(emitter, { sourceContinuationEntryPoint, Stack() }))
 			{
-				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, chainValues);
+				auto sourceValue = chainValues.require<ExpandedValue>(nullptr);
+
+				auto loopTarget = FunctionHelper::findTailCallTarget(&chainEntryPoint, Stack(sourceValue));
+				auto resultEntryPoint = ValueHelper::transferValue(chainEntryPoint, sourceValue, sourceContinuation, emitter);
 
 				auto loopTargetEntry = loopTarget->entry();
 
-				linkBlocks(chainEntryPoint.block(), loopTargetEntry->block());
+				linkBlocks(resultEntryPoint.block(), loopTargetEntry->block());
 			}
 		}
 		else

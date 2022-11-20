@@ -7,6 +7,7 @@
 #include "values/ArrayValue.h"
 #include "values/ReferenceValue.h"
 #include "values/IndexedValue.h"
+#include "values/ArrayValueProxy.h"
 
 #include "nodes/ArrayElementNode.h"
 
@@ -30,7 +31,9 @@ const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint, G
 
 	auto index = iteratorStorage->getOrCreate(std::to_string(m_id), entryPoint);
 
-	return new ArrayValue(m_ast, index, type(), m_values, m_size);
+	auto subject = new ArrayValue(m_ast, index, type(), m_values, m_size);
+
+	return new ArrayValueProxy(index, subject);
 }
 
 const Type *ArrayValueGenerator::type() const
@@ -76,7 +79,7 @@ const BaseValue *ArrayValueGenerator::elementAt(size_t index) const
 	return indexed->subject();
 }
 
-const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoint) const
+const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	if (m_values.size() == 1)
 	{
@@ -86,7 +89,7 @@ const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoi
 
 		std::transform(inputValues.begin(), inputValues.end(), std::back_inserter(clonedValues), [&](auto value)
 		{
-			return value->clone(entryPoint);
+			return value->clone(entryPoint, strategy);
 		});
 
 		return new ArrayValueGenerator({{ inputEntryPoint, clonedValues }}, m_ast, m_id, m_size);

@@ -16,10 +16,10 @@ const Type *IndexedValue::type() const
 	return m_subject->type();
 }
 
-const BaseValue *IndexedValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *IndexedValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	return new IndexedValue(m_index
-		, m_subject->clone(entryPoint)
+		, m_subject->clone(entryPoint, strategy)
 		);
 }
 

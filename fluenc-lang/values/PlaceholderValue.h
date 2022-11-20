@@ -12,7 +12,7 @@ class PlaceholderValue : public BaseValueWithMetadata<PlaceholderValueMetadata>
 
 		const Type *type() const override;
 
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 };
 
 #endif // PLACEHOLDERVALUE_H

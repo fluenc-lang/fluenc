@@ -9,11 +9,13 @@ ExpandableValue::ExpandableValue(bool isArray
 	, const Type *iteratorType
 	, const EntryPoint &provider
 	, const Node *chain
+	, const Stack &values
 	)
 	: m_isArray(isArray)
 	, m_iteratorType(iteratorType)
 	, m_provider(new EntryPoint(provider))
 	, m_chain(chain)
+	, m_values(values)
 {
 }
 
@@ -27,9 +29,10 @@ const Type *ExpandableValue::type() const
 	return m_iteratorType;
 }
 
-const BaseValue *ExpandableValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *ExpandableValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
+	UNUSED(strategy);
 
 	return this;
 }
@@ -47,4 +50,9 @@ const Node *ExpandableValue::chain() const
 const ExpandedType *ExpandableValue::expandedType() const
 {
 	return dynamic_cast<const ExpandedType *>(m_iteratorType);
+}
+
+const Stack ExpandableValue::values() const
+{
+	return m_values;
 }

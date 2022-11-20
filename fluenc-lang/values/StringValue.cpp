@@ -30,9 +30,9 @@ const Type *StringValue::type() const
 	return StringType::get(m_length);
 }
 
-const BaseValue *StringValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *StringValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
-	auto subject = (ReferenceValue *)m_address->clone(entryPoint);
+	auto subject = (ReferenceValue *)m_address->clone(entryPoint, strategy);
 
 	return new StringValue(m_node, subject, m_id, m_length);
 }

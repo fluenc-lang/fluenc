@@ -19,7 +19,7 @@ class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 
 		const Type *type() const override;
 
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 		const BaseValue *forward(size_t id) const override;
 
 	private:

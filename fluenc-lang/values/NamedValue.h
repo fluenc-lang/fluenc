@@ -20,7 +20,7 @@ class NamedValue : public BaseValueWithMetadata<NamedValueMetadata>
 		const BaseValue *value() const;
 
 		const Type *type() const override;
-		const BaseValue *clone(const EntryPoint &entryPoint) const override;
+		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 
 	private:
 		std::string m_name;

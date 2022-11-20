@@ -25,7 +25,7 @@ const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPo
 	return new StringIteratable(index, m_node, m_address, m_length);
 }
 
-const ILazyValueGenerator *StringIteratableGenerator::clone(const EntryPoint &entryPoint) const
+const ILazyValueGenerator *StringIteratableGenerator::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
 

@@ -24,13 +24,13 @@ const Type *TupleValue::type() const
 	return TupleType::get(types);
 }
 
-const BaseValue *TupleValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *TupleValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	std::vector<const BaseValue *> values;
 
 	std::transform(begin(m_values), end(m_values), std::back_inserter(values), [&](auto value)
 	{
-		return value->clone(entryPoint);
+		return value->clone(entryPoint, strategy);
 	});
 
 	return new TupleValue(values);

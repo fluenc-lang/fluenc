@@ -1,5 +1,7 @@
 #include "values/ReferenceValue.h"
+
 #include "EntryPoint.h"
+#include "IRBuilderEx.h"
 
 ReferenceValue::ReferenceValue(const Type *type, llvm::Value *value)
 	: m_type(type)
@@ -12,9 +14,20 @@ const Type *ReferenceValue::type() const
 	return m_type;
 }
 
-const BaseValue *ReferenceValue::clone(const EntryPoint &entryPoint) const
+const BaseValue *ReferenceValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
-	return entryPoint.alloc(m_type);
+	auto alloc = entryPoint.alloc(m_type);
+
+	if (strategy == CloneStrategy::Value)
+	{
+		IRBuilderEx builder(entryPoint);
+
+		auto load = builder.createLoad(this);
+
+		builder.createStore(load, alloc);
+	}
+
+	return alloc;
 }
 
 ReferenceValue::operator llvm::Value *() const
