@@ -1,7 +1,5 @@
 #include <llvm/IR/IRBuilder.h>
 
-#include <immer/set.hpp>
-
 #include "EntryPoint.h"
 #include "Type.h"
 
@@ -47,89 +45,24 @@ EntryPoint::EntryPoint(int depth
 {
 }
 
-using connector_t = std::function<void(llvm::BasicBlock *)>;
-
-void incorporate(llvm::Function *function, llvm::BasicBlock *block, immer::set<llvm::BasicBlock *> visited, connector_t reroute)
+void incorporate(llvm::BasicBlock *block, llvm::Function *function)
 {
-	auto keep = [&](llvm::Instruction *instruction)
-	{
-		block->insertInto(function);
-
-		for (auto i = 0u; i < instruction->getNumSuccessors(); i++)
-		{
-			auto successor = instruction->getSuccessor(i);
-
-			if (visited.count(block))
-			{
-				continue;
-			}
-
-			incorporate(function, successor, visited.insert(block), [=](llvm::BasicBlock *block)
-			{
-				instruction->setSuccessor(i, block);
-			});
-		}
-	};
-
-	auto discard = [&](llvm::Instruction *instruction)
-	{
-		for (auto i = 0u; i < instruction->getNumSuccessors(); i++)
-		{
-			auto successor = instruction->getSuccessor(i);
-
-			reroute(successor);
-
-			if (visited.count(block))
-			{
-				continue;
-			}
-
-			incorporate(function, successor, visited.insert(block), reroute);
-		}
-	};
-
 	if (block->getParent())
 	{
 		return;
 	}
 
-	auto terminator = block->getTerminator();
+	block->insertInto(function);
 
-	if (!terminator)
+	for (auto successor : llvm::successors(block))
 	{
-		return;
+		incorporate(successor, function);
 	}
-
-	auto &instructions = block->getInstList();
-
-	if (instructions.size() > 1)
-	{
-		return keep(terminator);
-	}
-
-	auto branch = llvm::dyn_cast_or_null<llvm::BranchInst>(terminator);
-
-	if (!branch)
-	{
-		return keep(terminator);
-	}
-
-	if (branch->isConditional())
-	{
-		return keep(terminator);
-	}
-
-	return discard(terminator);
 }
 
 void EntryPoint::incorporate()
 {
-	immer::set<llvm::BasicBlock *> visited;
-
-	::incorporate(m_function, m_alloc, visited, [=](llvm::BasicBlock *)
-	{
-		return;
-	});
+	::incorporate(m_alloc, m_function);
 }
 
 int EntryPoint::depth() const

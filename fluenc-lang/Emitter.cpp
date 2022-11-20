@@ -1,4 +1,6 @@
 #include <llvm/IR/Verifier.h>
+#include <llvm/Transforms/Scalar/SimplifyCFG.h>
+#include <llvm/Passes/PassBuilder.h>
 
 #include <range/v3/view.hpp>
 
@@ -383,6 +385,14 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 
 	ep.incorporate();
 
+	llvm::FunctionAnalysisManager analysisManager;
+
+	llvm::PassBuilder passBuilder;
+	passBuilder.registerFunctionAnalyses(analysisManager);
+
+	llvm::SimplifyCFGPass pass;
+	pass.run(*function, analysisManager);
+
 	verifyFunction(*function, &llvm::errs());
 
 	return result;
@@ -635,15 +645,7 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 
 		if (localsIterator != locals.end())
 		{
-			if (auto value = dynamic_cast<const ReferenceValue *>(localsIterator->second))
-			{
-				IRBuilderEx builder(context.entryPoint);
-
-				auto load = builder.createLoad(value, name);
-
-				context.values.push(load);
-			}
-			else if (localsIterator->second)
+			if (localsIterator->second)
 			{
 				auto forwarded = localsIterator->second->forward(node->id());
 
@@ -705,19 +707,6 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 			auto alloc = context.entryPoint.alloc(argumentType);
 
 			builder.createStore(typedValue, alloc);
-
-			return alloc;
-		}
-
-		if (auto referenceValue = dynamic_cast<const ReferenceValue *>(value))
-		{
-			auto argumentType = referenceValue->type();
-
-			auto load = builder.createLoad(referenceValue);
-
-			auto alloc = context.entryPoint.alloc(argumentType);
-
-			builder.createStore(load, alloc);
 
 			return alloc;
 		}
