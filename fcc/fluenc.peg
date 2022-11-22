@@ -58,11 +58,11 @@ Local               <- 'let' Id '=' Expression
 
 # Literals
 Int32Literal        <- Integer
-Int64Literal        <- Integer 'L'
+Int64Literal        <- Integer 'i64'
 Float32Literal      <- < Integer '.' Integer >
 BooleanLiteral      <- < 'true' | 'false' >
 StringLiteral       <- String
-Uint32Literal       <- Integer 'u'
+Uint32Literal       <- Integer 'u32'
 CharLiteral         <- < '\'' < [^\']+ > '\'' >
 ByteLiteral         <- Integer 'u8'
 NothingLiteral      <- 'nothing'

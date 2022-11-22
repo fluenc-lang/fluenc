@@ -26,22 +26,22 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 {
 	for (auto &name : m_names)
 	{
-		if (name == "int")
+		if (name == "i32")
 		{
 			return Int32Type::instance();
 		}
 
-		if (name == "long")
+		if (name == "i64")
 		{
 			return Int64Type::instance();
 		}
 
-		if (name == "uint")
+		if (name == "u32")
 		{
 			return Uint32Type::instance();
 		}
 
-		if (name == "byte")
+		if (name == "u8")
 		{
 			return ByteType::instance();
 		}
@@ -96,14 +96,14 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 
 DzTypeName *DzTypeName::int32()
 {
-	static DzTypeName typeName(nullptr, { "int" });
+	static DzTypeName typeName(nullptr, { "i32" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::int64()
 {
-	static DzTypeName typeName(nullptr, { "long" });
+	static DzTypeName typeName(nullptr, { "i64" });
 
 	return &typeName;
 }
@@ -117,14 +117,14 @@ DzTypeName *DzTypeName::f32()
 
 DzTypeName *DzTypeName::uint32()
 {
-	static DzTypeName typeName(nullptr, { "uint" });
+	static DzTypeName typeName(nullptr, { "u32" });
 
 	return &typeName;
 }
 
 DzTypeName *DzTypeName::byte()
 {
-	static DzTypeName typeName(nullptr, { "byte" });
+	static DzTypeName typeName(nullptr, { "u8" });
 
 	return &typeName;
 }

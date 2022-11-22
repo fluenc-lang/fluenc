@@ -1,11 +1,8 @@
 #include "types/Int32Type.h"
 
-#include "IRBuilderEx.h"
-#include "Utility.h"
-
 std::string Int32Type::name() const
 {
-	return "int";
+	return "i32";
 }
 
 llvm::Type *Int32Type::storageType(llvm::LLVMContext &context) const

@@ -2,7 +2,7 @@
 
 std::string ByteType::name() const
 {
-	return "byte";
+	return "u8";
 }
 
 llvm::Type *ByteType::storageType(llvm::LLVMContext &context) const
