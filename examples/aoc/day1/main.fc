@@ -1,17 +1,17 @@
 global O_RDONLY: 0
 
-import int printNumber(int number);
-import int open(string apathname, int flags);
-import int getc(long stream);
+import i32 printNumber(i32 number);
+import i32 open(string apathname, i32 flags);
+import i32 getc(i64 stream);
 
-import long fdopen(int fildes, string mode);
+import i64 fdopen(i32 fildes, string mode);
 
-function readChar(long file)
+function readChar(i64 file)
 {
     return getc(file) -> readChar(file);
 }
 
-function nextNumber(int accumulation, (int char, ...chars))
+function nextNumber(i32 accumulation, (i32 char, ...chars))
 {
     if (char == '\n') // New line
     {
@@ -26,7 +26,7 @@ function nextNumber(int accumulation, (int char, ...chars))
     return tail nextNumber((accumulation * 10) + (char - '0'), ...chars);
 }
 
-function part1(int count, int previous, int number)
+function part1(i32 count, i32 previous, i32 number)
 {
     if (number > previous)
     {
@@ -36,7 +36,7 @@ function part1(int count, int previous, int number)
     return count;
 }
 
-function part1(int count, int previous, (int number, ...numbers))
+function part1(i32 count, i32 previous, (i32 number, ...numbers))
 {
     if (previous < 0)
     {
@@ -51,12 +51,12 @@ function part1(int count, int previous, (int number, ...numbers))
     return tail part1(count + 1, number, ...numbers);
 }
 
-function part2(int i, int count, int x, int y, int z, int number)
+function part2(i32 i, i32 count, i32 x, i32 y, i32 z, i32 number)
 {
     return count;
 }
 
-function part2(int i, int count, int x, int y, int z, (int number, ...numbers))
+function part2(i32 i, i32 count, i32 x, i32 y, i32 z, (i32 number, ...numbers))
 {
     if (i < 3)
     {
@@ -71,7 +71,7 @@ function part2(int i, int count, int x, int y, int z, (int number, ...numbers))
     return tail part2(i + 1, count, y, z, number, ...numbers);
 }
 
-function bind(int result1, int result2)
+function bind(i32 result1, i32 result2)
 {
     return [result1, result2];
 }
@@ -92,19 +92,19 @@ function run()
     );
 }
 
-function printNumbers(int number)
+function printNumbers(i32 number)
 {
     return printNumber(number);
 }
 
-function printNumbers((int number, ...numbers))
+function printNumbers((i32 number, ...numbers))
 {
     printNumber(number);
 
     return tail printNumbers(...numbers);
 }
 
-export int main()
+export i32 main()
 {
     return printNumbers(run());
 }

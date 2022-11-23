@@ -1,19 +1,19 @@
 global O_RDONLY: 0;
 
-import int printNumber(int number);
-import int open(string apathname, int flags);
-import int getc(long stream);
+import i32 printNumber(i32 number);
+import i32 open(string apathname, i32 flags);
+import i32 getc(i64 stream);
 
-import long fdopen(int fildes, string mode);
+import i64 fdopen(i32 fildes, string mode);
 
-function readChar(long file)
+function readChar(i64 file)
 {
     return getc(file) -> readChar(file);
 }
 
 global Base: 2;
 
-function nextLine(int number, (int char, ...chars))
+function nextLine(i32 number, (i32 char, ...chars))
 {
     if (char == '\n') // New line
     {
@@ -28,7 +28,7 @@ function nextLine(int number, (int char, ...chars))
     return tail nextLine((number * Base) + (char - '0'), ...chars);
 }
 
-function invertInt(int value)
+function invertInt(i32 value)
 {
     if (value == 1)
     {
@@ -73,7 +73,7 @@ struct Row
     c12: 0
 };
 
-function add(int count, int value)
+function add(i32 count, i32 value)
 {
     if ((value % Base) == 1)
     {
@@ -83,7 +83,7 @@ function add(int count, int value)
     return count;
 }
 
-function count(int position, int value, Row row)
+function count(i32 position, i32 value, Row row)
 {
     if (position == 11)
     {
@@ -184,7 +184,7 @@ function count(int position, int value, Row row)
     return row;
 }
 
-function isMajority(int count, int numberOfRows)
+function isMajority(i32 count, i32 numberOfRows)
 {
     if (count > (numberOfRows / 2))
     {
@@ -194,7 +194,7 @@ function isMajority(int count, int numberOfRows)
     return 0;
 }
 
-function summarize(Row row, int i)
+function summarize(Row row, i32 i)
 {
     return Row
     {
@@ -213,7 +213,7 @@ function summarize(Row row, int i)
     };
 }
 
-function yield(int i, Row row)
+function yield(i32 i, Row row)
 {
     if (i == 11)
     {
@@ -273,12 +273,12 @@ function yield(int i, Row row)
     return row.c1;
 }
 
-function toDecimal(int accumulation, int value)
+function toDecimal(i32 accumulation, i32 value)
 {
     return (accumulation * 2) + value;
 }
 
-function toDecimal(int accumulation, (int value, ...values))
+function toDecimal(i32 accumulation, (i32 value, ...values))
 {
     return tail toDecimal((accumulation * 2) + value, ...values);
 }
@@ -288,12 +288,12 @@ function process(Row gamma, Row epsilon)
     return toDecimal(0, yield(11, gamma)) * toDecimal(0, yield(11, epsilon));
 }
 
-function part1(int i, Row row, int number)
+function part1(i32 i, Row row, i32 number)
 {
     return process(summarize(row, i), invert(summarize(row, i)));
 }
 
-function part1(int i, Row row, (int number, ...numbers))
+function part1(i32 i, Row row, (i32 number, ...numbers))
 {
     return tail part1(i + 1, count(0, number, row), ...numbers);
 }
@@ -303,7 +303,7 @@ function part2()
     return 2;
 }
 
-function bind(int result1, int result2)
+function bind(i32 result1, i32 result2)
 {
     return [result1, result2];
 }
@@ -320,19 +320,19 @@ function run()
     );
 }
 
-function printNumbers(int number)
+function printNumbers(i32 number)
 {
     return printNumber(number);
 }
 
-function printNumbers((int number, ...numbers))
+function printNumbers((i32 number, ...numbers))
 {
     printNumber(number);
 
-    return printNumbers(...numbers);
+    return tail printNumbers(...numbers);
 }
 
-export int main()
+export i32 main()
 {
     return printNumbers(run());
 }

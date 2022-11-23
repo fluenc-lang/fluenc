@@ -5,7 +5,7 @@ use "fire.fc"
 use "moon.fc"
 use "water.fc"
 
-function drawPlayer(long renderer, Player player)
+function drawPlayer(i64 renderer, Player player)
 {
 	SDL::SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 	SDL::SDL_RenderFillRect(renderer, applyCamera(rect(player)));
@@ -13,26 +13,26 @@ function drawPlayer(long renderer, Player player)
 	return nothing;
 }
 
-function drawLayer(long renderer, long map, (tmx::tmx_layer layer, ...layers))
+function drawLayer(i64 renderer, i64 map, (tmx::tmx_layer layer, ...layers))
 {
 	drawLayer(renderer, map, layer);
 
 	return tail drawLayer(renderer, map, ...layers);
 }
 
-function drawTile(long renderer, (any tile, ...tiles))
+function drawTile(i64 renderer, (any tile, ...tiles))
 {
 	drawTile(renderer, tile);
 
 	return tail drawTile(renderer, ...tiles);
 }
 
-function drawTile(long renderer, without tile)
+function drawTile(i64 renderer, without tile)
 {
 	return nothing;
 }
 
-function drawTile(long renderer, tmx::Tile tile)
+function drawTile(i64 renderer, tmx::Tile tile)
 {
 	let target = SDL::Rect
 	{
@@ -55,7 +55,7 @@ function drawTile(long renderer, tmx::Tile tile)
 	return nothing;
 }
 
-function drawLayer(long renderer, long map, tmx::tmx_layer layer)
+function drawLayer(i64 renderer, i64 map, tmx::tmx_layer layer)
 {
 	if (layer.type == tmx::L_LAYER)
 	{
@@ -67,7 +67,7 @@ function drawLayer(long renderer, long map, tmx::tmx_layer layer)
 	return nothing;
 }
 
-function drawLayers(long renderer, long map)
+function drawLayers(i64 renderer, i64 map)
 {
 	let layers = tmx::getLayers(map);
 
@@ -76,14 +76,14 @@ function drawLayers(long renderer, long map)
 	return nothing;
 }
 
-function drawRectangles(long renderer, (SDL::Rect rect, ...rects))
+function drawRectangles(i64 renderer, (SDL::Rect rect, ...rects))
 {
 	SDL::SDL_RenderFillRect(renderer, rect);
 
 	return tail drawRectangles(renderer, ...rects);
 }
 
-function drawRectangles(long renderer, SDL::Rect rect)
+function drawRectangles(i64 renderer, SDL::Rect rect)
 {
 	SDL::SDL_RenderFillRect(renderer, rect);
 
@@ -103,12 +103,12 @@ function applyCamera(SDL::Rect rect)
 	};
 }
 
-function drawStage(long renderer, without stage, State state)
+function drawStage(i64 renderer, without stage, State state)
 {
 	return nothing;
 }
 
-function drawStage(long renderer, Stages::Stage stage, State state)
+function drawStage(i64 renderer, Stages::Stage stage, State state)
 {
 	srand(stage.seed);
 
@@ -171,7 +171,7 @@ struct Color
 	r, g, b
 }
 
-function rgb(int r, int g, int b)
+function rgb(i32 r, i32 g, i32 b)
 {
 	return Color
 	{

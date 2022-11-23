@@ -19,7 +19,7 @@ using namespace boost::unit_test;
 BOOST_AUTO_TEST_CASE (scenario1)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			return 2 + 1;
 		}
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE (scenario2)
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo();
 		}
@@ -48,12 +48,12 @@ BOOST_AUTO_TEST_CASE (scenario2)
 BOOST_AUTO_TEST_CASE (scenario3)
 {
 	auto result = exec(R"(
-		function addFive(int v)
+		function addFive(i32 v)
 		{
 			return v + 5;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return addFive(1) + addFive(2);
 		}
@@ -65,17 +65,17 @@ BOOST_AUTO_TEST_CASE (scenario3)
 BOOST_AUTO_TEST_CASE (scenario4)
 {
 	auto result = exec(R"(
-		function addFive(int v)
+		function addFive(i32 v)
 		{
 			return v + 5;
 		}
 
-		function calc(int v)
+		function calc(i32 v)
 		{
 			return addFive(v) + addFive(2);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return calc(2 + 1);
 		}
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE (scenario4)
 BOOST_AUTO_TEST_CASE (scenario5)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			return 1;
 		}
@@ -104,12 +104,12 @@ BOOST_AUTO_TEST_CASE (scenario6)
 			return 2;
 		}
 
-		function consumer(int value)
+		function consumer(i32 value)
 		{
 			return value + 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return consumer(producer());
 		}
@@ -121,12 +121,12 @@ BOOST_AUTO_TEST_CASE (scenario6)
 BOOST_AUTO_TEST_CASE (scenario7)
 {
 	auto result = exec(R"(
-		function fn(int v)
+		function fn(i32 v)
 		{
 			return v;
 		}
 
-		function consumer(int v)
+		function consumer(i32 v)
 		{
 			return fn(v);
 		}
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE (scenario7)
 			return 2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return consumer(producer());
 		}
@@ -148,12 +148,12 @@ BOOST_AUTO_TEST_CASE (scenario7)
 BOOST_AUTO_TEST_CASE (scenario8)
 {
 	auto result = exec(R"(
-		function bar(int v)
+		function bar(i32 v)
 		{
 			return v;
 		}
 
-		function foo(int v)
+		function foo(i32 v)
 		{
 			return bar(v + 2) + bar(v + 3);
 		}
@@ -163,12 +163,12 @@ BOOST_AUTO_TEST_CASE (scenario8)
 			return 2;
 		}
 
-		function f2(int v)
+		function f2(i32 v)
 		{
 			return v * 4;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return f2(foo(f1() + 2));
 		}
@@ -180,22 +180,22 @@ BOOST_AUTO_TEST_CASE (scenario8)
 BOOST_AUTO_TEST_CASE (scenario9)
 {
 	auto result = exec(R"(
-		function func(long v)
+		function func(i64 v)
 		{
 			return 3;
 		}
 
-		function func(int v, int f)
+		function func(i32 v, i32 f)
 		{
 			return 2;
 		}
 
-		function func(int v)
+		function func(i32 v)
 		{
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return func(1);
 		}
@@ -207,22 +207,22 @@ BOOST_AUTO_TEST_CASE (scenario9)
 BOOST_AUTO_TEST_CASE (scenario10)
 {
 	auto result = exec(R"(
-		function func(long v)
+		function func(i64 v)
 		{
 			return 3;
 		}
 
-		function func(int v, int f)
+		function func(i32 v, i32 f)
 		{
 			return 2;
 		}
 
-		function func(int v)
+		function func(i32 v)
 		{
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return func(1) + 1;
 		}
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE (scenario10)
 BOOST_AUTO_TEST_CASE (scenario11)
 {
 	auto result = exec(R"(
-		function sign(int v)
+		function sign(i32 v)
 		{
 			if (v < 0)
 			{
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE (scenario11)
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sign(3);
 		}
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE (scenario11)
 BOOST_AUTO_TEST_CASE (scenario12)
 {
 	auto result = exec(R"(
-		function sign(int v)
+		function sign(i32 v)
 		{
 			if (v < 0)
 			{
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE (scenario12)
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sign(-3) * 5;
 		}
@@ -278,12 +278,12 @@ BOOST_AUTO_TEST_CASE (scenario12)
 BOOST_AUTO_TEST_CASE (scenario13)
 {
 	auto result = exec(R"(
-		function timesFive(int v)
+		function timesFive(i32 v)
 		{
 			return v * 5;
 		}
 
-		function sign(int v)
+		function sign(i32 v)
 		{
 			if (v < 0)
 			{
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE (scenario13)
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return timesFive(sign(-3));
 		}
@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE (scenario13)
 BOOST_AUTO_TEST_CASE (scenario14)
 {
 	auto result = exec(R"(
-		function max(int x, int y)
+		function max(i32 x, i32 y)
 		{
 			if (x > y)
 			{
@@ -315,7 +315,7 @@ BOOST_AUTO_TEST_CASE (scenario14)
 			return y;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return max(3, 2);
 		}
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE (scenario14)
 BOOST_AUTO_TEST_CASE (scenario15)
 {
 	auto result = exec(R"(
-		function loop(int i, int count)
+		function loop(i32 i, i32 count)
 		{
 			if (i < count)
 			{
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE (scenario15)
 			return i;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return loop(0, 5) + 2;
 		}
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE (scenario15)
 BOOST_AUTO_TEST_CASE (fibonacci)
 {
 	auto result = exec(R"(
-		function fibonacci(int current, int previous, int i, int count)
+		function fibonacci(i32 current, i32 previous, i32 i, i32 count)
 		{
 			if (i < count)
 			{
@@ -359,7 +359,7 @@ BOOST_AUTO_TEST_CASE (fibonacci)
 			return current;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return fibonacci(1, 0, 0, 19);
 		}
@@ -371,27 +371,27 @@ BOOST_AUTO_TEST_CASE (fibonacci)
 BOOST_AUTO_TEST_CASE (scenario16)
 {
 	auto result = exec(R"(
-		function consumer(int v)
+		function consumer(i32 v)
 		{
 			return 1;
 		}
 
-		function consumer(long v)
+		function consumer(i64 v)
 		{
 			return 2;
 		}
 
-		function producer(int v)
+		function producer(i32 v)
 		{
 			if (v > 0)
 			{
 				return 1;
 			}
 
-			return 2L;
+			return 2i64;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return consumer(producer(1)) + consumer(producer(-1));
 		}
@@ -403,7 +403,7 @@ BOOST_AUTO_TEST_CASE (scenario16)
 BOOST_AUTO_TEST_CASE (scenario17)
 {
 	auto result = exec(R"(
-		function isPositive(int v)
+		function isPositive(i32 v)
 		{
 			return v > 0;
 		}
@@ -418,7 +418,7 @@ BOOST_AUTO_TEST_CASE (scenario17)
 			return -2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(isPositive(7));
 		}
@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE (scenario18)
 			return -2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return numberPlz(true) + numberPlz(false);
 		}
@@ -452,9 +452,9 @@ BOOST_AUTO_TEST_CASE (scenario18)
 BOOST_AUTO_TEST_CASE (scenario19)
 {
 	auto result = exec(R"(
-		import int puts(string s);
+		import i32 puts(string s);
 
-		export int main()
+		export i32 main()
 		{
 			return puts(@"foo");
 		}
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE (scenario20)
 			num2
 		};
 
-		function createStruct(int num1, int num2)
+		function createStruct(i32 num1, i32 num2)
 		{
 			return DeStruct
 			{
@@ -486,7 +486,7 @@ BOOST_AUTO_TEST_CASE (scenario20)
 			return s.num1 + s.num2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return func(createStruct(4, 6));
 		}
@@ -507,16 +507,16 @@ BOOST_AUTO_TEST_CASE (scenario21)
 		{
 			return DeStruct
 			{
-				num: 2L
+				num: 2i64
 			};
 		}
 
-		function consumer(int v)
+		function consumer(i32 v)
 		{
 			return 1;
 		}
 
-		function consumer(long v)
+		function consumer(i64 v)
 		{
 			return 2;
 		}
@@ -526,7 +526,7 @@ BOOST_AUTO_TEST_CASE (scenario21)
 			return consumer(s.num);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return func(createStruct());
 		}
@@ -541,7 +541,7 @@ BOOST_AUTO_TEST_CASE (scenario22)
 		struct DeStruct
 		{
 			num1: 1,
-			num2: 2L
+			num2: 2i64
 		};
 
 		function createStruct()
@@ -549,12 +549,12 @@ BOOST_AUTO_TEST_CASE (scenario22)
 			return DeStruct {};
 		}
 
-		function consumer(int v)
+		function consumer(i32 v)
 		{
 			return 10;
 		}
 
-		function consumer(long v)
+		function consumer(i64 v)
 		{
 			return 20;
 		}
@@ -564,7 +564,7 @@ BOOST_AUTO_TEST_CASE (scenario22)
 			return consumer(s.num1) * consumer(s.num2);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return func(createStruct());
 		}
@@ -581,14 +581,14 @@ BOOST_AUTO_TEST_CASE (scenario23)
 			return 2;
 		}
 
-		function mainLoop(int init, long renderer)
+		function mainLoop(i32 init, long renderer)
 		{
 			return mainLoop(foo(renderer)
 				, renderer
 				);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return mainLoop(0, 1L);
 		}
@@ -605,7 +605,7 @@ BOOST_AUTO_TEST_CASE (scenario24)
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			if (foo() != 0)
 			{
@@ -632,7 +632,7 @@ BOOST_AUTO_TEST_CASE (scenario25)
 			return 1;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			if (foo() == 0)
 			{
@@ -651,7 +651,7 @@ BOOST_AUTO_TEST_CASE (scenario25)
 BOOST_AUTO_TEST_CASE (scenario26)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			return 0xFF;
 		}
@@ -664,19 +664,19 @@ BOOST_AUTO_TEST_CASE (scenario27)
 {
 	auto result = exec(R"(
 		global Constant1: 12;
-		global Constant2: 22u;
+		global Constant2: 22u32;
 
-		function f(int v)
+		function f(i32 v)
 		{
 			return 3;
 		}
 
-		function f(uint v)
+		function f(u32 v)
 		{
 			return 2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return f(Constant1) * f(Constant2);
 		}
@@ -688,7 +688,7 @@ BOOST_AUTO_TEST_CASE (scenario27)
 BOOST_AUTO_TEST_CASE (scenario28)
 {
 	auto result = exec(R"(
-		function conditional1(int v)
+		function conditional1(i32 v)
 		{
 			if (v > 0)
 			{
@@ -698,7 +698,7 @@ BOOST_AUTO_TEST_CASE (scenario28)
 			return 0;
 		}
 
-		function conditional2(int v)
+		function conditional2(i32 v)
 		{
 			if (conditional1(v * 2) > 0)
 			{
@@ -708,7 +708,7 @@ BOOST_AUTO_TEST_CASE (scenario28)
 			return 0;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return conditional2(10);
 		}
@@ -740,7 +740,7 @@ BOOST_AUTO_TEST_CASE (scenario29)
 			return s.x - s.y;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return doStuff(createStruct());
 		}
@@ -772,7 +772,7 @@ BOOST_AUTO_TEST_CASE (scenario30)
 			return s.x - s.y;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return doStuff(createStruct());
 		}
@@ -785,7 +785,7 @@ BOOST_AUTO_TEST_CASE (scenario31)
 {
 	auto result = exec(R"(
 		// This is a comment
-		export int main()
+		export i32 main()
 		{
 			// This is also a comment
 			return 1; // And this
@@ -826,7 +826,7 @@ BOOST_AUTO_TEST_CASE (scenario32)
 			return s.x + s.y;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return add(mutate(foo()));
 		}
@@ -861,12 +861,12 @@ BOOST_AUTO_TEST_CASE (scenario33)
 			};
 		}
 
-		function bar(int c)
+		function bar(i32 c)
 		{
 			return -1;
 		}
 
-		function bar((int c, ...s))
+		function bar((i32 c, ...s))
 		{
 			return 30;
 		}
@@ -876,7 +876,7 @@ BOOST_AUTO_TEST_CASE (scenario33)
 			return s.x + bar(s.y);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return add(mutate(foo()));
 		}
@@ -898,7 +898,7 @@ BOOST_AUTO_TEST_CASE (scenario34)
 			return 20;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return bar(foo());
 		}
@@ -934,7 +934,7 @@ BOOST_AUTO_TEST_CASE (scenario35)
 			return f.x - f.y;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return add(foo());
 		}
@@ -975,7 +975,7 @@ BOOST_AUTO_TEST_CASE (scenario36)
 			return b.x - getY(b);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return add(foo());
 		}
@@ -987,7 +987,7 @@ BOOST_AUTO_TEST_CASE (scenario36)
 BOOST_AUTO_TEST_CASE (scenario37)
 {
 	auto result = exec(R"(
-		function numbersBelow(int i, int number)
+		function numbersBelow(i32 i, i32 number)
 		{
 			if (i == number)
 			{
@@ -997,17 +997,17 @@ BOOST_AUTO_TEST_CASE (scenario37)
 			return i -> numbersBelow(i + 1, number);
 		}
 
-		function sum(int value, int number)
+		function sum(i32 value, i32 number)
 		{
 			return value + number;
 		}
 
-		function sum(int value, (int number, ...numbers))
+		function sum(i32 value, (i32 number, ...numbers))
 		{
 			return tail sum(value + number, ...numbers);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, numbersBelow(0, 5));
 		}
@@ -1019,17 +1019,17 @@ BOOST_AUTO_TEST_CASE (scenario37)
 BOOST_AUTO_TEST_CASE (scenario38)
 {
 	auto result = exec(R"(
-		function sum(int value, int number)
+		function sum(i32 value, i32 number)
 		{
 			return value + number;
 		}
 
-		function sum(int value, (int number, ...numbers))
+		function sum(i32 value, (i32 number, ...numbers))
 		{
 			return tail sum(value + number, ...numbers);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, [1, 2, 3]);
 		}
@@ -1051,27 +1051,27 @@ BOOST_AUTO_TEST_CASE (scenario39)
 			y
 		};
 
-		function sum(int value, Struct1 s)
+		function sum(i32 value, Struct1 s)
 		{
 			return value + s.x;
 		}
 
-		function sum(int value, (Struct1 s, ...ss))
+		function sum(i32 value, (Struct1 s, ...ss))
 		{
 			return tail sum(value + s.x, ...ss);
 		}
 
-		function sum(int value, Struct2 s)
+		function sum(i32 value, Struct2 s)
 		{
 			return value + s.y;
 		}
 
-		function sum(int value, (Struct2 s, ...ss))
+		function sum(i32 value, (Struct2 s, ...ss))
 		{
 			return tail sum(value + s.y, ...ss);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, [
 				Struct1
@@ -1097,17 +1097,17 @@ BOOST_AUTO_TEST_CASE (scenario40)
 			return [1, 2, 3];
 		}
 
-		function sum(int value, int number)
+		function sum(i32 value, i32 number)
 		{
 			return value + number;
 		}
 
-		function sum(int value, (int number, ...numbers))
+		function sum(i32 value, (i32 number, ...numbers))
 		{
 			return tail sum(value + number, ...numbers);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, createArray());
 		}
@@ -1131,12 +1131,12 @@ BOOST_AUTO_TEST_CASE (scenario41)
 			return 32;
 		}
 
-		function func(int value)
+		function func(i32 value)
 		{
 			return value;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return func(generator());
 		}
@@ -1148,27 +1148,27 @@ BOOST_AUTO_TEST_CASE (scenario41)
 BOOST_AUTO_TEST_CASE (scenario42)
 {
 	auto result = exec(R"(
-		function add(int value)
+		function add(i32 value)
 		{
 			return value + 2;
 		}
 
-		function add((int value, ...values))
+		function add((i32 value, ...values))
 		{
 			return value + 2 -> add(...values);
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, add([1, 2, 3]));
 		}
@@ -1205,7 +1205,7 @@ BOOST_AUTO_TEST_CASE (scenario43)
 			return c.x;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(createStruct());
 		}
@@ -1222,7 +1222,7 @@ BOOST_AUTO_TEST_CASE (scenario44)
 			return 23;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo([]);
 		}
@@ -1254,7 +1254,7 @@ BOOST_AUTO_TEST_CASE (scenario45)
 			return 23;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(createFoo());
 		}
@@ -1266,7 +1266,7 @@ BOOST_AUTO_TEST_CASE (scenario45)
 BOOST_AUTO_TEST_CASE (scenario46)
 {
 	auto result = exec(R"(
-		function bar(int value)
+		function bar(i32 value)
 		{
 			if ((value > 10) && (value < 20))
 			{
@@ -1276,7 +1276,7 @@ BOOST_AUTO_TEST_CASE (scenario46)
 			return 2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return bar(15);
 		}
@@ -1328,37 +1328,37 @@ BOOST_AUTO_TEST_CASE (scenario47)
 			];
 		}
 
-		function foo2(int accumulator, without item)
+		function foo2(i32 accumulator, without item)
 		{
 			return accumulator;
 		}
 
-		function foo2(int accumulator, Item item)
+		function foo2(i32 accumulator, Item item)
 		{
 			return accumulator + item.value;
 		}
 
-		function foo2(int accumulator, (Item item, ...values))
+		function foo2(i32 accumulator, (Item item, ...values))
 		{
 			return tail foo2(accumulator + item.value, ...values);
 		}
 
-		function foo1(int accumulator, without item)
+		function foo1(i32 accumulator, without item)
 		{
 			return accumulator;
 		}
 
-		function foo1(int accumulator, Item item)
+		function foo1(i32 accumulator, Item item)
 		{
 			return tail foo2(accumulator + item.value, item.children);
 		}
 
-		function foo1(int accumulator, (Item item, ...values))
+		function foo1(i32 accumulator, (Item item, ...values))
 		{
 			return tail foo1(foo2(accumulator + item.value, item.children), ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo1(0, createStructure());
 		}
@@ -1416,32 +1416,32 @@ BOOST_AUTO_TEST_CASE (scenario48)
 			];
 		}
 
-		function sumWidth(int sum, without item)
+		function sumWidth(i32 sum, without item)
 		{
 			return sum;
 		}
 
-		function sumWidth(int sum, Rectangle r)
+		function sumWidth(i32 sum, Rectangle r)
 		{
 			return tail sumWidth(sum + r.width, r.children);
 		}
 
-		function sumWidth(int sum, (Rectangle r, ...items))
+		function sumWidth(i32 sum, (Rectangle r, ...items))
 		{
 			return tail sumWidth(sumWidth(sum + r.width, r.children), ...items);
 		}
 
-		function sumWidth(int sum, Button b)
+		function sumWidth(i32 sum, Button b)
 		{
 			return tail sumWidth(sum + b.width, b.children);
 		}
 
-		function sumWidth(int sum, (Button b, ...items))
+		function sumWidth(i32 sum, (Button b, ...items))
 		{
 			return tail sumWidth(sumWidth(sum + b.width, b.children), ...items);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sumWidth(0, createStructure());
 		}
@@ -1453,7 +1453,7 @@ BOOST_AUTO_TEST_CASE (scenario48)
 BOOST_AUTO_TEST_CASE (scenario49)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			return 'a';
 		}
@@ -1465,7 +1465,7 @@ BOOST_AUTO_TEST_CASE (scenario49)
 BOOST_AUTO_TEST_CASE (scenario50)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			return ' ';
 		}
@@ -1477,7 +1477,7 @@ BOOST_AUTO_TEST_CASE (scenario50)
 BOOST_AUTO_TEST_CASE (scenario51)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			return '\n';
 		}
@@ -1504,7 +1504,7 @@ BOOST_AUTO_TEST_CASE (scenario52)
 			return row.x;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(Row {});
 		}
@@ -1527,7 +1527,7 @@ BOOST_AUTO_TEST_CASE (scenario53)
 			return row.y;
 		}
 
-		function bar(int y, Row row)
+		function bar(i32 y, Row row)
 		{
 			return row.x * y;
 		}
@@ -1537,7 +1537,7 @@ BOOST_AUTO_TEST_CASE (scenario53)
 			return bar(foo(row), row);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return boo(Row {});
 		}
@@ -1617,17 +1617,17 @@ BOOST_AUTO_TEST_CASE (scenario54)
 			return drawButton(button) -> draw(...items);
 		}
 
-		function sum(int accumulator, int value)
+		function sum(i32 accumulator, i32 value)
 		{
 			return accumulator + value;
 		}
 
-		function sum(int accumulator, (int value, ...values))
+		function sum(i32 accumulator, (i32 value, ...values))
 		{
 			return tail sum(accumulator + value, ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, draw(application()));
 		}
@@ -1639,17 +1639,17 @@ BOOST_AUTO_TEST_CASE (scenario54)
 BOOST_AUTO_TEST_CASE (scenario55)
 {
 	auto result = exec(R"(
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, [1, 2, 3]);
 		}
@@ -1666,12 +1666,12 @@ BOOST_AUTO_TEST_CASE (scenario56)
 			x
 		};
 
-		function sum(int product, Struct s)
+		function sum(i32 product, Struct s)
 		{
 			return product + s.x;
 		}
 
-		function sum(int product, (Struct s, ...structs))
+		function sum(i32 product, (Struct s, ...structs))
 		{
 			return tail sum(product + s.x, ...structs);
 		}
@@ -1694,7 +1694,7 @@ BOOST_AUTO_TEST_CASE (scenario56)
 			];
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, createStructs());
 		}
@@ -1712,12 +1712,12 @@ BOOST_AUTO_TEST_CASE (scenario57)
 			children: []
 		};
 
-		function sum(int product, Struct s)
+		function sum(i32 product, Struct s)
 		{
 			return product + s.x;
 		}
 
-		function sum(int product, (Struct s, ...structs))
+		function sum(i32 product, (Struct s, ...structs))
 		{
 			return tail sum(product + s.x, ...structs);
 		}
@@ -1740,7 +1740,7 @@ BOOST_AUTO_TEST_CASE (scenario57)
 			];
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, createStructs());
 		}
@@ -1793,7 +1793,7 @@ BOOST_AUTO_TEST_CASE (scenario58)
 			return tail loop(c2, c1);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(createStruct());
 		}
@@ -1805,7 +1805,7 @@ BOOST_AUTO_TEST_CASE (scenario58)
 BOOST_AUTO_TEST_CASE (scenario59)
 {
 	auto result = exec(R"(
-		function loop(int v1, int v2)
+		function loop(i32 v1, i32 v2)
 		{
 			if ((v1 - v2) == -1)
 			{
@@ -1815,7 +1815,7 @@ BOOST_AUTO_TEST_CASE (scenario59)
 			return tail loop(v2, v1);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return loop(2, 1);
 		}
@@ -1827,7 +1827,7 @@ BOOST_AUTO_TEST_CASE (scenario59)
 BOOST_AUTO_TEST_CASE (scenario60)
 {
 	auto regularFunction = compileFunction(R"(
-		function loop(int v1, int v2)
+		function loop(i32 v1, i32 v2)
 		{
 			if ((v1 - v2) == -1)
 			{
@@ -1839,7 +1839,7 @@ BOOST_AUTO_TEST_CASE (scenario60)
 	)");
 
 	auto iteratorFunction1 = compileFunction(R"(
-		function loop(int v1, int v2)
+		function loop(i32 v1, i32 v2)
 		{
 			if ((v1 - v2) == -1)
 			{
@@ -1851,14 +1851,14 @@ BOOST_AUTO_TEST_CASE (scenario60)
 	)");
 
 	auto iteratorFunction2 = compileFunction(R"(
-		function generator(int i)
+		function generator(i32 i)
 		{
 			return i -> generator(i + 1);
 		}
 	)");
 
 	auto iteratorFunction3 = compileFunction(R"(
-		function generator(int i)
+		function generator(i32 i)
 		{
 			if (i < 20)
 			{
@@ -1883,32 +1883,32 @@ BOOST_AUTO_TEST_CASE (scenario61)
 			values: []
 		};
 
-		function sum(int product, int v)
+		function sum(i32 product, i32 v)
 		{
 			return product + v;
 		}
 
-		function sum(int product, (int v, ...values))
+		function sum(i32 product, (i32 v, ...values))
 		{
 			return tail sum(product + v, ...values);
 		}
 
-		function add(int addend, int v)
+		function add(i32 addend, i32 v)
 		{
 			return v + addend;
 		}
 
-		function add(int addend, (int v, ...values))
+		function add(i32 addend, (i32 v, ...values))
 		{
 			return v + addend -> add(addend, ...values);
 		}
 
-		function first(int v)
+		function first(i32 v)
 		{
 			return v;
 		}
 
-		function first((int v, ...values))
+		function first((i32 v, ...values))
 		{
 			return v;
 		}
@@ -1931,7 +1931,7 @@ BOOST_AUTO_TEST_CASE (scenario61)
 			return first(s.values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(createStruct());
 		}
@@ -1948,22 +1948,22 @@ BOOST_AUTO_TEST_CASE (scenario62)
 			values: []
 		};
 
-		function sum(int product, int v)
+		function sum(i32 product, i32 v)
 		{
 			return product + v;
 		}
 
-		function sum(int product, (int v, ...values))
+		function sum(i32 product, (i32 v, ...values))
 		{
 			return tail sum(product + v, ...values);
 		}
 
-		function first(int v)
+		function first(i32 v)
 		{
 			return v;
 		}
 
-		function first((int v, ...values))
+		function first((i32 v, ...values))
 		{
 			return v;
 		}
@@ -1986,7 +1986,7 @@ BOOST_AUTO_TEST_CASE (scenario62)
 			return first(s.values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(createStruct());
 		}
@@ -2008,22 +2008,22 @@ BOOST_AUTO_TEST_CASE (scenario63)
 			value
 		};
 
-		function sum(int product, Element v)
+		function sum(i32 product, Element v)
 		{
 			return product + v.value;
 		}
 
-		function sum(int product, (Element v, ...values))
+		function sum(i32 product, (Element v, ...values))
 		{
 			return tail sum(product + v.value, ...values);
 		}
 
-		function add(int addend, Element v)
+		function add(i32 addend, Element v)
 		{
 			return v with { value: v.value + addend };
 		}
 
-		function add(int addend, (Element v, ...values))
+		function add(i32 addend, (Element v, ...values))
 		{
 			return v with { value: v.value + addend } -> add(addend, ...values);
 		}
@@ -2069,7 +2069,7 @@ BOOST_AUTO_TEST_CASE (scenario63)
 			return first(s.values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(createStruct());
 		}
@@ -2093,7 +2093,7 @@ BOOST_AUTO_TEST_CASE (scenario64)
 			b: 0
 		}
 
-		function rgb(int r, int g, int b)
+		function rgb(i32 r, i32 g, i32 b)
 		{
 			return Color
 			{
@@ -2108,12 +2108,12 @@ BOOST_AUTO_TEST_CASE (scenario64)
 			return c.r + c.g + c.b;
 		}
 
-		function sum(int product, Struct s)
+		function sum(i32 product, Struct s)
 		{
 			return product + sum(s.value);
 		}
 
-		function sum(int product, (Struct s, ...structs))
+		function sum(i32 product, (Struct s, ...structs))
 		{
 			return tail sum(product + sum(s.value), ...structs);
 		}
@@ -2132,7 +2132,7 @@ BOOST_AUTO_TEST_CASE (scenario64)
 			];
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, createStructs());
 		}
@@ -2144,22 +2144,22 @@ BOOST_AUTO_TEST_CASE (scenario64)
 BOOST_AUTO_TEST_CASE (scenario65)
 {
 	auto result = exec(R"(
-		function add(int v1, int v2)
+		function add(i32 v1, i32 v2)
 		{
 			return v1 + v2;
 		}
 
-		function mul(int v1, int v2)
+		function mul(i32 v1, i32 v2)
 		{
 			return v1 * v2;
 		}
 
-		function foo(int v1, int v2, function (int, int) fp)
+		function foo(i32 v1, i32 v2, function (i32, i32) fp)
 		{
 			return fp(v1, v2);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(3, 4, add) + foo(3, 4, mul);
 		}
@@ -2176,37 +2176,37 @@ BOOST_AUTO_TEST_CASE (scenario66)
 			fp
 		};
 
-		function add(int v1, int v2)
+		function add(i32 v1, i32 v2)
 		{
 			return v1 + v2;
 		}
 
-		function mul(int v1, int v2)
+		function mul(i32 v1, i32 v2)
 		{
 			return v1 * v2;
 		}
 
-		function invoke(int v1, int v2, function (int, int) fp)
+		function invoke(i32 v1, i32 v2, function (i32, i32) fp)
 		{
 			return fp(v1, v2);
 		}
 
-		function foo(int v1, int v2, Struct s)
+		function foo(i32 v1, i32 v2, Struct s)
 		{
 			return invoke(v1, v2, s.fp);
 		}
 
-		function foo(int v1, int v2, (Struct s, ...structs))
+		function foo(i32 v1, i32 v2, (Struct s, ...structs))
 		{
 			return invoke(v1, v2, s.fp) -> foo(v1, v2, ...structs);
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
@@ -2225,7 +2225,7 @@ BOOST_AUTO_TEST_CASE (scenario66)
 			];
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, foo(3, 4, createStructs()));
 		}
@@ -2237,29 +2237,29 @@ BOOST_AUTO_TEST_CASE (scenario66)
 BOOST_AUTO_TEST_CASE (scenario67)
 {
 	auto result = exec(R"(
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		function foo(int product, int value)
+		function foo(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		function foo(int product, (int value, ...values))
+		function foo(i32 product, (i32 value, ...values))
 		{
 			let result = product + value;
 
 			return result -> foo(result, ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, foo(0, [1, 2, 3]));
 		}
@@ -2271,37 +2271,37 @@ BOOST_AUTO_TEST_CASE (scenario67)
 BOOST_AUTO_TEST_CASE (scenario68)
 {
 	auto result = exec(R"(
-		function add(int left, int right)
+		function add(i32 left, i32 right)
 		{
 			return left + right;
 		}
 
-		function add((int left, ...lefts), (int right, ...rights))
+		function add((i32 left, ...lefts), (i32 right, ...rights))
 		{
 			return left + right -> add(...lefts, ...rights);
 		}
 
-		function add((int left, ...lefts), int right)
+		function add((i32 left, ...lefts), i32 right)
 		{
 			return left + right;
 		}
 
-		function add(int left, (int right, ...rights))
+		function add(i32 left, (i32 right, ...rights))
 		{
 			return left + right;
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, add([1, 2, 3], [4, 5, 6]));
 		}
@@ -2313,47 +2313,47 @@ BOOST_AUTO_TEST_CASE (scenario68)
 BOOST_AUTO_TEST_CASE (scenario69)
 {
 	auto result = exec(R"(
-		function add(int left, int right)
+		function add(i32 left, i32 right)
 		{
 			return left + right;
 		}
 
-		function add((int left, ...lefts), (int right, ...rights))
+		function add((i32 left, ...lefts), (i32 right, ...rights))
 		{
 			return left + right -> add(...lefts, ...rights);
 		}
 
-		function add((int left, ...lefts), int right)
+		function add((i32 left, ...lefts), i32 right)
 		{
 			return left + right;
 		}
 
-		function add(int left, (int right, ...rights))
+		function add(i32 left, (i32 right, ...rights))
 		{
 			return left + right;
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		function addOne(int value)
+		function addOne(i32 value)
 		{
 			return value + 1;
 		}
 
-		function addOne((int value, ...values))
+		function addOne((i32 value, ...values))
 		{
 			return value + 1 -> addOne(...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return sum(0, add(addOne([1, 2, 3]), addOne([4, 5, 6])));
 		}
@@ -2390,7 +2390,7 @@ BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_1)
 			return 3;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(Child {});
 		}
@@ -2422,7 +2422,7 @@ BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_2)
 			return 2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(Child {});
 		}
@@ -2433,7 +2433,7 @@ BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_2)
 
 BOOST_AUTO_TEST_CASE (compatibility)
 {
-	auto entryPoint = compile(R"(
+	auto entryPoi32 = compile(R"(
 		struct Unrelated
 		{
 			x: 0
@@ -2460,7 +2460,7 @@ BOOST_AUTO_TEST_CASE (compatibility)
 		}
 	)");
 
-	auto types = entryPoint.types();
+	auto types = entryPoi32.types();
 
 	auto unrelatedType = types["Unrelated"];
 	auto childType = types["Child"];
@@ -2468,23 +2468,23 @@ BOOST_AUTO_TEST_CASE (compatibility)
 	auto motherType = types["Mother"];
 	auto ancestorType = types["Ancestor"];
 
-	BOOST_TEST(childType->compatibility(childType, entryPoint) == 1);
-	BOOST_TEST(childType->compatibility(fatherType, entryPoint) == 2);
-	BOOST_TEST(childType->compatibility(motherType, entryPoint) == 2);
-	BOOST_TEST(childType->compatibility(ancestorType, entryPoint) == 3);
-	BOOST_TEST(childType->compatibility(AnyType::instance(), entryPoint) == 4);
-	BOOST_TEST(childType->compatibility(unrelatedType, entryPoint) == -1);
-	BOOST_TEST(childType->compatibility(Int32Type::instance(), entryPoint) == -1);
+	BOOST_TEST(childType->compatibility(childType, entryPoi32) == 1);
+	BOOST_TEST(childType->compatibility(fatherType, entryPoi32) == 2);
+	BOOST_TEST(childType->compatibility(motherType, entryPoi32) == 2);
+	BOOST_TEST(childType->compatibility(ancestorType, entryPoi32) == 3);
+	BOOST_TEST(childType->compatibility(AnyType::instance(), entryPoi32) == 4);
+	BOOST_TEST(childType->compatibility(unrelatedType, entryPoi32) == -1);
+	BOOST_TEST(childType->compatibility(Int32Type::instance(), entryPoi32) == -1);
 
-	BOOST_TEST(Int32Type::instance()->compatibility(Int32Type::instance(), entryPoint) == 0);
-	BOOST_TEST(Int32Type::instance()->compatibility(Int64Type::instance(), entryPoint) == -1);
-	BOOST_TEST(Int32Type::instance()->compatibility(AnyType::instance(), entryPoint) == 1);
+	BOOST_TEST(Int32Type::instance()->compatibility(Int32Type::instance(), entryPoi32) == 0);
+	BOOST_TEST(Int32Type::instance()->compatibility(Int64Type::instance(), entryPoi32) == -1);
+	BOOST_TEST(Int32Type::instance()->compatibility(AnyType::instance(), entryPoi32) == 1);
 }
 
 BOOST_AUTO_TEST_CASE (scenario70)
 {
 	auto result = exec(R"(
-		function elementAt(int index, int i, int item)
+		function elementAt(i32 index, i32 i, i32 item)
 		{
 			if (i == index)
 			{
@@ -2494,7 +2494,7 @@ BOOST_AUTO_TEST_CASE (scenario70)
 			return 0;
 		}
 
-		function elementAt(int index, int i, (int item, ...items))
+		function elementAt(i32 index, i32 i, (i32 item, ...items))
 		{
 			if (i == index)
 			{
@@ -2504,21 +2504,21 @@ BOOST_AUTO_TEST_CASE (scenario70)
 			return tail elementAt(index, i + 1, ...items);
 		}
 
-		function foo(int product, int index)
+		function foo(i32 product, i32 index)
 		{
 			let table = [10, 20];
 
 			return product + elementAt(index, 0, table);
 		}
 
-		function foo(int product, (int index, ...indexes))
+		function foo(i32 product, (i32 index, ...indexes))
 		{
 			let table = [10, 20];
 
 			return tail foo(product + elementAt(index, 0, table), ...indexes);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(0, [1, 0, 1]);
 		}
@@ -2530,16 +2530,16 @@ BOOST_AUTO_TEST_CASE (scenario70)
 BOOST_AUTO_TEST_CASE (arrayType_1)
 {
 	auto value1 = compileValue("[1, 2, 3]");
-	auto value2 = compileValue("[1, 2L, \"foo\"]");
+	auto value2 = compileValue("[1, 2i64, \"foo\"]");
 
-	BOOST_TEST(value1->type()->name() == "[int, int, int]");
-	BOOST_TEST(value2->type()->name() == "[int, long, string]");
+	BOOST_TEST(value1->type()->name() == "[i32, i32, i32]");
+	BOOST_TEST(value2->type()->name() == "[i32, i64, string]");
 }
 
 BOOST_AUTO_TEST_CASE (arrayType_2)
 {
 	auto value1 = compileValue("[1, 2, 3]");
-	auto value2 = compileValue("[1, 2L, \"foo\"]");
+	auto value2 = compileValue("[1, 2i64, \"foo\"]");
 	auto value3 = compileValue("[7, 5, 34]");
 
 	BOOST_TEST(value1->type()->compatibility(value1->type(), EntryPoint()) == 0);
@@ -2553,13 +2553,13 @@ BOOST_AUTO_TEST_CASE (arrayType_2)
 
 BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 {
-	auto entryPoint = compile(R"(
-		function foo((int value, ...values))
+	auto entryPoi32 = compile(R"(
+		function foo((i32 value, ...values))
 		{
 			return value -> foo(...values);
 		}
 
-		function foo(int value)
+		function foo(i32 value)
 		{
 			return value;
 		}
@@ -2570,13 +2570,13 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 		}
 	)");
 
-	auto functions = entryPoint.functions();
+	auto functions = entryPoi32.functions();
 
 	auto [_1, function] = *functions.find("bar");
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2586,13 +2586,13 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	auto lazy = functionValues.require<LazyValue>(nullptr);
 
-	BOOST_TEST(lazy->type()->name() == "[int, int]");
+	BOOST_TEST(lazy->type()->name() == "[i32, i32]");
 }
 
 BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 {
-	auto entryPoint = compile(R"(
-		function foo((int value, ...values))
+	auto entryPoi32 = compile(R"(
+		function foo((i32 value, ...values))
 		{
 			if (value > 1)
 			{
@@ -2602,7 +2602,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 			return false -> foo(...values);
 		}
 
-		function foo(int value)
+		function foo(i32 value)
 		{
 			return value;
 		}
@@ -2613,13 +2613,13 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 		}
 	)");
 
-	auto functions = entryPoint.functions();
+	auto functions = entryPoi32.functions();
 
 	auto [_1, function] = *functions.find("bar");
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2629,13 +2629,13 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	auto lazy = functionValues.require<LazyValue>(nullptr);
 
-	BOOST_TEST(lazy->type()->name() == "[bool, bool, int]");
+	BOOST_TEST(lazy->type()->name() == "[bool, bool, i32]");
 }
 
 BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 {
-	auto entryPoint = compile(R"(
-		function foo(int i, int count)
+	auto entryPoi32 = compile(R"(
+		function foo(i32 i, i32 count)
 		{
 			if (i < count)
 			{
@@ -2651,13 +2651,13 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 		}
 	)");
 
-	auto functions = entryPoint.functions();
+	auto functions = entryPoi32.functions();
 
 	auto [_1, function] = *functions.find("bar");
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2672,7 +2672,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 {
-	auto entryPoint = compile(R"(
+	auto entryPoi32 = compile(R"(
 		function foo((any item, ...items))
 		{
 			return item -> foo(...items);
@@ -2699,13 +2699,13 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 		}
 	)");
 
-	auto functions = entryPoint.functions();
+	auto functions = entryPoi32.functions();
 
 	auto [_1, function] = *functions.find("bar");
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults.size() == 1);
 
@@ -2715,23 +2715,23 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 
 	auto lazy = functionValues.require<LazyValue>(nullptr);
 
-	BOOST_TEST(lazy->type()->name() == "[int, int, int]");
+	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
 
 BOOST_AUTO_TEST_CASE (scenario71)
 {
 	auto result = exec(R"(
-		function count(int product, int c)
+		function count(i32 product, i32 c)
 		{
 			return product + 1;
 		}
 
-		function count(int product, (int c, ...characters))
+		function count(i32 product, (i32 c, ...characters))
 		{
 			return tail count(product + 1, ...characters);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return count(0, "foobar");
 		}
@@ -2761,7 +2761,7 @@ BOOST_AUTO_TEST_CASE (scenario72)
 			return 10;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return Foo::otherFunc();
 		}
@@ -2796,7 +2796,7 @@ BOOST_AUTO_TEST_CASE (scenario73)
 			return 10;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return Foo::otherFunc();
 		}
@@ -2831,7 +2831,7 @@ BOOST_AUTO_TEST_CASE (scenario74)
 			return 10;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return Foo::otherFunc();
 		}
@@ -2855,7 +2855,7 @@ BOOST_AUTO_TEST_CASE (scenario75)
 			}
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return Foo::otherFunc();
 		}
@@ -2877,7 +2877,7 @@ BOOST_AUTO_TEST_CASE (scenario76)
 			}
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return Foo::otherFunc();
 		}
@@ -2901,7 +2901,7 @@ BOOST_AUTO_TEST_CASE (scenario77)
 			}
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return Foo::otherFunc();
 		}
@@ -2931,14 +2931,14 @@ BOOST_AUTO_TEST_CASE (scenario78)
 			}
 		}
 
-		function printX(Foo::MyStruct s)
+		function pri32X(Foo::MyStruct s)
 		{
 			return s.x;
 		}
 
-		export int main()
+		export i32 main()
 		{
-			return printX(Foo::otherFunc());
+			return pri32X(Foo::otherFunc());
 		}
 	)");
 
@@ -2961,14 +2961,14 @@ BOOST_AUTO_TEST_CASE (scenario79)
 			}
 		}
 
-		function printX(MyStruct s)
+		function pri32X(MyStruct s)
 		{
 			return s.x;
 		}
 
-		export int main()
+		export i32 main()
 		{
-			return printX(Foo::otherFunc());
+			return pri32X(Foo::otherFunc());
 		}
 	)");
 
@@ -2996,14 +2996,14 @@ BOOST_AUTO_TEST_CASE (scenario80)
 			}
 		}
 
-		function printX(MyStruct s)
+		function pri32X(MyStruct s)
 		{
 			return s.x;
 		}
 
-		export int main()
+		export i32 main()
 		{
-			return printX(Foo::otherFunc());
+			return pri32X(Foo::otherFunc());
 		}
 	)");
 
@@ -3035,7 +3035,7 @@ BOOST_AUTO_TEST_CASE (scenario81)
 			];
 		}
 
-		function mainLoop(int count, ApplicationState state)
+		function mainLoop(i32 count, ApplicationState state)
 		{
 			if (count > 0)
 			{
@@ -3045,7 +3045,7 @@ BOOST_AUTO_TEST_CASE (scenario81)
 			return tail mainLoop(count + 1, state);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = ApplicationState
 			{
@@ -3122,7 +3122,7 @@ BOOST_AUTO_TEST_CASE (scenario82)
 			};
 		}
 
-		function mainLoop(int count, ApplicationState state)
+		function mainLoop(i32 count, ApplicationState state)
 		{
 			if (count > 0)
 			{
@@ -3137,7 +3137,7 @@ BOOST_AUTO_TEST_CASE (scenario82)
 			return tail mainLoop(count + 1, as);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = ApplicationState
 			{
@@ -3203,7 +3203,7 @@ BOOST_AUTO_TEST_CASE (scenario83)
 			};
 		}
 
-		function mainLoop(int count, ApplicationState state)
+		function mainLoop(i32 count, ApplicationState state)
 		{
 			if (count > 0)
 			{
@@ -3218,7 +3218,7 @@ BOOST_AUTO_TEST_CASE (scenario83)
 			return tail mainLoop(count + 1, as);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = ApplicationState
 			{
@@ -3237,7 +3237,7 @@ BOOST_AUTO_TEST_CASE (scenario84)
 	BOOST_REQUIRE_THROW(exec(R"(
 		struct Item;
 
-		export int main()
+		export i32 main()
 		{
 			let item = Item
 			{
@@ -3331,7 +3331,7 @@ BOOST_AUTO_TEST_CASE (scenario85)
 			return tail draw(...controls);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let button = Button {};
 
@@ -3396,7 +3396,7 @@ BOOST_AUTO_TEST_CASE (scenario86)
 			};
 		}
 
-		function mainLoop(int count, ApplicationState state)
+		function mainLoop(i32 count, ApplicationState state)
 		{
 			if (count > 0)
 			{
@@ -3411,7 +3411,7 @@ BOOST_AUTO_TEST_CASE (scenario86)
 			return tail mainLoop(count + 1, as);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = ApplicationState
 			{
@@ -3448,7 +3448,7 @@ BOOST_AUTO_TEST_CASE (scenario87)
 			];
 		}
 
-		function mainLoop(int count, ApplicationState state)
+		function mainLoop(i32 count, ApplicationState state)
 		{
 			if (count > 0)
 			{
@@ -3458,7 +3458,7 @@ BOOST_AUTO_TEST_CASE (scenario87)
 			return tail mainLoop(count + 1, state);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = ApplicationState
 			{
@@ -3525,17 +3525,17 @@ BOOST_AUTO_TEST_CASE (scenario88)
 			};
 		}
 
-		function update(int current, int next)
+		function update(i32 current, i32 next)
 		{
 			return current;
 		}
 
-		function update((int current, ...currents), (int next, ...nexts))
+		function update((i32 current, ...currents), (i32 next, ...nexts))
 		{
 			return current -> update(...currents, ...nexts);
 		}
 
-		function mainLoop(int i, State state)
+		function mainLoop(i32 i, State state)
 		{
 			if (i > 0)
 			{
@@ -3550,7 +3550,7 @@ BOOST_AUTO_TEST_CASE (scenario88)
 			return tail mainLoop(i + 1, s);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -3572,7 +3572,7 @@ BOOST_AUTO_TEST_CASE (scenario89)
 			return true;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			if (getBool())
 			{
@@ -3589,7 +3589,7 @@ BOOST_AUTO_TEST_CASE (scenario89)
 BOOST_AUTO_TEST_CASE (scenario90)
 {
 	auto result = exec(R"(
-		function generator(int count, int i)
+		function generator(i32 count, i32 i)
 		{
 			if (i < count)
 			{
@@ -3599,17 +3599,17 @@ BOOST_AUTO_TEST_CASE (scenario90)
 			return i;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let range = generator(3, 0);
 
@@ -3630,7 +3630,7 @@ BOOST_AUTO_TEST_CASE (scenario91)
 			array
 		};
 
-		function process(int value)
+		function process(i32 value)
 		{
 			if (value > 2)
 			{
@@ -3640,12 +3640,12 @@ BOOST_AUTO_TEST_CASE (scenario91)
 			return value * 2;
 		}
 
-		function process((int value, ...values))
+		function process((i32 value, ...values))
 		{
 			return value -> process(...values);
 		}
 
-		function mainLoop(int i, State state)
+		function mainLoop(i32 i, State state)
 		{
 			let s = state with
 			{
@@ -3660,7 +3660,7 @@ BOOST_AUTO_TEST_CASE (scenario91)
 			return 6;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -3677,9 +3677,9 @@ BOOST_AUTO_TEST_CASE (scenario91)
 BOOST_AUTO_TEST_CASE (scenario92)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
-			if ((0x00000101u & 0x00000101u) == 0x00000101u)
+			if ((0x00000101u32 & 0x00000101u32) == 0x00000101u32)
 			{
 				return 1;
 			}
@@ -3694,9 +3694,9 @@ BOOST_AUTO_TEST_CASE (scenario92)
 BOOST_AUTO_TEST_CASE (scenario93)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
-			if ((0x00010100u | 0x00000101u) == 0x00010101u)
+			if ((0x00010100u32 | 0x00000101u32) == 0x00010101u32)
 			{
 				return 1;
 			}
@@ -3711,9 +3711,9 @@ BOOST_AUTO_TEST_CASE (scenario93)
 BOOST_AUTO_TEST_CASE (scenario94)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
-			if ((0x00010100u ^ 0x00000101u) == 0x00010001u)
+			if ((0x00010100u32 ^ 0x00000101u32) == 0x00010001u32)
 			{
 				return 1;
 			}
@@ -3728,29 +3728,29 @@ BOOST_AUTO_TEST_CASE (scenario94)
 BOOST_AUTO_TEST_CASE (scenario95)
 {
 	auto result = exec(R"(
-		function add1(without previous, int value)
+		function add1(without previous, i32 value)
 		{
 			return value;
 		}
 
-		function add1(int previous, int value)
+		function add1(i32 previous, i32 value)
 		{
 			return previous + value;
 		}
 
-		function add(any previous, int value)
+		function add(any previous, i32 value)
 		{
 			return add1(previous, value);
 		}
 
-		function add(any previous, (int value, ...values))
+		function add(any previous, (i32 value, ...values))
 		{
 			let product = add1(previous, value);
 
 			return tail add(product, ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let values = [1, 2];
 
@@ -3764,29 +3764,29 @@ BOOST_AUTO_TEST_CASE (scenario95)
 BOOST_AUTO_TEST_CASE (scenario96)
 {
 	auto result = exec(R"(
-		function add1(without previous, int value)
+		function add1(without previous, i32 value)
 		{
 			return value;
 		}
 
-		function add1(int previous, int value)
+		function add1(i32 previous, i32 value)
 		{
 			return previous + value;
 		}
 
-		function add(any previous, int value)
+		function add(any previous, i32 value)
 		{
 			return add1(previous, value);
 		}
 
-		function add(any previous, (int value, ...values))
+		function add(any previous, (i32 value, ...values))
 		{
 			let product = add1(previous, value);
 
 			return tail add(product, ...values);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let values = [1, 2, 3];
 
@@ -3805,27 +3805,27 @@ BOOST_AUTO_TEST_CASE (scenario97)
 			items
 		};
 
-		function add(int value)
+		function add(i32 value)
 		{
 			return value + 10;
 		}
 
-		function transform(int k, int value)
+		function transform(i32 k, i32 value)
 		{
 			return value + k;
 		}
 
-		function transform(int k, (int value, ...values))
+		function transform(i32 k, (i32 value, ...values))
 		{
 			return value + k -> transform(add(value), ...values);
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
@@ -3845,7 +3845,7 @@ BOOST_AUTO_TEST_CASE (scenario97)
 			return tail mainLoop(mut);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let foo = Foo
 			{
@@ -3872,7 +3872,7 @@ BOOST_AUTO_TEST_CASE (scenario98)
 			return 2;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(1.23 * 2.0);
 		}
@@ -3889,7 +3889,7 @@ BOOST_AUTO_TEST_CASE (scenario99)
 			value
 		};
 
-		export int main()
+		export i32 main()
 		{
 			let s = Struct
 			{
@@ -3916,7 +3916,7 @@ BOOST_AUTO_TEST_CASE (scenario100)
 			return 4;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let s = Struct
 			{
@@ -3938,12 +3938,12 @@ BOOST_AUTO_TEST_CASE (scenario100)
 BOOST_AUTO_TEST_CASE (scenario101)
 {
 	auto result = exec(R"(
-		function f(int value)
+		function f(i32 value)
 		{
 			return value * 10;
 		}
 
-		function getNumbers(int i, int count)
+		function getNumbers(i32 i, i32 count)
 		{
 			if (i >= count)
 			{
@@ -3953,17 +3953,17 @@ BOOST_AUTO_TEST_CASE (scenario101)
 			return f(i) -> getNumbers(i + 1, count);
 		}
 
-		function sum((int value, ...values), int product)
+		function sum((i32 value, ...values), i32 product)
 		{
 			return tail sum(...values, product + value);
 		}
 
-		function sum(int value, int product)
+		function sum(i32 value, i32 product)
 		{
 			return product + value;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let numbers = getNumbers(0, 5);
 
@@ -3982,27 +3982,27 @@ BOOST_AUTO_TEST_CASE (scenario102)
 			children
 		};
 
-		function sum((int value, ...values), int product)
+		function sum((i32 value, ...values), i32 product)
 		{
 			return tail sum(...values, product + value);
 		}
 
-		function sum(int value, int product)
+		function sum(i32 value, i32 product)
 		{
 			return product + value;
 		}
 
-		function add(Foo foo, (int left, ...lefts))
+		function add(Foo foo, (i32 left, ...lefts))
 		{
 			return left -> add(foo, ...lefts);
 		}
 
-		function add(Foo foo, int left)
+		function add(Foo foo, i32 left)
 		{
 			return left;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let foo = Foo
 			{
@@ -4089,7 +4089,7 @@ BOOST_AUTO_TEST_CASE (scenario103)
 			];
 		}
 
-		function foo(State state, int i)
+		function foo(State state, i32 i)
 		{
 			if (i > 1)
 			{
@@ -4104,7 +4104,7 @@ BOOST_AUTO_TEST_CASE (scenario103)
 			return tail foo(s, i + 1);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -4141,7 +4141,7 @@ BOOST_AUTO_TEST_CASE (scenario104)
 			return nothing;
 		}
 
-		function bar(int count, State s)
+		function bar(i32 count, State s)
 		{
 			if (count > 0)
 			{
@@ -4151,7 +4151,7 @@ BOOST_AUTO_TEST_CASE (scenario104)
 			return tail bar(count + 1, s);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -4188,7 +4188,7 @@ BOOST_AUTO_TEST_CASE (scenario105)
 			return item;
 		}
 
-		function bar(int count, State s)
+		function bar(i32 count, State s)
 		{
 			if (count > 0)
 			{
@@ -4198,7 +4198,7 @@ BOOST_AUTO_TEST_CASE (scenario105)
 			return tail bar(count + 1, s);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -4235,7 +4235,7 @@ BOOST_AUTO_TEST_CASE (scenario106)
 			return item;
 		}
 
-		function bar(int count, State s)
+		function bar(i32 count, State s)
 		{
 			if (count > 0)
 			{
@@ -4255,7 +4255,7 @@ BOOST_AUTO_TEST_CASE (scenario106)
 			return bar(0, state);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return boo(array);
 		}
@@ -4294,7 +4294,7 @@ BOOST_AUTO_TEST_CASE (scenario107)
 			return item;
 		}
 
-		function bar(int count, State s)
+		function bar(i32 count, State s)
 		{
 			if (count >= 1)
 			{
@@ -4304,7 +4304,7 @@ BOOST_AUTO_TEST_CASE (scenario107)
 			return tail bar(count + 1, s);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -4356,7 +4356,7 @@ BOOST_AUTO_TEST_CASE (scenario108)
 			return item;
 		}
 
-		function bar(int count, State s)
+		function bar(i32 count, State s)
 		{
 			if (count >= 1)
 			{
@@ -4389,7 +4389,7 @@ BOOST_AUTO_TEST_CASE (scenario108)
 			return bar(0, state);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let callbacks = Callbacks
 			{
@@ -4438,7 +4438,7 @@ BOOST_AUTO_TEST_CASE (scenario109)
 			return getRed(item.color);
 		}
 
-		function bar(int count, State s)
+		function bar(i32 count, State s)
 		{
 			if (count >= 1)
 			{
@@ -4448,7 +4448,7 @@ BOOST_AUTO_TEST_CASE (scenario109)
 			return tail bar(count + 1, s);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -4473,7 +4473,7 @@ BOOST_AUTO_TEST_CASE (scenario110)
 			return tail loop();
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return loop();
 		}
@@ -4588,7 +4588,7 @@ BOOST_AUTO_TEST_CASE (scenario112)
 BOOST_AUTO_TEST_CASE (scenario113)
 {
 	auto result = exec(R"(
-		function generator(int i, int count)
+		function generator(i32 i, i32 count)
 		{
 			if (i < count)
 			{
@@ -4598,29 +4598,29 @@ BOOST_AUTO_TEST_CASE (scenario113)
 			return i;
 		}
 
-		function add(without v1, int v2)
+		function add(without v1, i32 v2)
 		{
 			return v2;
 		}
 
-		function add(int v1, int v2)
+		function add(i32 v1, i32 v2)
 		{
 			return v1 + v2;
 		}
 
-		function foo(any accumulated, (int value, ...values))
+		function foo(any accumulated, (i32 value, ...values))
 		{
 			let added = add(accumulated, value);
 
 			return tail foo(added, ...values);
 		}
 
-		function foo(any accumulated, int value)
+		function foo(any accumulated, i32 value)
 		{
 			return add(accumulated, value);
 		}
 
-		export int main()
+		export i32 main()
 		{
 			return foo(nothing, generator(0, 3));
 		}
@@ -4632,7 +4632,7 @@ BOOST_AUTO_TEST_CASE (scenario113)
 BOOST_AUTO_TEST_CASE (scenario114)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			let predicate = 1 > 2;
 
@@ -4651,7 +4651,7 @@ BOOST_AUTO_TEST_CASE (scenario114)
 BOOST_AUTO_TEST_CASE (scenario115)
 {
 	auto result = exec(R"(
-		export int main()
+		export i32 main()
 		{
 			let predicate = 1 > 2;
 
@@ -4690,7 +4690,7 @@ BOOST_AUTO_TEST_CASE (scenario116)
 			return callback();
 		}
 
-		function generator(int i, State previous)
+		function generator(i32 i, State previous)
 		{
 			if (i == 0)
 			{
@@ -4705,17 +4705,17 @@ BOOST_AUTO_TEST_CASE (scenario116)
 			return invoke(previous.func);
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let init = State
 			{
@@ -4762,7 +4762,7 @@ BOOST_AUTO_TEST_CASE (scenario117)
 			return item;
 		}
 
-		function mainLoop(int index, State state)
+		function mainLoop(i32 index, State state)
 		{
 			if (index > 0)
 			{
@@ -4797,7 +4797,7 @@ BOOST_AUTO_TEST_CASE (scenario117)
 			return state.user;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let state = State
 			{
@@ -4871,17 +4871,17 @@ BOOST_AUTO_TEST_CASE (scenario118)
 			return item;
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let ui = application();
 			let res = update(expand(ui), expand(application()));
@@ -4956,17 +4956,17 @@ BOOST_AUTO_TEST_CASE (scenario119)
 			return foo(item.item) -> foo(...items);
 		}
 
-		function sum(int product, (int value, ...values))
+		function sum(i32 product, (i32 value, ...values))
 		{
 			return tail sum(product + value, ...values);
 		}
 
-		function sum(int product, int value)
+		function sum(i32 product, i32 value)
 		{
 			return product + value;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let ui = application();
 			let res = foo(ui);
@@ -4986,7 +4986,7 @@ BOOST_AUTO_TEST_CASE (scenario120)
 			value
 		}
 
-		function createItem(int index)
+		function createItem(i32 index)
 		{
 			return Item
 			{
@@ -4994,12 +4994,12 @@ BOOST_AUTO_TEST_CASE (scenario120)
 			};
 		}
 
-		function item((int v, ...vs))
+		function item((i32 v, ...vs))
 		{
 			return createItem(v) -> item(...vs);
 		}
 
-		function item(int v)
+		function item(i32 v)
 		{
 			return createItem(v);
 		}
@@ -5009,12 +5009,12 @@ BOOST_AUTO_TEST_CASE (scenario120)
 			return item([1, 2, 3]);
 		}
 
-		function sum(int product, (Item item, ...items))
+		function sum(i32 product, (Item item, ...items))
 		{
 			return tail sum(product + item.value, ...items);
 		}
 
-		function sum(int product, Item item)
+		function sum(i32 product, Item item)
 		{
 			return product + item.value;
 		}
@@ -5029,7 +5029,7 @@ BOOST_AUTO_TEST_CASE (scenario120)
 			return nothing;
 		}
 
-		export int main()
+		export i32 main()
 		{
 			let items = application();
 
@@ -5042,7 +5042,7 @@ BOOST_AUTO_TEST_CASE (scenario120)
 	BOOST_TEST(result == 6);
 }
 
-test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
+test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
 	llvm::InitializeAllTargets();

@@ -42,12 +42,12 @@ function process(ApplicationState state, Rectangle rectangle)
 
 // Draw
 
-function draw(long renderer, any parent, without item)
+function draw(i64 renderer, any parent, without item)
 {
     return nothing;
 }
 
-function draw(long renderer, any parent, Rectangle rectangle)
+function draw(i64 renderer, any parent, Rectangle rectangle)
 {
     setRenderDrawColor(renderer, rectangle.color);
 

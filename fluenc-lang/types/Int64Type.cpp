@@ -1,9 +1,8 @@
 #include "types/Int64Type.h"
-#include "Utility.h"
 
 std::string Int64Type::name() const
 {
-	return "long";
+	return "i64";
 }
 
 llvm::Type *Int64Type::storageType(llvm::LLVMContext &context) const

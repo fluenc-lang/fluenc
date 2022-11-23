@@ -1,9 +1,8 @@
 #include "types/Uint32Type.h"
-#include "Utility.h"
 
 std::string Uint32Type::name() const
 {
-	return "uint";
+	return "u32";
 }
 
 llvm::Type *Uint32Type::storageType(llvm::LLVMContext &context) const

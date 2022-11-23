@@ -72,7 +72,7 @@ function generateFireRoof(FireContext context)
 	};
 }
 
-function invoke(int generator, FireContext context)
+function invoke(i32 generator, FireContext context)
 {
 	if (generator == 0)
 	{

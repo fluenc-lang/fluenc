@@ -1,27 +1,27 @@
-import int puts(string str);
+import i32 puts(string str);
 
-import int SDL_Init(uint flags);
-import int SDL_SetRenderDrawColor(long renderer, int r, int g, int b, int a);
-import int SDL_RenderClear(long renderer);
-import int SDL_RenderFillRect(long renderer, SDL_Rect rect);
-import int SDL_PollKeyEvent(SDL_KeyboardEvent key);
+import i32 SDL_Init(u32 flags);
+import i32 SDL_SetRenderDrawColor(i64 renderer, i32 r, i32 g, i32 b, i32 a);
+import i32 SDL_RenderClear(i64 renderer);
+import i32 SDL_RenderFillRect(i64 renderer, SDL_Rect rect);
+import i32 SDL_PollKeyEvent(SDL_KeyboardEvent key);
 
-import long SDL_CreateRenderer(long window, int index, int flags);
-import long SDL_CreateWindow(string title, int x, int y, int w, int h, int flags);
+import i64 SDL_CreateRenderer(i64 window, i32 index, i32 flags);
+import i64 SDL_CreateWindow(string title, i32 x, i32 y, i32 w, i32 h, i32 flags);
 
-import void SDL_RenderPresent(long renderer);
+import void SDL_RenderPresent(i64 renderer);
 import void SDL_PumpEvents();
 
-import void printnum(int num);
+import void printnum(i32 num);
 
-global SDL_INIT_VIDEO: 0x00000020u;
-global SDL_WINDOWPOS_UNDEFINED: 0x1FFF0000u;
-global SDL_KEYDOWN: 0x300u;
-global SDL_KEYUP: 0x301u;
-global SDLK_a: 0x61u;
-global SDLK_d: 0x64u;
-global SDLK_s: 0x73u;
-global SDLK_w: 0x77u;
+global SDL_INIT_VIDEO: 0x00000020u32;
+global SDL_WINDOWPOS_UNDEFINED: 0x1FFF0000u32;
+global SDL_KEYDOWN: 0x300u32;
+global SDL_KEYUP: 0x301u32;
+global SDLK_a: 0x61u32;
+global SDLK_d: 0x64u32;
+global SDLK_s: 0x73u32;
+global SDLK_w: 0x77u32;
 
 struct SDL_Rect
 {
@@ -38,8 +38,8 @@ struct SDL_KeyboardEvent
     windowID: 0,
     padding: 0,
     scancode: 0,
-    sym: 0u,
-    padding: 0L
+    sym: 0u32,
+    padding: 0i64
 };
 
 struct Player
@@ -137,7 +137,7 @@ function rectFromPlayer(Player player)
     };
 }
 
-function mainLoop(long renderer, Player player)
+function mainLoop(i64 renderer, Player player)
 {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
@@ -156,7 +156,7 @@ function mainLoop(long renderer, Player player)
         );
 }
 
-export int main()
+export i32 main()
 {
     SDL_Init(SDL_INIT_VIDEO);
 

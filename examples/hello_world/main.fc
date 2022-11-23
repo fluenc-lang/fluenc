@@ -1,6 +1,6 @@
-import int puts(string str);
+import i32 puts(string str);
 
-function printHelloWorld(int i, int count, int t)
+function printHelloWorld(i32 i, i32 count, i32 t)
 {
     if (i >= count)
     {
@@ -13,7 +13,7 @@ function printHelloWorld(int i, int count, int t)
         );
 }
 
-export int main()
+export i32 main()
 {
     return printHelloWorld(0, 5, 0);
 }

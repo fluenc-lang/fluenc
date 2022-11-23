@@ -1,22 +1,22 @@
 global O_RDONLY: 0;
 
-import int printNumber(int number);
-import int open(string apathname, int flags);
-import int getc(long stream);
+import i32 printNumber(i32 number);
+import i32 open(string apathname, i32 flags);
+import i32 getc(i64 stream);
 
-import long fdopen(int fildes, string mode);
+import i64 fdopen(i32 fildes, string mode);
 
-function readChar(long file)
+function readChar(i64 file)
 {
     return getc(file) -> readChar(file);
 }
 
-function sum(int product, int value)
+function sum(i32 product, i32 value)
 {
     return product + value;
 }
 
-function sum(int product, (int value, ...values))
+function sum(i32 product, (i32 value, ...values))
 {
     return sum(product + value, ...values);
 }
@@ -37,7 +37,7 @@ struct Instruction
     value: 0
 };
 
-function instruction(int type, int value)
+function instruction(i32 type, i32 value)
 {
     return Instruction
     {
@@ -46,7 +46,7 @@ function instruction(int type, int value)
     };
 }
 
-function nextInstruction(int mode, int type, int value, (int char, ...chars))
+function nextInstruction(i32 mode, i32 type, i32 value, (i32 char, ...chars))
 {
     if (char == '\n') // New line
     {
@@ -71,12 +71,12 @@ function nextInstruction(int mode, int type, int value, (int char, ...chars))
     return tail nextInstruction(mode, type, (value * 10) + (char - '0'), ...chars);
 }
 
-function part1(int x, int y, without instruction)
+function part1(i32 x, i32 y, without instruction)
 {
     return x * y;
 }
 
-function part1(int x, int y, (Instruction instruction, ...instructions))
+function part1(i32 x, i32 y, (Instruction instruction, ...instructions))
 {
     if (instruction.type == Forward)
     {
@@ -96,12 +96,12 @@ function part1(int x, int y, (Instruction instruction, ...instructions))
     return tail part1(x, y, ...instructions);
 }
 
-function part2(int x, int y, int aim, without instruction)
+function part2(i32 x, i32 y, i32 aim, without instruction)
 {
     return x * y;
 }
 
-function part2(int x, int y, int aim, (Instruction instruction, ...instructions))
+function part2(i32 x, i32 y, i32 aim, (Instruction instruction, ...instructions))
 {
     if (instruction.type == Forward)
     {
@@ -125,7 +125,7 @@ function part2(int x, int y, int aim, (Instruction instruction, ...instructions)
     return tail part2(x, y, aim, ...instructions);
 }
 
-function bind(int result1, int result2)
+function bind(i32 result1, i32 result2)
 {
     return [result1, result2];
 }
@@ -148,19 +148,19 @@ function run()
     );
 }
 
-function printNumbers(int number)
+function printNumbers(i32 number)
 {
     return printNumber(number);
 }
 
-function printNumbers((int number, ...numbers))
+function printNumbers((i32 number, ...numbers))
 {
     printNumber(number);
 
     return tail printNumbers(...numbers);
 }
 
-export int main()
+export i32 main()
 {
     return printNumbers(run());
 }

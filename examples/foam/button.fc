@@ -129,7 +129,7 @@ function process(ApplicationState state, (Button button, ...controls))
 
 // Draw
 
-function draw(long renderer, any parent, Button button)
+function draw(i64 renderer, any parent, Button button)
 {
     return tail draw(renderer, parent, selectTemplate(defaultTemplate(button), button));
 }

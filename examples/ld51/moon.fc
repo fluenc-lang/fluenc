@@ -71,7 +71,7 @@ function generateMoonRoof(MoonContext context)
 	};
 }
 
-function invoke(int generator, MoonContext context)
+function invoke(i32 generator, MoonContext context)
 {
 	if (generator == 0)
 	{
