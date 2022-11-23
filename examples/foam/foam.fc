@@ -67,7 +67,7 @@ function createApplicationState(State state)
     };
 }
 
-function rgb(int r, int g, int b)
+function rgb(i32 r, i32 g, i32 b)
 {
     return Color
     {
@@ -150,7 +150,7 @@ function boundingRect(Item item, Item parent)
     };
 }
 
-function setRenderDrawColor(long renderer, Color color)
+function setRenderDrawColor(i64 renderer, Color color)
 {
     return SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
@@ -170,7 +170,7 @@ function selectTemplate(ControlTemplate template, Item item)
     return template.normal;
 }
 
-function draw(long renderer, any parent, (any item, ...controls))
+function draw(i64 renderer, any parent, (any item, ...controls))
 {
     draw(renderer, parent, item);
 
@@ -190,7 +190,7 @@ function isPressed(SDL::MouseButtonEvent button)
     return button.type == SDL::MOUSEBUTTONDOWN;
 }
 
-function mainLoop(long renderer, ApplicationState state, ApplicationDefinition definition)
+function mainLoop(i64 renderer, ApplicationState state, ApplicationDefinition definition)
 {
     SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL::SDL_RenderClear(renderer);

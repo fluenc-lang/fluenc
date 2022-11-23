@@ -1,6 +1,6 @@
 namespace Array
 {
-    function elementAt(any item, int index, int i)
+    function elementAt(any item, i32 index, i32 i)
     {
         if (i == index)
         {
@@ -10,7 +10,7 @@ namespace Array
         return nothing;
     }
 
-    function elementAt((any item, ...items), int index, int i)
+    function elementAt((any item, ...items), i32 index, i32 i)
     {
         if (i == index)
         {
@@ -20,7 +20,7 @@ namespace Array
         return tail elementAt(...items, index, i + 1);
     }
 
-    function set((int value, ...values), int index, int result, int i)
+    function set((i32 value, ...values), i32 index, i32 result, i32 i)
     {
         if (i == index)
         {
@@ -30,7 +30,7 @@ namespace Array
         return value -> set(...values, index, result, i + 1);
     }
 
-    function set(int value, int index, int result, int i)
+    function set(i32 value, i32 index, i32 result, i32 i)
     {
         if (i == index)
         {

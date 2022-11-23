@@ -2,12 +2,12 @@ import MyStruct foo(MyStruct s);
 
 struct NestedStruct
 {
-    int y
+    i32 y
 };
 
 struct MyStruct
 {
-    int x,
+    i32 x,
     NestedStruct nested
 };
 
@@ -33,7 +33,7 @@ function bar(MyStruct s)
     return s.x + borr(s.nested);
 }
 
-export int main()
+export i32 main()
 {
     return bar(foo(createStruct()));
 }

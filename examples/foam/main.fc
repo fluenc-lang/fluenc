@@ -6,9 +6,9 @@ use "image.fc"
 use "composite.fc"
 use "column.fc"
 
-import int puts(string str);
+import i32 puts(string str);
 
-import void printnum(int num);
+import void printnum(i32 num);
 
 struct State
 {
@@ -287,7 +287,7 @@ function initState()
     return State {};
 }
 
-export int main()
+export i32 main()
 {
     let definition = ApplicationDefinition
     {

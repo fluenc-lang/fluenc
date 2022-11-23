@@ -6,11 +6,11 @@ use "input.fc"
 use "draw.fc"
 use "tmx.fc"
 
-import int puts(string str);
-import int rand();
+import i32 puts(string str);
+import i32 rand();
 
-import void srand(int seed);
-import void printnum(int num);
+import void srand(i32 seed);
+import void printnum(i32 num);
 
 global Width: 1280;
 global Height: 720;
@@ -73,7 +73,7 @@ function mainLoop(State state)
 	return tail mainLoop(withUpdatedStage);
 }
 
-function nextStage(int rounds)
+function nextStage(i32 rounds)
 {
 	let result = rounds % 4;
 
@@ -111,7 +111,7 @@ function nextStage(int rounds)
 	};
 }
 
-export int main()
+export i32 main()
 {
 	SDL::SDL_Init(SDL::INIT_VIDEO | SDL::INIT_AUDIO);
 

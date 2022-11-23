@@ -35,7 +35,7 @@ function process(ApplicationState state, Composite image)
     return process(state, composite(image));
 }
 
-function draw(long renderer, any parent, Composite image)
+function draw(i64 renderer, any parent, Composite image)
 {
 	return draw(renderer, parent, composite(image));
 }

@@ -3,42 +3,42 @@ struct Struct
     values: []
 };
 
-function sum(int product, int v)
+function sum(i32 product, i32 v)
 {
     return product + v;
 }
 
-function sum(int product, (int v, ...values))
+function sum(i32 product, (i32 v, ...values))
 {
     return tail sum(product + v, ...values);
 }
 
-function add(int addend, int v)
+function add(i32 addend, i32 v)
 {
     return v + addend;
 }
 
-function add(int addend, (int v, ...values))
+function add(i32 addend, (i32 v, ...values))
 {
     return v + addend -> add(addend, ...values);
 }
 
-function noop(int v)
+function noop(i32 v)
 {
     return v;
 }
 
-function noop((int v, ...values))
+function noop((i32 v, ...values))
 {
     return v -> noop(...values);
 }
 
-function first(int v)
+function first(i32 v)
 {
     return v;
 }
 
-function first((int v, ...values))
+function first((i32 v, ...values))
 {
     return v;
 }
@@ -61,7 +61,7 @@ function foo(Struct s)
 	return first(s.values);
 }
 
-export int main()
+export i32 main()
 {
     return foo(createStruct());
 }

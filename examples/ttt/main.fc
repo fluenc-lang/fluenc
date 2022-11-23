@@ -1,8 +1,8 @@
 use "array.fc"
 use "sdl.fc"
 
-import int puts(string str);
-import void printnum(int num);
+import i32 puts(string str);
+import void printnum(i32 num);
 
 struct Color
 {
@@ -41,7 +41,7 @@ function createEventState()
     };
 }
 
-function rgb(int r, int g, int b)
+function rgb(i32 r, i32 g, i32 b)
 {
     return Color
     {
@@ -51,7 +51,7 @@ function rgb(int r, int g, int b)
     };
 }
 
-function createSquare(int index, int owner)
+function createSquare(i32 index, i32 owner)
 {
     let x = index % 3;
 
@@ -63,12 +63,12 @@ function createSquare(int index, int owner)
     };
 }
 
-function square((int owner, ...values), int index)
+function square((i32 owner, ...values), i32 index)
 {
     return createSquare(index, owner) -> square(...values, index + 1);
 }
 
-function square(int owner, int index)
+function square(i32 owner, i32 index)
 {
     return createSquare(index, owner);
 }
@@ -92,17 +92,17 @@ function bounds(Square square)
     };
 }
 
-function setRenderDrawColor(long renderer, Color color)
+function setRenderDrawColor(i64 renderer, Color color)
 {
     return SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 }
 
-function setRenderDrawColor(long renderer, without color)
+function setRenderDrawColor(i64 renderer, without color)
 {
     return SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 255, 0);
 }
 
-function drawSquare(long renderer, Square square)
+function drawSquare(i64 renderer, Square square)
 {
     let colors = [rgb(255, 0, 0), rgb(0, 255, 0)];
 
@@ -115,14 +115,14 @@ function drawSquare(long renderer, Square square)
     return nothing;
 }
 
-function draw(long renderer, (Square square, ...next))
+function draw(i64 renderer, (Square square, ...next))
 {
     drawSquare(renderer, square);
 
     return tail draw(renderer, ...next);
 }
 
-function draw(long renderer, Square square)
+function draw(i64 renderer, Square square)
 {
     return drawSquare(renderer, square);
 }
@@ -140,7 +140,7 @@ function isPressed(SDL::MouseButtonEvent button)
     return button.type == SDL::MOUSEBUTTONDOWN;
 }
 
-function updateCell(State state, EventState events, int index, Square square)
+function updateCell(State state, EventState events, i32 index, Square square)
 {
     if (square.owner >= 0)
     {
@@ -159,19 +159,19 @@ function updateCell(State state, EventState events, int index, Square square)
     return state;
 }
 
-function update(State state, EventState events, int index, (Square square, ...squares))
+function update(State state, EventState events, i32 index, (Square square, ...squares))
 {
     let updatedState = updateCell(state, events, index, square);
 
     return tail update(updatedState, events, index + 1, ...squares);
 }
 
-function update(State state, EventState events, int index, Square square)
+function update(State state, EventState events, i32 index, Square square)
 {
     return updateCell(state, events, index, square);
 }
 
-function mainLoop(long renderer, State state)
+function mainLoop(i64 renderer, State state)
 {
     SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL::SDL_RenderClear(renderer);
@@ -198,7 +198,7 @@ function initState()
     };
 }
 
-export int main()
+export i32 main()
 {
     SDL::SDL_Init(SDL::INIT_VIDEO);
 

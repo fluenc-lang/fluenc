@@ -1,16 +1,16 @@
 use "sdl.fc"
 
-import int puts(string str);
-import int rand();
+import i32 puts(string str);
+import i32 rand();
 
-import void srand(int seed);
-import void printnum(int num);
+import void srand(i32 seed);
+import void printnum(i32 num);
 
 global Width: 1920;
 global Height: 1080;
 global Target: (Width / 2) - 100;
 
-function rect(int x, int y, int width, int height)
+function rect(i32 x, i32 y, i32 width, i32 height)
 {
 	return SDL::Rect
 	{
@@ -21,7 +21,7 @@ function rect(int x, int y, int width, int height)
 	};
 }
 
-function min(int left, int right)
+function min(i32 left, i32 right)
 {
 	if (left < right)
 	{
@@ -31,7 +31,7 @@ function min(int left, int right)
 	return right;
 }
 
-function max(int left, int right)
+function max(i32 left, i32 right)
 {
 	if (left > right)
 	{
@@ -53,7 +53,7 @@ struct Star
 	y
 };
 
-function drawSkyscraper(long renderer, int x, int y, int scale, Skyscraper previous, Skyscraper current)
+function drawSkyscraper(i64 renderer, i32 x, i32 y, i32 scale, Skyscraper previous, Skyscraper current)
 {
 	let right = x + current.width;
 	let height = (current.height * scale) / 100;
@@ -65,19 +65,19 @@ function drawSkyscraper(long renderer, int x, int y, int scale, Skyscraper previ
 	return right + 20;
 }
 
-function drawSkyscrapers(long renderer, int x, int y, int scale, Skyscraper previous, Skyscraper current)
+function drawSkyscrapers(i64 renderer, i32 x, i32 y, i32 scale, Skyscraper previous, Skyscraper current)
 {
 	return drawSkyscraper(renderer, x, y, scale, previous, current);
 }
 
-function drawSkyscrapers(long renderer, int x, int y, int scale, Skyscraper previous, (Skyscraper current, ...next))
+function drawSkyscrapers(i64 renderer, i32 x, i32 y, i32 scale, Skyscraper previous, (Skyscraper current, ...next))
 {
 	let offset = drawSkyscraper(renderer, x, y, scale, previous, current);
 
 	return tail drawSkyscrapers(renderer, offset, y, scale, current, ...next);
 }
 
-function skyscrapers(int seed, int total)
+function skyscrapers(i32 seed, i32 total)
 {
 	srand(seed + total);
 
@@ -100,7 +100,7 @@ function skyscrapers(int seed, int total)
 	return skyscraper;
 }
 
-function stars(int seed, int i, int count)
+function stars(i32 seed, i32 i, i32 count)
 {
 	srand(seed + (i * 2));
 
@@ -131,12 +131,12 @@ struct Color
 	b
 };
 
-function getViewport(long renderer)
+function getViewport(i64 renderer)
 {
 	return SDL::SDL_RenderGetViewportEx(renderer, SDL::Rect {});
 }
 
-function colorForStar(int episodes, int twinkleIndex, int starIndex)
+function colorForStar(i32 episodes, i32 twinkleIndex, i32 starIndex)
 {
 	if ((episodes > 63) || (twinkleIndex == starIndex))
 	{
@@ -156,14 +156,14 @@ function colorForStar(int episodes, int twinkleIndex, int starIndex)
 	};
 }
 
-function setRenderColor(long renderer, Color color)
+function setRenderColor(i64 renderer, Color color)
 {
 	SDL::SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 
 	return nothing;
 }
 
-function drawStars(long renderer, int y, int episodes, int i, Star star)
+function drawStars(i64 renderer, i32 y, i32 episodes, i32 i, Star star)
 {
 	let radius = 20;
 	let color = colorForStar(episodes, episodes % 5, i % 5);
@@ -178,12 +178,12 @@ function drawStars(long renderer, int y, int episodes, int i, Star star)
 	return nothing;
 }
 
-function strokeStars(long renderer, int y, int episodes, int i, without previous, Star current)
+function strokeStars(i64 renderer, i32 y, i32 episodes, i32 i, without previous, Star current)
 {
 	return nothing;
 }
 
-function strokeStars(long renderer, int y, int episodes, int i, Star previous, Star current)
+function strokeStars(i64 renderer, i32 y, i32 episodes, i32 i, Star previous, Star current)
 {
 	if (i > (episodes - 48))
 	{
@@ -196,26 +196,26 @@ function strokeStars(long renderer, int y, int episodes, int i, Star previous, S
 	return nothing;
 }
 
-function strokeStars(long renderer, int y, int episodes, int i, without previous, (Star current, ...next))
+function strokeStars(i64 renderer, i32 y, i32 episodes, i32 i, without previous, (Star current, ...next))
 {
 	return tail strokeStars(renderer, y, episodes, i + 1, current, ...next);
 }
 
-function strokeStars(long renderer, int y, int episodes, int i, Star previous, (Star current, ...next))
+function strokeStars(i64 renderer, i32 y, i32 episodes, i32 i, Star previous, (Star current, ...next))
 {
 	strokeStars(renderer, y, episodes, i, previous, current);
 
 	return tail strokeStars(renderer, y, episodes, i + 1, current, ...next);
 }
 
-function drawStars(long renderer, int y, int episodes, int i, (Star star, ...next))
+function drawStars(i64 renderer, i32 y, i32 episodes, i32 i, (Star star, ...next))
 {
 	drawStars(renderer, y, episodes, i, star);
 
 	return tail drawStars(renderer, y, episodes, i + 1, ...next);
 }
 
-function star(int x, int y)
+function star(i32 x, i32 y)
 {
 	return Star
 	{
@@ -241,7 +241,7 @@ function getAdaptedViewport(SDL::Rect actual)
 	};
 }
 
-function credits(long renderer)
+function credits(i64 renderer)
 {
 	let ticks = SDL::SDL_GetTicks();
 
@@ -266,7 +266,7 @@ function credits(long renderer)
 
 	SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL::SDL_RenderFillRect(renderer, viewport);
-	SDL::SDL_RenderCopy(renderer, texture, 0L, bounds);
+	SDL::SDL_RenderCopy(renderer, texture, 0i64, bounds);
 	SDL::SDL_FreeSurface(surface);
 
 	let fadeIn = max(255 - (((ticks - 20000) * 255) / 1000), 0);
@@ -280,7 +280,7 @@ function credits(long renderer)
 	return tail mainLoop(renderer, 0);
 }
 
-function scene1(long renderer, int episodes)
+function scene1(i64 renderer, i32 episodes)
 {
 	let ticks = SDL::SDL_GetTicks();
 	let viewport = getAdaptedViewport(getViewport(renderer));
@@ -363,7 +363,7 @@ function scene1(long renderer, int episodes)
 	return tail mainLoop(renderer, episodes);
 }
 
-function mainLoop(long renderer, int episodes)
+function mainLoop(i64 renderer, i32 episodes)
 {
 	SDL::SDL_SetRenderDrawColor(renderer, 28, 28, 36, 255);
 	SDL::SDL_RenderClear(renderer);
@@ -372,7 +372,7 @@ function mainLoop(long renderer, int episodes)
 	return scene1(renderer, episodes);
 }
 
-export int main()
+export i32 main()
 {
 	SDL::SDL_Init(SDL::INIT_VIDEO | SDL::INIT_AUDIO);
 
