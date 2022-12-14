@@ -14,7 +14,8 @@ add_library(${PROJECT_NAME} OBJECT ${SOURCE_FILES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    LLVM
+	${LLVM_AVAILABLE_LIBS}
+
     immer
     range-v3
 
