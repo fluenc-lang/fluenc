@@ -16,7 +16,7 @@ class IteratorValue : public IIteratable
 			, const Node *subject
 			);
 
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const EntryPoint *m_entryPoint;

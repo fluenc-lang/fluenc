@@ -73,7 +73,7 @@ int8_t ExpandedType::compatibility(const Type *type, const EntryPoint &entryPoin
 		return 0;
 	}
 
-	if (auto iterator = dynamic_cast<const IteratorType *>(type))
+	if (dynamic_cast<const IteratorType *>(type))
 	{
 		return 1;
 	}

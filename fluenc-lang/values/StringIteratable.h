@@ -10,7 +10,7 @@ class StringIteratable : public IIteratable
 	public:
 		StringIteratable(const ReferenceValue *index, const Node *node, llvm::Value *address, size_t length);
 
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const ReferenceValue *m_index;

@@ -38,7 +38,6 @@ class EntryPoint
 			, immer::box<std::map<std::string, Prototype *>> types
 			, immer::box<std::vector<const CallableNode *>> roots
 			, immer::box<Stack> values
-			, IIteratorStorage *iteratorStorage
 			, const ExpandedType *iteratorType
 			);
 
@@ -70,8 +69,6 @@ class EntryPoint
 
 		const Stack &values() const;
 
-		IIteratorStorage *iteratorStorage() const;
-
 		const EntryPoint *byName(const std::string &name) const;
 		const EntryPoint *entry() const;
 		const EntryPoint *parent() const;
@@ -80,7 +77,6 @@ class EntryPoint
 
 		EntryPoint withBlock(llvm::BasicBlock *block) const;
 		EntryPoint withAlloc(llvm::BasicBlock *alloc) const;
-		EntryPoint withIteratorStorage(IIteratorStorage *iteratorStorage) const;
 		EntryPoint markEntry() const;
 		EntryPoint withFunction(llvm::Function *function) const;
 		EntryPoint withLocals(const std::map<std::string, const BaseValue *> &locals) const;
@@ -117,8 +113,6 @@ class EntryPoint
 		immer::box<std::map<std::string, Prototype *>> m_types;
 		immer::box<std::vector<const CallableNode *>> m_roots;
 		immer::box<Stack> m_values;
-
-		IIteratorStorage *m_iteratorStorage;
 
 		const ExpandedType *m_iteratorType;
 };

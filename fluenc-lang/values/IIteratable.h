@@ -6,7 +6,7 @@
 
 class EntryPoint;
 
-class IIteratable : public Visitable<Emitter>
+class IIteratable : public Visitable<DefaultNodeVisitor>
 {
 };
 

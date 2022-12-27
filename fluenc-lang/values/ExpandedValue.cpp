@@ -29,6 +29,7 @@ const Type *ExpandedValue::type() const
 const BaseValue *ExpandedValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
+	UNUSED(strategy);
 
 	return this;
 }

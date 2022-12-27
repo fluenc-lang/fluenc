@@ -38,6 +38,7 @@ const Type *FunctionValue::type() const
 const BaseValue *FunctionValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
+	UNUSED(strategy);
 
 	return this;
 }

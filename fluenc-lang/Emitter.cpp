@@ -12,7 +12,6 @@
 #include "IRBuilderEx.h"
 #include "ITypeName.h"
 #include "UndeclaredIdentifierException.h"
-#include "DecoratedIteratorStorage.h"
 #include "FunctionNotFoundException.h"
 #include "FunctionHelper.h"
 #include "Indexed.h"
@@ -52,6 +51,7 @@
 #include "values/IteratorValue.h"
 #include "values/StringIteratable.h"
 #include "values/IteratorValueGeneratorProxy.h"
+#include "values/Iterator.h"
 
 #include "nodes/BinaryNode.h"
 #include "nodes/ExportedFunctionNode.h"
@@ -66,6 +66,7 @@
 #include "nodes/MemberAccessNode.h"
 #include "nodes/ReferenceSinkNode.h"
 #include "nodes/LazyEvaluationNode.h"
+#include "nodes/IteratorEvaluationNode.h"
 #include "nodes/FunctionCallNode.h"
 #include "nodes/StackSegmentNode.h"
 #include "nodes/FunctionCallProxyNode.h"
@@ -90,6 +91,7 @@
 #include "nodes/IteratableNode.h"
 #include "nodes/DistributorNode.h"
 #include "nodes/RenderedNode.h"
+#include "nodes/Pod.h"
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/MissingTailCallException.h"
@@ -751,11 +753,102 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 
 std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisitorContext context) const
 {
-	auto digestDepth = [this](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
+	auto digestDepth = [&, this](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
 	{
 		for (auto i = 0u; i < values.size(); i++)
 		{
 			auto value = values.pop();
+
+			if (auto lazy = dynamic_cast<const LazyValue *>(value))
+			{
+				auto iteratable = lazy->generate(entryPoint);
+
+				std::vector<DzResult> results;
+
+				for (auto &[resultEntryPoint, resultValues] : iteratable->accept(*this, { entryPoint, Stack() }))
+				{
+					auto forwardedValues = values;
+
+					for (auto &resultValue : resultValues)
+					{
+						forwardedValues.push(resultValue);
+					}
+
+					for (auto &result : recurse(resultEntryPoint, forwardedValues, recurse))
+					{
+						results.push_back(result);
+					}
+				}
+
+				return results;
+			}
+
+			std::vector<DzResult> results;
+
+			for (auto &[resultEntryPoint, resultValues] : recurse(entryPoint, values, recurse))
+			{
+				std::vector<const BaseValue *> forwardedValues;
+
+				for (auto resultValue : resultValues)
+				{
+					forwardedValues.push_back(resultValue);
+				}
+
+				forwardedValues.push_back(value);
+
+				results.push_back({ resultEntryPoint, forwardedValues });
+			}
+
+			return results;
+		}
+
+		return {{ entryPoint, values }};
+	};
+
+	std::vector<DzResult> results;
+
+	for (auto &[resultEntryPoint, resultValues] : digestDepth(context.entryPoint, context.values, digestDepth))
+	{
+		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
+		{
+			results.push_back(result);
+		}
+	}
+
+	return results;
+}
+
+std::vector<DzResult> Emitter::visit(const IteratorEvaluationNode *node, DefaultVisitorContext context) const
+{
+	UNUSED(node);
+
+	auto digestDepth = [&, this](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
+	{
+		for (auto i = 0u; i < values.size(); i++)
+		{
+			auto value = values.pop();
+
+			if (auto iterator = dynamic_cast<const Iterator *>(value))
+			{
+				std::vector<DzResult> results;
+
+				for (auto &[resultEntryPoint, resultValues] : iterator->generate(*this, { entryPoint, Stack() }))
+				{
+					auto forwardedValues = values;
+
+					for (auto &resultValue : resultValues)
+					{
+						forwardedValues.push(resultValue);
+					}
+
+					for (auto &result : recurse(resultEntryPoint, forwardedValues, recurse))
+					{
+						results.push_back(result);
+					}
+				}
+
+				return results;
+			}
 
 			if (auto forwarded = dynamic_cast<const ForwardedValue *>(value))
 			{
@@ -780,6 +873,7 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 				return results;
 			}
 
+			// Why is this needed?
 			if (auto lazy = dynamic_cast<const LazyValue *>(value))
 			{
 				auto iteratable = lazy->generate(entryPoint);
@@ -933,17 +1027,7 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 		return {{ entryPoint, values }};
 	};
 
-	std::vector<DzResult> results;
-
-	for (auto &[resultEntryPoint, resultValues] : digestDepth(context.entryPoint, context.values, digestDepth))
-	{
-		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
-		{
-			results.push_back(result);
-		}
-	}
-
-	return results;
+	return digestDepth(context.entryPoint, context.values, digestDepth);
 }
 
 std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisitorContext context) const
@@ -1082,15 +1166,8 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisitorContext context) const
 {
-	auto iteratorStorage = new DecoratedIteratorStorage(context.entryPoint.iteratorStorage()
-		, std::to_string(node->id())
-		);
-
-	auto inputEntryPoint = context.entryPoint
-		.withIteratorStorage(iteratorStorage);
-
 	std::vector<DzResult> result;
-	std::vector<DzResult> input = {{ inputEntryPoint, Stack() }};
+	std::vector<DzResult> input = {{ context.entryPoint, Stack() }};
 
 	std::vector<Indexed<Node *>> orderedValues;
 
@@ -1148,25 +1225,51 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 			pointersToValues.push(value);
 		}
 
-		auto callResults = node->m_call->accept(*this, { subjectEntryPoint, pointersToValues });
+		auto llvmContext = subjectEntryPoint.context();
 
-		for (auto &[callEntryPoint, callValues] : callResults)
+		auto preliminaryBlock = createBlock(llvmContext);
+
+		auto preliminaryEntryPoint = subjectEntryPoint
+			.withBlock(preliminaryBlock)
+			;
+
+		auto pod = new Pod(node->m_call, context.values);
+		auto callResults = pod->accept(*this, { preliminaryEntryPoint, pointersToValues });
+
+		auto producesIterator = std::any_of(begin(callResults), end(callResults), [](auto pair)
 		{
-			auto forwardedValues = context.values;
+			auto &[_, callValues] = pair;
 
-			for (auto &value : callValues)
+			if (callValues.size() <= 0)
 			{
-				forwardedValues.push(value);
+				return false;
 			}
 
-			auto forwardedEntryPoint = callEntryPoint
-				.withIteratorStorage(context.entryPoint.iteratorStorage());
+			auto returnValue = callValues.peek();
 
-			auto consumerResults = node->m_consumer->accept(*this, { forwardedEntryPoint, forwardedValues });
+			return dynamic_cast<const TupleValue *>(returnValue) != nullptr;
+		});
 
-			for (auto &consumerResult : consumerResults)
+		if (producesIterator)
+		{
+			auto iterator = new Iterator(pod, new IteratorType(), preliminaryEntryPoint, pointersToValues, callResults);
+
+			result.push_back({ subjectEntryPoint, iterator });
+		}
+		else
+		{
+			linkBlocks(subjectEntryPoint.block(), preliminaryBlock);
+
+			std::vector<DzResult> preliminaryResults;
+
+			for (auto &[callEntryPoint, callValues] : callResults)
 			{
-				result.push_back(consumerResult);
+				auto consumerResults = node->m_consumer->accept(*this, { callEntryPoint, callValues });
+
+				for (auto &consumerResult : consumerResults)
+				{
+					result.push_back(consumerResult);
+				}
 			}
 		}
 	}
@@ -1197,7 +1300,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 
 		auto returnValue = preliminaryValues.peek();
 
-		if (dynamic_cast<const TupleValue *>(returnValue))
+		if (dynamic_cast<const Iterator *>(returnValue))
 		{
 			auto subject = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, context.entryPoint);
 			auto generator = new IteratorValueGeneratorProxy(subject, preliminaryEntryPoint, preliminaryResults);
@@ -1217,6 +1320,8 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 			return results;
 		}
 	}
+
+	preliminaryEntryPoint->setParent(context.entryPoint);
 
 	linkBlocks(context.entryPoint.block(), preliminaryBlock);
 

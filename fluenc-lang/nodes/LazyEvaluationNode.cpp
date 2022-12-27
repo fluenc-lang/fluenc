@@ -1,6 +1,6 @@
 #include "nodes/LazyEvaluationNode.h"
 
-LazyEvaluationNode::LazyEvaluationNode(const Node *consumer)
+LazyEvaluationNode::LazyEvaluationNode(const Visitable<DefaultNodeVisitor> *consumer)
 	: m_consumer(consumer)
 {
 }

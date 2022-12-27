@@ -1,9 +1,13 @@
-#include "IteratorStorage.h"
+#include "ScalarValue.h"
+#include "IRBuilderEx.h"
 
 #include "values/StringIteratableGenerator.h"
 #include "values/StringIteratable.h"
+#include "values/Iteratable.h"
 
 #include "types/IteratorType.h"
+#include "types/Int64Type.h"
+#include "types/StringType.h"
 
 StringIteratableGenerator::StringIteratableGenerator(const Node *node, llvm::Value *address, size_t id, size_t length)
 	: m_node(node)
@@ -17,17 +21,32 @@ const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPo
 {
 	UNUSED(mode);
 
-	auto iteratorStorage = entryPoint
-		.iteratorStorage();
+	IRBuilderEx builder(entryPoint);
 
-	auto index = iteratorStorage->getOrCreate(std::to_string(m_id), entryPoint);
+	auto context = entryPoint.context();
 
-	return new StringIteratable(index, m_node, m_address, m_length);
+	auto indexType = Int64Type::instance();
+	auto storageType = indexType->storageType(*context);
+
+	auto zero = new ScalarValue(indexType
+		, llvm::ConstantInt::get(storageType, 0)
+		);
+
+	auto index = entryPoint.alloc(indexType, "index");
+
+	builder.createStore(zero, index);
+
+	auto subject = new StringIteratable(index, m_node, m_address, m_length);
+
+	return new Iteratable(subject
+		, StringType::get(m_length)
+		);
 }
 
 const ILazyValueGenerator *StringIteratableGenerator::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
+	UNUSED(strategy);
 
 	return this;
 }

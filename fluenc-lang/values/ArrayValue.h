@@ -20,7 +20,7 @@ class ArrayValue : public IIteratable
 			, size_t size
 			);
 
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		static const Node *createIterator(const IIteratable *parent, const Type *type, size_t size, const std::shared_ptr<peg::Ast> &ast);
