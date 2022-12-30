@@ -5168,6 +5168,22 @@ BOOST_AUTO_TEST_CASE (scenario122)
 	BOOST_TEST(result == 21);
 }
 
+BOOST_AUTO_TEST_CASE (scenario123)
+{
+	auto result = exec(R"(
+		export i32 foo(i32 value)
+		{
+			return value * 2;
+		}
+
+		export i32 main()
+		{
+			return foo(123);
+		}
+	)");
+
+	BOOST_TEST(result == 246);
+}
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {

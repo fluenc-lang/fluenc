@@ -1,5 +1,4 @@
 #include "DzArgument.h"
-#include "Utility.h"
 #include "Type.h"
 
 #include "nodes/ImportedFunctionNode.h"
@@ -8,7 +7,7 @@
 
 ImportedFunctionNode::ImportedFunctionNode(ITypeName *returnType
 	, const std::string &name
-	, const std::shared_ptr<peg::Ast> &ast
+	, const std::shared_ptr<peg::Ast> ast
 	, const std::vector<DzBaseArgument *> &arguments
 	)
 	: m_returnType(returnType)
@@ -16,6 +15,11 @@ ImportedFunctionNode::ImportedFunctionNode(ITypeName *returnType
 	, m_ast(ast)
 	, m_arguments(arguments)
 {
+}
+
+ITypeName *ImportedFunctionNode::returnType() const
+{
+	return m_returnType;
 }
 
 std::string ImportedFunctionNode::name() const

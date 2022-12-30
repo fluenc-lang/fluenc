@@ -138,6 +138,14 @@ void populateInstructions(const std::vector<std::string> &namespaces
 				if (callable->attribute() == FunctionAttribute::Export)
 				{
 					roots.push_back(callable);
+
+					auto import = new ImportedFunctionNode(callable->returnType(), callable->name(), nullptr, callable->arguments());
+
+					auto name = qualifiedNames(namespaces
+						, callable->name()
+						);
+
+					functions.insert({ name[0], import });
 				}
 				else
 				{
@@ -719,6 +727,13 @@ CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &as
 	auto returnType = visitTypeName(ast->nodes[0]);
 	auto name = visitId(ast->nodes[1]);
 
+	std::vector<DzBaseArgument *> arguments;
+
+	std::transform(begin(ast->nodes) + 2, end(ast->nodes) - 1, std::back_inserter(arguments), [this](auto argument)
+	{
+		return visitArgument(argument);
+	});
+
 	auto terminator = new ExportedFunctionTerminatorNode();
 
 	Visitor visitor(m_namespaces, nullptr, m_parent, TerminatorNode::instance(), nullptr);
@@ -728,7 +743,7 @@ CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &as
 	auto junction = new JunctionNode(block);
 	auto distributor = new DistributorNode(junction, terminator);
 
-	return new ExportedFunctionNode(name, distributor, returnType);
+	return new ExportedFunctionNode(name, arguments, distributor, returnType);
 }
 
 CallableNode *Visitor::visitImportedFunction(const std::shared_ptr<peg::Ast> &ast) const

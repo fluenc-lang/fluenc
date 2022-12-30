@@ -3,13 +3,20 @@
 #include "nodes/ExportedFunctionNode.h"
 
 ExportedFunctionNode::ExportedFunctionNode(const std::string &name
+	, const std::vector<DzBaseArgument *> &arguments
 	, Node *block
 	, ITypeName *returnType
 	)
 	: m_name(name)
+	, m_arguments(arguments)
 	, m_block(block)
 	, m_returnType(returnType)
 {
+}
+
+ITypeName *ExportedFunctionNode::returnType() const
+{
+	return m_returnType;
 }
 
 std::string ExportedFunctionNode::name() const
@@ -19,7 +26,7 @@ std::string ExportedFunctionNode::name() const
 
 std::vector<DzBaseArgument *> ExportedFunctionNode::arguments() const
 {
-	return std::vector<DzBaseArgument *>();
+	return m_arguments;
 }
 
 FunctionAttribute ExportedFunctionNode::attribute() const

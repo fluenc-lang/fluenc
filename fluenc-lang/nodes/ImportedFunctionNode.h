@@ -14,9 +14,11 @@ class ImportedFunctionNode : public CallableNode
 	public:
 		ImportedFunctionNode(ITypeName *returnType
 			, const std::string &name
-			, const std::shared_ptr<peg::Ast> &ast
+			, const std::shared_ptr<peg::Ast> ast
 			, const std::vector<DzBaseArgument *> &arguments
 			);
+
+		ITypeName *returnType() const override;
 
 		std::string name() const override;
 		std::vector<DzBaseArgument *> arguments() const override;

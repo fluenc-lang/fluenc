@@ -22,6 +22,11 @@ FunctionNode::FunctionNode(const std::string &name
 {
 }
 
+ITypeName *FunctionNode::returnType() const
+{
+	return nullptr;
+}
+
 IBlockInstruction *FunctionNode::inject(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType>>> &nodes
 	, const std::vector<std::string> &namespaces
 	, const Type *iteratorType
