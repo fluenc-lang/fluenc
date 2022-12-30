@@ -10,7 +10,8 @@
 #include "containers/sequence.h"
 
 class Emitter;
-class DefaultVisitorContext;
+
+struct DefaultVisitorContext;
 
 class Iterator : public BaseValueWithMetadata<IteratorMetadata>
 {
