@@ -647,7 +647,15 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 
 		if (localsIterator != locals.end())
 		{
-			if (localsIterator->second)
+			if (auto referenceValue = dynamic_cast<const ReferenceValue *>(localsIterator->second))
+			{
+				IRBuilderEx builder(context.entryPoint);
+
+				auto load = builder.createLoad(referenceValue);
+
+				context.values.push(load);
+			}
+			else if (localsIterator->second)
 			{
 				auto forwarded = localsIterator->second->forward(node->id());
 
@@ -711,6 +719,11 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 			builder.createStore(typedValue, alloc);
 
 			return alloc;
+		}
+
+		if (auto referenceValue = dynamic_cast<const ReferenceValue *>(value))
+		{
+			return referenceValue->clone(context.entryPoint, CloneStrategy::Value);
 		}
 
 		if (auto tupleValue = dynamic_cast<const TupleValue *>(value))

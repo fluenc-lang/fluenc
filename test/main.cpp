@@ -5042,6 +5042,70 @@ BOOST_AUTO_TEST_CASE (scenario120)
 	BOOST_TEST(result == 6);
 }
 
+BOOST_AUTO_TEST_CASE (scenario121)
+{
+	auto result = exec(R"(
+		function foo(i32 counter, any value, (any nextValue, ...nextValues))
+		{
+			return 0;
+		}
+
+		function foo(i32 counter, (any value, ...values), any nextValue)
+		{
+			return 0;
+		}
+
+		function foo(i32 counter, (i32 value, ...values), (i32 nextValue, ...nextValues))
+		{
+			return counter + value + nextValue -> foo(counter + 1, ...values, ...nextValues);
+		}
+
+		function foo(i32 counter, i32 value, i32 nextValue)
+		{
+			return counter + value + nextValue;
+		}
+
+		function consume((any item, ...items))
+		{
+			return tail consume(...items);
+		}
+
+		function consume(any item)
+		{
+			return nothing;
+		}
+
+		function sum(i32 product, (i32 item, ...items))
+		{
+			return tail sum(product + item, ...items);
+		}
+
+		function sum(i32 product, i32 item)
+		{
+			return product + item;
+		}
+
+		function doStuff(i32 init)
+		{
+			let items1 = [1, 2];
+			let items2 = [2, 3];
+
+			let values = foo(init, items1, items2);
+
+			consume(values);
+
+			return sum(0, values);
+		}
+
+		export i32 main()
+		{
+			return doStuff(0);
+		}
+	)");
+
+	BOOST_TEST(result == 9);
+}
+
 BOOST_AUTO_TEST_CASE (scenario122)
 {
 	auto result = exec(R"(
