@@ -25,8 +25,8 @@ class Emitter : public DefaultNodeVisitor
 		std::vector<DzResult> visit(const NothingNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const MemberAccessNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const ReferenceSinkNode *node, DefaultVisitorContext context) const override;
-		std::vector<DzResult> visit(const LazyEvaluationNode *node, DefaultVisitorContext context) const override;
-		std::vector<DzResult> visit(const IteratorEvaluationNode *node, DefaultVisitorContext context) const override;
+		std::vector<DzResult> visit(const PreEvaluationNode *node, DefaultVisitorContext context) const override;
+		std::vector<DzResult> visit(const PostEvaluationNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const FunctionCallNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const StackSegmentNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const FunctionCallProxyNode *node, DefaultVisitorContext context) const override;

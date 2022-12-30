@@ -13,7 +13,7 @@ struct IntegerUnaryNode;
 struct FloatUnaryNode;
 struct BooleanUnaryNode;
 struct StringUnaryNode;
-struct IteratorEvaluationNode;
+struct PostEvaluationNode;
 
 class ExportedFunctionNode;
 class ArrayContinuationNode;
@@ -25,7 +25,7 @@ class StringLiteralNode;
 class CharacterLiteralNode;
 class MemberAccessNode;
 class ReferenceSinkNode;
-class LazyEvaluationNode;
+class PreEvaluationNode;
 class FunctionCallNode;
 class StackSegmentNode;
 class FunctionCallProxyNode;
@@ -90,8 +90,8 @@ class NodeVisitor
 		virtual TReturn visit(const NothingNode *node, TContext context) const = 0;
 		virtual TReturn visit(const MemberAccessNode *node, TContext context) const = 0;
 		virtual TReturn visit(const ReferenceSinkNode *node, TContext context) const = 0;
-		virtual TReturn visit(const LazyEvaluationNode *node, TContext context) const = 0;
-		virtual TReturn visit(const IteratorEvaluationNode *node, TContext context) const = 0;
+		virtual TReturn visit(const PreEvaluationNode *node, TContext context) const = 0;
+		virtual TReturn visit(const PostEvaluationNode *node, TContext context) const = 0;
 		virtual TReturn visit(const FunctionCallNode *node, TContext context) const = 0;
 		virtual TReturn visit(const StackSegmentNode *node, TContext context) const = 0;
 		virtual TReturn visit(const FunctionCallProxyNode *node, TContext context) const = 0;

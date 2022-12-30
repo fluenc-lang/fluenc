@@ -14,7 +14,7 @@
 #include "values/ExpandableValue.h"
 #include "values/Iterator.h"
 
-#include "nodes/IteratorEvaluationNode.h"
+#include "nodes/PostEvaluationNode.h"
 
 using ElementType = std::pair<bool, const Type *>;
 
@@ -60,7 +60,7 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 
 std::vector<DzResult> expandIterator(const Emitter &emitter, DefaultVisitorContext context)
 {
-	IteratorEvaluationNode node;
+	PostEvaluationNode node;
 
 	return node.accept(emitter, context);
 }

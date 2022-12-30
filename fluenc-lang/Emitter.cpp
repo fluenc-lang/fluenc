@@ -65,8 +65,8 @@
 #include "nodes/NothingNode.h"
 #include "nodes/MemberAccessNode.h"
 #include "nodes/ReferenceSinkNode.h"
-#include "nodes/LazyEvaluationNode.h"
-#include "nodes/IteratorEvaluationNode.h"
+#include "nodes/PreEvaluationNode.h"
+#include "nodes/PostEvaluationNode.h"
 #include "nodes/FunctionCallNode.h"
 #include "nodes/StackSegmentNode.h"
 #include "nodes/FunctionCallProxyNode.h"
@@ -764,7 +764,7 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 	return node->m_consumer->accept(*this, context);
 }
 
-std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const PreEvaluationNode *node, DefaultVisitorContext context) const
 {
 	auto digestDepth = [&, this](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
 	{
@@ -842,7 +842,7 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 	return results;
 }
 
-std::vector<DzResult> Emitter::visit(const IteratorEvaluationNode *node, DefaultVisitorContext context) const
+std::vector<DzResult> Emitter::visit(const PostEvaluationNode *node, DefaultVisitorContext context) const
 {
 	UNUSED(node);
 

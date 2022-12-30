@@ -43,8 +43,8 @@
 #include "nodes/ReferenceSinkNode.h"
 #include "nodes/TailFunctionCallNode.h"
 #include "nodes/StackSegmentNode.h"
-#include "nodes/LazyEvaluationNode.h"
-#include "nodes/IteratorEvaluationNode.h"
+#include "nodes/PreEvaluationNode.h"
+#include "nodes/PostEvaluationNode.h"
 #include "nodes/IndexSinkNode.h"
 #include "nodes/ExpansionNode.h"
 #include "nodes/LocalNode.h"
@@ -474,9 +474,9 @@ Node *Visitor::visitMember(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
-	auto lazyEvaluation = new LazyEvaluationNode(sink);
+	auto preEvaluation = new PreEvaluationNode(sink);
 
-	Visitor visitor(m_namespaces, m_iteratorType, m_parent, lazyEvaluation, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, preEvaluation, nullptr);
 
 	std::vector<Node *> values;
 
@@ -489,8 +489,8 @@ Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[0])
 		);
 
-	auto iteratorEvaluation = new IteratorEvaluationNode();
-	auto call = new FunctionCallNode(ast, names, iteratorEvaluation);
+	auto postEvaluation = new PostEvaluationNode();
+	auto call = new FunctionCallNode(ast, names, postEvaluation);
 
 	auto segment = new StackSegmentNode(values, call, TerminatorNode::instance());
 
@@ -657,9 +657,9 @@ Node *Visitor::visitUnary(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitTail(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
-	auto lazyEvaluation = new LazyEvaluationNode(sink);
+	auto preEvaluation = new PreEvaluationNode(sink);
 
-	Visitor visitor(m_namespaces, m_iteratorType, m_parent, lazyEvaluation, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, preEvaluation, nullptr);
 
 	std::vector<Node *> values;
 
@@ -672,8 +672,8 @@ Node *Visitor::visitTail(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[0])
 		);
 
-	auto iteratorEvaluation = new IteratorEvaluationNode();
-	auto call = new FunctionCallNode(ast, names, iteratorEvaluation);
+	auto postEvaluation = new PostEvaluationNode();
+	auto call = new FunctionCallNode(ast, names, postEvaluation);
 	auto proxy = new TailFunctionCallNode(names, call);
 
 	return new StackSegmentNode(values, proxy, m_alpha);
