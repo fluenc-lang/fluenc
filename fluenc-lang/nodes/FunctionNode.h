@@ -27,6 +27,8 @@ class FunctionNode : public CallableNode
 			, const Type *iteratorType
 			);
 
+		ITypeName *returnType() const override;
+
 		std::string name() const override;
 		std::vector<DzBaseArgument *> arguments() const override;
 

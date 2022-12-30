@@ -5,10 +5,13 @@
 #include "FunctionAttribute.h"
 
 class DzBaseArgument;
+class ITypeName;
 
 class CallableNode : public Node
 {
 	public:
+		virtual ITypeName *returnType() const = 0;
+
 		virtual std::string name() const = 0;
 		virtual std::vector<DzBaseArgument *> arguments() const = 0;
 

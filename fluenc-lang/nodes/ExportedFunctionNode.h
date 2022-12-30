@@ -10,7 +10,13 @@ class ExportedFunctionNode : public CallableNode
 	friend class Emitter;
 
 	public:
-		ExportedFunctionNode(const std::string &name, Node *block, ITypeName *returnType);
+		ExportedFunctionNode(const std::string &name
+			, const std::vector<DzBaseArgument *> &arguments
+			, Node *block
+			, ITypeName *returnType
+			);
+
+		ITypeName *returnType() const override;
 
 		std::string name() const override;
 		std::vector<DzBaseArgument *> arguments() const override;
@@ -23,6 +29,7 @@ class ExportedFunctionNode : public CallableNode
 
 	private:
 		std::string m_name;
+		std::vector<DzBaseArgument *> m_arguments;
 
 		Node *m_block;
 		ITypeName *m_returnType;

@@ -368,10 +368,35 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 	auto returnType = node->m_returnType->resolve(context.entryPoint);
 	auto storageType = returnType->storageType(*llvmContext);
 
+	auto arguments = node->arguments();
+
 	std::vector<llvm::Type *> argumentTypes;
+
+	std::transform(begin(arguments), end(arguments), back_inserter(argumentTypes), [&](auto argument)
+	{
+		auto type = argument->type(context.entryPoint);
+
+		return type->storageType(*llvmContext);
+	});
 
 	auto functionType = llvm::FunctionType::get(storageType, argumentTypes, false);
 	auto function = llvm::Function::Create(functionType, llvm::Function::ExternalLinkage, node->m_name, module);
+
+	std::map<std::string, const BaseValue *> locals;
+
+	std::transform(function->arg_begin(), function->arg_end(), begin(arguments), inserter(locals, begin(locals)), [&](auto &value, auto argument) -> std::pair<std::string, const BaseValue *>
+	{
+		auto standardArgument = dynamic_cast<const DzArgument *>(argument);
+
+		if (!standardArgument)
+		{
+			throw new InvalidArgumentTypeException(nullptr);
+		}
+
+		auto type = standardArgument->type(context.entryPoint);
+
+		return { standardArgument->name(), new ScalarValue(type, &value) };
+	});
 
 	auto alloc = llvm::BasicBlock::Create(*llvmContext, "alloc");
 	auto block = createBlock(llvmContext);
@@ -381,7 +406,8 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 	auto ep = context.entryPoint
 		.withFunction(function)
 		.withBlock(block)
-		.withAlloc(alloc);
+		.withAlloc(alloc)
+		.withLocals(locals);
 
 	auto result = node->m_block->accept(*this, { ep, context.values });
 
