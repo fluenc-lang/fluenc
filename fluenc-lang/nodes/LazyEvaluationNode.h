@@ -11,10 +11,10 @@ class LazyEvaluationNode : public VisitableNode<LazyEvaluationNode>
 	friend class Emitter;
 
 	public:
-		LazyEvaluationNode(const Node *consumer);
+		LazyEvaluationNode(const Visitable<DefaultNodeVisitor> *consumer);
 
 	private:
-		const Node *m_consumer;
+		const Visitable<DefaultNodeVisitor> *m_consumer;
 };
 
 #endif // LAZYEVALUATIONNODE_H

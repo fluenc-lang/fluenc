@@ -8,7 +8,7 @@ class RenderedIteratorValue : public IIteratable
 	public:
 		RenderedIteratorValue(EntryPoint *entryPoint, const std::vector<DzResult> &results);
 
-		std::vector<DzResult> accept(const Emitter &emitter, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const DefaultNodeVisitor &emitter, DefaultVisitorContext context) const override;
 
 	private:
 		EntryPoint *m_entryPoint;

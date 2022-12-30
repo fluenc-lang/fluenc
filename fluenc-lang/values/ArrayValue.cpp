@@ -17,7 +17,7 @@ ArrayValue::ArrayValue(const std::shared_ptr<peg::Ast> &ast
 {
 }
 
-std::vector<DzResult> ArrayValue::accept(const Emitter &visitor, DefaultVisitorContext context) const
+std::vector<DzResult> ArrayValue::accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const
 {
 	return visitor.visit(this, context);
 }

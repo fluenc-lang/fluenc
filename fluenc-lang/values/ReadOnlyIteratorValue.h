@@ -8,7 +8,7 @@ class ReadOnlyIteratorValue : public IIteratable
 	public:
 		ReadOnlyIteratorValue(const std::vector<DzResult>& results);
 
-		std::vector<DzResult> accept(const Emitter &emitter, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const DefaultNodeVisitor &emitter, DefaultVisitorContext context) const override;
 
 	private:
 		std::vector<DzResult> m_results;

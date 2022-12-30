@@ -10,7 +10,7 @@ class ArrayValueProxy : public IIteratable
 	public:
 		ArrayValueProxy(const ReferenceValue *index, const IIteratable *subject);
 
-		std::vector<DzResult> accept(const Emitter &visitor, DefaultVisitorContext context) const override;
+		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 
 	private:
 		const ReferenceValue *m_index;

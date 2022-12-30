@@ -1,6 +1,6 @@
-#include "DummyIteratorStorage.h"
+#include <unordered_map>
+
 #include "ValueHelper.h"
-#include "IteratorStorage.h"
 #include "FunctionHelper.h"
 
 #include "types/ArrayType.h"
@@ -12,8 +12,7 @@
 #include "values/IteratorValueGenerator.h"
 #include "values/TupleValue.h"
 #include "values/ExpandableValue.h"
-
-#include "nodes/ArraySinkNode.h"
+#include "values/Iterator.h"
 
 using ElementType = std::pair<bool, const Type *>;
 
@@ -55,7 +54,69 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 
 		return { accumulated.first, value->type() };
 	});
-};
+}
+
+std::vector<DzResult> expandIterator(const Emitter &emitter, DefaultVisitorContext context)
+{
+	auto digestDepth = [&](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
+	{
+		for (auto i = 0u; i < values.size(); i++)
+		{
+			auto value = values.pop();
+
+			if (auto iterator = dynamic_cast<const Iterator *>(value))
+			{
+				std::vector<DzResult> results;
+
+				for (auto &[resultEntryPoint, resultValues] : iterator->generate(emitter, { entryPoint, Stack() }))
+				{
+					auto forwardedValues = values;
+
+					for (auto &resultValue : resultValues)
+					{
+						forwardedValues.push(resultValue);
+					}
+
+					for (auto &result : recurse(resultEntryPoint, forwardedValues, recurse))
+					{
+						results.push_back(result);
+					}
+				}
+
+				return results;
+			}
+
+			std::vector<DzResult> results;
+
+			for (auto &[resultEntryPoint, resultValues] : recurse(entryPoint, values, recurse))
+			{
+				std::vector<const BaseValue *> forwardedValues;
+
+				for (auto resultValue : resultValues)
+				{
+					forwardedValues.push_back(resultValue);
+				}
+
+				forwardedValues.push_back(value);
+
+				results.push_back({ resultEntryPoint, forwardedValues });
+			}
+
+			return results;
+		}
+
+		return {{ entryPoint, values }};
+	};
+
+	std::vector<DzResult> results;
+
+	for (auto &result : digestDepth(context.entryPoint, context.values, digestDepth))
+	{
+		results.push_back(result);
+	}
+
+	return results;
+}
 
 const Type *LazyValue::type() const
 {
@@ -66,18 +127,25 @@ const Type *LazyValue::type() const
 
 	linkBlocks(alloc, block);
 
-	auto iteratorStorage = new IteratorStorage();
-
 	auto entryPoint = (*m_entryPoint)
 		.withBlock(block)
-		.withAlloc(alloc)
-		.withIteratorStorage(iteratorStorage);
+		.withAlloc(alloc);
 
 	auto iteratable = m_generator->generate(entryPoint, GenerationMode::DryRun);
 
 	Emitter analyzer;
 
-	auto results = iteratable->accept(analyzer, { entryPoint, Stack() });
+	std::vector<DzResult> results;
+
+	for (auto &[resultEntryPoint, resultValues] : iteratable->accept(analyzer, { entryPoint, Stack() }))
+	{
+		auto resultBlock = createBlock(context);
+
+		for (auto &result : expandIterator(analyzer, { resultEntryPoint.withBlock(resultBlock), resultValues }))
+		{
+			results.push_back(result);
+		}
+	}
 
 	std::map<int, const Type *> typesByIndex;
 
@@ -143,14 +211,17 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const BaseValue *
 {
 	auto context = entryPoint.context();
 
-	IteratorStorage iteratorStorage;
+	auto targetIteratable = m_generator->generate(entryPoint, GenerationMode::Regular);
 
-	auto iteratorEntryPoint = entryPoint
-		.withIteratorStorage(&iteratorStorage);
+	std::vector<DzResult> targetResults;
 
-	auto targetIteratable = m_generator->generate(iteratorEntryPoint, GenerationMode::Regular);
-
-	auto targetResults = targetIteratable->accept(emitter, { iteratorEntryPoint, Stack() });
+	for (auto &[resultEntryPoint, resultValues] : targetIteratable->accept(emitter, { entryPoint, Stack() }))
+	{
+		for (auto &result : expandIterator(emitter, { resultEntryPoint, resultValues }))
+		{
+			targetResults.push_back(result);
+		}
+	}
 
 	std::unordered_map<uint32_t, const BaseValue *> indexedResults;
 
@@ -234,15 +305,18 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 {
 	auto context = entryPoint.context();
 
-	IteratorStorage iteratorStorage;
+	auto sourceIteratable = source->generate(entryPoint);
+	auto targetIteratable = m_generator->generate(entryPoint, GenerationMode::Regular);
 
-	auto iteratorEntryPoint = entryPoint
-		.withIteratorStorage(&iteratorStorage);
+	std::vector<DzResult> targetResults;
 
-	auto sourceIteratable = source->generate(iteratorEntryPoint);
-	auto targetIteratable = m_generator->generate(iteratorEntryPoint, GenerationMode::Regular);
-
-	auto targetResults = targetIteratable->accept(emitter, { iteratorEntryPoint, Stack() });
+	for (auto &[resultEntryPoint, resultValues] : targetIteratable->accept(emitter, { entryPoint, Stack() }))
+	{
+		for (auto &result : expandIterator(emitter, { resultEntryPoint, resultValues }))
+		{
+			targetResults.push_back(result);
+		}
+	}
 
 	std::unordered_map<uint32_t, const BaseValue *> indexedResults;
 
@@ -267,7 +341,15 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 	auto sourceExitBlock = llvm::BasicBlock::Create(*context, "sourceExit");
 
-	auto sourceResults = sourceIteratable->accept(emitter, { sourceEntryPoint, Stack() });
+	std::vector<DzResult> sourceResults;
+
+	for (auto &[resultEntryPoint, resultValues] : sourceIteratable->accept(emitter, { sourceEntryPoint, Stack() }))
+	{
+		for (auto &result : expandIterator(emitter, { resultEntryPoint, resultValues }))
+		{
+			sourceResults.push_back(result);
+		}
+	}
 
 	for (auto i = 0u; i < sourceResults.size(); i++)
 	{

@@ -20,6 +20,7 @@ const Type *PlaceholderValue::type() const
 const BaseValue *PlaceholderValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
+	UNUSED(strategy);
 
 	return this;
 }

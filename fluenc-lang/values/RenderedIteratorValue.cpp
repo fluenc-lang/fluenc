@@ -8,7 +8,7 @@ RenderedIteratorValue::RenderedIteratorValue(EntryPoint *entryPoint, const std::
 {
 }
 
-std::vector<DzResult> RenderedIteratorValue::accept(const Emitter &emitter, DefaultVisitorContext context) const
+std::vector<DzResult> RenderedIteratorValue::accept(const DefaultNodeVisitor &emitter, DefaultVisitorContext context) const
 {
 	UNUSED(emitter);
 

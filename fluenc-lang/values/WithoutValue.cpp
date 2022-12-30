@@ -17,6 +17,7 @@ const Type *WithoutValue::type() const
 const BaseValue *WithoutValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
 {
 	UNUSED(entryPoint);
+	UNUSED(strategy);
 
 	return this;
 }

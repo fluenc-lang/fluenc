@@ -44,6 +44,7 @@
 #include "nodes/TailFunctionCallNode.h"
 #include "nodes/StackSegmentNode.h"
 #include "nodes/LazyEvaluationNode.h"
+#include "nodes/IteratorEvaluationNode.h"
 #include "nodes/IndexSinkNode.h"
 #include "nodes/ExpansionNode.h"
 #include "nodes/LocalNode.h"
@@ -53,7 +54,6 @@
 #include "nodes/JunctionNode.h"
 #include "nodes/DistributorNode.h"
 #include "nodes/BlockStackFrameNode.h"
-#include "nodes/IteratorStorageBoundary.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -474,8 +474,9 @@ Node *Visitor::visitMember(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
+	auto lazyEvaluation = new LazyEvaluationNode(sink);
 
-	Visitor visitor(m_namespaces, m_iteratorType, m_parent, sink, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, lazyEvaluation, nullptr);
 
 	std::vector<Node *> values;
 
@@ -488,8 +489,8 @@ Node *Visitor::visitCall(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[0])
 		);
 
-	auto evaluation = new LazyEvaluationNode(TerminatorNode::instance());
-	auto call = new FunctionCallNode(ast, names, evaluation);
+	auto iteratorEvaluation = new IteratorEvaluationNode();
+	auto call = new FunctionCallNode(ast, names, iteratorEvaluation);
 
 	auto segment = new StackSegmentNode(values, call, TerminatorNode::instance());
 
@@ -656,8 +657,9 @@ Node *Visitor::visitUnary(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitTail(const std::shared_ptr<peg::Ast> &ast) const
 {
 	auto sink = new ReferenceSinkNode(TerminatorNode::instance());
+	auto lazyEvaluation = new LazyEvaluationNode(sink);
 
-	Visitor visitor(m_namespaces, m_iteratorType, m_parent, sink, nullptr);
+	Visitor visitor(m_namespaces, m_iteratorType, m_parent, lazyEvaluation, nullptr);
 
 	std::vector<Node *> values;
 
@@ -670,8 +672,8 @@ Node *Visitor::visitTail(const std::shared_ptr<peg::Ast> &ast) const
 		, visitId(ast->nodes[0])
 		);
 
-	auto evaluation = new LazyEvaluationNode(TerminatorNode::instance());
-	auto call = new FunctionCallNode(ast, names, evaluation);
+	auto iteratorEvaluation = new IteratorEvaluationNode();
+	auto call = new FunctionCallNode(ast, names, iteratorEvaluation);
 	auto proxy = new TailFunctionCallNode(names, call);
 
 	return new StackSegmentNode(values, proxy, m_alpha);
@@ -709,9 +711,7 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 
 	auto iteratorType = new IteratorType();
 
-	auto function = new FunctionNode(name, arguments, ast->nodes, m_namespaces, iteratorType);
-
-	return new IteratorStorageBoundary(function);
+	return new FunctionNode(name, arguments, ast->nodes, m_namespaces, iteratorType);
 }
 
 CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const
@@ -728,9 +728,7 @@ CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &as
 	auto junction = new JunctionNode(block);
 	auto distributor = new DistributorNode(junction, terminator);
 
-	auto function = new ExportedFunctionNode(name, distributor, returnType);
-
-	return new IteratorStorageBoundary(function);
+	return new ExportedFunctionNode(name, distributor, returnType);
 }
 
 CallableNode *Visitor::visitImportedFunction(const std::shared_ptr<peg::Ast> &ast) const

@@ -8,7 +8,7 @@ IteratorValue::IteratorValue(const EntryPoint *entryPoint
 {
 }
 
-std::vector<DzResult > IteratorValue::accept(const Emitter &visitor, DefaultVisitorContext context) const
+std::vector<DzResult > IteratorValue::accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const
 {
 	return visitor.visit(this, context);
 }

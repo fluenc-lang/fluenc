@@ -1,18 +1,21 @@
 #include <numeric>
 
-#include "IteratorStorage.h"
 #include "IndexIterator.h"
+#include "ScalarValue.h"
+#include "IRBuilderEx.h"
 
 #include "values/ArrayValueGenerator.h"
 #include "values/ArrayValue.h"
 #include "values/ReferenceValue.h"
 #include "values/IndexedValue.h"
 #include "values/ArrayValueProxy.h"
+#include "values/Iteratable.h"
 
 #include "nodes/ArrayElementNode.h"
 
 #include "types/ArrayType.h"
 #include "types/IteratorType.h"
+#include "types/Int64Type.h"
 
 ArrayValueGenerator::ArrayValueGenerator(const std::vector<DzResult > &values, const std::shared_ptr<peg::Ast> &ast, size_t id, size_t size)
 	: m_values(values)
@@ -26,14 +29,27 @@ const IIteratable *ArrayValueGenerator::generate(const EntryPoint &entryPoint, G
 {
 	UNUSED(mode);
 
-	auto iteratorStorage = entryPoint
-		.iteratorStorage();
+	IRBuilderEx builder(entryPoint);
 
-	auto index = iteratorStorage->getOrCreate(std::to_string(m_id), entryPoint);
+	auto context = entryPoint.context();
 
-	auto subject = new ArrayValue(m_ast, index, type(), m_values, m_size);
+	auto indexType = Int64Type::instance();
 
-	return new ArrayValueProxy(index, subject);
+	auto storageType = indexType->storageType(*context);
+
+	auto zero = new ScalarValue(indexType
+		, llvm::ConstantInt::get(storageType, 0)
+		);
+
+	auto index = entryPoint.alloc(indexType, "index");
+
+	builder.createStore(zero, index);
+
+	auto subject = new ArrayValueProxy(index
+		, new ArrayValue(m_ast, index, type(), m_values, m_size)
+		);
+
+	return new Iteratable(subject, type());
 }
 
 const Type *ArrayValueGenerator::type() const

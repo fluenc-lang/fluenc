@@ -7,7 +7,7 @@ ReadOnlyIteratorValue::ReadOnlyIteratorValue(const std::vector<DzResult> &result
 {
 }
 
-std::vector<DzResult> ReadOnlyIteratorValue::accept(const Emitter &emitter, DefaultVisitorContext context) const
+std::vector<DzResult> ReadOnlyIteratorValue::accept(const DefaultNodeVisitor &emitter, DefaultVisitorContext context) const
 {
 	UNUSED(emitter);
 	UNUSED(context);

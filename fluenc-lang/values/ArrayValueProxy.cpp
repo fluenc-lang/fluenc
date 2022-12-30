@@ -7,7 +7,7 @@ ArrayValueProxy::ArrayValueProxy(const ReferenceValue *index, const IIteratable 
 {
 }
 
-std::vector<DzResult> ArrayValueProxy::accept(const Emitter &visitor, DefaultVisitorContext context) const
+std::vector<DzResult> ArrayValueProxy::accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const
 {
 	context.values.push(m_index);
 
