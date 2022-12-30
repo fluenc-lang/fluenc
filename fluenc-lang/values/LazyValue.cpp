@@ -14,6 +14,8 @@
 #include "values/ExpandableValue.h"
 #include "values/Iterator.h"
 
+#include "nodes/IteratorEvaluationNode.h"
+
 using ElementType = std::pair<bool, const Type *>;
 
 LazyValue::LazyValue(const ILazyValueGenerator *generator, const EntryPoint &entryPoint)
@@ -58,64 +60,9 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 
 std::vector<DzResult> expandIterator(const Emitter &emitter, DefaultVisitorContext context)
 {
-	auto digestDepth = [&](const EntryPoint &entryPoint, Stack values, auto &recurse) -> std::vector<DzResult>
-	{
-		for (auto i = 0u; i < values.size(); i++)
-		{
-			auto value = values.pop();
+	IteratorEvaluationNode node;
 
-			if (auto iterator = dynamic_cast<const Iterator *>(value))
-			{
-				std::vector<DzResult> results;
-
-				for (auto &[resultEntryPoint, resultValues] : iterator->generate(emitter, { entryPoint, Stack() }))
-				{
-					auto forwardedValues = values;
-
-					for (auto &resultValue : resultValues)
-					{
-						forwardedValues.push(resultValue);
-					}
-
-					for (auto &result : recurse(resultEntryPoint, forwardedValues, recurse))
-					{
-						results.push_back(result);
-					}
-				}
-
-				return results;
-			}
-
-			std::vector<DzResult> results;
-
-			for (auto &[resultEntryPoint, resultValues] : recurse(entryPoint, values, recurse))
-			{
-				std::vector<const BaseValue *> forwardedValues;
-
-				for (auto resultValue : resultValues)
-				{
-					forwardedValues.push_back(resultValue);
-				}
-
-				forwardedValues.push_back(value);
-
-				results.push_back({ resultEntryPoint, forwardedValues });
-			}
-
-			return results;
-		}
-
-		return {{ entryPoint, values }};
-	};
-
-	std::vector<DzResult> results;
-
-	for (auto &result : digestDepth(context.entryPoint, context.values, digestDepth))
-	{
-		results.push_back(result);
-	}
-
-	return results;
+	return node.accept(emitter, context);
 }
 
 const Type *LazyValue::type() const

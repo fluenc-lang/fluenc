@@ -796,6 +796,17 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 				return results;
 			}
 
+			if (auto string = dynamic_cast<const StringValue *>(value))
+			{
+				auto iterator =	string->iterator();
+
+				auto forwardedValues = values;
+
+				forwardedValues.push(iterator);
+
+				return recurse(entryPoint, forwardedValues, recurse);
+			}
+
 			std::vector<DzResult> results;
 
 			for (auto &[resultEntryPoint, resultValues] : recurse(entryPoint, values, recurse))
@@ -884,42 +895,6 @@ std::vector<DzResult> Emitter::visit(const IteratorEvaluationNode *node, Default
 				}
 
 				return results;
-			}
-
-			// Why is this needed?
-			if (auto lazy = dynamic_cast<const LazyValue *>(value))
-			{
-				auto iteratable = lazy->generate(entryPoint);
-
-				std::vector<DzResult> results;
-
-				for (auto &[resultEntryPoint, resultValues] : iteratable->accept(*this, { entryPoint, Stack() }))
-				{
-					auto forwardedValues = values;
-
-					for (auto &resultValue : resultValues)
-					{
-						forwardedValues.push(resultValue);
-					}
-
-					for (auto &result : recurse(resultEntryPoint, forwardedValues, recurse))
-					{
-						results.push_back(result);
-					}
-				}
-
-				return results;
-			}
-
-			if (auto string = dynamic_cast<const StringValue *>(value))
-			{
-				auto iterator =	string->iterator();
-
-				auto forwardedValues = values;
-
-				forwardedValues.push(iterator);
-
-				return recurse(entryPoint, forwardedValues, recurse);
 			}
 
 			if (auto tuple = dynamic_cast<const TupleValue *>(value))
