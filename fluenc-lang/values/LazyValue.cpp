@@ -1,3 +1,5 @@
+#include <llvm/Transforms/Utils/BasicBlockUtils.h>
+
 #include "DummyIteratorStorage.h"
 #include "ValueHelper.h"
 #include "IteratorStorage.h"
@@ -73,6 +75,20 @@ const Type *LazyValue::type() const
 		.withAlloc(alloc)
 		.withIteratorStorage(iteratorStorage);
 
+//	eep.setParent(EntryPoint());
+
+//	auto l = eep.locals();
+
+//	std::map<std::string, const BaseValue *> locals;
+
+//	std::transform(begin(l), end(l), std::inserter(locals, begin(locals)), [&](auto loc) -> std::pair<std::string, const BaseValue *>
+//	{
+//		return { loc.first, loc.second->clone(eep, CloneStrategy::Value) };
+//	});
+
+//	auto entryPoint = eep
+//		.withLocals(locals);
+
 	auto iteratable = m_generator->generate(entryPoint, GenerationMode::DryRun);
 
 	Emitter analyzer;
@@ -85,7 +101,16 @@ const Type *LazyValue::type() const
 	{
 		auto resultBlock = createBlock(context);
 
-		auto [isArrayCompatible, type] = getElementType({ true, nullptr }, resultEntryPoint.withBlock(resultBlock), resultValues);
+		auto k = resultEntryPoint.withBlock(resultBlock);
+
+		auto [isArrayCompatible, type] = getElementType({ true, nullptr }, k, resultValues);
+
+		//k.iterate([](llvm::BasicBlock* b)
+		//{
+		//	llvm::DeleteDeadBlock(b);
+
+		//	return true;
+		//});
 
 		if (!isArrayCompatible)
 		{
@@ -104,6 +129,14 @@ const Type *LazyValue::type() const
 
 		typesByIndex[index] = type;
 	}
+
+//	entryPoint.iterate([](llvm::BasicBlock* b)
+//	{
+//		b->deleteValue();
+////		llvm::DeleteDeadBlock(b);
+
+//		return true;
+//	});
 
 	std::vector<const Type *> types;
 

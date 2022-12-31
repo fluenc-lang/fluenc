@@ -1,5 +1,6 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/Transforms/Scalar/SimplifyCFG.h>
+#include <llvm/Transforms/Scalar/ADCE.h>
 #include <llvm/Passes/PassBuilder.h>
 
 #include <range/v3/view.hpp>
@@ -390,8 +391,13 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 	llvm::PassBuilder passBuilder;
 	passBuilder.registerFunctionAnalyses(analysisManager);
 
+	//Aggressive Dead Code Elimination
+
+	//llvm::ADCEPass pass1;
+
 	llvm::SimplifyCFGPass pass;
 	pass.run(*function, analysisManager);
+	//pass1.run(*function, analysisManager);
 
 	verifyFunction(*function, &llvm::errs());
 
@@ -850,7 +856,9 @@ std::vector<DzResult> Emitter::visit(const LazyEvaluationNode *node, DefaultVisi
 							auto node = expanded->node();
 							auto provider = expanded->provider();
 
-							for (auto &result : node->accept(*this, { provider->withBlock(block), expanded->values() }))
+							auto wb = provider->withBlock(block);
+
+							for (auto &result : node->accept(*this, { wb, expanded->values() }))
 							{
 								results.push_back(result);
 							}

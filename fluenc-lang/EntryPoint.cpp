@@ -65,6 +65,24 @@ void EntryPoint::incorporate()
 	::incorporate(m_alloc, m_function);
 }
 
+void iterate(llvm::BasicBlock* block, std::function<bool(llvm::BasicBlock*)> callback)
+{
+	if (!callback(block))
+	{
+		return;
+	}
+
+	for (auto successor : llvm::successors(block))
+	{
+		iterate(successor, callback);
+	}
+}
+
+void EntryPoint::iterate(std::function<bool(llvm::BasicBlock *)> callback)
+{
+	return ::iterate(m_alloc, callback);
+}
+
 int EntryPoint::depth() const
 {
 	return m_depth;

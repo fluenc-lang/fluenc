@@ -1,6 +1,7 @@
 #include <numeric>
 
 #include <llvm/IR/Instructions.h>
+#include <llvm/IR/Constants.h>
 
 #include "InteropHelper.h"
 #include "IndexIterator.h"

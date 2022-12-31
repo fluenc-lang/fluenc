@@ -8,7 +8,8 @@ class sequence
 {
 	public:
 		sequence(std::initializer_list<T> init)
-			: m_values(init)
+			: m_index(0)
+			, m_values(init)
 		{
 		}
 

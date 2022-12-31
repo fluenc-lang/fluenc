@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include <llvm/IR/Instructions.h>
+#include <llvm/IR/Constants.h>
 
 #include "IteratorStorage.h"
 #include "EntryPoint.h"
@@ -32,7 +33,7 @@ const ReferenceValue *IteratorStorage::getOrCreate(std::filesystem::path path, c
 
 		builder.createStore(zero, alloc);
 
-		m_storage.insert({ path, alloc });
+		m_storage.insert({ path.string(), alloc });
 
 		return alloc;
 	}

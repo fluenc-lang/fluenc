@@ -16,19 +16,20 @@
 #include <llvm/Transforms/Scalar/SimplifyCFG.h>
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Config/llvm-config.h>
-#if LLVM_VERSION_MAJOR == 14
+#if LLVM_VERSION_MAJOR >= 14
 #include <llvm/MC/TargetRegistry.h>
 #else
 #include <llvm/Support/TargetRegistry.h>
 #endif
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetOptions.h>
-
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Target/TargetMachine.h>
 
-#include "peglib.h"
-#include "incbin.h"
+#include <peglib.h>
+#include <incbin.h>
+#include <grammar.h>
 
 #include "ProjectFileParser.h"
 #include "CompilerException.h"
@@ -40,7 +41,7 @@
 #include "exceptions/ParserException.h"
 #include "exceptions/FileNotFoundException.h"
 
-INCTXT(Grammar, "fluenc.peg");
+INCBIN_EXTERN(Grammar);
 
 struct CompilerJob
 {
@@ -65,7 +66,7 @@ CompilerJob createJob(const ModuleInfo &module, const std::filesystem::path &ste
 	{
 		return
 		{
-			name,
+			name.string(),
 			objectFile,
 			sourceFile,
 			std::filesystem::last_write_time(objectFile),
@@ -76,7 +77,7 @@ CompilerJob createJob(const ModuleInfo &module, const std::filesystem::path &ste
 
 	return
 	{
-		name,
+		name.string(),
 		objectFile,
 		sourceFile,
 		std::filesystem::file_time_type(),
@@ -85,7 +86,7 @@ CompilerJob createJob(const ModuleInfo &module, const std::filesystem::path &ste
 	};
 }
 
-ModuleInfo analyze(const std::string &file, peg::parser &parser)
+ModuleInfo analyze(const std::filesystem::path &file, peg::parser &parser)
 {
 	std::ifstream stream(file);
 	std::stringstream buffer;
@@ -97,10 +98,10 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 
 	parser.log = [&](size_t line, size_t col, const std::string &message)
 	{
-		throw new ParserException(file, line, col, message);
+		throw new ParserException(file.string(), line, col, message);
 	};
 
-	parser.parse(*source, ast, file.c_str());
+	parser.parse(*source, ast, file.string().c_str());
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
@@ -115,7 +116,9 @@ std::string translateUse(const std::string &use, const CompilerJob &job)
 	auto sourceFilePath = std::filesystem::path(job.sourceFile);
 	auto relativeUsePath = sourceFilePath.parent_path() / use;
 
-	return relativeUsePath.lexically_normal();
+	return relativeUsePath
+		.lexically_normal()
+		.string();
 }
 
 bool isStale(std::unordered_set<std::string> &processed
@@ -258,7 +261,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	peg::parser parser(gGrammarData);
+	peg::parser parser(grammar());
 
 	parser.log = [](size_t line, size_t col, const std::string &msg)
 	{
@@ -463,7 +466,7 @@ int main(int argc, char **argv)
 		return strcpy(new char[argument.size() + 1], argument.c_str());
 	});
 
-#if LLVM_VERSION_MAJOR == 14
+#if LLVM_VERSION_MAJOR >= 14
     lld::elf::link(llvm::makeArrayRef(arguments), llvm::outs(), llvm::errs(), true, false);
 #else
 	lld::elf::link(llvm::makeArrayRef(arguments), true, llvm::outs(), llvm::errs());

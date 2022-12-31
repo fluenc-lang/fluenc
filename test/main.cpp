@@ -460,7 +460,11 @@ BOOST_AUTO_TEST_CASE (scenario19)
 		}
 	)");
 
+#ifdef _WIN32
+	BOOST_TEST(result == 0);
+#else
 	BOOST_TEST(result == 4);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE (scenario20)
@@ -3076,7 +3080,7 @@ BOOST_AUTO_TEST_CASE (compatibility_3)
 	auto userType2 = UserType::get(itemType, { WithoutType::instance() });
 
 	// Both have the same tag
-	BOOST_TEST(userType1->compatibility(userType2, result) == 1);
+	BOOST_TEST(static_cast<int>(userType1->compatibility(userType2, result)) == 1);
 }
 
 BOOST_AUTO_TEST_CASE (scenario82)
@@ -5049,6 +5053,10 @@ test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 	llvm::InitializeAllTargetMCs();
 	llvm::InitializeAllAsmParsers();
 	llvm::InitializeAllAsmPrinters();
+
+//	_CrtSetReportMode(_CRT_ASSERT,0);
+//	_set_error_mode(_OUT_TO_STDERR);
+//	_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 
 	return 0;
 }
