@@ -21,11 +21,19 @@ option(FLUENC_BUILD_EXAMPLES "Copy the examples to the build output" OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_options(-Wall -Wextra -Wpedantic)
+if (MSVC)
+	add_compile_options(/Zc:__cplusplus /bigobj)
+	add_compile_definitions(NOMINMAX)
+	add_compile_definitions(NDEBUG)
+else()
+	add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
 add_subdirectory("fluenc-lang")
 add_subdirectory("fcc")
 add_subdirectory("test")
+add_subdirectory("incbin")
+add_subdirectory("grammar")
 
 add_custom_target(vcpkg SOURCES
 	vcpkg.json

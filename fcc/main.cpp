@@ -28,7 +28,7 @@
 #endif
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetOptions.h>
-
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Target/TargetMachine.h>
 
@@ -54,6 +54,9 @@
 
 #include "peglib.h"
 #include "incbin.h"
+#include <peglib.h>
+#include <incbin.h>
+#include <grammar.h>
 
 #include "ProjectFileParser.h"
 #include "CompilerException.h"
@@ -65,7 +68,7 @@
 #include "exceptions/ParserException.h"
 #include "exceptions/FileNotFoundException.h"
 
-INCTXT(Grammar, "fluenc.peg");
+INCBIN_EXTERN(Grammar);
 
 ModuleInfo analyze(const std::string &file, const std::string &source, peg::parser &parser)
 {
@@ -73,7 +76,7 @@ ModuleInfo analyze(const std::string &file, const std::string &source, peg::pars
 
 	parser.log = [&](size_t line, size_t col, const std::string &message)
 	{
-		throw new ParserException(file, line, col, message);
+		throw new ParserException(file.string(), line, col, message);
 	};
 
 	parser.parse(source, ast, file.c_str());
@@ -135,7 +138,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	peg::parser parser(gGrammarData);
+	peg::parser parser(grammar());
 
 	parser.log = [](size_t line, size_t col, const std::string &msg)
 	{

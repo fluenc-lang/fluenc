@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     fluenc-lang
+	grammar
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

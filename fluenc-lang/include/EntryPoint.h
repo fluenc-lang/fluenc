@@ -45,6 +45,7 @@ class EntryPoint
 		EntryPoint(const EntryPoint &) = default;
 
 		void incorporate();
+		void iterate(std::function<bool(llvm::BasicBlock *)> callback);
 
 		int depth() const;
 		int index() const;
