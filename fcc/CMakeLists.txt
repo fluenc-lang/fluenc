@@ -8,6 +8,7 @@ endif ()
 
 find_package(LLD REQUIRED CONFIG)
 find_package(tomlplusplus CONFIG REQUIRED)
+find_package(LibArchive REQUIRED)
 
 find_path(CPP_PEGLIB_INCLUDE_DIRS "peglib.h")
 
@@ -24,6 +25,7 @@ target_link_libraries(${PROJECT_NAME}
     lldELF
 
     tomlplusplus::tomlplusplus
+	LibArchive::LibArchive
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

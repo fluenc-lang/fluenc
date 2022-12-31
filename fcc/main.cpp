@@ -4,6 +4,9 @@
 #include <filesystem>
 #include <fstream>
 
+#include <archive.h>
+#include <archive_entry.h>
+
 #include <fmt/core.h>
 
 #include <lld/Common/Driver.h>
@@ -16,7 +19,7 @@
 #include <llvm/Transforms/Scalar/SimplifyCFG.h>
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Config/llvm-config.h>
-#if LLVM_VERSION_MAJOR == 14
+#if LLVM_VERSION_MAJOR >= 14
 #include <llvm/MC/TargetRegistry.h>
 #else
 #include <llvm/Support/TargetRegistry.h>
@@ -85,14 +88,8 @@ CompilerJob createJob(const ModuleInfo &module, const std::filesystem::path &ste
 	};
 }
 
-ModuleInfo analyze(const std::string &file, peg::parser &parser)
+ModuleInfo analyze(const std::string &file, const std::string &source, peg::parser &parser)
 {
-	std::ifstream stream(file);
-	std::stringstream buffer;
-	buffer << stream.rdbuf();
-
-	auto source = new std::string(buffer.str());
-
 	std::shared_ptr<peg::Ast> ast;
 
 	parser.log = [&](size_t line, size_t col, const std::string &message)
@@ -100,7 +97,7 @@ ModuleInfo analyze(const std::string &file, peg::parser &parser)
 		throw new ParserException(file, line, col, message);
 	};
 
-	parser.parse(*source, ast, file.c_str());
+	parser.parse(source, ast, file.c_str());
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 
@@ -272,11 +269,59 @@ int main(int argc, char **argv)
 
 	auto workingDirectory = std::filesystem::current_path();
 
-	std::vector<std::string> objectFiles;
+	std::unordered_map<std::string, llvm::SmallVector<char>> objectFiles;
+	std::unordered_map<std::string, std::string> sourceFiles;
+
+	auto baseModule = std::accumulate(begin(configuration->modules), end(configuration->modules), ModuleInfo {}, [&](auto accumulated, auto moduleName)
+	{
+		auto moduleFileName = fmt::format("{}.fcm", moduleName);
+
+		auto archive = archive_read_new();
+
+		archive_read_support_format_tar(archive);
+
+		if (archive_read_open_filename(archive, moduleFileName.data(), 10240) != ARCHIVE_OK)
+		{
+			fmt::print("Failed to open module {} for reading: {}\n", moduleName, archive_error_string(archive));
+
+			return accumulated;
+		}
+
+		archive_entry *entry = nullptr;
+
+		auto module = accumulated;
+
+		while (archive_read_next_header(archive, &entry) == ARCHIVE_OK)
+		{
+			auto size = archive_entry_size(entry);
+
+			std::filesystem::path path(archive_entry_pathname(entry));
+
+			auto buffer = new char[size];
+
+			archive_read_data(archive, buffer, size);
+
+			if (path.extension() == ".fc")
+			{
+				module = ModuleInfo::merge(module, analyze(path.string(), std::string(buffer, size), parser));
+			}
+
+			if (path.extension() == ".o")
+			{
+				objectFiles.insert({ path.string(), llvm::SmallVector<char>(buffer, buffer + size) });
+			}
+		}
+
+		archive_read_free(archive);
+
+		return module;
+	});
 
 	try
 	{
-		for (const auto &entry : std::filesystem::recursive_directory_iterator(workingDirectory))
+		using iterator_t = std::filesystem::recursive_directory_iterator;
+
+		auto module = std::accumulate(iterator_t(workingDirectory), iterator_t(), baseModule, [&](auto accumulated, auto entry)
 		{
 			auto path = entry.path();
 
@@ -284,97 +329,84 @@ int main(int argc, char **argv)
 			{
 				fmt::print("Skipping file {}\n", path.string());
 
-				continue;
+				return accumulated;
 			}
 
 			fmt::print("Adding file {}\n", path.string());
 
 			auto relative = std::filesystem::relative(path);
 
-			auto relativeStem = relative.parent_path() / relative.stem();
+			std::ifstream stream(relative);
+			std::stringstream buffer;
+			buffer << stream.rdbuf();
 
-			auto module = analyze(relative, parser);
-			auto job = createJob(module, relativeStem);
+			auto [it, inserted] = sourceFiles.emplace(relative.string(), buffer.str());
 
-			jobs.insert({ job.sourceFile, job});
-		}
+			if (!inserted)
+			{
+				return accumulated;
+			}
 
-		for (auto &[_, job] : jobs)
+			auto module = analyze(it->first, it->second, parser);
+
+			return ModuleInfo::merge(accumulated, module);
+		});
+
+		auto llvmModule = std::make_unique<llvm::Module>("main", *llvmContext);
+
+		fmt::print("Building...\n");
+
+		Stack values;
+
+		EntryPoint entryPoint(0
+			, -1
+			, nullptr
+			, nullptr
+			, nullptr
+			, nullptr
+			, nullptr
+			, llvmModule.get()
+			, llvmContext.get()
+			, "term"
+			, module.functions
+			, module.locals
+			, module.globals
+			, module.types
+			, module.roots
+			, values
+			, nullptr
+			);
+
+		Emitter emitter;
+
+		for (auto &root : module.roots)
 		{
-			if (job.module.roots.empty())
-			{
-				fmt::print("File {} has no roots, skipping\n", job.sourceFile);
-
-				continue;
-			}
-
-			if (isStale(job, jobs))
-			{
-				auto module = processUses(job, jobs);
-
-				fmt::print("Building {}...\n", job.sourceFile);
-
-				auto llvmModule = std::make_unique<llvm::Module>(job.name, *llvmContext);
-
-				Stack values;
-
-				EntryPoint entryPoint(0
-					, -1
-					, nullptr
-					, nullptr
-					, nullptr
-					, nullptr
-					, nullptr
-					, llvmModule.get()
-					, llvmContext.get()
-					, "term"
-					, module.functions
-					, module.locals
-					, module.globals
-					, module.types
-					, module.roots
-					, values
-					, nullptr
-					);
-
-				Emitter emitter;
-
-				for (auto root : module.roots)
-				{
-					root->accept(emitter, { entryPoint, values });
-				}
-
-				llvmModule->print(llvm::errs(), nullptr);
-				llvmModule->setDataLayout(dataLayout);
-
-//				if (verifyModule(*llvmModule, &llvm::errs()))
-//				{
-//					throw new std::exception();
-//				}
-
-				std::error_code error;
-
-				llvm::raw_fd_ostream destination(job.objectFile, error, llvm::sys::fs::OF_None);
-
-				llvm::legacy::PassManager passManager;
-
-				if (argc > 1)
-				{
-					if (!strcmp(argv[1], "-dot-cfg"))
-					{
-						passManager.add(llvm::createCFGPrinterLegacyPassPass());
-					}
-				}
-
-				targetMachine->addPassesToEmitFile(passManager, destination, nullptr, llvm::CGFT_ObjectFile);
-
-				passManager.run(*llvmModule);
-
-				destination.flush();
-			}
-
-			objectFiles.push_back(job.objectFile);
+			root->accept(emitter, { entryPoint, values });
 		}
+
+		llvmModule->print(llvm::errs(), nullptr);
+		llvmModule->setDataLayout(dataLayout);
+
+		std::error_code error;
+
+		llvm::SmallVector<char> buffer;
+
+		llvm::raw_svector_ostream destination(buffer);
+		llvm::legacy::PassManager passManager;
+
+		if (argc > 1)
+		{
+			if (!strcmp(argv[1], "-dot-cfg"))
+			{
+				passManager.add(llvm::createCFGPrinterLegacyPassPass());
+			}
+		}
+
+		targetMachine->addPassesToEmitFile(passManager, destination, nullptr, llvm::CGFT_ObjectFile);
+
+		passManager.run(*llvmModule);
+
+		objectFiles.insert({ "module.o", buffer });
 	}
 	catch (CompilerException *exception)
 	{
@@ -435,38 +467,93 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	fmt::print("Linking {}...\n", configuration->target);;
-
-	std::vector<std::string> linkerArguments =
+	if (configuration->type == "module")
 	{
-		"fcc",
-		"-dynamic-linker",
-		"/lib64/ld-linux-x86-64.so.2",
-		"/usr/lib/crt1.o",
-		"/usr/lib/crti.o",
-		"/usr/lib/crtn.o",
-		"-L/usr/lib",
-		"-lc",
-	};
+		auto archive = archive_write_new();
 
-	linkerArguments.insert(end(linkerArguments), begin(configuration->libs), end(configuration->libs));
-	linkerArguments.insert(end(linkerArguments), begin(objectFiles), end(objectFiles));
+		archive_write_set_format_pax_restricted(archive);
+		archive_write_open_filename(archive, "module.fcm");
 
-	linkerArguments.push_back("-o");
-	linkerArguments.push_back(configuration->target);
+		auto addFile = [=](auto name, auto contents)
+		{
+			auto entry = archive_entry_new();
 
-	std::vector<const char *> arguments;
+			archive_entry_set_pathname(entry, name.data());
+			archive_entry_set_size(entry, contents.size());
+			archive_entry_set_filetype(entry, AE_IFREG);
+			archive_entry_set_perm(entry, 0644);
 
-	std::transform(begin(linkerArguments), end(linkerArguments), std::back_inserter(arguments), [](auto argument)
+			archive_write_header(archive, entry);
+			archive_write_data(archive, contents.data(), contents.size());
+
+			archive_entry_free(entry);
+		};
+
+		for (auto &[name, contents] : objectFiles)
+		{
+			addFile(name, contents);
+		}
+
+		for (auto &[name, contents] : sourceFiles)
+		{
+			addFile(name, contents);
+		}
+
+		archive_write_close(archive);
+		archive_write_free(archive);
+	}
+	else
 	{
-		return strcpy(new char[argument.size() + 1], argument.c_str());
-	});
+		fmt::print("Linking {}...\n", configuration->target);
 
-#if LLVM_VERSION_MAJOR == 14
-    lld::elf::link(llvm::makeArrayRef(arguments), llvm::outs(), llvm::errs(), true, false);
+		std::vector<std::string> linkerArguments =
+		{
+			"fcc",
+			"-dynamic-linker",
+			"/lib64/ld-linux-x86-64.so.2",
+			"/usr/lib/crt1.o",
+			"/usr/lib/crti.o",
+			"/usr/lib/crtn.o",
+			"-L/usr/lib",
+			"-lc",
+		};
+
+		std::error_code error;
+
+		for (auto &[name, contents] : objectFiles)
+		{
+			linkerArguments.push_back(name);
+
+			llvm::raw_fd_ostream destination(name, error, llvm::sys::fs::OF_None);
+
+			for (auto i = 0u; i < contents.size(); i += 1024)
+			{
+				destination.write(contents.data() + i
+					, std::min(1024ul, contents.size() - i)
+					);
+			}
+
+			destination.flush();
+		}
+
+		linkerArguments.insert(end(linkerArguments), begin(configuration->libs), end(configuration->libs));
+
+		linkerArguments.push_back("-o");
+		linkerArguments.push_back(configuration->target);
+
+		std::vector<const char *> arguments;
+
+		std::transform(begin(linkerArguments), end(linkerArguments), std::back_inserter(arguments), [](auto argument)
+		{
+			return strcpy(new char[argument.size() + 1], argument.c_str());
+		});
+
+#if LLVM_VERSION_MAJOR >= 14
+		lld::elf::link(llvm::makeArrayRef(arguments), llvm::outs(), llvm::errs(), true, false);
 #else
-	lld::elf::link(llvm::makeArrayRef(arguments), true, llvm::outs(), llvm::errs());
+		lld::elf::link(llvm::makeArrayRef(arguments), true, llvm::outs(), llvm::errs());
 #endif
+	}
 
 	return 0;
 }
