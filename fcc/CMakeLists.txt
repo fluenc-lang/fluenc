@@ -8,6 +8,8 @@ endif ()
 
 find_package(LLD REQUIRED CONFIG)
 find_package(tomlplusplus CONFIG REQUIRED)
+find_package(LibArchive REQUIRED)
+find_package(Clang REQUIRED)
 
 find_path(CPP_PEGLIB_INCLUDE_DIRS "peglib.h")
 
@@ -22,8 +24,10 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     fluenc-lang
     lldELF
+	clang-cpp
 
     tomlplusplus::tomlplusplus
+	LibArchive::LibArchive
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

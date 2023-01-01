@@ -32,7 +32,8 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 			{
 				*type,
 				accumulation.target,
-				accumulation.libs
+				accumulation.libs,
+				accumulation.modules,
 			};
 		}
 
@@ -49,7 +50,8 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 			{
 				accumulation.type,
 				*target,
-				accumulation.libs
+				accumulation.libs,
+				accumulation.modules,
 			};
 		}
 
@@ -73,7 +75,36 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 				{
 					accumulation.type,
 					accumulation.target,
-					libs
+					libs,
+					accumulation.modules,
+				};
+			}
+
+			return accumulation;
+		}
+
+		if (key.str() == "modules")
+		{
+			if (auto array = value.as_array())
+			{
+				std::vector<std::string> modules;
+
+				for (auto &element : *array)
+				{
+					auto module = element.value<std::string>();
+
+					if (module)
+					{
+						modules.push_back(*module);
+					}
+				}
+
+				return
+				{
+					accumulation.type,
+					accumulation.target,
+					accumulation.libs,
+					modules,
 				};
 			}
 

@@ -10,6 +10,7 @@ struct BuildConfiguration
 	std::string target;
 
 	std::vector<std::string> libs;
+	std::vector<std::string> modules;
 };
 
 #endif // BUILDCONFIGURATION_H
