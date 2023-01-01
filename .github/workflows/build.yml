@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: '**'
 
 env:
   BUILD_TYPE: Release
@@ -14,12 +14,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-22.04, macos-12 ]
+        os: [ ubuntu-22.04, macos-12, windows-2022 ]
         include:
           - os: ubuntu-22.04
             cmake-prefix-path: /usr/lib/llvm-14
+            artifact-path: /build/fcc
           - os: macos-12
             cmake-prefix-path: /usr/local/opt/llvm@14
+            artifact-path: /build/fcc
+          - os: windows-2022
+            cmake-prefix-path: c:\llvm-14.0.6-windows-amd64-msvc17-msvcrt
+            artifact-path: /build/fcc/Release
       fail-fast: false
 
     steps:
@@ -27,7 +32,11 @@ jobs:
 
     - name: Install build dependencies
       run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          curl -L -o /c/llvm-14.0.6-windows-amd64-msvcrt-Release.zip https://github.com/Znurre/llvm-package-windows/releases/download/v0.0.1/llvm-14.0.6-windows-amd64-msvcrt-Release.zip &&
+          7z x -y c:\\llvm-14.0.6-windows-amd64-msvcrt-Release.zip -oc:\\ &&
+          7z x -y c:\\llvm-14.0.6-windows-amd64-msvc17-msvcrt.7z -oc:\\
+        elif [ "$RUNNER_OS" == "Linux" ]; then
           sudo apt-get update && sudo apt-get install liblld-14-dev libclang-14-dev
         fi
       shell: bash
@@ -48,4 +57,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{runner.os}}-fcc
-        path: ${{github.workspace}}/build/fcc
+        path: ${{github.workspace}}${{matrix.artifact-path}}
