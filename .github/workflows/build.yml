@@ -28,7 +28,7 @@ jobs:
     - name: Install build dependencies
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get update && sudo apt-get install liblld-14-dev
+          sudo apt-get update && sudo apt-get install liblld-14-dev libclang-14-dev
         fi
       shell: bash
 
