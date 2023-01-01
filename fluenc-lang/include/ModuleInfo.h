@@ -21,12 +21,15 @@ struct ModuleInfo
 	std::map<std::string, Prototype *> types;
 	std::unordered_map<std::string, Use *> uses;
 
-	static ModuleInfo merge(const ModuleInfo &left, const ModuleInfo &right)
+	static ModuleInfo merge(const ModuleInfo &left, const ModuleInfo &right, bool skipRoots)
 	{
 		ModuleInfo target;
 
-		std::copy(begin(left.roots), end(left.roots), back_inserter(target.roots));
-		std::copy(begin(right.roots), end(right.roots), back_inserter(target.roots));
+		if (!skipRoots)
+		{
+			std::copy(begin(left.roots), end(left.roots), back_inserter(target.roots));
+			std::copy(begin(right.roots), end(right.roots), back_inserter(target.roots));
+		}
 
 		std::copy(begin(left.functions), end(left.functions), inserter(target.functions, begin(target.functions)));
 		std::copy(begin(right.functions), end(right.functions), inserter(target.functions, begin(target.functions)));

@@ -1,2 +1,2 @@
 target = "foam"
-libs = [ "sdl.o", "-lSDL2" ]
+libs = [ "-lSDL2" ]
