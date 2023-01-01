@@ -67,9 +67,7 @@ const BaseValue *compileValue(std::string source)
 
 	std::shared_ptr<peg::Ast> ast;
 
-	auto src = stream.str();
-
-	parser.parse(src, ast);
+	parser.parse(stream.str(), ast);
 
 	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
 

@@ -54,6 +54,7 @@
 
 #include "peglib.h"
 #include "incbin.h"
+
 #include <peglib.h>
 #include <incbin.h>
 #include <grammar.h>
@@ -76,7 +77,7 @@ ModuleInfo analyze(const std::string &file, const std::string &source, peg::pars
 
 	parser.log = [&](size_t line, size_t col, const std::string &message)
 	{
-		throw new ParserException(file.string(), line, col, message);
+		throw new ParserException(file, line, col, message);
 	};
 
 	parser.parse(source, ast, file.c_str());
