@@ -20,13 +20,13 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     fmt::fmt
 )
 
-if (MSVC)
+if (${LLVM_LINK_LLVM_DYLIB})
 	target_link_libraries(${PROJECT_NAME} PUBLIC
-		${LLVM_AVAILABLE_LIBS}
+		LLVM
 	)
 else()
 	target_link_libraries(${PROJECT_NAME} PUBLIC
-		LLVM
+		${LLVM_AVAILABLE_LIBS}
 	)
 endif()
 

@@ -88,7 +88,9 @@ const Type *LazyValue::type() const
 	{
 		auto resultBlock = createBlock(context);
 
-		for (auto &result : expandIterator(analyzer, { resultEntryPoint.withBlock(resultBlock), resultValues }))
+		auto withBlock = resultEntryPoint.withBlock(resultBlock);
+
+		for (auto &result : expandIterator(analyzer, { withBlock, resultValues }))
 		{
 			results.push_back(result);
 		}
@@ -100,7 +102,9 @@ const Type *LazyValue::type() const
 	{
 		auto resultBlock = createBlock(context);
 
-		auto [isArrayCompatible, type] = getElementType({ true, nullptr }, resultEntryPoint.withBlock(resultBlock), resultValues);
+		auto withBlock = resultEntryPoint.withBlock(resultBlock);
+
+		auto [isArrayCompatible, type] = getElementType({ true, nullptr }, withBlock, resultValues);
 
 		if (!isArrayCompatible)
 		{

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(fcc LANGUAGES C CXX)
 
 if (NOT ${FLUENC_BUILD_COMPILER})
-    return()
+	return()
 endif ()
 
 find_package(LLD REQUIRED CONFIG)
@@ -16,22 +16,37 @@ find_path(CPP_PEGLIB_INCLUDE_DIRS "peglib.h")
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
 add_executable(${PROJECT_NAME}
-    ${SOURCE_FILES}
+	${SOURCE_FILES}
 )
 
-target_link_libraries(${PROJECT_NAME}
-    fluenc-lang
-    lldELF
-	clang-cpp
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	fluenc-lang
+	lldELF
 	grammar
 
-    tomlplusplus::tomlplusplus
+	tomlplusplus::tomlplusplus
 	LibArchive::LibArchive
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    "."
+if (${CLANG_LINK_CLANG_DYLIB})
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		clang-cpp
+	)
+else()
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		clangFrontend
+		clangAst
+		clangBasic
+		clangLex
+		clangParse
+		clangCodeGen
+		clangSema
+	)
+endif()
 
-    ${LLD_INCLUDE_DIRS}
-    ${CPP_PEGLIB_INCLUDE_DIRS}
+target_include_directories(${PROJECT_NAME} PRIVATE
+	"."
+
+	${LLD_INCLUDE_DIRS}
+	${CPP_PEGLIB_INCLUDE_DIRS}
 )
