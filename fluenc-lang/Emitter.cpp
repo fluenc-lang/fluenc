@@ -958,7 +958,12 @@ std::vector<DzResult> Emitter::visit(const PostEvaluationNode *node, DefaultVisi
 							auto node = expanded->node();
 							auto provider = expanded->provider();
 
-							for (auto &result : node->accept(*this, { provider->withBlock(block), expanded->values() }))
+							// Workaround for an MSVC bug, where the compiler will crash
+							// if this is not stored to a local variable.
+							//
+							auto withBlock = provider->withBlock(block);
+
+							for (auto &result : node->accept(*this, { withBlock, expanded->values() }))
 							{
 								results.push_back(result);
 							}

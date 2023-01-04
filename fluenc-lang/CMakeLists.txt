@@ -14,12 +14,21 @@ add_library(${PROJECT_NAME} OBJECT ${SOURCE_FILES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-	LLVM
     immer
     range-v3
 
     fmt::fmt
 )
+
+if (${LLVM_LINK_LLVM_DYLIB})
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		LLVM
+	)
+else()
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		${LLVM_AVAILABLE_LIBS}
+	)
+endif()
 
 target_link_directories(${PROJECT_NAME} PUBLIC
     ${LLVM_LIBRARY_DIR}

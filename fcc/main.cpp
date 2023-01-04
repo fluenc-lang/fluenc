@@ -3,6 +3,7 @@
 #include <string_view>
 #include <filesystem>
 #include <fstream>
+#include <algorithm>
 
 #include <archive.h>
 #include <archive_entry.h>
@@ -28,7 +29,7 @@
 #endif
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetOptions.h>
-
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Target/TargetMachine.h>
 
@@ -55,6 +56,10 @@
 #include "peglib.h"
 #include "incbin.h"
 
+#include <peglib.h>
+#include <incbin.h>
+#include <grammar.h>
+
 #include "ProjectFileParser.h"
 #include "CompilerException.h"
 #include "Visitor.h"
@@ -65,7 +70,7 @@
 #include "exceptions/ParserException.h"
 #include "exceptions/FileNotFoundException.h"
 
-INCTXT(Grammar, "fluenc.peg");
+INCBIN_EXTERN(Grammar);
 
 ModuleInfo analyze(const std::string &file, const std::string &source, peg::parser &parser)
 {
@@ -135,7 +140,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	peg::parser parser(gGrammarData);
+	peg::parser parser(grammar());
 
 	parser.log = [](size_t line, size_t col, const std::string &msg)
 	{
@@ -501,7 +506,7 @@ int main(int argc, char **argv)
 			for (auto i = 0u; i < contents.size(); i += 1024)
 			{
 				destination.write(contents.data() + i
-					, std::min(1024ul, contents.size() - i)
+					, std::min(1024u, static_cast<uint32_t>(contents.size() - i))
 					);
 			}
 

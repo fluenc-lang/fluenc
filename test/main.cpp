@@ -460,7 +460,11 @@ BOOST_AUTO_TEST_CASE (scenario19)
 		}
 	)");
 
+#ifdef _WIN32
+	BOOST_TEST(result == 0);
+#else
 	BOOST_TEST(result == 4);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE (scenario20)

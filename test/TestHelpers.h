@@ -7,17 +7,20 @@
 #include <llvm/Support/Host.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Config/llvm-config.h>
-#if LLVM_VERSION_MAJOR == 14
+#if LLVM_VERSION_MAJOR >= 14
 #include <llvm/MC/TargetRegistry.h>
 #else
 #include <llvm/Support/TargetRegistry.h>
 #endif
+#include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
+#include <llvm/IR/ValueSymbolTable.h>
 
-#include "peglib.h"
-#include "incbin.h"
+#include <peglib.h>
+#include <incbin.h>
+#include <grammar.h>
 
 #include "KaleidoscopeJIT.h"
 #include "Visitor.h"
@@ -27,11 +30,9 @@
 #include "CallableNode.h"
 #include "Utility.h"
 
-INCTXT(Grammar, "fluenc.peg");
-
 const CallableNode *compileFunction(std::string source)
 {
-	peg::parser parser(gGrammarData);
+	peg::parser parser(grammar());
 
 	parser.enable_ast();
 	parser.enable_packrat_parsing();
@@ -59,7 +60,7 @@ const BaseValue *compileValue(std::string source)
 	stream << source;
 	stream << ";";
 
-	peg::parser parser(gGrammarData);
+	peg::parser parser(grammar());
 
 	parser.enable_ast();
 	parser.enable_packrat_parsing();
@@ -117,7 +118,7 @@ const BaseValue *compileValue(std::string source)
 
 EntryPoint compile(std::string source)
 {
-	peg::parser parser(gGrammarData);
+	peg::parser parser(grammar());
 
 	parser.enable_ast();
 	parser.enable_packrat_parsing();
@@ -162,7 +163,7 @@ EntryPoint compile(std::string source)
 
 int exec(std::string source)
 {
-	static peg::parser parser(gGrammarData);
+	static peg::parser parser(grammar());
 
 	parser.enable_ast();
 	parser.enable_packrat_parsing();
@@ -209,21 +210,24 @@ int exec(std::string source)
 	module->print(llvm::errs(), nullptr);
 #endif
 
-	verifyModule(*module, &llvm::errs());
-
-	auto threadSafeModule = llvm::orc::ThreadSafeModule(
-		std::move(module),
-		std::move(llvmContext)
-		);
+	if (verifyModule(*module, &llvm::errs()))
+	{
+		return -1;
+	}
 
 	auto jit = llvm::orc::KaleidoscopeJIT::Create();
 
 	if (!jit)
 	{
-		auto error = jit.takeError();
-
 		return -1;
 	}
+
+	module->setDataLayout((*jit)->getDataLayout());
+
+	auto threadSafeModule = llvm::orc::ThreadSafeModule(
+		std::move(module),
+		std::move(llvmContext)
+		);
 
 	auto error = (*jit)->addModule(std::move(threadSafeModule));
 
@@ -233,6 +237,11 @@ int exec(std::string source)
 	}
 
 	auto mainSymbol = (*jit)->lookup("main");
+
+	if (!mainSymbol)
+	{
+		return -1;
+	}
 
 	auto main = (int(*)())mainSymbol->getAddress();
 

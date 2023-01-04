@@ -1,15 +1,15 @@
 #ifndef EXTREMITIESITERATOR_H
 #define EXTREMITIESITERATOR_H
 
-#include <cmath>
+#include <algorithm>
 
 template<typename T>
 class extremities_iterator
 {
 	public:
 		extremities_iterator(T &min, T &max)
-			: m_min(min)
-			, m_max(max)
+			: m_min(&min)
+			, m_max(&max)
 		{
 		}
 
@@ -25,15 +25,15 @@ class extremities_iterator
 
 		extremities_iterator &operator =(T value)
 		{
-			m_min = std::min(m_min, value);
-			m_max = std::max(m_max, value);
+			*m_min = std::min(*m_min, value);
+			*m_max = std::max(*m_max, value);
 
 			return *this;
 		}
 
 	private:
-		T &m_min;
-		T &m_max;
+		T *m_min;
+		T *m_max;
 };
 
 #endif // EXTREMITIESITERATOR_H
