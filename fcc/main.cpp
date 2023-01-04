@@ -506,7 +506,7 @@ int main(int argc, char **argv)
 			for (auto i = 0u; i < contents.size(); i += 1024)
 			{
 				destination.write(contents.data() + i
-					, std::min(1024ull, contents.size() - i)
+					, std::min(1024u, static_cast<uint32_t>(contents.size() - i))
 					);
 			}
 
