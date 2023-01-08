@@ -87,6 +87,18 @@ const char *getClangPath()
 	return "clang";
 }
 
+llvm::ArrayRef<const char *> arrayRef(const std::vector<std::string> &input)
+{
+	std::vector<const char *> result;
+
+	std::transform(begin(input), end(input), back_inserter(result), [](auto argument)
+	{
+		return strcpy(new char[argument.size() + 1], argument.c_str());
+	});
+
+	return llvm::makeArrayRef(result.data(), result.size());
+}
+
 int main(int argc, char **argv)
 {
 	llvm::InitializeAllTargetInfos();
@@ -113,6 +125,8 @@ int main(int argc, char **argv)
 
 	auto targetTriple = llvm::sys::getDefaultTargetTriple();
 	auto target = llvm::TargetRegistry::lookupTarget(targetTriple, errors);
+
+	std::cout << targetTriple << std::endl;
 
 	if (!target)
 	{
@@ -241,7 +255,7 @@ int main(int argc, char **argv)
 
 				output.push_back(file);
 
-				auto module = analyze(file, buffer.str(), parser);
+				auto module = analyze(file.string(), buffer.str(), parser);
 
 				return ModuleInfo::merge(accumulated, module, false);
 			});
@@ -369,20 +383,30 @@ int main(int argc, char **argv)
 
 	auto clang = [&](auto input) -> std::vector<std::filesystem::path>
 	{
+		if (empty(input))
+		{
+			return input;
+		}
+
 		std::vector<std::filesystem::path> output;
 
-		std::vector<const char *> compilerArguments = { clangPath, "-c" };
+		std::vector<std::string> compilerArguments = { clangPath, "-c" };
 
 		for (auto file : input)
 		{
-			compilerArguments.push_back(file.c_str());
+			compilerArguments.push_back(file.string());
 
 			output.push_back(file.stem() += ".o");
 		}
 
 		clang::SmallVector<std::pair<int, const clang::driver::Command *>> failingCommands;
 
-		auto compilation = clangDriver.BuildCompilation(llvm::makeArrayRef(compilerArguments.data(), compilerArguments.size()));
+		auto compilation = clangDriver.BuildCompilation(arrayRef(compilerArguments));
+
+		for (auto &job : compilation->getJobs())
+		{
+			job.Print(llvm::errs(), "\n", true);
+		}
 
 		clangDriver.ExecuteCompilation(*compilation, failingCommands);
 
@@ -411,7 +435,7 @@ int main(int argc, char **argv)
 
 			auto entry = archive_entry_new();
 
-			archive_entry_set_pathname(entry, file.c_str());
+			archive_entry_set_pathname(entry, file.string().c_str());
 			archive_entry_set_size(entry, size);
 			archive_entry_set_filetype(entry, AE_IFREG);
 			archive_entry_set_perm(entry, 0644);
@@ -437,30 +461,39 @@ int main(int argc, char **argv)
 	{
 		fmt::print("Linking {}...\n", configuration->target);
 
-		std::vector<const char *> linkerArguments =
+		std::vector<std::string> linkerArguments =
 		{
 			clangPath,
-			"-no-pie",
 			"-o",
+#ifdef _WIN32
+			fmt::format("{}.exe", configuration->target)
+#else
+			"-no-pie",
 			configuration->target.c_str()
+#endif
 		};
 
 		for (auto &file : resultFiles)
 		{
 			if (file.extension() == ".o")
 			{
-				linkerArguments.push_back(file.c_str());
+				linkerArguments.push_back(file.string());
 			}
 		}
 
 		for (auto &lib : configuration->libs)
 		{
-			linkerArguments.push_back(lib.c_str());
+			linkerArguments.push_back(lib);
 		}
 
 		clang::SmallVector<std::pair<int, const clang::driver::Command *>> failingCommands;
 
-		auto compilation = clangDriver.BuildCompilation(llvm::makeArrayRef(linkerArguments.data(), linkerArguments.size()));
+		auto compilation = clangDriver.BuildCompilation(arrayRef(linkerArguments));
+
+		for (auto &job : compilation->getJobs())
+		{
+			job.Print(llvm::errs(), "\n", false);
+		}
 
 		return clangDriver.ExecuteCompilation(*compilation, failingCommands);
 	}
