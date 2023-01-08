@@ -75,7 +75,7 @@ ModuleInfo analyze(const std::string &file, const std::string &source, peg::pars
 	return moduleInfo;
 }
 
-const char *getClangPath()
+std::string getClangPath(std::filesystem::path exe)
 {
 	auto fromEnv = std::getenv("CLANG_PATH");
 
@@ -84,7 +84,9 @@ const char *getClangPath()
 		return fromEnv;
 	}
 
-	return "clang";
+	auto clangExe = exe.parent_path() / "clang";
+
+	return clangExe.string();
 }
 
 llvm::ArrayRef<const char *> arrayRef(const std::vector<std::string> &input)
@@ -135,7 +137,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	auto clangPath = getClangPath();
+	auto clangPath = getClangPath(*argv);
 
 	auto diagnostics = clang::CompilerInstance::createDiagnostics(new clang::DiagnosticOptions);
 
