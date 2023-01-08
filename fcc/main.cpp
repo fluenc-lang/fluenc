@@ -33,25 +33,10 @@
 #include <llvm/Support/Host.h>
 #include <llvm/Target/TargetMachine.h>
 
-#include <clang/AST/ASTContext.h>
-#include <clang/AST/ASTConsumer.h>
 #include <clang/Basic/DiagnosticOptions.h>
-#include <clang/Basic/Diagnostic.h>
-#include <clang/Basic/FileManager.h>
-#include <clang/Basic/FileSystemOptions.h>
-#include <clang/Basic/LangOptions.h>
-#include <clang/Basic/SourceManager.h>
-#include <clang/Basic/TargetInfo.h>
-#include <clang/CodeGen/CodeGenAction.h>
 #include <clang/Frontend/CompilerInstance.h>
-#include <clang/Frontend/CompilerInvocation.h>
-#include <clang/Frontend/TextDiagnosticPrinter.h>
-#include <clang/Lex/HeaderSearch.h>
-#include <clang/Lex/HeaderSearchOptions.h>
-#include <clang/Lex/Preprocessor.h>
-#include <clang/Lex/PreprocessorOptions.h>
-#include <clang/Parse/ParseAST.h>
-#include <clang/Sema/Sema.h>
+#include <clang/Driver/Driver.h>
+#include <clang/Driver/Compilation.h>
 
 #include "peglib.h"
 #include "incbin.h"
@@ -68,7 +53,6 @@
 #include "CallableNode.h"
 
 #include "exceptions/ParserException.h"
-#include "exceptions/FileNotFoundException.h"
 
 INCBIN_EXTERN(Grammar);
 
@@ -89,6 +73,18 @@ ModuleInfo analyze(const std::string &file, const std::string &source, peg::pars
 		.visit(ast);
 
 	return moduleInfo;
+}
+
+const char *getClangPath()
+{
+	auto fromEnv = std::getenv("CLANG_PATH");
+
+	if (fromEnv)
+	{
+		return fromEnv;
+	}
+
+	return "clang";
 }
 
 int main(int argc, char **argv)
@@ -125,6 +121,12 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	auto clangPath = getClangPath();
+
+	auto diagnostics = clang::CompilerInstance::createDiagnostics(new clang::DiagnosticOptions);
+
+	clang::driver::Driver clangDriver(clangPath, targetTriple, *diagnostics, "fluenc");
+
 	auto relocModel = llvm::Optional<llvm::Reloc::Model>();
 	auto targetMachine = target->createTargetMachine(targetTriple, "generic", "", llvm::TargetOptions(), relocModel);
 	auto dataLayout = targetMachine->createDataLayout();
@@ -152,9 +154,8 @@ int main(int argc, char **argv)
 
 	auto workingDirectory = std::filesystem::current_path();
 
-	std::unordered_map<std::string, llvm::SmallVector<char>> objectFiles;
-	std::vector<std::string> nativeSourceFiles;
-	std::vector<std::string> foreignSourceFiles;
+	std::vector<std::filesystem::path> nativeSourceFiles;
+	std::vector<std::filesystem::path> foreignSourceFiles;
 
 	using iterator_t = std::filesystem::recursive_directory_iterator;
 
@@ -176,15 +177,10 @@ int main(int argc, char **argv)
 		}
 	}
 
-	struct CompilationResult
+	auto fluenc = [&](auto input) -> std::vector<std::filesystem::path>
 	{
-		std::string name;
-		std::unique_ptr<llvm::Module> module;
-		std::unordered_map<std::string, std::string> files;
-	};
+		std::vector<std::filesystem::path> output;
 
-	auto fluenc = [&](auto files) -> CompilationResult
-	{
 		try
 		{
 			auto baseModule = std::accumulate(begin(configuration->modules), end(configuration->modules), ModuleInfo {}, [&](auto accumulated, auto moduleName)
@@ -223,7 +219,12 @@ int main(int argc, char **argv)
 
 					if (path.extension() == ".o")
 					{
-						objectFiles.insert({ path.string(), llvm::SmallVector<char>(buffer, buffer + size) });
+						std::ofstream stream(path, std::ios::out | std::ios::binary);
+
+						stream.write(buffer, size);
+						stream.close();
+
+						output.push_back(path);
 					}
 				}
 
@@ -232,22 +233,15 @@ int main(int argc, char **argv)
 				return module;
 			});
 
-			std::unordered_map<std::string, std::string> sourceFiles;
-
-			auto module = std::accumulate(begin(files), end(files), baseModule, [&](auto accumulated, auto file)
+			auto module = std::accumulate(begin(input), end(input), baseModule, [&](auto accumulated, auto file)
 			{
 				std::ifstream stream(file);
 				std::stringstream buffer;
 				buffer << stream.rdbuf();
 
-				auto [it, inserted] = sourceFiles.emplace(file, buffer.str());
+				output.push_back(file);
 
-				if (!inserted)
-				{
-					return accumulated;
-				}
-
-				auto module = analyze(it->first, it->second, parser);
+				auto module = analyze(file, buffer.str(), parser);
 
 				return ModuleInfo::merge(accumulated, module, false);
 			});
@@ -289,18 +283,29 @@ int main(int argc, char **argv)
 //				llvmModule->print(llvm::errs(), nullptr);
 				llvmModule->setDataLayout(dataLayout);
 
-				return {
-					"native",
-					std::move(llvmModule),
-					sourceFiles
-				};
+				std::error_code error;
+
+				auto objectFileName = fmt::format("{}_native.o", configuration->target);
+
+				llvm::raw_fd_ostream destination(objectFileName, error);
+				llvm::legacy::PassManager passManager;
+
+				if (argc > 1)
+				{
+					if (!strcmp(argv[1], "-dot-cfg"))
+					{
+						passManager.add(llvm::createCFGPrinterLegacyPassPass());
+					}
+				}
+
+				targetMachine->addPassesToEmitFile(passManager, destination, nullptr, llvm::CGFT_ObjectFile);
+
+				passManager.run(*llvmModule);
+
+				output.push_back(objectFileName);
 			}
 
-			return {
-				"native",
-				nullptr,
-				sourceFiles
-			};
+			return output;
 		}
 		catch (CompilerException *exception)
 		{
@@ -362,82 +367,34 @@ int main(int argc, char **argv)
 		}
 	};
 
-	auto clang = [&](auto files) -> CompilationResult
+	auto clang = [&](auto input) -> std::vector<std::filesystem::path>
 	{
-		clang::TextDiagnosticPrinter textDiagnosticPrinter(llvm::outs(), new clang::DiagnosticOptions);
+		std::vector<std::filesystem::path> output;
 
-		clang::CompilerInstance compiler;
-		compiler.createDiagnostics(&textDiagnosticPrinter, false);
+		std::vector<const char *> compilerArguments = { clangPath, "-c" };
 
-		auto &invocation = compiler.getInvocation();
-
-		auto &headerSearchOptions = invocation.getHeaderSearchOpts();
-		auto &targetOptions = invocation.getTargetOpts();
-		auto &frontEndOptions = invocation.getFrontendOpts();
-
-		targetOptions.Triple = llvm::sys::getDefaultTargetTriple();
-
-		headerSearchOptions.AddPath("/usr/include", clang::frontend::IncludeDirGroup::Angled, false, false);
-		headerSearchOptions.AddPath("/usr/lib/clang/14.0.6/include/", clang::frontend::IncludeDirGroup::Angled, false, false);
-
-		std::transform(begin(files), end(files), std::back_inserter(frontEndOptions.Inputs), [](auto file)
+		for (auto file : input)
 		{
-			return clang::FrontendInputFile(file, clang::Language::C);
-		});
+			compilerArguments.push_back(file.c_str());
 
-		auto action = std::make_unique<clang::EmitLLVMOnlyAction>(llvmContext.get());
-
-		if (!compiler.ExecuteAction(*action))
-		{
-			return {};
+			output.push_back(file.stem() += ".o");
 		}
 
-		auto module = action->takeModule();
+		clang::SmallVector<std::pair<int, const clang::driver::Command *>> failingCommands;
 
-		if (!module)
-		{
-			return {};
-		}
+		auto compilation = clangDriver.BuildCompilation(llvm::makeArrayRef(compilerArguments.data(), compilerArguments.size()));
 
-		return {
-			"foreign",
-			std::move(module),
-			std::unordered_map<std::string, std::string>()
-		};
+		clangDriver.ExecuteCompilation(*compilation, failingCommands);
+
+		return output;
 	};
 
-	std::vector<CompilationResult> results;
-	results.push_back(fluenc(nativeSourceFiles));
-	results.push_back(clang(foreignSourceFiles));
+	auto fluencOutput = fluenc(nativeSourceFiles);
+	auto clangOutput = clang(foreignSourceFiles);
 
-	std::error_code error;
-
-	for (auto &result : results)
-	{
-		if (!result.module)
-		{
-			continue;
-		}
-
-		llvm::SmallVector<char> buffer;
-
-		llvm::raw_svector_ostream destination(buffer);
-		llvm::legacy::PassManager passManager;
-
-		if (argc > 1)
-		{
-			if (!strcmp(argv[1], "-dot-cfg"))
-			{
-				passManager.add(llvm::createCFGPrinterLegacyPassPass());
-			}
-		}
-
-		targetMachine->addPassesToEmitFile(passManager, destination, nullptr, llvm::CGFT_ObjectFile);
-
-		passManager.run(*result.module);
-
-		objectFiles.insert({ fmt::format("{}_{}.o", configuration->target, result.name), buffer });
-	}
+	std::vector<std::filesystem::path> resultFiles;
+	resultFiles.insert(end(resultFiles), begin(fluencOutput), end(fluencOutput));
+	resultFiles.insert(end(resultFiles), begin(clangOutput), end(clangOutput));
 
 	if (configuration->type == "module")
 	{
@@ -448,32 +405,29 @@ int main(int argc, char **argv)
 		archive_write_set_format_pax_restricted(archive);
 		archive_write_open_filename(archive, moduleFileName.data());
 
-		auto addFile = [=](auto name, auto contents)
+		for (auto &file : resultFiles)
 		{
+			auto size = std::filesystem::file_size(file);
+
 			auto entry = archive_entry_new();
 
-			archive_entry_set_pathname(entry, name.data());
-			archive_entry_set_size(entry, contents.size());
+			archive_entry_set_pathname(entry, file.c_str());
+			archive_entry_set_size(entry, size);
 			archive_entry_set_filetype(entry, AE_IFREG);
 			archive_entry_set_perm(entry, 0644);
 
 			archive_write_header(archive, entry);
-			archive_write_data(archive, contents.data(), contents.size());
+
+			std::ifstream stream(file, std::ios::in | std::ios::binary);
+
+			for (char buffer[1 << 12]
+				; stream.good()
+				; archive_write_data(archive, buffer, stream.gcount()))
+			{
+				stream.read(buffer, sizeof(buffer));
+			}
 
 			archive_entry_free(entry);
-		};
-
-		for (auto &[name, contents] : objectFiles)
-		{
-			addFile(name, contents);
-		}
-
-		for (auto &result : results)
-		{
-			for (auto &[name, contents] : result.files)
-			{
-				addFile(name, contents);
-			}
 		}
 
 		archive_write_close(archive);
@@ -483,53 +437,32 @@ int main(int argc, char **argv)
 	{
 		fmt::print("Linking {}...\n", configuration->target);
 
-		std::vector<std::string> linkerArguments =
+		std::vector<const char *> linkerArguments =
 		{
-			"fcc",
-			"-dynamic-linker",
-			"/lib64/ld-linux-x86-64.so.2",
-			"/usr/lib/crt1.o",
-			"/usr/lib/crti.o",
-			"/usr/lib/crtn.o",
-			"-L/usr/lib",
-			"-lc",
+			clangPath,
+			"-no-pie",
+			"-o",
+			configuration->target.c_str()
 		};
 
-		std::error_code error;
-
-		for (auto &[name, contents] : objectFiles)
+		for (auto &file : resultFiles)
 		{
-			linkerArguments.push_back(name);
-
-			llvm::raw_fd_ostream destination(name, error, llvm::sys::fs::OF_None);
-
-			for (auto i = 0u; i < contents.size(); i += 1024)
+			if (file.extension() == ".o")
 			{
-				destination.write(contents.data() + i
-					, std::min(1024u, static_cast<uint32_t>(contents.size() - i))
-					);
+				linkerArguments.push_back(file.c_str());
 			}
-
-			destination.flush();
 		}
 
-		linkerArguments.insert(end(linkerArguments), begin(configuration->libs), end(configuration->libs));
-
-		linkerArguments.push_back("-o");
-		linkerArguments.push_back(configuration->target);
-
-		std::vector<const char *> arguments;
-
-		std::transform(begin(linkerArguments), end(linkerArguments), std::back_inserter(arguments), [](auto argument)
+		for (auto &lib : configuration->libs)
 		{
-			return strcpy(new char[argument.size() + 1], argument.c_str());
-		});
+			linkerArguments.push_back(lib.c_str());
+		}
 
-#if LLVM_VERSION_MAJOR >= 14
-		lld::elf::link(llvm::makeArrayRef(arguments), llvm::outs(), llvm::errs(), true, false);
-#else
-		lld::elf::link(llvm::makeArrayRef(arguments), true, llvm::outs(), llvm::errs());
-#endif
+		clang::SmallVector<std::pair<int, const clang::driver::Command *>> failingCommands;
+
+		auto compilation = clangDriver.BuildCompilation(llvm::makeArrayRef(linkerArguments.data(), linkerArguments.size()));
+
+		return clangDriver.ExecuteCompilation(*compilation, failingCommands);
 	}
 
 	return 0;
