@@ -21,7 +21,6 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	fluenc-lang
-	lldELF
 	grammar
 
 	tomlplusplus::tomlplusplus
@@ -32,6 +31,8 @@ if (${CLANG_LINK_CLANG_DYLIB})
 	target_link_libraries(${PROJECT_NAME} PRIVATE
 		clang-cpp
 	)
+
+    install(IMPORTED_RUNTIME_ARTIFACTS clang-cpp)
 else()
 	target_link_libraries(${PROJECT_NAME} PRIVATE
 		clangFrontend
@@ -50,3 +51,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${LLD_INCLUDE_DIRS}
 	${CPP_PEGLIB_INCLUDE_DIRS}
 )
+
+install(TARGETS fcc COMPONENT tomlplusplus::tomlplusplus)
+install(IMPORTED_RUNTIME_ARTIFACTS clang)

@@ -24,6 +24,8 @@ if (${LLVM_LINK_LLVM_DYLIB})
 	target_link_libraries(${PROJECT_NAME} PUBLIC
 		LLVM
 	)
+
+    install(IMPORTED_RUNTIME_ARTIFACTS LLVM)
 else()
 	target_link_libraries(${PROJECT_NAME} PUBLIC
 		${LLVM_AVAILABLE_LIBS}
