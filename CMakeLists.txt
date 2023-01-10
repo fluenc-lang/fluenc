@@ -9,6 +9,8 @@ FetchContent_Declare(_project_options URL https://github.com/aminya/project_opti
 FetchContent_MakeAvailable(_project_options)
 include(${_project_options_SOURCE_DIR}/Index.cmake)
 
+set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON)
+
 run_vcpkg(VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg)
 
 project(fluenc LANGUAGES C CXX)
