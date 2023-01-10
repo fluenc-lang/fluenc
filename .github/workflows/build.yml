@@ -18,15 +18,12 @@ jobs:
         include:
           - os: ubuntu-22.04
             cmake-prefix-path: /usr/lib/llvm-14
-            artifact-path: /build/fcc
             cmake-args: ""
           - os: macos-12
             cmake-prefix-path: /usr/local/opt/llvm@14
-            artifact-path: /build/fcc
             cmake-args: ""
           - os: windows-2022
             cmake-prefix-path: c:\llvm-14.0.6-windows-amd64-msvc17-msvcrt
-            artifact-path: /build/fcc/Release
             cmake-args: "-T ClangCl"
       fail-fast: false
 
@@ -45,10 +42,13 @@ jobs:
       shell: bash
 
     - name: Configure CMake
-      run: cmake ${{matrix.cmake-args}} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=${{matrix.cmake-prefix-path}}
+      run: cmake ${{matrix.cmake-args}} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=${{matrix.cmake-prefix-path}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Install
+      run: cmake --install ${{github.workspace}}/build
 
     - name: Run tests
       run: |
@@ -60,4 +60,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{runner.os}}-fcc
-        path: ${{github.workspace}}${{matrix.artifact-path}}
+        path: ${{github.workspace}}/install
