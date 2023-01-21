@@ -51,11 +51,13 @@ bool buildDependencies(const BuildConfiguration &config, const BuildContext &con
 
 		auto repoDir = absolute(reposDir / name);
 
+		auto repoDirString = repoDir.string();
+
 		if (!exists(repoDir))
 		{
 			fmt::print("Fetching repository '{}' to {}...\n", name, repoDir.string());
 
-			if (git_clone(&repo, url.c_str(), repoDir.c_str(), nullptr) < 0)
+			if (git_clone(&repo, url.c_str(), repoDirString.c_str(), nullptr) < 0)
 			{
 				auto error = git_error_last();
 
@@ -68,7 +70,7 @@ bool buildDependencies(const BuildConfiguration &config, const BuildContext &con
 		{
 			fmt::print("Updating repository '{}'...\n", name);
 
-			if (git_repository_open(&repo, repoDir.c_str()) < 0)
+			if (git_repository_open(&repo, repoDirString.c_str()) < 0)
 			{
 				auto error = git_error_last();
 
