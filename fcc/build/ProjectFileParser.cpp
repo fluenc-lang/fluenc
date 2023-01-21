@@ -34,6 +34,7 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 				accumulation.target,
 				accumulation.libs,
 				accumulation.modules,
+				accumulation.repos,
 			};
 		}
 
@@ -52,6 +53,7 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 				*target,
 				accumulation.libs,
 				accumulation.modules,
+				accumulation.repos,
 			};
 		}
 
@@ -77,6 +79,7 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 					accumulation.target,
 					libs,
 					accumulation.modules,
+					accumulation.repos,
 				};
 			}
 
@@ -85,18 +88,13 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 
 		if (key.str() == "modules")
 		{
-			if (auto array = value.as_array())
+			if (auto array = value.as_table())
 			{
 				std::vector<std::string> modules;
 
-				for (auto &element : *array)
+				for (auto &[key, value] : *array)
 				{
-					auto module = element.value<std::string>();
-
-					if (module)
-					{
-						modules.push_back(*module);
-					}
+					modules.push_back(std::string(key.str()));
 				}
 
 				return
@@ -105,6 +103,34 @@ std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fi
 					accumulation.target,
 					accumulation.libs,
 					modules,
+					accumulation.repos,
+				};
+			}
+
+			return accumulation;
+		}
+
+		if (key.str() == "repos")
+		{
+			if (auto array = value.as_table())
+			{
+				std::unordered_map<std::string, std::string> repos;
+
+				for (auto &[key, value] : *array)
+				{
+					if (auto url = value.as_string())
+					{
+						repos.emplace(std::string(key.str()), *url);
+					}
+				}
+
+				return
+				{
+					accumulation.type,
+					accumulation.target,
+					accumulation.libs,
+					accumulation.modules,
+					repos,
 				};
 			}
 

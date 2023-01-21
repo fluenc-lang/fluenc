@@ -8,6 +8,8 @@
     "fmt",
     "range-v3",
 	"boost-test",
-	"libarchive"
+	"libarchive",
+	"cli11",
+	"libgit2"
   ]
 }
