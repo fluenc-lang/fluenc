@@ -162,11 +162,13 @@ bool build(const BuildContext &context)
 			{
 				auto moduleFileName = context.environment.root / ".fluenc" / "modules" / fmt::format("{}.fcm", moduleName);
 
+				auto moduleFileNameString = moduleFileName.string();
+
 				auto archive = archive_read_new();
 
 				archive_read_support_format_tar(archive);
 
-				if (archive_read_open_filename(archive, moduleFileName.c_str(), 10240) != ARCHIVE_OK)
+				if (archive_read_open_filename(archive, moduleFileNameString.c_str(), 10240) != ARCHIVE_OK)
 				{
 					fmt::print("Failed to open module {} for reading: {}\n", moduleName, archive_error_string(archive));
 
