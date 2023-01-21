@@ -6,9 +6,9 @@
 
 #include "ProjectFileParser.h"
 
-std::optional<BuildConfiguration> ProjectFileParser::parse(const std::string &fileName)
+std::optional<BuildConfiguration> ProjectFileParser::parse(const std::filesystem::path &fileName)
 {
-	auto table = toml::parse_file(fileName);
+	auto table = toml::parse_file(fileName.string());
 
 	if (!table)
 	{
