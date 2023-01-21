@@ -20,7 +20,7 @@ jobs:
             cmake-prefix-path: /usr/lib/llvm-14
             cmake-args: ""
           - os: macos-12
-            cmake-prefix-path: /usr/local/opt/llvm@14
+            cmake-prefix-path: $(brew --prefix llvm@14)
             cmake-args: ""
           - os: windows-2022
             cmake-prefix-path: c:\llvm-14.0.6-windows-amd64-msvc17-msvcrt
@@ -43,6 +43,7 @@ jobs:
 
     - name: Configure CMake
       run: cmake ${{matrix.cmake-args}} -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=${{matrix.cmake-prefix-path}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install
+      shell: bash
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
