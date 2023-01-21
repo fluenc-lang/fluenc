@@ -264,7 +264,9 @@ bool build(const BuildContext &context)
 
 				auto objectFileName = context.environment.source / fmt::format("{}_native.o", configuration->target);
 
-				llvm::raw_fd_ostream destination(objectFileName.c_str(), error);
+				auto objectFileNameString = objectFileName.string();
+
+				llvm::raw_fd_ostream destination(objectFileNameString.c_str(), error);
 				llvm::legacy::PassManager passManager;
 
 				if (context.options.generateDotCfg)
@@ -411,7 +413,9 @@ bool build(const BuildContext &context)
 
 			auto entry = archive_entry_new();
 
-			archive_entry_set_pathname(entry, file.string().c_str());
+			auto fileString = file.string();
+
+			archive_entry_set_pathname(entry, fileString.c_str());
 			archive_entry_set_size(entry, size);
 			archive_entry_set_filetype(entry, AE_IFREG);
 			archive_entry_set_perm(entry, 0644);
