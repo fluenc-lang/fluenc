@@ -398,10 +398,12 @@ bool build(const BuildContext &context)
 	{
 		auto moduleFileName = context.environment.target / fmt::format("{}.fcm", configuration->target);
 
+		auto moduleFileNameString = moduleFileName.string();
+
 		auto archive = archive_write_new();
 
 		archive_write_set_format_pax_restricted(archive);
-		archive_write_open_filename(archive, moduleFileName.c_str());
+		archive_write_open_filename(archive, moduleFileNameString.c_str());
 
 		for (auto &file : resultFiles)
 		{
