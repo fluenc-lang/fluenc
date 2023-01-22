@@ -1,3 +1,5 @@
+#include <llvm/IR/Constants.h>
+
 #include "ScalarValue.h"
 #include "IRBuilderEx.h"
 
