@@ -14,13 +14,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-12 ]
+        os: [ ubuntu-22.04, macos-12, windows-2022 ]
         include:
           - os: ubuntu-22.04
             cmake-prefix-path: /usr/lib/llvm-14
             cmake-args: ""
           - os: macos-12
-            cmake-prefix-path: /usr/local/opt/llvm@14
+            cmake-prefix-path: /usr/local/opt/llvm@15
             cmake-args: ""
           - os: windows-2022
             cmake-prefix-path: c:\llvm-14.0.6-windows-amd64-msvc17-msvcrt
@@ -29,9 +29,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Inspect
-      run: ls -R /usr/local/opt/
 
     - name: Install build dependencies
       run: |
