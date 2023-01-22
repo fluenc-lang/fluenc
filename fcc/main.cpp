@@ -1,5 +1,6 @@
 #include <llvm/InitializePasses.h>
 #include <llvm/Support/TargetSelect.h>
+#include <llvm/PassRegistry.h>
 
 #include <CLI/App.hpp>
 #include <CLI/Config.hpp>
