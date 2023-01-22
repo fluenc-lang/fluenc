@@ -1,5 +1,7 @@
 #include <numeric>
 
+#include <llvm/IR/Constants.h>
+
 #include "IndexIterator.h"
 #include "ScalarValue.h"
 #include "IRBuilderEx.h"

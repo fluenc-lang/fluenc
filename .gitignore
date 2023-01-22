@@ -13,7 +13,7 @@ moc_*
 
 # Build
 /Makefile
-build/
+/build/
 
 # Merge stuff
 *.orig

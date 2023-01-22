@@ -20,7 +20,7 @@ option(FLUENC_BUILD_COMPILER "Build the compiler" ON)
 option(FLUENC_BUILD_SANITIZERS "Build the compiler with ASan and UBSan support" OFF)
 option(FLUENC_BUILD_EXAMPLES "Copy the examples to the build output" OFF)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (MSVC)
