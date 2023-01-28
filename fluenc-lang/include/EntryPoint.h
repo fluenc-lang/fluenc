@@ -87,6 +87,7 @@ class EntryPoint
 		EntryPoint withIndex(int index) const;
 		EntryPoint withIteratorType(const ExpandedType *iteratorType) const;
 		EntryPoint detach() const;
+		EntryPoint increaseDepth() const;
 
 		void setParent(const EntryPoint &parent);
 
