@@ -5189,6 +5189,48 @@ BOOST_AUTO_TEST_CASE (scenario123)
 	BOOST_TEST(result == 246);
 }
 
+BOOST_AUTO_TEST_CASE (scenario124)
+{
+	auto result = exec(R"(
+		function startsWith((any value, ...values), (any needle, ...pattern))
+		{
+			if (value == needle)
+			{
+				return tail startsWith(...values, ...pattern);
+			}
+
+			return false;
+		}
+
+		function startsWith(any value, any needle)
+		{
+			return (value == needle);
+		}
+
+		function startsWith((any value, ...values), any needle)
+		{
+			return (value == needle);
+		}
+
+		function startsWith(any value, (any needle, ...pattern))
+		{
+			return false;
+		}
+
+		export i32 main()
+		{
+			if (startsWith("foo", "foo"))
+			{
+				return 123;
+			}
+
+			return 456;;
+		}
+	)");
+
+	BOOST_TEST(result == 123);
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

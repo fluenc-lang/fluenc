@@ -27,5 +27,5 @@ std::vector<DzResult> Iteratable::accept(const DefaultNodeVisitor &visitor, Defa
 
 	context.values.push(iterator);
 
-	return {{ context.entryPoint, context.values }};
+	return {{ context.entryPoint.increaseDepth(), context.values }};
 }

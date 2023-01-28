@@ -29,6 +29,7 @@
 #include "types/IPrototype.h"
 #include "types/VoidType.h"
 #include "types/ExpandedType.h"
+#include "types/ByteType.h"
 
 #include "values/ScalarValue.h"
 #include "values/ExpandedValue.h"
@@ -2260,6 +2261,7 @@ std::vector<DzResult> Emitter::visit(const IteratorValue *node, DefaultVisitorCo
 std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisitorContext context) const
 {
 	auto llvmContext = context.entryPoint.context();
+	auto module = context.entryPoint.module();
 
 	auto block = context.entryPoint.block();
 
@@ -2289,13 +2291,23 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 	auto characterType = llvm::Type::getInt8Ty(*llvmContext);
 	auto stringType = llvm::Type::getInt8PtrTy(*llvmContext);
 
-	auto cast = new llvm::BitCastInst(node->m_address, stringType, "stringCast", iteratorBlock);
+	auto dataLayout = module->getDataLayout();
 
-	auto gep = new ReferenceValue(Int32Type::instance()
-		, llvm::GetElementPtrInst::CreateInBounds(characterType, cast, { *index }, "stringAccess", iteratorBlock)
+	auto align = dataLayout.getABITypeAlign(storageType);
+
+	auto load = new llvm::LoadInst(stringType, node->m_address, "strLoad", false, align, iteratorBlock);
+
+	auto gep = new ReferenceValue(ByteType::instance()
+		, llvm::GetElementPtrInst::CreateInBounds(characterType, load, { *index }, "stringAccess", iteratorBlock)
 		);
 
 	auto value = builder.createLoad(gep);
+
+	auto targetType = Int32Type::instance();
+
+	auto sext = new ScalarValue(targetType
+		, new llvm::SExtInst(*value, targetType->storageType(*llvmContext), "sext", iteratorBlock)
+		);
 
 	auto comparison = builder.createCmp(llvm::CmpInst::ICMP_SLT, index, length);
 
@@ -2310,12 +2322,12 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 	auto continuation = new ArrayContinuationNode(node->m_index, node->m_node, IteratorType::instance());
 	auto expandable = new ExpandableValue(false, IteratorType::instance(), iteratorEntryPoint, continuation, node->m_index);
 
-	auto tuple = new TupleValue({ expandable, value });
+	auto tuple = new TupleValue({ expandable, sext });
 
 	return
 	{
 		{ epIfTrue, tuple },
-		{ epIfFalse, value },
+		{ epIfFalse, sext },
 	};
 }
 
