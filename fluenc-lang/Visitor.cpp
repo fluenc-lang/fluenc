@@ -719,7 +719,14 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 
 	auto iteratorType = new IteratorType();
 
-	return new FunctionNode(name, arguments, ast->nodes, m_namespaces, iteratorType);
+	auto evaluation = new PostEvaluationNode();
+	auto call = new FunctionCallNode(ast->nodes[0], { name }, evaluation);
+
+	Visitor visitor(m_namespaces, iteratorType, call, TerminatorNode::instance(), nullptr);
+
+	auto block = visitor.visitBlock(*ast->nodes.rbegin());
+
+	return new FunctionNode(name, arguments, block);
 }
 
 CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const

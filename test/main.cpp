@@ -5231,6 +5231,70 @@ BOOST_AUTO_TEST_CASE (scenario124)
 	BOOST_TEST(result == 123);
 }
 
+BOOST_AUTO_TEST_CASE(scenario125)
+{
+	auto result = exec(R"(
+		function format((i32 char, ...string), any value)
+		{
+			return char -> format(...string, nothing);
+		}
+
+		function format(i32 char, any value)
+		{
+			return char;
+		}
+
+		function count((any c, ...chars), i32 i)
+		{
+			return tail count(...chars, i + 1);
+		}
+
+		function count(any c, i32 i)
+		{
+			return i + 1;
+		}
+
+		export i32 main()
+		{
+			return count(format([1, 2], 12), 0);
+		}
+	)");
+
+	BOOST_TEST(result == 2);
+}
+
+BOOST_AUTO_TEST_CASE(scenario126)
+{
+	auto result = exec(R"(
+		function format((i32 char, ...string), any value)
+		{
+			return char -> format(...string, nothing);
+		}
+
+		function format(i32 char, any value)
+		{
+			return char;
+		}
+
+		function count((any c, ...chars), i32 i)
+		{
+			return tail count(...chars, i + 1);
+		}
+
+		function count(any c, i32 i)
+		{
+			return i + 1;
+		}
+
+		export i32 main()
+		{
+			return count(format("foo", 12), 0);
+		}
+	)");
+
+	BOOST_TEST(result == 4);
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

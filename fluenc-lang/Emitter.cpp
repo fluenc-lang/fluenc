@@ -610,7 +610,7 @@ std::vector<DzResult> Emitter::visit(const StringLiteralNode *node, DefaultVisit
 
 	builder.createStore(string, alloc);
 
-	context.values.push(new StringValue(node, alloc, node->id(), node->m_value.size()));
+	context.values.push(new StringValue(alloc, node->id(), node->m_value.size()));
 
 	return node->m_consumer->accept(*this, context);
 }
@@ -930,65 +930,28 @@ std::vector<DzResult> Emitter::visit(const PostEvaluationNode *node, DefaultVisi
 				{
 					if (auto expanded = dynamic_cast<const ExpandedValue *>(element))
 					{
-						auto process = [&](auto exp, const EntryPoint &entryPoint, auto rec) -> std::vector<DzResult>
-						{
-							std::vector<DzResult> results;
-
-							auto next = exp->next();
-
-							auto ep = std::accumulate(begin(next), end(next), entryPoint, [&](auto nextEntryPoint, auto nextValue)
-							{
-								auto nextResults = rec(nextValue, entryPoint, rec);
-
-								return std::accumulate(begin(nextResults), end(nextResults), nextEntryPoint, [&](auto accumulatedEntryPoint, auto result)
-								{
-									auto &[resultEntryPoint, _] = result;
-
-									linkBlocks(accumulatedEntryPoint.block(), resultEntryPoint.block());
-
-									results.push_back(result);
-
-									return resultEntryPoint;
-								});
-							});
-
-							auto block = createBlock(entryPoint.context());
-
-							linkBlocks(ep.block(), block);
-
-							auto node = expanded->node();
-							auto provider = expanded->provider();
-
-							// Workaround for an MSVC bug, where the compiler will crash
-							// if this is not stored to a local variable.
-							//
-							auto withBlock = provider->withBlock(block);
-
-							for (auto &result : node->accept(*this, { withBlock, expanded->values() }))
-							{
-								results.push_back(result);
-							}
-
-							return results;
-						};
-
 						std::vector<DzResult> results;
 
-						for (auto &[resultEntryPoint, resultValues] : process(expanded, entryPoint, process))
+						auto node = expanded->node();
+
+						for (auto &[inputEntryPoint, inputValues] : recurse(entryPoint, expanded->values(), recurse))
 						{
-							auto forwardedValues = values;
-
-							for (auto &resultValue : resultValues)
+							for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { inputEntryPoint, inputValues }))
 							{
-								forwardedValues.push(resultValue);
-							}
+								auto forwardedEntryPoint = entryPoint
+									.withBlock(resultEntryPoint.block());
 
-							auto forwardedEntryPoint = entryPoint
-								.withBlock(resultEntryPoint.block());
+								for (auto &[finalEntryPoint, finalValues] : recurse(forwardedEntryPoint, resultValues, recurse))
+								{
+									auto forwardedValues = values;
 
-							for (auto &result : recurse(forwardedEntryPoint, forwardedValues, recurse))
-							{
-								results.push_back(result);
+									for (auto resultValue : finalValues)
+									{
+										forwardedValues.push(resultValue);
+									}
+
+									results.push_back({ finalEntryPoint, forwardedValues });
+								}
 							}
 						}
 
