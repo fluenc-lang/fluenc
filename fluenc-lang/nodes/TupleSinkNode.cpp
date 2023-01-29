@@ -17,7 +17,7 @@ std::vector<DzResult> TupleSinkNode::accept(const DefaultNodeVisitor &visitor, D
 	{
 		auto value = context.values.pop();
 
-		values.push_back(value);
+		values.insert(begin(values), value);
 	}
 
 	auto tuple = new TupleValue(values);

@@ -5347,6 +5347,23 @@ BOOST_AUTO_TEST_CASE(scenario128)
 	BOOST_TEST(result == 12);
 }
 
+BOOST_AUTO_TEST_CASE(scenario129)
+{
+	auto result = exec(R"(
+		function foo((i32 v1, i64 v2))
+		{
+			return v1;
+		}
+
+		export i32 main()
+		{
+			return foo((5, 7i64));
+		}
+	)");
+
+	BOOST_TEST(result == 5);
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
