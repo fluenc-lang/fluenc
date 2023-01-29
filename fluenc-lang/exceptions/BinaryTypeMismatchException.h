@@ -1,14 +1,14 @@
-#ifndef TYPEMISMATCHEXCEPTION_H
-#define TYPEMISMATCHEXCEPTION_H
+#ifndef BINARYTYPEMISMATCHEXCEPTION_H
+#define BINARYTYPEMISMATCHEXCEPTION_H
 
 #include <string>
 
 #include "CompilerException.h"
 
-class TypeMismatchException : public CompilerException
+class BinaryTypeMismatchException : public CompilerException
 {
 	public:
-		TypeMismatchException(const std::shared_ptr<peg::Ast> &ast
+		BinaryTypeMismatchException(const std::shared_ptr<peg::Ast> &ast
 			, const std::string &leftTypeName
 			, const std::string &rightTypeName
 			);
@@ -20,4 +20,4 @@ class TypeMismatchException : public CompilerException
 		std::string m_rightTypeName;
 };
 
-#endif // TYPEMISMATCHEXCEPTION_H
+#endif // BINARYTYPEMISMATCHEXCEPTION_H

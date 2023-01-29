@@ -93,6 +93,7 @@
 #include "nodes/DistributorNode.h"
 #include "nodes/RenderedNode.h"
 #include "nodes/Pod.h"
+#include "nodes/ExportedFunctionTerminatorNode.h"
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/MissingTailCallException.h"
@@ -101,12 +102,12 @@
 #include "exceptions/MissingFieldException.h"
 #include "exceptions/InvalidArgumentTypeException.h"
 #include "exceptions/InvalidOperatorException.h"
-#include "exceptions/TypeMismatchException.h"
+#include "exceptions/BinaryTypeMismatchException.h"
 
 std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisitorContext context) const
 {
-	auto left = ValueHelper::getScalar(context.entryPoint, context.values);
-	auto right = ValueHelper::getScalar(context.entryPoint, context.values);
+	auto left = ValueHelper::getScalar(node->ast, context.entryPoint, context.values);
+	auto right = ValueHelper::getScalar(node->ast, context.entryPoint, context.values);
 
 	IRBuilderEx builder(context.entryPoint);
 
@@ -147,8 +148,8 @@ std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisit
 
 std::vector<DzResult> Emitter::visit(const FloatBinaryNode *node, DefaultVisitorContext context) const
 {
-	auto left = ValueHelper::getScalar(context.entryPoint, context.values);
-	auto right = ValueHelper::getScalar(context.entryPoint, context.values);
+	auto left = ValueHelper::getScalar(node->ast, context.entryPoint, context.values);
+	auto right = ValueHelper::getScalar(node->ast, context.entryPoint, context.values);
 
 	IRBuilderEx builder(context.entryPoint);
 
@@ -219,8 +220,8 @@ std::vector<DzResult> Emitter::visit(const FloatBinaryNode *node, DefaultVisitor
 
 std::vector<DzResult> Emitter::visit(const IntegerBinaryNode *node, DefaultVisitorContext context) const
 {
-	auto left = ValueHelper::getScalar(context.entryPoint, context.values);
-	auto right = ValueHelper::getScalar(context.entryPoint, context.values);
+	auto left = ValueHelper::getScalar(node->ast, context.entryPoint, context.values);
+	auto right = ValueHelper::getScalar(node->ast, context.entryPoint, context.values);
 
 	IRBuilderEx builder(context.entryPoint);
 
@@ -331,7 +332,7 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 
 	if (leftType->compatibility(rightType, context.entryPoint) != 0)
 	{
-		throw new TypeMismatchException(node->ast
+		throw new BinaryTypeMismatchException(node->ast
 			, leftType->name()
 			, rightType->name()
 			);
@@ -1442,7 +1443,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 				auto align = dataLayout.getABITypeAlign(storageType);
 
-				auto typedValue = ValueHelper::getScalar(context.entryPoint, value);
+				auto typedValue = ValueHelper::getScalar(node->m_ast, context.entryPoint, value);
 
 				auto store = new llvm::StoreInst(*typedValue, *reference, false, align, block);
 
@@ -1518,7 +1519,7 @@ std::vector<DzResult> Emitter::visit(const ConditionalNode *node, DefaultVisitor
 
 	IRBuilderEx builder(context.entryPoint);
 
-	auto conditional = ValueHelper::getScalar(context.entryPoint, context.values);
+	auto conditional = ValueHelper::getScalar(node->m_ast, context.entryPoint, context.values);
 
 	builder.createCondBr(conditional, ifTrue, ifFalse);
 
@@ -1754,7 +1755,7 @@ std::vector<DzResult> Emitter::visit(const ContinuationNode *node, DefaultVisito
 
 std::vector<DzResult> Emitter::visit(const BooleanUnaryNode *node, DefaultVisitorContext context) const
 {
-	auto operand = ValueHelper::getScalar(context.entryPoint, context.values);
+	auto operand = ValueHelper::getScalar(node->ast, context.entryPoint, context.values);
 
 	IRBuilderEx builder(context.entryPoint);
 
@@ -1992,7 +1993,7 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionTerminatorNode *node,
 	auto ep = context.entryPoint
 		.withBlock(block);
 
-	auto returnValue = ValueHelper::getScalar(ep, context.values);
+	auto returnValue = ValueHelper::getScalar(node->m_ast, ep, context.values);
 
 	IRBuilderEx builder(ep);
 	builder.createRet(*returnValue);
