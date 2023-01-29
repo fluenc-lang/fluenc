@@ -261,7 +261,44 @@ std::string Visitor::visitInteger(const std::shared_ptr<peg::Ast> &ast) const
 
 std::string Visitor::visitString(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return ast->token_to_string();
+	static std::unordered_map<char, char> table =
+	{
+		{ 'n', '\n' },
+		{ 'r', '\r' },
+		{ 't', '\t' },
+		{ '0', '\0' },
+		{ '\\', '\\' },
+	};
+
+	auto input = ast->token_to_string();
+
+	std::ostringstream stream;
+
+	std::accumulate(begin(input), end(input), false, [&](auto substitute, auto token)
+	{
+		if (substitute)
+		{
+			if (auto iterator = table.find(token); iterator != end(table))
+			{
+				stream << iterator->second;
+			}
+		}
+		else
+		{
+			if (token == '\\')
+			{
+				return true;
+			}
+			else
+			{
+				stream << token;
+			}
+		}
+
+		return false;
+	});
+
+	return stream.str();
 }
 
 std::vector<ITypeName *> Visitor::visitTypeList(const std::shared_ptr<peg::Ast> &ast) const
@@ -419,7 +456,7 @@ Node *Visitor::visitUint32Literal(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitCharLiteral(const std::shared_ptr<peg::Ast> &ast) const
 {
 	return new CharacterLiteralNode(m_alpha
-		, ast->token_to_string()
+		, visitString(ast)
 		);
 }
 

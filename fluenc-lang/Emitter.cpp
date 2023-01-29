@@ -622,32 +622,10 @@ std::vector<DzResult> Emitter::visit(const CharacterLiteralNode *node, DefaultVi
 	auto type = Int32Type::instance();
 	auto storageType = type->storageType(*llvmContext);
 
-	auto valueProvider = [&]
-	{
-		static std::unordered_map<std::string, std::string> sequences =
-		{
-			{ "\\n", "\n" },
-			{ "\\r", "\r" },
-			{ "\\t", "\t" },
-			{ "\\0", "\0" },
-		};
-
-		auto iterator = sequences.find(node->m_value);
-
-		if (iterator != sequences.end())
-		{
-			return llvm::ConstantInt::get((llvm::IntegerType *)storageType
-				, *iterator->second.begin()
-				);
-		}
-
-		return llvm::ConstantInt::get((llvm::IntegerType *)storageType
-			, *node->m_value.begin()
-			);
-	};
-
 	auto value = new ScalarValue(type
-		, valueProvider()
+		, llvm::ConstantInt::get((llvm::IntegerType *)storageType
+			, *node->m_value.begin()
+			)
 		);
 
 	context.values.push(value);
