@@ -2,9 +2,9 @@
 
 #include <fmt/core.h>
 
-#include "exceptions/TypeMismatchException.h"
+#include "exceptions/BinaryTypeMismatchException.h"
 
-TypeMismatchException::TypeMismatchException(const std::shared_ptr<peg::Ast> &ast
+BinaryTypeMismatchException::BinaryTypeMismatchException(const std::shared_ptr<peg::Ast> &ast
 	, const std::string &leftTypeName
 	, const std::string &rightTypeName
 	)
@@ -14,7 +14,7 @@ TypeMismatchException::TypeMismatchException(const std::shared_ptr<peg::Ast> &as
 {
 }
 
-std::string TypeMismatchException::message() const
+std::string BinaryTypeMismatchException::message() const
 {
 	return fmt::format("Attempted binary operation on values with incompatible types ({}) and ({})", m_leftTypeName, m_rightTypeName);
 }

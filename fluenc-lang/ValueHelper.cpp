@@ -136,7 +136,7 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	return resultEntryPoint.value_or(entryPoint);
 }
 
-const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, const BaseValue *value)
+const ScalarValue *ValueHelper::getScalar(const std::shared_ptr<peg::Ast> &ast, const EntryPoint &entryPoint, const BaseValue *value)
 {
 	if (auto scalar = dynamic_cast<const ScalarValue *>(value))
 	{
@@ -150,12 +150,18 @@ const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, const Ba
 		return builder.createLoad(reference);
 	}
 
-	throw new std::exception();
+	auto &expectedMetadata = ScalarValue::staticMetadata();
+	auto &actualMetadata = value->metadata();
+
+	throw new InvalidTypeException(ast
+		, expectedMetadata.name()
+		, actualMetadata.name()
+		);
 }
 
-const ScalarValue *ValueHelper::getScalar(const EntryPoint &entryPoint, Stack &values)
+const ScalarValue *ValueHelper::getScalar(const std::shared_ptr<peg::Ast> &ast, const EntryPoint &entryPoint, Stack &values)
 {
 	auto value = values.pop();
 
-	return getScalar(entryPoint, value);
+	return getScalar(ast, entryPoint, value);
 }

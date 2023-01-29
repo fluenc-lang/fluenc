@@ -18,8 +18,8 @@ class ValueHelper
 			, const Emitter &emitter
 			);
 
-		static const ScalarValue *getScalar(const EntryPoint &entryPoint, const BaseValue *value);
-		static const ScalarValue *getScalar(const EntryPoint &entryPoint, Stack &values);
+		static const ScalarValue *getScalar(const std::shared_ptr<peg::Ast> &ast, const EntryPoint &entryPoint, const BaseValue *value);
+		static const ScalarValue *getScalar(const std::shared_ptr<peg::Ast> &ast, const EntryPoint &entryPoint, Stack &values);
 
 		template<typename T, typename TContainer>
 		static std::vector<const T *> extractValues(TContainer container)

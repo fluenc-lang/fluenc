@@ -579,7 +579,7 @@ Node *Visitor::visitConditional(const std::shared_ptr<peg::Ast> &ast) const
 	auto block = blockVisitor
 		.visitBlock(ast->nodes[1]);
 
-	auto conditional = new ConditionalNode(m_alpha, block);
+	auto conditional = new ConditionalNode(ast, m_alpha, block);
 
 	Visitor expressionVisitor(m_namespaces, m_iteratorType, m_parent, conditional, nullptr);
 
@@ -795,7 +795,7 @@ CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &as
 		return visitArgument(argument);
 	});
 
-	auto terminator = new ExportedFunctionTerminatorNode();
+	auto terminator = new ExportedFunctionTerminatorNode(*ast->nodes.rbegin());
 
 	Visitor visitor(m_namespaces, nullptr, m_parent, TerminatorNode::instance(), nullptr);
 
