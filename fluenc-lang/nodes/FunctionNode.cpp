@@ -2,40 +2,25 @@
 #include <numeric>
 
 #include "nodes/FunctionNode.h"
-#include "nodes/TerminatorNode.h"
 #include "nodes/IBlockInstruction.h"
 
 #include "Visitor.h"
 #include "DzBaseArgument.h"
-#include "Utility.h"
 #include "Type.h"
 
 FunctionNode::FunctionNode(const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
-	, const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType> > > &nodes
-	, const std::vector<std::string> &namespaces
-	, const Type *iteratorType
+	, const IBlockInstruction *block
 	)
 	: m_name(name)
 	, m_arguments(arguments)
-	, m_block(inject(nodes, namespaces, iteratorType, this))
+	, m_block(block)
 {
 }
 
 ITypeName *FunctionNode::returnType() const
 {
 	return nullptr;
-}
-
-IBlockInstruction *FunctionNode::inject(const std::vector<std::shared_ptr<peg::AstBase<peg::EmptyType>>> &nodes
-	, const std::vector<std::string> &namespaces
-	, const Type *iteratorType
-	, const Node *self
-	)
-{
-	Visitor visitor(namespaces, iteratorType, self, TerminatorNode::instance(), nullptr);
-
-	return visitor.visitBlock(*nodes.rbegin());
 }
 
 std::string FunctionNode::name() const

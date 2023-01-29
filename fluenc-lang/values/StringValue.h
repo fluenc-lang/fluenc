@@ -12,7 +12,7 @@ class LazyValue;
 class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 {
 	public:
-		StringValue(const Node *node, const ReferenceValue *address, size_t id, size_t length);
+		StringValue(const ReferenceValue *address, size_t id, size_t length);
 
 		const ReferenceValue *reference() const;
 		const LazyValue *iterator() const;
@@ -23,7 +23,6 @@ class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 		const BaseValue *forward(size_t id) const override;
 
 	private:
-		const Node *m_node;
 		const ReferenceValue *m_address;
 
 		size_t m_id;

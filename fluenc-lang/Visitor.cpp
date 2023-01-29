@@ -54,6 +54,7 @@
 #include "nodes/JunctionNode.h"
 #include "nodes/DistributorNode.h"
 #include "nodes/BlockStackFrameNode.h"
+#include "nodes/TupleSinkNode.h"
 
 #include "types/Prototype.h"
 #include "types/IteratorType.h"
@@ -260,7 +261,44 @@ std::string Visitor::visitInteger(const std::shared_ptr<peg::Ast> &ast) const
 
 std::string Visitor::visitString(const std::shared_ptr<peg::Ast> &ast) const
 {
-	return ast->token_to_string();
+	static std::unordered_map<char, char> table =
+	{
+		{ 'n', '\n' },
+		{ 'r', '\r' },
+		{ 't', '\t' },
+		{ '0', '\0' },
+		{ '\\', '\\' },
+	};
+
+	auto input = ast->token_to_string();
+
+	std::ostringstream stream;
+
+	std::accumulate(begin(input), end(input), false, [&](auto substitute, auto token)
+	{
+		if (substitute)
+		{
+			if (auto iterator = table.find(token); iterator != end(table))
+			{
+				stream << iterator->second;
+			}
+		}
+		else
+		{
+			if (token == '\\')
+			{
+				return true;
+			}
+			else
+			{
+				stream << token;
+			}
+		}
+
+		return false;
+	});
+
+	return stream.str();
 }
 
 std::vector<ITypeName *> Visitor::visitTypeList(const std::shared_ptr<peg::Ast> &ast) const
@@ -323,6 +361,8 @@ Node *Visitor::visitExpression(const std::shared_ptr<peg::Ast> &ast) const
 			return visitConditional(ast);
 		case "Array"_:
 			return visitArray(ast);
+		case "Tuple"_:
+			return visitTuple(ast);
 		case "Group"_:
 			return visitGroup(ast);
 		case "Expansion"_:
@@ -416,7 +456,7 @@ Node *Visitor::visitUint32Literal(const std::shared_ptr<peg::Ast> &ast) const
 Node *Visitor::visitCharLiteral(const std::shared_ptr<peg::Ast> &ast) const
 {
 	return new CharacterLiteralNode(m_alpha
-		, ast->token_to_string()
+		, visitString(ast)
 		);
 }
 
@@ -581,6 +621,18 @@ Node *Visitor::visitArray(const std::shared_ptr<peg::Ast> &ast) const
 	return new ArraySinkNode(ast->nodes.size(), ast, m_alpha, firstValue);
 }
 
+Node *Visitor::visitTuple(const std::shared_ptr<peg::Ast> &ast) const
+{
+	auto sink = new TupleSinkNode(ast->nodes.size(), m_alpha);
+
+	return std::accumulate(begin(ast->nodes), end(ast->nodes), static_cast<Node *>(sink), [&](auto consumer, auto value)
+	{
+		Visitor visitor(m_namespaces, m_iteratorType, m_parent, consumer, nullptr);
+
+		return visitor.visitExpression(value);
+	});
+}
+
 Node *Visitor::visitGroup(const std::shared_ptr<peg::Ast> &ast) const
 {
 	return visitExpression(ast->nodes[0]);
@@ -710,6 +762,8 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 {
 	auto name = visitId(ast->nodes[0]);
 
+	auto qualifiedName = qualifiedNames(m_namespaces, name);
+
 	std::vector<DzBaseArgument *> arguments;
 
 	std::transform(begin(ast->nodes) + 1, end(ast->nodes) - 1, std::back_inserter(arguments), [this](auto argument)
@@ -719,7 +773,14 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 
 	auto iteratorType = new IteratorType();
 
-	return new FunctionNode(name, arguments, ast->nodes, m_namespaces, iteratorType);
+	auto evaluation = new PostEvaluationNode();
+	auto call = new FunctionCallNode(ast->nodes[0], qualifiedName, evaluation);
+
+	Visitor visitor(m_namespaces, iteratorType, call, TerminatorNode::instance(), nullptr);
+
+	auto block = visitor.visitBlock(*ast->nodes.rbegin());
+
+	return new FunctionNode(name, arguments, block);
 }
 
 CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const

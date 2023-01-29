@@ -74,6 +74,7 @@ class Visitor
 		Node *visitInstantiation(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitConditional(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitArray(const std::shared_ptr<peg::Ast> &ast) const;
+		Node *visitTuple(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitGroup(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitExpansion(const std::shared_ptr<peg::Ast> &ast) const;
 		Node *visitLocal(const std::shared_ptr<peg::Ast> &ast) const;

@@ -1,8 +1,9 @@
 #include "values/StringIteratable.h"
+#include "nodes/IteratableNode.h"
 
-StringIteratable::StringIteratable(const ReferenceValue *index, const Node *node, llvm::Value *address, size_t length)
+StringIteratable::StringIteratable(const ReferenceValue *index, llvm::Value *address, size_t length)
 	: m_index(index)
-	, m_node(node)
+	, m_node(new IteratableNode(this))
 	, m_address(address)
 	, m_length(length)
 {
