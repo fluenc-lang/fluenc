@@ -11,6 +11,7 @@
 
 #include "types/IPrototype.h"
 #include "types/ProxyType.h"
+#include "types/OpaquePointerType.h"
 
 #include "values/NamedValue.h"
 #include "values/ScalarValue.h"
@@ -36,6 +37,11 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 		Emitter emitter;
 
 		auto fields = prototype->fields(entryPoint, emitter);
+
+		if (empty(fields))
+		{
+			return new ScalarValue { new OpaquePointerType(prototype), value };
+		}
 
 		std::vector<llvm::Type *> types;
 
