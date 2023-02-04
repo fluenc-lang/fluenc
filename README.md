@@ -325,3 +325,25 @@ To instruct `fcc` which clang binary to use, one can set the `CLANG_PATH` enviro
 export CLANG_PATH=/usr/bin/path
 ```
 
+The `fcc` binary can be invoked with two commands: `init` and `build`.
+
+You can use `init` to initialize a directory with a template project.toml file. The `build` command is used to build a project, and is expected to be invoked inside a directory with a project.toml file.
+
+To build the hello_world application, for example, we can enter the `examples/hello_world` directory and issue the following command (adjust according to your build folder):
+
+```
+../../fcc/fcc build
+```
+
+If everything is properly set up, you should see output similar to this:
+
+```
+Building 'hello_world'...
+Linking 'hello_world'...
+```
+
+A compiled fluenc binary can be run as any program:
+
+```
+./hello_world
+```
