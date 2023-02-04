@@ -299,3 +299,16 @@ The experience when it comes to getting the compiler up and running is probably 
 The most mature experience is definitely on Linux, and if you are okay with building it yourself, things should work well.
 
 ## Building
+
+### Requirements
+
+* CMake 3.10 or later
+* A C++ compiler with C++20 support
+* LLVM 13 or later
+
+Clone the repo, navigate to the directory, and execute the following commands:
+
+```
+cmake .
+cmake --build .
+```
