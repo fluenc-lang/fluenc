@@ -287,3 +287,63 @@ export i32 main()
 ```
 
 Since there is no mutable state, loops have to be implemented using recursion. Of course, the language has full support for tail call recursion.
+
+# Status
+
+The language specification and compiler are both under heavy development, and are not ready for general use. That said, a number of different applications have already been created using the language.
+
+# Getting started
+
+The experience when it comes to getting the compiler up and running is probably what is holding back the project the most right now. There are CI builds, exposed as build artifacts, but they are not complete and might or might not run. The compiler is also not self hosted, but relies on clang and a working compiler toolchain for linking and building C code.
+
+The most mature experience is definitely on Linux, and if you are okay with building it yourself, things should work well.
+
+## Building
+
+### Requirements
+
+* CMake 3.10 or later
+* A C++ compiler with C++20 support
+* LLVM 13 or later
+
+Clone the repo, navigate to the directory, and execute the following commands:
+
+```
+cmake .
+cmake --build .
+```
+
+## Running
+
+After building, the compiler binary can be found in the fcc subfolder of the build directory. As the compiler is not self hosted, and relies on clang, it's  important that a working clang executable can be found.
+
+By default, `fcc` will attempt to find a clang executable in the current directory. This will most likely fail, unless you have installed the compiler.
+
+To instruct `fcc` which clang binary to use, one can set the `CLANG_PATH` environment variable.
+
+```
+export CLANG_PATH=/usr/bin/path
+```
+
+The `fcc` binary can be invoked with two commands: `init` and `build`.
+
+You can use `init` to initialize a directory with a template project.toml file. The `build` command is used to build a project, and is expected to be invoked inside a directory with a project.toml file.
+
+To build the hello_world application, for example, we can enter the `examples/hello_world` directory and issue the following command (adjust according to your build folder):
+
+```
+../../fcc/fcc build
+```
+
+If everything is properly set up, you should see output similar to this:
+
+```
+Building 'hello_world'...
+Linking 'hello_world'...
+```
+
+A compiled fluenc binary can be run as any program:
+
+```
+./hello_world
+```
