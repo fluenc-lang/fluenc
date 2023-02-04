@@ -312,3 +312,16 @@ Clone the repo, navigate to the directory, and execute the following commands:
 cmake .
 cmake --build .
 ```
+
+## Running
+
+After building, the compiler binary can be found in the fcc subfolder of the build directory. As the compiler is not self hosted, and relies on clang, it's  important that a working clang executable can be found.
+
+By default, `fcc` will attempt to find a clang executable in the current directory. This will most likely fail, unless you have installed the compiler.
+
+To instruct `fcc` which clang binary to use, one can set the `CLANG_PATH` environment variable.
+
+```
+export CLANG_PATH=/usr/bin/path
+```
+
