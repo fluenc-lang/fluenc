@@ -18,7 +18,7 @@ jobs:
         include:
           - os: windows-2022
             cmake-prefix-path: c:\llvm-14.0.6-windows-amd64-msvc17-msvcrt
-            cmake-args: "-T ClangCl"
+            cmake-args: "-T ClangCl -DVCPKG_TARGET_TRIPLET=x64-windows-static-md"
       fail-fast: false
 
     steps:
@@ -43,9 +43,6 @@ jobs:
       
     - name: Install
       run: cmake --install ${{github.workspace}}/build
-      
-    - name: Dir
-      run: dir ${{github.workspace}}/install/bin
 
     - name: Run tests
       run: |
