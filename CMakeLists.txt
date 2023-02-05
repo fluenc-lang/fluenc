@@ -33,9 +33,12 @@ endif()
 
 add_subdirectory("fluenc-lang")
 add_subdirectory("fcc")
-add_subdirectory("test")
 add_subdirectory("incbin")
 add_subdirectory("grammar")
+
+if (NOT MSVC)
+	add_subdirectory("test")
+endif()
 
 add_custom_target(vcpkg SOURCES
 	vcpkg.json
