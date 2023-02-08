@@ -11,7 +11,11 @@ include(${_project_options_SOURCE_DIR}/Index.cmake)
 
 set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON)
 
-run_vcpkg(VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg)
+run_vcpkg(
+	VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg
+	VCPKG_URL https://github.com/Znurre/vcpkg
+	VCPKG_REV libgit2-static
+)
 
 project(fluenc LANGUAGES C CXX)
 
