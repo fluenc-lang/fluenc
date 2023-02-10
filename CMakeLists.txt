@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
     cmake_policy(SET CMP0135 NEW)
@@ -11,7 +11,11 @@ include(${_project_options_SOURCE_DIR}/Index.cmake)
 
 set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON)
 
-run_vcpkg(VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg)
+run_vcpkg(
+	VCPKG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg
+	VCPKG_URL https://github.com/Znurre/vcpkg
+	VCPKG_REV libgit2-static
+) 
 
 project(fluenc LANGUAGES C CXX)
 
@@ -33,9 +37,12 @@ endif()
 
 add_subdirectory("fluenc-lang")
 add_subdirectory("fcc")
-add_subdirectory("test")
 add_subdirectory("incbin")
 add_subdirectory("grammar")
+
+if (NOT MSVC)
+	add_subdirectory("test")
+endif()
 
 add_custom_target(vcpkg SOURCES
 	vcpkg.json
