@@ -25,8 +25,7 @@ function process(ApplicationState state, Image image)
 
 function draw(i64 renderer, any parent, Image image)
 {
-	let rw = SDL::SDL_RWFromFile(@image.source, @"r");
-	let surface = SDL::SDL_LoadBMP_RW(rw, 1);
+	let surface = SDL::Image::IMG_Load(@image.source);
 	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
 
 	SDL::SDL_RenderCopy(renderer, texture, 0i64, boundingRect(image));

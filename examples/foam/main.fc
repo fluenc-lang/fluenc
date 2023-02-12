@@ -20,7 +20,7 @@ struct SideBarItem : Composite
 	icon
 };
 
-function composite(SideBarItem item)
+function expand(SideBarItem item)
 {
 	return Rectangle
 	{
@@ -32,8 +32,8 @@ function composite(SideBarItem item)
 		children: [
 			Image
 			{
-				x: item.x + 25,
-				y: item.y + 25,
+				x: (item.width - 50) / 2,
+				y: (item.height - 50) / 2,
 				width: 50,
 				height: 50,
 				source: item.icon
@@ -61,224 +61,24 @@ function decreaseCounter(State state)
 function application(State state)
 {
     return [
-// 		Rectangle
-// 		{
-// 			width: 100,
-// 			height: 600,
-// 			color: rgb(199, 0, 37),
-// 			children: [
-				Column
-				{
-// 					width: 100,
-// 					height: 600,
-// 					spacing: 0,
-					children: [
-						LayoutItem
-						{
-							minimum: 200,
-							stretch: 1,
-							item: Rectangle
-							{
-								color: rgb(255, 0, 0),
-							}
-						},
-						LayoutItem
-						{
-							maximum: 300,
-							stretch: 2,
-							item: Row
-							{
-								children: [
-									LayoutItem
-									{
-										stretch: 1,
-										item: Rectangle
-										{
-											color: rgb(0, 255, 0),
-			// 								children: [
-			// 									Rectangle
-			// 									{
-			// 										x: 5,
-			// 										y: 5,
-			// 										width: 50,
-			// 										height: 50,
-			// 										color: rgb(255, 255, 0),
-			// 									}
-			// 								]
-										},
-									},
-									LayoutItem
-									{
-										stretch: 1,
-										item: Rectangle
-										{
-											color: rgb(0, 255, 255),
-			// 								children: [
-			// 									Rectangle
-			// 									{
-			// 										x: 5,
-			// 										y: 5,
-			// 										width: 50,
-			// 										height: 50,
-			// 										color: rgb(255, 255, 0),
-			// 									}
-			// 								]
-										},
-									}
-								]
-							}
-						},
-						LayoutItem
-						{
-							stretch: 1,
-							item: Rectangle
-							{
-								color: rgb(0, 0, 255)
-							}
-						}
-
-// 						LayoutItem
-// 						{
-// 							minimum: 60,
-// 							item: Image
-// 							{
-// 								height: 60,
-// 								source: "menui_logo.bmp"
-// 							},
-// 						},
-// 						LayoutItem
-// 						{
-// 							minimum: 140,
-// 							item: SideBarItem
-// 							{
-// 								height: 140,
-// 								icon: "dishes.bmp"
-// 							}
-// 						},
-// 						LayoutItem
-// 						{
-// 							minimum: 140,
-// 							item: SideBarItem
-// 							{
-// 								height: 140,
-// 								icon: "dishes.bmp"
-// 							}
-// 						}
-					]
-				}
-// 			]
-// 		},
-// 		Rectangle
-// 		{
-// 			x: 100,
-// 			width: 250,
-// 			height: 600,
-// 			color: rgb(255, 255, 255),
-// 			children: [
-// 				Rectangle
-// 				{
-// 					x: 5,
-// 					y: 5,
-// 					width: 50,
-// 					height: 50
-// 				},
-// 				Row
-// 				{
-// 					x: 60,
-// 					y: 5,
-// 					spacing: 5,
-// 					width: 250,
-// 					height: 50,
-// 					children: [
-// 						LayoutItem
-// 						{
-// 							minimum: 50,
-// 							item: Rectangle
-// 							{
-// 								color: rgb(255, 0, 0)
-// 							}
-// 						},
-// 						LayoutItem
-// 						{
-// 							minimum: 50,
-// 							item: Rectangle
-// 							{
-// 								color: rgb(0, 255, 0)
-// 							}
-// 						}
-// 					]
-// 				}
-// 			]
-// 		},
-// 		Rectangle
-// 		{
-// 			x: 350,
-// 			width: 800 - 350,
-// 			height: 600,
-// 			color: rgb(240, 240, 240)
-// 		}
-// //         Rectangle
-// //         {
-// // 			x: 10,
-// // 			y: 10,
-// // 			width: 250,
-// // 			height: 150,
-// //             color: rgb(252, 252, 252),
-// //             children: [
-// //                 Button
-// //                 {
-// //                     x: 30 + state.counter,
-// //                     y: 30,
-// //                     width: 210,
-// //                     height: 30,
-// //                     text: "Button 1",
-// //                 },
-// // // //                 Button
-// // // //                 {
-// // // //                     x: 30 + state.counter,
-// // // //                     y: 70,
-// // // //                     width: 210,
-// // // //                     height: 30,
-// // // //                     text: "Click me!"
-// // // //                 },
-// //                 Button
-// //                 {
-// //                     x: 30 + state.counter,
-// //                     y: 110,
-// //                     width: 70,
-// //                     height: 30,
-// //                     text: "Decrease",
-// //                     onClicked: decreaseCounter
-// //                 },
-// //                 Button
-// //                 {
-// //                     x: 140 + state.counter,
-// //                     y: 110,
-// //                     width: 70,
-// //                     height: 30,
-// //                     text: "Increase",
-// //                     onClicked: increaseCounter
-// //                 },
-// // //                 Button
-// // //                 {
-// // //                     x: 140 + state.counter,
-// // //                     y: 150,
-// // //                     width: 70,
-// // //                     height: 30,
-// // //                     text: "Click me!",
-// // // //                     onClicked: increaseCounter
-// // //                 },
-// // //                 Button
-// // //                 {
-// // //                     x: 140 + state.counter,
-// // //                     y: 190,
-// // //                     width: 70,
-// // //                     height: 30,
-// // //                     text: "Click me!",
-// // // //                     onClicked: increaseCounter
-// // //                 }
-// //             ]
-// //         }
+		Column {
+			children: [
+				LayoutItem {
+					stretch: 1,
+					item: SideBarItem {
+						width: 100,
+						height: 100,
+						icon: "dishes.png"
+					}
+				},
+				LayoutItem {
+					stretch: 1,
+					item: Rectangle {
+						color: rgb(255, 200, 200)
+					}
+				},
+			]
+		}
     ];
 }
 
