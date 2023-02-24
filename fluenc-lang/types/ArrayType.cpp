@@ -81,6 +81,11 @@ int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) 
 	return -1;
 }
 
+std::vector<const Type *> ArrayType::types() const
+{
+	return m_types;
+}
+
 ArrayType *ArrayType::get(const std::vector<const Type *> &types)
 {
 	static std::unordered_map<size_t, ArrayType> cache;
