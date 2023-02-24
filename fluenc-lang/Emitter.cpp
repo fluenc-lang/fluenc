@@ -30,6 +30,7 @@
 #include "types/VoidType.h"
 #include "types/ExpandedType.h"
 #include "types/ByteType.h"
+#include "types/ArrayType.h"
 
 #include "values/ScalarValue.h"
 #include "values/ExpandedValue.h"
@@ -95,6 +96,7 @@
 #include "nodes/Pod.h"
 #include "nodes/ExportedFunctionTerminatorNode.h"
 #include "nodes/AllocatorNode.h"
+#include "nodes/TerminatorNode.h"
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/MissingTailCallException.h"
