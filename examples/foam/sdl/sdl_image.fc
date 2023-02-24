@@ -1,0 +1,13 @@
+namespace SDL::Image
+{
+    import i32 IMG_Init(u32 flags);
+
+    import SDL::SDL_Surface IMG_Load(string file);
+
+    global INIT_JPG: 0x00000001u32;
+    global INIT_PNG: 0x00000002u32;
+    global INIT_TIF: 0x00000004u32;
+    global INIT_WEBP: 0x00000008u32;
+    global INIT_JXL: 0x00000010u32;
+    global INIT_AVIF: 0x00000020u32;
+}

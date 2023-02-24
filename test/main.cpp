@@ -5364,6 +5364,88 @@ BOOST_AUTO_TEST_CASE(scenario129)
 	BOOST_TEST(result == 5);
 }
 
+BOOST_AUTO_TEST_CASE(scenario130)
+{
+	auto result = exec(R"(
+		function count((any c, ...chars), i32 i)
+		{
+			return tail count(...chars, i + 1);
+		}
+
+		function count(any c, i32 i)
+		{
+			return i + 1;
+		}
+
+		export i32 main()
+		{
+			let array = [1, 2];
+
+			return count(array, 0);
+		}
+	)");
+
+	BOOST_TEST(result == 2);
+}
+
+BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
+{
+	auto entryPoi32 = compile(R"(
+		function foo((any item1, ...items1), (any item2, ...items2))
+		{
+			return item1 -> foo(...items1, ...items2);
+		}
+
+		function foo(any item1, (any item2, ...items2))
+		{
+			return item1;
+		}
+
+		function foo((any item1, ...items1), any item2)
+		{
+			return item1;
+		}
+
+		function foo(any item1, any item2)
+		{
+			return item1;
+		}
+
+		function foo(without item)
+		{
+			return nothing;
+		}
+
+		function application()
+		{
+			return [1, 2, 3];
+		}
+
+		function bar()
+		{
+			return foo(application(), application());
+		}
+	)");
+
+	auto functions = entryPoi32.functions();
+
+	auto [_1, function] = *functions.find("bar");
+
+	Emitter emitter;
+
+	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
+
+	BOOST_TEST(functionResults.size() == 1);
+
+	auto [_2, functionValues] = functionResults[0];
+
+	BOOST_TEST(functionValues.size() == 1);
+
+	auto lazy = functionValues.require<LazyValue>(nullptr);
+
+	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

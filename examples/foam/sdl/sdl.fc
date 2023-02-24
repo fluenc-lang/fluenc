@@ -1,5 +1,7 @@
 namespace SDL
 {
+    struct SDL_Surface;
+
     import i32 SDL_Init(u32 flags);
     import i32 SDL_SetRenderDrawColor(i64 renderer, i32 r, i32 g, i32 b, i32 a);
     import i32 SDL_RenderClear(i64 renderer);
@@ -12,14 +14,14 @@ namespace SDL
 	import i64 SDL_RenderGetWindow(i64 renderer);
 	import i64 SDL_GetWindowSurface(i64 window);
 	import i64 SDL_RWFromFile(string file, string mode);
-	import i64 SDL_CreateTextureFromSurface(i64 renderer, i64 surface);
+	import i64 SDL_CreateTextureFromSurface(i64 renderer, SDL_Surface surface);
 
 	import i32 SDL_LowerBlit(i64 src, i64 srcRect, i64 dst, Rect dstRect);
 	import i32 SDL_UpdateWindowSurface(i64 window);
 	import i32 SDL_RenderCopy(i64 renderer, i64 texture, i64 srcrect, Rect dstrect);
 
     import void SDL_RenderPresent(i64 renderer);
-	import void SDL_FreeSurface(i64 surface);
+	import void SDL_FreeSurface(SDL_Surface surface);
 
     import EventState SDL_WaitEventEx(EventState events);
 	import Rect SDL_RenderGetViewportEx(i64 renderer, Rect rect);

@@ -15,6 +15,8 @@ class ArrayType : public Type
 
 		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
 
+		std::vector<const Type *> types() const;
+
 		static ArrayType *get(const std::vector<const Type *> &types);
 
 	private:

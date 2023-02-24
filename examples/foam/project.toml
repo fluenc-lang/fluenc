@@ -1,2 +1,2 @@
 target = "foam"
-libs = [ "-lSDL2" ]
+libs = [ "-lSDL2", "-lSDL2_image" ]

@@ -3,10 +3,12 @@
 
 #include "Type.h"
 
+class IPrototype;
+
 class UserType : public Type
 {
 	public:
-		UserType(const Type *prototype, const std::vector<const Type *> &elementTypes);
+		UserType(const IPrototype *prototype, const std::vector<const Type *> &elementTypes);
 
 		std::string name() const override;
 		std::string fullName() const override;
@@ -15,10 +17,14 @@ class UserType : public Type
 
 		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
 
-		static UserType *get(const Type *prototype, const std::vector<const Type *> &elementTypes);
+		const IPrototype *prototype() const;
+
+		std::vector<const Type *> elementTypes() const;
+
+		static UserType *get(const IPrototype *prototype, const std::vector<const Type *> &elementTypes);
 
 	private:
-		const Type *m_prototype;
+		const IPrototype *m_prototype;
 
 		std::vector<const Type *> m_elementTypes;
 };

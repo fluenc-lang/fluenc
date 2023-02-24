@@ -96,17 +96,17 @@ function invoke(function () callback)
 
 function update(EventState events, any parent, any item, any nextItem)
 {
-    return nothing;
+    return item;
 }
 
 function update(EventState events, any parent, (any item, ...controls), any nextItem)
 {
-    return nothing;
+    return item;
 }
 
 function update(EventState events, any parent, any item, (any nextItem, ...nextItems))
 {
-    return nothing;
+    return item;
 }
 
 // Process stubs
@@ -190,17 +190,26 @@ function isPressed(SDL::MouseButtonEvent button)
     return button.type == SDL::MOUSEBUTTONDOWN;
 }
 
+function expand((any item, ...items))
+{
+    return expand(item) -> expand(...items);
+}
+
+function expand(any item)
+{
+    return item;
+}
+
+function expand(without item)
+{
+    return nothing;
+}
+
 function mainLoop(i64 renderer, ApplicationState state, ApplicationDefinition definition)
 {
     SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL::SDL_RenderClear(renderer);
 
-    draw(renderer, nothing, state.ui);
-
-    SDL::SDL_RenderPresent(renderer);
-
-    let user = process(state, state.ui);
-    let events = SDL::SDL_WaitEventEx(createEventState());
 	let viewport = SDL::SDL_RenderGetViewportEx(renderer, SDL::Rect {});
 
 	let window = Item
@@ -209,11 +218,20 @@ function mainLoop(i64 renderer, ApplicationState state, ApplicationDefinition de
 		height: viewport.height,
 	};
 
+    let events = SDL::SDL_WaitEventEx(createEventState());
+    let ui = update(events, window, state.ui, expand(invoke(definition.ui, state.user)));
+
+    draw(renderer, nothing, ui);
+
+    SDL::SDL_RenderPresent(renderer);
+
+    let user = process(state, ui);
+
     let as = state with
     {
         user: user,
         events: events,
-        ui: update(events, window, state.ui, invoke(definition.ui, user))
+        ui: ui
     };
 
     return tail mainLoop(renderer, as, definition);
@@ -224,17 +242,17 @@ namespace Foam
     function run(ApplicationDefinition definition)
     {
         SDL::SDL_Init(SDL::INIT_VIDEO);
+        SDL::Image::IMG_Init(SDL::Image::INIT_PNG);
 
         let window = SDL::SDL_CreateWindow(@"test", 0, 0, 800, 600, SDL::WINDOW_RESIZABLE);
         let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
 
         let user = invoke(definition.state);
-        let ui = invoke(definition.ui, user);
 
         let state = ApplicationState
         {
             user: user,
-            ui: ui,
+            ui: expand(invoke(definition.ui, user)),
             events: SDL::SDL_WaitEventEx(createEventState()),
         };
 

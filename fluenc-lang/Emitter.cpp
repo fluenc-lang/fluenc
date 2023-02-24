@@ -30,6 +30,7 @@
 #include "types/VoidType.h"
 #include "types/ExpandedType.h"
 #include "types/ByteType.h"
+#include "types/ArrayType.h"
 
 #include "values/ScalarValue.h"
 #include "values/ExpandedValue.h"
@@ -94,6 +95,8 @@
 #include "nodes/RenderedNode.h"
 #include "nodes/Pod.h"
 #include "nodes/ExportedFunctionTerminatorNode.h"
+#include "nodes/AllocatorNode.h"
+#include "nodes/TerminatorNode.h"
 
 #include "exceptions/InvalidFunctionPointerTypeException.h"
 #include "exceptions/MissingTailCallException.h"
@@ -1704,6 +1707,35 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 
 			return { ss.str(), field->value() };
 		});
+	}
+
+	if (auto lazyValue = dynamic_cast<const LazyValue *>(value))
+	{
+		auto type = lazyValue->type();
+
+		// Optimization: If iteration can be represented as an array, create
+		// a new, temporary array and copy the iteration result into it.
+		// This will ensure that multiple iterations are cheap.
+		//
+
+		if (auto arrayType = dynamic_cast<const ArrayType *>(type))
+		{
+			auto allocator = new AllocatorNode(type, TerminatorNode::instance());
+
+			for (auto &result : allocator->accept(*this, { context.entryPoint, Stack() }))
+			{
+				auto array = result.values.require<LazyValue>(nullptr);
+
+				auto assignmentEntryPoint = array->assignFrom(context.entryPoint, lazyValue, *this);
+
+				locals[node->m_name] = array;
+
+				auto ep = assignmentEntryPoint
+					.withLocals(locals);
+
+				return node->m_consumer->accept(*this, { ep, context.values });
+			}
+		}
 	}
 
 	locals[node->m_name] = value;

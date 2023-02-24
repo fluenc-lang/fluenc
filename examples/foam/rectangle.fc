@@ -9,7 +9,7 @@ function update(EventState events, any parent, Rectangle rectangle, Rectangle ne
 {
 	return rectangle with
     {
-        children: update(events, rectangle, rectangle.children, nextItem.children)
+        children: update(events, rectangle, expand(rectangle.children), expand(nextItem.children))
     };
 }
 
@@ -17,7 +17,7 @@ function update(EventState events, any parent, (Rectangle rectangle, ...controls
 {
     let r = rectangle with
     {
-        children: update(events, rectangle, rectangle.children, nextItem.children)
+        children: update(events, rectangle, expand(rectangle.children), expand(nextItem.children))
     };
 
 	return r -> update(events, parent, ...controls, ...nextControls);

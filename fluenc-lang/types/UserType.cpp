@@ -3,13 +3,13 @@
 #include <unordered_map>
 
 #include "Utility.h"
-
-#include "types/AnyType.h"
-#include "types/UserType.h"
+#include "IPrototype.h"
+#include "AnyType.h"
+#include "UserType.h"
 
 #include "iterators/ExtremitiesIterator.h"
 
-UserType::UserType(const Type *prototype, const std::vector<const Type *> &elementTypes)
+UserType::UserType(const IPrototype *prototype, const std::vector<const Type *> &elementTypes)
 	: m_prototype(prototype)
 	, m_elementTypes(elementTypes)
 {
@@ -91,7 +91,17 @@ int8_t UserType::compatibility(const Type *type, const EntryPoint &entryPoint) c
 	return 0;
 }
 
-UserType *UserType::get(const Type *prototype, const std::vector<const Type *> &elementTypes)
+const IPrototype *UserType::prototype() const
+{
+	return m_prototype;
+}
+
+std::vector<const Type *> UserType::elementTypes() const
+{
+	return m_elementTypes;
+}
+
+UserType *UserType::get(const IPrototype *prototype, const std::vector<const Type *> &elementTypes)
 {
 	static std::unordered_map<size_t, UserType> cache;
 
