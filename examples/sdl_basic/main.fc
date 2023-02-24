@@ -1,15 +1,18 @@
+struct SDL_Renderer;
+struct SDL_Window;
+
 import i32 puts(string str);
 
 import i32 SDL_Init(u32 flags);
-import i32 SDL_SetRenderDrawColor(i64 renderer, i32 r, i32 g, i32 b, i32 a);
-import i32 SDL_RenderClear(i64 renderer);
-import i32 SDL_RenderFillRect(i64 renderer, SDL_Rect rect);
+import i32 SDL_SetRenderDrawColor(SDL_Renderer renderer, i32 r, i32 g, i32 b, i32 a);
+import i32 SDL_RenderClear(SDL_Renderer renderer);
+import i32 SDL_RenderFillRect(SDL_Renderer renderer, SDL_Rect rect);
 import i32 SDL_PollKeyEvent(SDL_KeyboardEvent key);
 
-import i64 SDL_CreateRenderer(i64 window, i32 index, i32 flags);
-import i64 SDL_CreateWindow(string title, i32 x, i32 y, i32 w, i32 h, i32 flags);
+import SDL_Renderer SDL_CreateRenderer(SDL_Window window, i32 index, i32 flags);
+import SDL_Window SDL_CreateWindow(string title, i32 x, i32 y, i32 w, i32 h, i32 flags);
 
-import void SDL_RenderPresent(i64 renderer);
+import void SDL_RenderPresent(SDL_Renderer renderer);
 import void SDL_PumpEvents();
 
 import void printnum(i32 num);
@@ -137,7 +140,7 @@ function rectFromPlayer(Player player)
     };
 }
 
-function mainLoop(i64 renderer, Player player)
+function mainLoop(SDL_Renderer renderer, Player player)
 {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 

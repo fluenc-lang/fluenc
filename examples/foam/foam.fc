@@ -96,17 +96,17 @@ function invoke(function () callback)
 
 function update(EventState events, any parent, any item, any nextItem)
 {
-    return nothing;
+    return item;
 }
 
 function update(EventState events, any parent, (any item, ...controls), any nextItem)
 {
-    return nothing;
+    return item;
 }
 
 function update(EventState events, any parent, any item, (any nextItem, ...nextItems))
 {
-    return nothing;
+    return item;
 }
 
 // Process stubs

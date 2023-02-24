@@ -15,12 +15,22 @@ struct State
     counter: 0
 };
 
-struct SideBarItem : Composite
+struct SideBarButton : Item
 {
 	icon
 };
 
-function expand(SideBarItem item)
+struct SideBar : Item
+{
+	items
+};
+
+struct SideBarItem
+{
+	icon
+};
+
+function expand(SideBarButton item)
 {
 	return Rectangle
 	{
@@ -32,11 +42,48 @@ function expand(SideBarItem item)
 		children: [
 			Image
 			{
-				x: (item.width - 50) / 2,
-				y: (item.height - 50) / 2,
+				x: 25,// item.x + ((item.width - 50) / 2),
+				y: item.y + ((item.height - 50) / 2),
 				width: 50,
 				height: 50,
 				source: item.icon
+			}
+		]
+	};
+}
+
+function createSideBarButton(SideBarItem item)
+{
+	return LayoutItem {
+		stretch: 0,
+		minimum: 100,
+		item: SideBarButton
+		{
+			icon: item.icon
+		}
+	};
+}
+
+function itemsFor((SideBarItem item, ...items))
+{
+	return createSideBarButton(item) -> itemsFor(...items);
+}
+
+function itemsFor(SideBarItem item)
+{
+	return createSideBarButton(item);
+}
+
+function expand(SideBar item)
+{
+	return Rectangle {
+		width: item.width,
+		height: item.height,
+		color: rgb(210, 51, 81),
+		children: [
+			Column
+			{
+				children: itemsFor(item.items)
 			}
 		]
 	};
@@ -58,25 +105,93 @@ function decreaseCounter(State state)
     };
 }
 
-function application(State state)
+function application1(State state)
 {
     return [
-		Column {
+		Row {
 			children: [
 				LayoutItem {
-					stretch: 1,
-					item: SideBarItem {
-						width: 100,
-						height: 100,
-						icon: "dishes.png"
+					stretch: 0,
+					minimum: 100,
+					item: Rectangle {
+						color: rgb(210, 51, 81),
+						children: [
+							Column
+							{
+								children: [
+									LayoutItem {
+										stretch: 0,
+										minimum: 100,
+										item: Rectangle {
+											color: rgb(210, 51, 81),
+											children: [
+												Image {
+													x: 25,// item.x + ((item.width - 50) / 2),
+													y: 25,
+													width: 50,
+													height: 50,
+													source: "dishes.png"
+												}
+											]
+										}
+									},
+									LayoutItem {
+										stretch: 0,
+										minimum: 100,
+										item: Rectangle {
+											color: rgb(210, 51, 81),
+											children: [
+												Image {
+													x: 25,// item.x + ((item.width - 50) / 2),
+													y: 125,
+													width: 50,
+													height: 50,
+													source: "sign-out.png"
+												}
+											]
+										}
+									}
+								]
+							}
+						]
 					}
 				},
 				LayoutItem {
 					stretch: 1,
 					item: Rectangle {
-						color: rgb(255, 200, 200)
+						color: rgb(255, 255, 255)
+					}
+				}
+			]
+		}
+    ];
+}
+
+function application(State state)
+{
+    return [
+		Row {
+			children: [
+				LayoutItem {
+					stretch: 0,
+					minimum: 100,
+					item: SideBar {
+						items: [
+							SideBarItem {
+								icon: "dishes.png"
+							},
+							SideBarItem {
+								icon: "sign-out.png"
+							}
+						]
 					}
 				},
+				LayoutItem {
+					stretch: 1,
+					item: Rectangle {
+						color: rgb(255, 255, 255)
+					}
+				}
 			]
 		}
     ];

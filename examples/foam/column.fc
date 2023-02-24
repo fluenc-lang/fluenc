@@ -312,16 +312,16 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 		height: info.foreign,
 	};
 
-	let remainingOverflow = (nis.allocated - nis.actual) + overflow;
-
-	if ((remainingOverflow != 0) && (info.remainingStretch > 0.0))
-	{
-		return remainingOverflow;
-	}
+	// let remainingOverflow = (nis.allocated - nis.actual) + overflow;
+ //
+	// if ((remainingOverflow != 0) && (info.remainingStretch > 0.0))
+	// {
+	// 	return remainingOverflow;
+	// }
 
 	return item with
 	{
-		item: tail update(events, row, layouted, nextItem.item)
+		item: tail update(events, row, expand(layouted), expand(nextItem.item))
 	};
 }
 
@@ -339,7 +339,7 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 
 	let result = item with
 	{
-		item: tail update(events, row, layouted, nextItem.item)
+		item: tail update(events, row, expand(layouted), expand(nextItem.item))
 	};
 
 	let nextOffset = nis.actual + offset + info.spacing;
