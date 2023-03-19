@@ -13,6 +13,8 @@ class ArrayType : public Type
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
+		IOperatorSet *operators() const override;
+
 		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
 
 		std::vector<const Type *> types() const;

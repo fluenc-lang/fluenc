@@ -4,8 +4,9 @@
 
 #include "Utility.h"
 
-#include "types/ArrayType.h"
-#include "types/IteratorType.h"
+#include "ArrayType.h"
+#include "IteratorType.h"
+#include "ArrayOperatorSet.h"
 
 ArrayType::ArrayType(std::vector<const Type *> types)
 	: m_types(types)
@@ -59,6 +60,13 @@ llvm::Type *ArrayType::storageType(llvm::LLVMContext &context) const
 	return llvm::Type::getInt8PtrTy(context);
 }
 
+IOperatorSet *ArrayType::operators() const
+{
+	static ArrayOperatorSet operators;
+
+	return &operators;
+}
+
 int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) const
 {
 	UNUSED(entryPoint);
@@ -73,7 +81,7 @@ int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) 
 		return -1;
 	}
 
-    if (dynamic_cast<const IteratorType *>(type))
+	if (dynamic_cast<const IteratorType *>(type))
 	{
 		return 0;
 	}

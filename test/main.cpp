@@ -5446,6 +5446,92 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
 
+BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
+{
+	auto entryPoint = compile(R"(
+		struct Item
+		{
+			children: nothing
+		};
+
+		function foo(any item1, any item2)
+		{
+			return item1;
+		}
+
+		function foo(((Item item1, Item item2), ...items))
+		{
+			let item = item1 with
+			{
+				children: foo(item1.children | item2.children)
+			};
+
+			return item -> foo(...items);
+		}
+
+		function foo((Item item1, Item item2))
+		{
+			return item1 with
+			{
+				children: foo(item1.children | item2.children)
+			};
+		}
+
+		function foo(without item)
+		{
+			return nothing;
+		}
+
+		function transform((any item, ...items))
+		{
+			return item -> transform(...items);
+		}
+
+		function transform(any item)
+		{
+			return item;
+		}
+
+		function application()
+		{
+			return [
+				Item {
+					children: [
+						Item {},
+						Item {}
+					]
+				},
+				Item {}
+			];
+		}
+
+		function bar()
+		{
+			return foo(
+				transform(application()) | transform(application())
+				);
+		}
+	)");
+
+	auto functions = entryPoint.functions();
+
+	auto [_1, function] = *functions.find("bar");
+
+	Emitter emitter;
+
+	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+
+	BOOST_TEST(functionResults.size() == 1);
+
+	auto [_2, functionValues] = functionResults[0];
+
+	BOOST_TEST(functionValues.size() == 1);
+
+	auto lazy = functionValues.require<LazyValue>(nullptr);
+
+	BOOST_TEST(lazy->type()->name() == "[Item, Item]");
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
