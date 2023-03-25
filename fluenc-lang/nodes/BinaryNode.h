@@ -39,6 +39,10 @@ struct WithoutBinaryNode : public BinaryNodeBase<WithoutBinaryNode>
 {
 };
 
+struct UserBinaryNode : public BinaryNodeBase<UserBinaryNode>
+{
+};
+
 struct BinaryNode : public BinaryNodeBase<BinaryNode>
 {
 };

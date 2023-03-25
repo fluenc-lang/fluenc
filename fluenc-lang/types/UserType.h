@@ -19,6 +19,8 @@ class UserType : public Type
 
 		const IPrototype *prototype() const;
 
+		IOperatorSet *operators() const override;
+
 		std::vector<const Type *> elementTypes() const;
 
 		static UserType *get(const IPrototype *prototype, const std::vector<const Type *> &elementTypes);

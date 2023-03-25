@@ -3,14 +3,14 @@ struct Image : Item
     source
 };
 
-function update(EventState events, any parent, Image image, Image nextItem)
+function update(EventState events, any parent, (Image image, Image nextItem))
 {
     return image;
 }
 
-function update(EventState events, any parent, (Image image, ...controls), (Image nextItem, ...nextControls))
+function update(EventState events, any parent, ((Image image, Image nextItem), ...controls))
 {
-	return image -> update(events, parent, ...controls, ...nextControls);
+	return image -> update(events, parent, ...controls);
 }
 
 function process(ApplicationState state, (Image image, ...controls))

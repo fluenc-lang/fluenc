@@ -6,6 +6,10 @@
 #include "IPrototype.h"
 #include "AnyType.h"
 #include "UserType.h"
+#include "IOperatorSet.h"
+
+#include "nodes/BinaryNode.h"
+#include "nodes/UnaryNode.h"
 
 #include "iterators/ExtremitiesIterator.h"
 
@@ -94,6 +98,36 @@ int8_t UserType::compatibility(const Type *type, const EntryPoint &entryPoint) c
 const IPrototype *UserType::prototype() const
 {
 	return m_prototype;
+}
+
+class UserOperatorSet : public IOperatorSet
+{
+	const Node *forBinary(const BinaryNode *node) const
+	{
+		auto result = new UserBinaryNode();
+		result->ast = node->ast;
+		result->consumer = node->consumer;
+		result->op = node->op;
+
+		return result;
+	}
+
+	const Node *forUnary(const UnaryNode *node) const
+	{
+		auto result = new UserUnaryNode();
+		result->ast = node->ast;
+		result->consumer = node->consumer;
+		result->op = node->op;
+
+		return result;
+	}
+};
+
+IOperatorSet *UserType::operators() const
+{
+	static UserOperatorSet operators;
+
+	return &operators;
 }
 
 std::vector<const Type *> UserType::elementTypes() const

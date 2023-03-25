@@ -94,7 +94,7 @@ function invoke(function () callback)
 
 // Update stubs
 
-function update(EventState events, any parent, any item, any nextItem)
+function update(EventState events, any parent, any item)
 {
     return item;
 }
@@ -219,7 +219,7 @@ function mainLoop(i64 renderer, ApplicationState state, ApplicationDefinition de
 	};
 
     let events = SDL::SDL_WaitEventEx(createEventState());
-    let ui = update(events, window, state.ui, expand(invoke(definition.ui, state.user)));
+    let ui = update(events, window, state.ui | expand(invoke(definition.ui, state.user)));
 
     draw(renderer, nothing, ui);
 

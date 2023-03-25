@@ -5,22 +5,22 @@ struct Rectangle : Item
 
 // Update
 
-function update(EventState events, any parent, Rectangle rectangle, Rectangle nextItem)
+function update(EventState events, any parent, (Rectangle rectangle, Rectangle nextItem))
 {
 	return rectangle with
     {
-        children: update(events, rectangle, expand(rectangle.children), expand(nextItem.children))
+        children: update(events, rectangle, expand(rectangle.children) | expand(nextItem.children))
     };
 }
 
-function update(EventState events, any parent, (Rectangle rectangle, ...controls), (Rectangle nextItem, ...nextControls))
+function update(EventState events, any parent, ((Rectangle rectangle, Rectangle nextItem), ...controls))
 {
     let r = rectangle with
     {
-        children: update(events, rectangle, expand(rectangle.children), expand(nextItem.children))
+        children: update(events, rectangle, expand(rectangle.children) | expand(nextItem.children))
     };
 
-	return r -> update(events, parent, ...controls, ...nextControls);
+	return r -> update(events, parent, ...controls);
 }
 
 // Process

@@ -415,6 +415,28 @@ std::vector<DzResult> Emitter::visit(const WithoutBinaryNode *node, DefaultVisit
 	return {{ context.entryPoint, context.values }};
 }
 
+std::vector<DzResult> Emitter::visit(const UserBinaryNode *node, DefaultVisitorContext context) const
+{
+	UNUSED(node);
+
+	auto left = context.values.pop();
+	auto right = context.values.pop();
+
+	if (node->op == "|")
+	{
+		auto tuple = new TupleValue({ left, right });
+
+		context.values.push(tuple);
+
+		return {{ context.entryPoint, context.values }};
+	}
+
+	auto operandType = left->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+}
+
 std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorContext context) const
 {
 	auto values = context.values;
@@ -425,7 +447,7 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 	auto leftType = left->type();
 	auto rightType = right->type();
 
-	if (leftType->compatibility(rightType, context.entryPoint) != 0)
+	if (leftType->compatibility(rightType, context.entryPoint) > 1)
 	{
 		throw new BinaryTypeMismatchException(node->ast
 			, leftType->name()
@@ -1965,6 +1987,16 @@ std::vector<DzResult> Emitter::visit(const WithoutUnaryNode *node, DefaultVisito
 	UNUSED(node);
 
 	return {{ context.entryPoint, context.values }};
+}
+
+std::vector<DzResult> Emitter::visit(const UserUnaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = context.values.pop();
+
+	auto operandType = operand->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContext context) const

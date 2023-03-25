@@ -9,15 +9,18 @@
 #include "BaseValue.h"
 
 #include "types/ArrayType.h"
+#include "types/StringType.h"
 #include "types/UserType.h"
 #include "types/IPrototype.h"
 #include "types/WithoutType.h"
 
 #include "values/NamedValue.h"
+#include "values/ScalarValue.h"
 #include "values/UserTypeValue.h"
 #include "values/LazyValue.h"
 #include "values/WithoutValue.h"
 #include "values/ReferenceValue.h"
+#include "values/StringValue.h"
 
 AllocatorNode::AllocatorNode(const Type *type, const Node *consumer)
 	: m_type(type)
@@ -36,7 +39,7 @@ const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor
 
 		std::vector<const NamedValue *> values;
 
-		transform(begin(fields), end(fields), rbegin(elementTypes), back_inserter(values), [&](auto field, auto elementType)
+		transform(begin(fields), end(fields), begin(elementTypes), back_inserter(values), [&](auto field, auto elementType)
 		{
 			return new NamedValue(field.name()
 				, alloc(elementType, visitor, entryPoint)
@@ -71,6 +74,13 @@ const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor
 		{
 			return result.values.require<LazyValue>(nullptr);
 		}
+	}
+
+	if (auto string = dynamic_cast<const StringType *>(type))
+	{
+		auto alloc = entryPoint.alloc(string);
+
+		return new StringValue(alloc, 0, string->length());
 	}
 
 	if (dynamic_cast<const WithoutType *>(type))

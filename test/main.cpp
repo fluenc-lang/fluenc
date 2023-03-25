@@ -5532,6 +5532,38 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 	BOOST_TEST(lazy->type()->name() == "[Item, Item]");
 }
 
+BOOST_AUTO_TEST_CASE (scenario131)
+{
+	auto result = exec(R"(
+		function add((i32 left, i32 right))
+		{
+			return left + right;
+		}
+
+		function add(((i32 left, i32 right), ...values))
+		{
+			return left + right -> add(...values);
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		export i32 main()
+		{
+			return sum(0, add([1, 2, 3] | [4, 5, 6]));
+		}
+	)");
+
+	BOOST_TEST(result == 21);
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

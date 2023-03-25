@@ -15,6 +15,7 @@ class Emitter : public DefaultNodeVisitor
 		std::vector<DzResult> visit(const StringBinaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const ArrayBinaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const WithoutBinaryNode *node, DefaultVisitorContext context) const override;
+		std::vector<DzResult> visit(const UserBinaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const BinaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const ExportedFunctionNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const ArrayContinuationNode *node, DefaultVisitorContext context) const override;
@@ -48,6 +49,7 @@ class Emitter : public DefaultNodeVisitor
 		std::vector<DzResult> visit(const StringUnaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const ArrayUnaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const WithoutUnaryNode *node, DefaultVisitorContext context) const override;
+		std::vector<DzResult> visit(const UserUnaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const UnaryNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const TailFunctionCallNode *node, DefaultVisitorContext context) const override;
 		std::vector<DzResult> visit(const FunctionNode *node, DefaultVisitorContext context) const override;
