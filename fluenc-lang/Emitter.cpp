@@ -379,7 +379,7 @@ std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitor
 
 			std::vector<const BaseValue *> elements;
 
-			std::transform(begin(values), end(values), back_inserter(elements), [](auto value) -> const BaseValue *
+			std::transform(rbegin(values), rend(values), back_inserter(elements), [](auto value) -> const BaseValue *
 			{
 				if (!value)
 				{
@@ -424,7 +424,7 @@ std::vector<DzResult> Emitter::visit(const UserBinaryNode *node, DefaultVisitorC
 
 	if (node->op == "|")
 	{
-		auto tuple = new TupleValue({ left, right });
+		auto tuple = new TupleValue({ right, left });
 
 		context.values.push(tuple);
 

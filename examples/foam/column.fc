@@ -228,7 +228,7 @@ function update(EventState events, any parent, (Layout item, Layout nextItem))
 
 function update(EventState events, any parent, ((Layout item, Layout nextItem), ...controls))
 {
-	return tail update(events, parent, item, nextItem) -> update(events, parent, ...controls);
+	return update(events, parent, item, nextItem) -> update(events, parent, ...controls);
 }
 
 // Column
@@ -260,7 +260,7 @@ function layout(EventState events, Column column, i32 offset, i32 overflow, Layo
 
 	return item with
 	{
-		item: tail update(events, parent, (expand(layouted), expand(nextItem.item)))
+		item: update(events, parent, expand(layouted) | expand(nextItem.item))
 	};
 }
 
@@ -284,7 +284,7 @@ function layout(EventState events, Column column, i32 offset, i32 overflow, Layo
 
 	let result = item with
 	{
-		item: tail update(events, parent, (expand(layouted), expand(nextItem.item)))
+		item: update(events, parent, expand(layouted) | expand(nextItem.item))
 	};
 
 	let nextOffset = nis.actual + offset + info.spacing;
@@ -321,7 +321,7 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 
 	return item with
 	{
-		item: tail update(events, row, (expand(layouted), expand(nextItem.item)))
+		item: update(events, row, expand(layouted) | expand(nextItem.item))
 	};
 }
 
@@ -339,7 +339,7 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 
 	let result = item with
 	{
-		item: tail update(events, row, (expand(layouted), expand(nextItem.item)))
+		item: update(events, row, expand(layouted) | expand(nextItem.item))
 	};
 
 	let nextOffset = nis.actual + offset + info.spacing;
