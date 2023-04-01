@@ -13,9 +13,9 @@ class OpaquePointerType : public Type
 		std::string name() const override;
 		std::string fullName() const override;
 
-		llvm::Type *storageType(llvm::LLVMContext &context) const override;
+		const IPrototype *subject() const;
 
-		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
+		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
 	private:
 		const IPrototype *m_subject;

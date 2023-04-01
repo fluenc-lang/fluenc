@@ -20,6 +20,7 @@
 #include "DzArgument.h"
 #include "DzTupleArgument.h"
 #include "InteropHelper.h"
+#include "TypeCompatibilityCalculator.h"
 
 #include "nodes/StaticNode.h"
 #include "types/IOperatorSet.h"
@@ -447,7 +448,7 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 	auto leftType = left->type();
 	auto rightType = right->type();
 
-	if (leftType->compatibility(rightType, context.entryPoint) > 1)
+	if (TypeCompatibilityCalculator::calculate(context.entryPoint, leftType, rightType) > 1)
 	{
 		throw new BinaryTypeMismatchException(node->ast
 			, leftType->name()

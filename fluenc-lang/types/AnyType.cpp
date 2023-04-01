@@ -17,11 +17,3 @@ llvm::Type *AnyType::storageType(llvm::LLVMContext &context) const
 {
 	return llvm::Type::getInt1Ty(context);
 }
-
-int8_t AnyType::compatibility(const Type *type, const EntryPoint &entryPoint) const
-{
-	UNUSED(type);
-	UNUSED(entryPoint);
-
-	return 1;
-}

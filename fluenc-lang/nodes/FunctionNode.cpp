@@ -7,6 +7,7 @@
 #include "Visitor.h"
 #include "DzBaseArgument.h"
 #include "Type.h"
+#include "TypeCompatibilityCalculator.h"
 
 FunctionNode::FunctionNode(const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
@@ -68,7 +69,7 @@ int8_t FunctionNode::signatureCompatibility(const EntryPoint &entryPoint, const 
 
 		auto [argumentType, valueType] = pair;
 
-		auto compatibility = valueType->compatibility(argumentType, entryPoint);
+		auto compatibility = TypeCompatibilityCalculator::calculate(entryPoint, valueType, argumentType);
 
 		if (compatibility < 0)
 		{

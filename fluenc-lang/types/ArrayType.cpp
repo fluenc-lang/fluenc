@@ -67,28 +67,6 @@ IOperatorSet *ArrayType::operators() const
 	return &operators;
 }
 
-int8_t ArrayType::compatibility(const Type *type, const EntryPoint &entryPoint) const
-{
-	UNUSED(entryPoint);
-
-	if (auto other = dynamic_cast<const ArrayType *>(type))
-	{
-		if (other == this)
-		{
-			return 0;
-		}
-
-		return -1;
-	}
-
-	if (dynamic_cast<const IteratorType *>(type))
-	{
-		return 0;
-	}
-
-	return -1;
-}
-
 std::vector<const Type *> ArrayType::types() const
 {
 	return m_types;

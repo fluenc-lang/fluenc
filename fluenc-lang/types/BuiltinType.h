@@ -2,11 +2,13 @@
 #define BUILTINTYPE_H
 
 #include "Type.h"
-#include "Utility.h"
-#include "AnyType.h"
+
+class IBuiltinType : public Type
+{
+};
 
 template<typename T>
-class BuiltinType : public Type
+class BuiltinType : public IBuiltinType
 {
 	public:
 		static Type *instance()
@@ -14,28 +16,6 @@ class BuiltinType : public Type
 			static T instance;
 
 			return &instance;
-		}
-
-		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override
-		{
-			UNUSED(entryPoint);
-
-			if (type == this)
-			{
-				return 0;
-			}
-
-			if (type->name() == name())
-			{
-				return 1;
-			}
-
-			if (dynamic_cast<const AnyType *>(type))
-			{
-				return 1;
-			}
-
-			return -1;
 		}
 };
 

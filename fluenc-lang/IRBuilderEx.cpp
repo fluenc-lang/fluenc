@@ -1,6 +1,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "IRBuilderEx.h"
+#include "Utility.h"
 
 #include "types/BooleanType.h"
 
