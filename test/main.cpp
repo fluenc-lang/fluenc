@@ -5662,6 +5662,46 @@ BOOST_AUTO_TEST_CASE (scenario134)
 	BOOST_TEST(result == 3);
 }
 
+BOOST_AUTO_TEST_CASE (scenario135)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			value
+		};
+
+		function add((Item left, Item right))
+		{
+			return left.value + right.value;
+		}
+
+		function value(i32 v)
+		{
+			return Item
+			{
+				value: v
+			};
+		}
+
+		function transform((any item, ...items))
+		{
+			return item -> transform(...items);
+		}
+
+		function transform(any item)
+		{
+			return item;
+		}
+
+		export i32 main()
+		{
+			return add(transform([value(1)]) | transform([value(2)]));
+		}
+	)");
+
+	BOOST_TEST(result == 3);
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

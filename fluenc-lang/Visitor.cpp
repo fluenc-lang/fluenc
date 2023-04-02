@@ -600,6 +600,11 @@ Node *Visitor::visitArray(const std::shared_ptr<peg::Ast> &ast) const
 		return static_cast<Node *>(empty);
 	}
 
+	if (ast->nodes.size() == 1)
+	{
+		return visitExpression(ast->nodes[0]);
+	}
+
 	std::vector<Indexed<std::shared_ptr<peg::Ast>>> indexed;
 
 	std::transform(begin(ast->nodes), end(ast->nodes), index_iterator(0u), std::back_insert_iterator(indexed), [=](auto x, auto y) -> Indexed<std::shared_ptr<peg::Ast>>

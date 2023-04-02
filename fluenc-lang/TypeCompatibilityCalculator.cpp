@@ -36,13 +36,6 @@ struct Storage
 			return 0;
 		});
 
-		add<ArrayType, Type>([](const EntryPoint &entryPoint, auto left, auto right)
-		{
-			auto elementTypes = left->types();
-
-			return TypeCompatibilityCalculator::calculate(entryPoint, elementTypes[0], right);
-		});
-
 		add<UserType, UserType>([](const EntryPoint &entryPoint, const auto left, auto right) -> int8_t
 		{
 			auto leftElementTypes = left->elementTypes();
