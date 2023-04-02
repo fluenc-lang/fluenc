@@ -12,11 +12,3 @@ llvm::Type *PlaceholderType::storageType(llvm::LLVMContext &context) const
 
 	return nullptr;
 }
-
-int8_t PlaceholderType::compatibility(const Type *type, const EntryPoint &entryPoint) const
-{
-	UNUSED(type);
-	UNUSED(entryPoint);
-
-	return 0;
-}

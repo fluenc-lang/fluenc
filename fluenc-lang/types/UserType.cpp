@@ -2,12 +2,12 @@
 #include <numeric>
 #include <unordered_map>
 
-#include "Utility.h"
 #include "IPrototype.h"
-#include "AnyType.h"
 #include "UserType.h"
+#include "IOperatorSet.h"
 
-#include "iterators/ExtremitiesIterator.h"
+#include "nodes/BinaryNode.h"
+#include "nodes/UnaryNode.h"
 
 UserType::UserType(const IPrototype *prototype, const std::vector<const Type *> &elementTypes)
 	: m_prototype(prototype)
@@ -54,46 +54,39 @@ llvm::Type *UserType::storageType(llvm::LLVMContext &context) const
 	return llvm::Type::getInt8PtrTy(context);
 }
 
-int8_t UserType::compatibility(const Type *type, const EntryPoint &entryPoint) const
-{
-	auto other = dynamic_cast<const UserType *>(type);
-
-	if (!other)
-	{
-		return m_prototype->compatibility(type, entryPoint);
-	}
-
-	if (m_elementTypes.size() != other->m_elementTypes.size())
-	{
-		return -1;
-	}
-
-	auto prototypeCompatibility = m_prototype->compatibility(type, entryPoint);
-
-	if (prototypeCompatibility < 0)
-	{
-		return prototypeCompatibility;
-	}
-
-	int8_t min = 0;
-	int8_t max = 0;
-
-	std::transform(begin(m_elementTypes), end(m_elementTypes), begin(other->m_elementTypes), extremities_iterator(min, max), [&](auto left, auto right)
-	{
-		return left->compatibility(right, entryPoint);
-	});
-
-	if (min < 0 || max > 0)
-	{
-		return prototypeCompatibility;
-	}
-
-	return 0;
-}
-
 const IPrototype *UserType::prototype() const
 {
 	return m_prototype;
+}
+
+class UserOperatorSet : public IOperatorSet
+{
+	const Node *forBinary(const BinaryNode *node) const
+	{
+		auto result = new UserBinaryNode();
+		result->ast = node->ast;
+		result->consumer = node->consumer;
+		result->op = node->op;
+
+		return result;
+	}
+
+	const Node *forUnary(const UnaryNode *node) const
+	{
+		auto result = new UserUnaryNode();
+		result->ast = node->ast;
+		result->consumer = node->consumer;
+		result->op = node->op;
+
+		return result;
+	}
+};
+
+IOperatorSet *UserType::operators() const
+{
+	static UserOperatorSet operators;
+
+	return &operators;
 }
 
 std::vector<const Type *> UserType::elementTypes() const

@@ -31,6 +31,18 @@ struct StringUnaryNode : public UnaryNodeBase<StringUnaryNode>
 {
 };
 
+struct ArrayUnaryNode : public UnaryNodeBase<ArrayUnaryNode>
+{
+};
+
+struct WithoutUnaryNode : public UnaryNodeBase<WithoutUnaryNode>
+{
+};
+
+struct UserUnaryNode : public UnaryNodeBase<UserUnaryNode>
+{
+};
+
 struct UnaryNode : public UnaryNodeBase<UnaryNode>
 {
 };

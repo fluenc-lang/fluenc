@@ -1,5 +1,6 @@
 #include "DzArgument.h"
 #include "Type.h"
+#include "TypeCompatibilityCalculator.h"
 
 #include "nodes/ImportedFunctionNode.h"
 
@@ -56,7 +57,7 @@ int8_t ImportedFunctionNode::signatureCompatibility(const EntryPoint &entryPoint
 
 		auto argumentType = argument->type(entryPoint);
 
-		return valueType->compatibility(argumentType, entryPoint);
+		return TypeCompatibilityCalculator::calculate(entryPoint, valueType, argumentType);
 	});
 
 	if (min < 0)

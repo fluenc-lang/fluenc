@@ -31,6 +31,18 @@ struct StringBinaryNode : public BinaryNodeBase<StringBinaryNode>
 {
 };
 
+struct ArrayBinaryNode : public BinaryNodeBase<ArrayBinaryNode>
+{
+};
+
+struct WithoutBinaryNode : public BinaryNodeBase<WithoutBinaryNode>
+{
+};
+
+struct UserBinaryNode : public BinaryNodeBase<UserBinaryNode>
+{
+};
+
 struct BinaryNode : public BinaryNodeBase<BinaryNode>
 {
 };

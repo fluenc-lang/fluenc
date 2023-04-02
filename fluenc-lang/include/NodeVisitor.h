@@ -14,6 +14,12 @@ struct FloatUnaryNode;
 struct BooleanUnaryNode;
 struct StringUnaryNode;
 struct PostEvaluationNode;
+struct ArrayBinaryNode;
+struct ArrayUnaryNode;
+struct WithoutBinaryNode;
+struct WithoutUnaryNode;
+struct UserBinaryNode;
+struct UserUnaryNode;
 
 class ExportedFunctionNode;
 class ArrayContinuationNode;
@@ -78,6 +84,9 @@ class NodeVisitor
 		virtual TReturn visit(const FloatBinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const IntegerBinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const StringBinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ArrayBinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const WithoutBinaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const UserBinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const BinaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const ExportedFunctionNode *node, TContext context) const = 0;
 		virtual TReturn visit(const ArrayContinuationNode *node, TContext context) const = 0;
@@ -109,6 +118,9 @@ class NodeVisitor
 		virtual TReturn visit(const FloatUnaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const IntegerUnaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const StringUnaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const ArrayUnaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const WithoutUnaryNode *node, TContext context) const = 0;
+		virtual TReturn visit(const UserUnaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const UnaryNode *node, TContext context) const = 0;
 		virtual TReturn visit(const TailFunctionCallNode *node, TContext context) const = 0;
 		virtual TReturn visit(const FunctionNode *node, TContext context) const = 0;

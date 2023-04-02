@@ -15,6 +15,11 @@ const IPrototype *WithPrototype::root() const
 	return m_value->prototype();
 }
 
+const UserTypeValue *WithPrototype::value() const
+{
+	return m_value;
+}
+
 std::string WithPrototype::name() const
 {
 	return m_value->type()->name();
@@ -40,9 +45,4 @@ std::vector<PrototypeField> WithPrototype::fields(const EntryPoint &entryPoint, 
 llvm::Type *WithPrototype::storageType(llvm::LLVMContext &context) const
 {
 	return m_value->type()->storageType(context);
-}
-
-int8_t WithPrototype::compatibility(const Type *type, const EntryPoint &entryPoint) const
-{
-	return m_value->type()->compatibility(type, entryPoint);
 }

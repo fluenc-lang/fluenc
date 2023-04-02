@@ -149,7 +149,7 @@ function getOverflow(any i)
 
 function solve(i32 overflow, EventState events, LayoutInfo info, Layout item, Layout nextItem)
 {
-	let result = layout(events, item, 0, overflow, info, item.children, nextItem.children);
+	let result = layout(events, item, 0, overflow, info, item.children | nextItem.children);
 
 	let remainingOverflow = getOverflow(result);
 
@@ -201,7 +201,7 @@ function process(ApplicationState state, Layout item)
 
 // Update
 
-function update(EventState events, any parent, Layout item, Layout nextItem)
+function update(EventState events, any parent, (Layout item, Layout nextItem))
 {
 	let adapted = item with
 	{
@@ -226,14 +226,14 @@ function update(EventState events, any parent, Layout item, Layout nextItem)
 	return solve(0, events, withRemainingStretch, adapted, nextItem);
 }
 
-function update(EventState events, any parent, (Layout item, ...controls), (Layout nextItem, ...nextControls))
+function update(EventState events, any parent, ((Layout item, Layout nextItem), ...controls))
 {
-	return tail update(events, parent, item, nextItem) -> update(events, parent, ...controls, ...nextControls);
+	return update(events, parent, item, nextItem) -> update(events, parent, ...controls);
 }
 
 // Column
 
-function layout(EventState events, Column column, i32 offset, i32 overflow, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
+function layout(EventState events, Column column, i32 offset, i32 overflow, LayoutInfo info, (LayoutItem item, LayoutItem nextItem))
 {
 	let nis = calculateNativeItemSize(item, overflow, info);
 
@@ -260,11 +260,11 @@ function layout(EventState events, Column column, i32 offset, i32 overflow, Layo
 
 	return item with
 	{
-		item: tail update(events, parent, expand(layouted), expand(nextItem.item))
+		item: update(events, parent, expand(layouted) | expand(nextItem.item))
 	};
 }
 
-function layout(EventState events, Column column, i32 offset, i32 overflow, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+function layout(EventState events, Column column, i32 offset, i32 overflow, LayoutInfo info, ((LayoutItem item, LayoutItem nextItem), ...items))
 {
 	let nis = calculateNativeItemSize(item, overflow, info);
 
@@ -284,7 +284,7 @@ function layout(EventState events, Column column, i32 offset, i32 overflow, Layo
 
 	let result = item with
 	{
-		item: tail update(events, parent, expand(layouted), expand(nextItem.item))
+		item: update(events, parent, expand(layouted) | expand(nextItem.item))
 	};
 
 	let nextOffset = nis.actual + offset + info.spacing;
@@ -295,12 +295,12 @@ function layout(EventState events, Column column, i32 offset, i32 overflow, Layo
 		remainingStretch: nis.stretch,
 	};
 
-	return result -> layout(events, column, nextOffset, remainingOverflow, withRemainingStretch, ...items, ...nextItems);
+	return result -> layout(events, column, nextOffset, remainingOverflow, withRemainingStretch, ...items);
 }
 
 // Row
 
-function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo info, LayoutItem item, LayoutItem nextItem)
+function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo info, (LayoutItem item, LayoutItem nextItem))
 {
 	let nis = calculateNativeItemSize(item, overflow, info);
 
@@ -321,11 +321,11 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 
 	return item with
 	{
-		item: tail update(events, row, expand(layouted), expand(nextItem.item))
+		item: update(events, row, expand(layouted) | expand(nextItem.item))
 	};
 }
 
-function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo info, (LayoutItem item, ...items), (LayoutItem nextItem, ...nextItems))
+function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo info, ((LayoutItem item, LayoutItem nextItem), ...items))
 {
 	let nis = calculateNativeItemSize(item, overflow, info);
 
@@ -339,7 +339,7 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 
 	let result = item with
 	{
-		item: tail update(events, row, expand(layouted), expand(nextItem.item))
+		item: update(events, row, expand(layouted) | expand(nextItem.item))
 	};
 
 	let nextOffset = nis.actual + offset + info.spacing;
@@ -350,18 +350,5 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 		remainingStretch: nis.stretch,
 	};
 
-	return result -> layout(events, row, nextOffset, remainingOverflow, withRemainingStretch, ...items, ...nextItems);
+	return result -> layout(events, row, nextOffset, remainingOverflow, withRemainingStretch, ...items);
 }
-
-// Common
-
-function layout(EventState events, Layout layout, i32 offset, i32 overflow, LayoutInfo info, (LayoutItem item, ...items), LayoutItem nextItem)
-{
-	return nothing;
-}
-
-function layout(EventState events, Layout layout, i32 offset, i32 overflow, LayoutInfo info, LayoutItem item, (LayoutItem nextItem, ...nextItems))
-{
-	return nothing;
-}
-

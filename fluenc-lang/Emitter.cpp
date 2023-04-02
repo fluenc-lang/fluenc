@@ -20,7 +20,9 @@
 #include "DzArgument.h"
 #include "DzTupleArgument.h"
 #include "InteropHelper.h"
+#include "TypeCompatibilityCalculator.h"
 
+#include "nodes/StaticNode.h"
 #include "types/IOperatorSet.h"
 #include "types/Int64Type.h"
 #include "types/BooleanType.h"
@@ -323,6 +325,119 @@ std::vector<DzResult> Emitter::visit(const StringBinaryNode *node, DefaultVisito
 	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
+std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitorContext context) const
+{
+	auto left = context.values.require<LazyValue>(node->ast);
+	auto right = context.values.require<LazyValue>(node->ast);
+
+	if (node->op == "|")
+	{
+		auto inputs = { left, right };
+
+		auto llvmContext = context.entryPoint.context();
+
+		std::map<size_t, std::array<const BaseValue *, 2>> results;
+
+		auto [_, entryPoint] = std::accumulate(begin(inputs), end(inputs), std::make_pair(0, context.entryPoint), [&](auto pair, auto input)
+		{
+			auto [storageIndex, entryPoint] = pair;
+
+			auto block = llvm::BasicBlock::Create(*llvmContext);
+
+			auto iteratable = input->generate(entryPoint);
+
+			for (auto [resultEntryPoint, resultValues] : iteratable->accept(*this, { entryPoint, Stack() }))
+			{
+				auto iterator = resultValues.template require<Iterator>(node->ast);
+
+				for (auto [iteratorEntryPoint, iteratorValues] : iterator->generate(*this, { resultEntryPoint, Stack() }))
+				{
+					auto& storage = results[iteratorEntryPoint.index()];
+
+					auto value = iteratorValues.pop();
+
+					if (auto tuple  = dynamic_cast<const TupleValue *>(value))
+					{
+						auto elements = tuple->values();
+
+						storage[storageIndex] = elements.pop();
+					}
+					else
+					{
+						storage[storageIndex] = value;
+					}
+
+					linkBlocks(iteratorEntryPoint.block(), block);
+				}
+			}
+
+			return std::make_pair(storageIndex + 1, entryPoint.withBlock(block));
+		});
+
+		auto firstValue = std::accumulate(begin(results), end(results), static_cast<Node *>(TerminatorNode::instance()), [](auto next, auto pair)
+		{
+			auto [index, values] = pair;
+
+			std::vector<const BaseValue *> elements;
+
+			std::transform(rbegin(values), rend(values), back_inserter(elements), [](auto value) -> const BaseValue *
+			{
+				if (!value)
+				{
+					return WithoutValue::instance();
+				}
+
+				return value;
+			});
+
+			auto indexSink = new IndexSinkNode(index, next);
+			auto tupleValue = new TupleValue(elements);
+
+			return new StaticNode(tupleValue, indexSink);
+		});
+
+		auto arraySink = new ArraySinkNode(results.size(), node->ast, TerminatorNode::instance(), firstValue);
+
+		return arraySink->accept(*this, { entryPoint, context.values });
+	}
+
+	auto operandType = left->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+}
+
+std::vector<DzResult> Emitter::visit(const WithoutBinaryNode *node, DefaultVisitorContext context) const
+{
+	UNUSED(node);
+
+	context.values.discard();
+
+	return {{ context.entryPoint, context.values }};
+}
+
+std::vector<DzResult> Emitter::visit(const UserBinaryNode *node, DefaultVisitorContext context) const
+{
+	UNUSED(node);
+
+	auto left = context.values.pop();
+	auto right = context.values.pop();
+
+	if (node->op == "|")
+	{
+		auto tuple = new TupleValue({ right, left });
+
+		context.values.push(tuple);
+
+		return {{ context.entryPoint, context.values }};
+	}
+
+	auto operandType = left->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+}
+
 std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorContext context) const
 {
 	auto values = context.values;
@@ -333,7 +448,7 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 	auto leftType = left->type();
 	auto rightType = right->type();
 
-	if (leftType->compatibility(rightType, context.entryPoint) != 0)
+	if (TypeCompatibilityCalculator::calculate(context.entryPoint, leftType, rightType) > 1)
 	{
 		throw new BinaryTypeMismatchException(node->ast
 			, leftType->name()
@@ -1132,7 +1247,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisitorContext context) const
 {
 	std::vector<DzResult> result;
-	std::vector<DzResult> input = {{ context.entryPoint, Stack() }};
+	std::vector<DzResult> input = {{ context.entryPoint.withIndex(-1), Stack() }};
 
 	std::vector<Indexed<Node *>> orderedValues;
 
@@ -1295,7 +1410,10 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 
 	for (auto &[resultEntryPoint, resultValues] : junction->accept(*this, context))
 	{
-		for (auto &result : node->m_consumer->accept(*this, { resultEntryPoint, resultValues }))
+		auto consumerEntryPoint = resultEntryPoint
+			.withIndex(context.entryPoint.index());
+
+		for (auto &result : node->m_consumer->accept(*this, { consumerEntryPoint, resultValues }))
 		{
 			results.push_back(result);
 		}
@@ -1718,7 +1836,7 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 		// This will ensure that multiple iterations are cheap.
 		//
 
-		if (auto arrayType = dynamic_cast<const ArrayType *>(type))
+		if (dynamic_cast<const ArrayType *>(type))
 		{
 			auto allocator = new AllocatorNode(type, TerminatorNode::instance());
 
@@ -1853,6 +1971,33 @@ std::vector<DzResult> Emitter::visit(const StringUnaryNode *node, DefaultVisitor
 	context.values.push(value);
 
 	return node->consumer->accept(*this, context);
+}
+
+std::vector<DzResult> Emitter::visit(const ArrayUnaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = context.values.pop();
+
+	auto operandType = operand->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+}
+
+std::vector<DzResult> Emitter::visit(const WithoutUnaryNode *node, DefaultVisitorContext context) const
+{
+	UNUSED(node);
+
+	return {{ context.entryPoint, context.values }};
+}
+
+std::vector<DzResult> Emitter::visit(const UserUnaryNode *node, DefaultVisitorContext context) const
+{
+	auto operand = context.values.pop();
+
+	auto operandType = operand->type();
+	auto operandTypeName = operandType->name();
+
+	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContext context) const

@@ -1,5 +1,6 @@
 #include "FunctionHelper.h"
 #include "Type.h"
+#include "TypeCompatibilityCalculator.h"
 
 #include "iterators/ExtremitiesIterator.h"
 
@@ -29,7 +30,7 @@ std::tuple<int8_t, const EntryPoint *> findEntryPoint(const EntryPoint &entryPoi
 		auto storageType = storage->type();
 		auto valueType = value->type();
 
-		return valueType->compatibility(storageType, entryPoint);
+		return TypeCompatibilityCalculator::calculate(entryPoint, valueType, storageType);
 	});
 
 	if (min < 0 || max > 0)

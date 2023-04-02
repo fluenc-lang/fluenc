@@ -35,7 +35,7 @@ StandardField       <- Id (':' Expression)?
 
 # Arguments
 StandardArgument    <- TypeName Id
-TupleArgument       <- '(' StandardArgument (',' StandardArgument)* ')'
+TupleArgument       <- '(' Argument (',' Argument)* ')'
 
 # Functions
 RegularFunction     <- 'function' Id '(' List(Argument)? ')' Block
@@ -44,7 +44,7 @@ ExportedFunction    <- 'export' TypeName Id '(' List(Argument)? ')' Block
 
 # Expressions
 Literal             <- ByteLiteral / Float32Literal / Uint32Literal / Int64Literal / Int32Literal / BooleanLiteral / StringLiteral / CharLiteral / NothingLiteral
-Binary              <- (Group BinaryOperator Expression) / (Literal BinaryOperator Expression) / (Member BinaryOperator Expression) / (Call BinaryOperator Expression)
+Binary              <- (Group BinaryOperator Expression) / (Literal BinaryOperator Expression) / (Member BinaryOperator Expression) / (Call BinaryOperator Expression) / (Array BinaryOperator Expression)
 Unary               <- (UnaryOperator Group) / (UnaryOperator Literal) / (UnaryOperator Member) / (UnaryOperator Call)
 Member              <- IdList With?
 Tail                <- 'tail' Id '(' List(Expression)? ')'
@@ -69,7 +69,7 @@ ByteLiteral         <- Integer 'u8'
 NothingLiteral      <- 'nothing'
 
 # Primitives
-BinaryOperator      <- '<=' | '>=' | '==' | '!=' | '&&' | '||' | '-' | '+' | '/' | '*' | '%' | '<' | '>' | '|' | '&' | '^'
+BinaryOperator      <- '<=' | '>=' | '==' | '!=' | '&&' | '||' | '-' | '+' | '/' | '*' | '%' | '<' | '>' | '|' | '&' | '^' | '|'
 UnaryOperator       <- '!' | '@'
 Integer             <- < ('0x'[0-9A-F]+) / ('-'?[0-9]+) >
 String              <- < '"' < [^"]* > '"' >

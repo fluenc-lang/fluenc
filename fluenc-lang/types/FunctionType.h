@@ -13,9 +13,11 @@ class FunctionType : public Type
 		std::string name() const override;
 		std::string fullName() const override;
 
-		llvm::Type *storageType(llvm::LLVMContext &context) const override;
+		std::vector<const Type *> types() const;
 
-		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
+		const CallableNode *function() const;
+
+		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
 		static FunctionType *get(const std::vector<const Type *> &types, const CallableNode *function);
 

@@ -3,9 +3,6 @@
 #include <unordered_map>
 
 #include "types/FunctionType.h"
-#include "AllIterator.h"
-
-#include "iterators/ExtremitiesIterator.h"
 
 FunctionType::FunctionType(const std::vector<const Type *> &types, const CallableNode *function)
 	: m_types(types)
@@ -55,49 +52,19 @@ std::string FunctionType::fullName() const
 	return ss.str();
 }
 
+std::vector<const Type *> FunctionType::types() const
+{
+	return m_types;
+}
+
+const CallableNode *FunctionType::function() const
+{
+	return m_function;
+}
+
 llvm::Type *FunctionType::storageType(llvm::LLVMContext &context) const
 {
 	return llvm::Type::getInt1Ty(context);
-}
-
-int8_t FunctionType::compatibility(const Type *type, const EntryPoint &entryPoint) const
-{
-	if (type == this)
-	{
-		return 0;
-	}
-
-	auto other = dynamic_cast<const FunctionType *>(type);
-
-	if (!other)
-	{
-		return -1;
-	}
-
-	if (m_types.size() != other->m_types.size())
-	{
-		return -1;
-	}
-
-	int8_t min = 0;
-	int8_t max = 0;
-
-	std::transform(begin(m_types), end(m_types), begin(other->m_types), extremities_iterator(min, max), [&](auto left, auto right)
-	{
-		return left->compatibility(right, entryPoint);
-	});
-
-	if (min < 0)
-	{
-		return min;
-	}
-
-	if (m_function != other->m_function)
-	{
-		return std::max(static_cast<int8_t>(1), max);
-	}
-
-	return max;
 }
 
 FunctionType *FunctionType::get(const std::vector<const Type *> &types, const CallableNode *function)

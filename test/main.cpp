@@ -1,6 +1,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "TestHelpers.h"
+#include "TypeCompatibilityCalculator.h"
 
 #include "values/LazyValue.h"
 
@@ -2437,7 +2438,7 @@ BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_2)
 
 BOOST_AUTO_TEST_CASE (compatibility)
 {
-	auto entryPoi32 = compile(R"(
+	auto entryPoint = compile(R"(
 		struct Unrelated
 		{
 			x: 0
@@ -2464,7 +2465,7 @@ BOOST_AUTO_TEST_CASE (compatibility)
 		}
 	)");
 
-	auto types = entryPoi32.types();
+	auto types = entryPoint.types();
 
 	auto unrelatedType = types["Unrelated"];
 	auto childType = types["Child"];
@@ -2472,17 +2473,17 @@ BOOST_AUTO_TEST_CASE (compatibility)
 	auto motherType = types["Mother"];
 	auto ancestorType = types["Ancestor"];
 
-	BOOST_TEST(childType->compatibility(childType, entryPoi32) == 1);
-	BOOST_TEST(childType->compatibility(fatherType, entryPoi32) == 2);
-	BOOST_TEST(childType->compatibility(motherType, entryPoi32) == 2);
-	BOOST_TEST(childType->compatibility(ancestorType, entryPoi32) == 3);
-	BOOST_TEST(childType->compatibility(AnyType::instance(), entryPoi32) == 4);
-	BOOST_TEST(childType->compatibility(unrelatedType, entryPoi32) == -1);
-	BOOST_TEST(childType->compatibility(Int32Type::instance(), entryPoi32) == -1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, childType) == 1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, fatherType) == 2);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, motherType) == 2);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, ancestorType) == 3);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, AnyType::instance()) == 4);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, unrelatedType) == -1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, Int32Type::instance()) == -1);
 
-	BOOST_TEST(Int32Type::instance()->compatibility(Int32Type::instance(), entryPoi32) == 0);
-	BOOST_TEST(Int32Type::instance()->compatibility(Int64Type::instance(), entryPoi32) == -1);
-	BOOST_TEST(Int32Type::instance()->compatibility(AnyType::instance(), entryPoi32) == 1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), Int32Type::instance()) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), Int64Type::instance()) == -1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), AnyType::instance()) == 1);
 }
 
 BOOST_AUTO_TEST_CASE (scenario70)
@@ -2546,13 +2547,13 @@ BOOST_AUTO_TEST_CASE (arrayType_2)
 	auto value2 = compileValue("[1, 2i64, \"foo\"]");
 	auto value3 = compileValue("[7, 5, 34]");
 
-	BOOST_TEST(value1->type()->compatibility(value1->type(), EntryPoint()) == 0);
-	BOOST_TEST(value2->type()->compatibility(value2->type(), EntryPoint()) == 0);
-	BOOST_TEST(value1->type()->compatibility(value3->type(), EntryPoint()) == 0);
-	BOOST_TEST(value3->type()->compatibility(value1->type(), EntryPoint()) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value1->type(), value1->type()) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value2->type(), value2->type()) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value1->type(), value3->type()) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value3->type(), value1->type()) == 0);
 
-	BOOST_TEST(value1->type()->compatibility(value2->type(), EntryPoint()) == -1);
-	BOOST_TEST(value2->type()->compatibility(value1->type(), EntryPoint()) == -1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value1->type(), value2->type()) == -1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value2->type(), value1->type()) == -1);
 }
 
 BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
@@ -3080,7 +3081,7 @@ BOOST_AUTO_TEST_CASE (compatibility_3)
 	auto userType2 = UserType::get(itemType, { WithoutType::instance() });
 
 	// Both have the same tag
-	BOOST_TEST(userType1->compatibility(userType2, result) == 1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, userType1, userType2) == 1);
 }
 
 BOOST_AUTO_TEST_CASE (scenario82)
@@ -4528,9 +4529,9 @@ BOOST_AUTO_TEST_CASE (scenario111)
 	auto type1 = types[0];
 	auto type2 = types[1];
 
-	BOOST_TEST(type1->compatibility(type2, result) == -1);
-	BOOST_TEST(type1->compatibility(type1, result) == 0);
-	BOOST_TEST(type2->compatibility(type2, result) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type2) == -1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type1) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type2, type2) == 0);
 }
 
 BOOST_AUTO_TEST_CASE (scenario112)
@@ -4584,9 +4585,9 @@ BOOST_AUTO_TEST_CASE (scenario112)
 	auto type1 = types[0];
 	auto type2 = types[1];
 
-	BOOST_TEST(type1->compatibility(type2, result) == 1);
-	BOOST_TEST(type1->compatibility(type1, result) == 0);
-	BOOST_TEST(type2->compatibility(type2, result) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type2) == 1);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type1) == 0);
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type2, type2) == 0);
 }
 
 BOOST_AUTO_TEST_CASE (scenario113)
@@ -5444,6 +5445,221 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 	auto lazy = functionValues.require<LazyValue>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
+}
+
+BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
+{
+	auto entryPoint = compile(R"(
+		struct Item
+		{
+			children: nothing
+		};
+
+		function foo(any item1, any item2)
+		{
+			return item1;
+		}
+
+		function foo(((Item item1, Item item2), ...items))
+		{
+			let item = item1 with
+			{
+				children: foo(item1.children | item2.children)
+			};
+
+			return item -> foo(...items);
+		}
+
+		function foo((Item item1, Item item2))
+		{
+			return item1 with
+			{
+				children: foo(item1.children | item2.children)
+			};
+		}
+
+		function foo(without item)
+		{
+			return nothing;
+		}
+
+		function transform((any item, ...items))
+		{
+			return item -> transform(...items);
+		}
+
+		function transform(any item)
+		{
+			return item;
+		}
+
+		function application()
+		{
+			return [
+				Item {
+					children: [
+						Item {},
+						Item {}
+					]
+				},
+				Item {}
+			];
+		}
+
+		function bar()
+		{
+			return foo(
+				transform(application()) | transform(application())
+				);
+		}
+	)");
+
+	auto functions = entryPoint.functions();
+
+	auto [_1, function] = *functions.find("bar");
+
+	Emitter emitter;
+
+	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+
+	BOOST_TEST(functionResults.size() == 1);
+
+	auto [_2, functionValues] = functionResults[0];
+
+	BOOST_TEST(functionValues.size() == 1);
+
+	auto lazy = functionValues.require<LazyValue>(nullptr);
+
+	BOOST_TEST(lazy->type()->name() == "[Item, Item]");
+}
+
+BOOST_AUTO_TEST_CASE (scenario131)
+{
+	auto result = exec(R"(
+		function add((i32 left, i32 right))
+		{
+			return left + right;
+		}
+
+		function add(((i32 left, i32 right), ...values))
+		{
+			return left + right -> add(...values);
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		export i32 main()
+		{
+			return sum(0, add([1, 2, 3] | [4, 5, 6]));
+		}
+	)");
+
+	BOOST_TEST(result == 21);
+}
+
+BOOST_AUTO_TEST_CASE (scenario132)
+{
+	auto result = exec(R"(
+		function sub((i32 left, i32 right))
+		{
+			return right - left;
+		}
+
+		function sub(((i32 left, i32 right), ...values))
+		{
+			return right - left -> add(...values);
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		export i32 main()
+		{
+			return sum(0, sub([1, 2, 3] | [4, 5, 6]));
+		}
+	)");
+
+	BOOST_TEST(result == 9);
+}
+
+BOOST_AUTO_TEST_CASE (scenario133)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			value
+		};
+
+		function sub((Item left, Item right))
+		{
+			return right.value - left.value;
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function value(any v)
+		{
+			return Item
+			{
+				value: v
+			};
+		}
+
+		export i32 main()
+		{
+			return sum(0, sub(value(1) | value(4)));
+		}
+	)");
+
+	BOOST_TEST(result == 3);
+}
+
+BOOST_AUTO_TEST_CASE (scenario134)
+{
+	auto result = exec(R"(
+		struct Item
+		{
+			value
+		};
+
+		function add((Item left, Item right))
+		{
+			return left.value + right.value;
+		}
+
+		function value(i32 v)
+		{
+			return Item
+			{
+				value: v
+			};
+		}
+
+		export i32 main()
+		{
+			return add([value(1)] | [value(2)]);
+		}
+	)");
+
+	BOOST_TEST(result == 3);
 }
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )

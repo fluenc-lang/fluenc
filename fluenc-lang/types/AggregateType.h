@@ -14,9 +14,9 @@ class AggregateType : public Type
 		std::string name() const override;
 		std::string fullName() const override;
 
-		llvm::Type *storageType(llvm::LLVMContext &context) const override;
+		std::vector<const Type *> subjects() const;
 
-		int8_t compatibility(const Type *type, const EntryPoint &entryPoint) const override;
+		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
 		static AggregateType *get(const std::vector<const Type *> &types);
 

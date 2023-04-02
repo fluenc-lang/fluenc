@@ -1,9 +1,8 @@
 #include <numeric>
 
-#include "types/Prototype.h"
-#include "DzTypeName.h"
+#include "Prototype.h"
+#include "ITypeName.h"
 #include "Node.h"
-#include "types/AnyType.h"
 
 Prototype::Prototype(const std::string &tag
 	, const std::vector<PrototypeFieldEmbryo> &fields
@@ -56,26 +55,14 @@ std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint, cons
 	return fields;
 }
 
+std::vector<ITypeName *> Prototype::parentTypes() const
+{
+	return m_parentTypes;
+}
+
 llvm::Type *Prototype::storageType(llvm::LLVMContext &context) const
 {
 	return llvm::Type::getInt8PtrTy(context);
-}
-
-int8_t Prototype::compatibility(const Type *type, const EntryPoint &entryPoint) const
-{
-	auto [match, score] = compatibility(1, type, entryPoint);
-
-	if (match)
-	{
-		return score;
-	}
-
-	if (dynamic_cast<const AnyType *>(type))
-	{
-		return score + 1;
-	}
-
-	return -1;
 }
 
 std::pair<bool, int8_t> Prototype::compatibility(int8_t score, const Type *type, const EntryPoint &entryPoint) const

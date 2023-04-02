@@ -2,6 +2,7 @@
 
 #include "ValueHelper.h"
 #include "FunctionHelper.h"
+#include "TypeCompatibilityCalculator.h"
 
 #include "types/ArrayType.h"
 
@@ -115,7 +116,7 @@ const Type *LazyValue::type() const
 
 		if (auto existing = typesByIndex.find(index); existing != end(typesByIndex))
 		{
-			if (existing->second->compatibility(type, entryPoint) != 0)
+			if (TypeCompatibilityCalculator::calculate(entryPoint, existing->second, type) != 0)
 			{
 				return m_generator->type();
 			}
@@ -131,12 +132,7 @@ const Type *LazyValue::type() const
 		return pair.second;
 	});
 
-	if (types.size() > 1)
-	{
-		return ArrayType::get(types);
-	}
-
-	return types[0];
+	return ArrayType::get(types);
 }
 
 const BaseValue *LazyValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
