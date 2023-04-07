@@ -257,7 +257,7 @@ bool build(const BuildContext &context)
 					root->accept(emitter, { entryPoint, values });
 				}
 
-//				llvmModule->print(llvm::errs(), nullptr);
+				llvmModule->print(llvm::errs(), nullptr);
 				llvmModule->setDataLayout(dataLayout);
 
 				std::error_code error;

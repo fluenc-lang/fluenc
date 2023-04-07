@@ -1,4 +1,4 @@
-#include <llvm/IR/Verifier.h>
+﻿#include <llvm/IR/Verifier.h>
 #include <llvm/Transforms/Scalar/SimplifyCFG.h>
 #include <llvm/Passes/PassBuilder.h>
 
@@ -325,6 +325,8 @@ std::vector<DzResult> Emitter::visit(const StringBinaryNode *node, DefaultVisito
 	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
+#include "nodes/ExpansionNode.h"
+
 std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitorContext context) const
 {
 	auto left = context.values.require<LazyValue>(node->ast);
@@ -332,19 +334,257 @@ std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitor
 
 	if (node->op == "|")
 	{
+		using results_t = std::map<size_t, std::array<const BaseValue *, 2>>;
+
+		class Bar : public IIteratable
+		{
+			public:
+				Bar(const results_t &results, const ReferenceValue *index, const Node *node, const Type *arrayType)
+					: m_results(results)
+					, m_index(index)
+//					, m_node(node)
+					, m_arrayType(arrayType)
+				{
+
+				}
+
+				struct ThrowNode : public Node
+				{
+					static ThrowNode *instance()
+					{
+						static ThrowNode instance;
+
+						return &instance;
+					}
+
+					std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override
+					{
+						throw std::exception();
+					}
+				};
+
+				std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override
+				{
+					auto llvmContext = context.entryPoint.context();
+
+					std::vector<DzResult> res;
+
+					auto ab = llvm::BasicBlock::Create(*llvmContext, "besk");
+
+					linkBlocks(context.entryPoint.block(), ab);
+
+					auto fuu = context.entryPoint
+						.withName("__array")
+						.withBlock(ab)
+						.markEntry();
+
+					auto ac = new ArrayContinuationNode(m_index, ThrowNode::instance(), IteratorType::instance());
+
+					auto lep = std::accumulate(begin(m_results), prev(end(m_results)), fuu, [&](auto kep, auto pair)
+					{
+						auto [i, values] = pair;
+
+						auto arrayExpandable = new ExpandableValue(true, m_arrayType, fuu, ac, m_index);
+
+						std::vector<const BaseValue *> elements;
+						std::vector<const BaseValue *> kas = {
+							new TupleValue({ arrayExpandable, PlaceholderValue::instance() })
+						};
+
+						auto init = new StaticNode(arrayExpandable
+							, new ExpansionNode(new ContinuationNode(ThrowNode::instance(), nullptr), nullptr)
+							);
+
+						auto asdh = std::accumulate(rbegin(values), rend(values), static_cast<const Node *>(init), [&](auto next, auto value) -> const Node *
+						{
+							if (!value)
+							{
+								elements.push_back(WithoutValue::instance());
+							}
+							else if (auto tuple = dynamic_cast<const TupleValue *>(value))
+							{
+								auto tv = tuple->values();
+
+								kas.push_back(tuple);
+
+								auto actualValue = tv.pop();
+
+								elements.push_back(actualValue);
+
+								auto expandable = tv.require<ExpandableValue>(nullptr);
+
+								return new StaticNode(expandable
+									, new ExpansionNode(next, nullptr)
+									);
+							}
+							else
+							{
+								elements.push_back(value);
+							}
+
+							return next;
+						});
+
+						IRBuilderEx builder(kep);
+
+						auto indexLoad = builder.createLoad(m_index, "index");
+
+						auto indexType = Int64Type::instance();
+
+						auto storageType = indexType->storageType(*llvmContext);
+
+						auto indexConstant = new ScalarValue(indexType
+							, llvm::ConstantInt::get(storageType, i)
+							);
+
+						auto ifTrue = createBlock(llvmContext);
+						auto ifFalse = createBlock(llvmContext);
+
+						auto comparison =  builder.createCmp(llvm::CmpInst::Predicate::ICMP_EQ, indexLoad, indexConstant);
+
+						builder.createCondBr(comparison , ifTrue, ifFalse);
+
+						auto epIfFalse = kep
+							.withIndex(i)
+							.withBlock(ifFalse);
+
+						auto epIfTrue = kep
+							.withIndex(i)
+							.withBlock(ifTrue);
+
+						std::vector<const Type *> kas_types = {
+							m_arrayType
+						};
+
+						std::transform(begin(kas), end(kas), back_inserter(kas_types), [](auto value)
+						{
+							return value->type();
+						});
+
+						auto expandableType = ExpandedType::get(kas_types);
+
+						auto expandable = new ExpandableValue(true, expandableType, kep, asdh, kas);
+
+						auto tupleValue = new TupleValue(elements);
+
+						auto finalValue = new TupleValue({ expandable, tupleValue });
+
+						res.push_back({ epIfTrue, finalValue });
+
+						return epIfFalse;
+					});
+
+					std::vector<const BaseValue *> elements;
+
+					auto pair = *rbegin(m_results);
+
+					auto [i, values] = pair;
+
+					std::transform(rbegin(values), rend(values), back_inserter(elements), [](auto value) -> const BaseValue *
+					{
+						if (!value)
+						{
+							return WithoutValue::instance();
+						}
+
+						return value;
+					});
+
+					auto tupleValue = new TupleValue(elements);
+
+					res.push_back({ lep, tupleValue });
+
+					return res;
+				}
+
+			private:
+				results_t m_results;
+
+				const ReferenceValue *m_index;
+//				const Node *m_node;
+				const Type *m_arrayType;
+		};
+
+		class Foo : public ILazyValueGenerator
+		{
+			public:
+				Foo(const results_t &results, const Node *node, const Type *arrayType, const ReferenceValue *index)
+					: m_results(results)
+					, m_node(node)
+					, m_arrayType(arrayType)
+					, m_index(index)
+				{
+				}
+
+				const IIteratable *generate(const EntryPoint &entryPoint, GenerationMode mode) const override
+				{
+					UNUSED(mode);
+
+//					auto llvmContext = entryPoint.context();
+
+					return new Bar(m_results, m_index, m_node, m_arrayType);
+				}
+
+				const ILazyValueGenerator *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override
+				{
+					UNUSED(entryPoint);
+					UNUSED(strategy);
+
+					return this;
+				}
+
+				const ILazyValueGenerator *forward(size_t id) const override
+				{
+					UNUSED(id);
+
+					return this;
+				}
+
+				const Type *type() const override
+				{
+					return m_arrayType;
+				}
+
+			private:
+				results_t m_results;
+
+				const Node *m_node;
+				const Type *m_arrayType;
+				const ReferenceValue *m_index;
+		};
+
 		auto inputs = { left, right };
 
 		auto llvmContext = context.entryPoint.context();
 
-		std::map<size_t, std::array<const BaseValue *, 2>> results;
+		results_t results;
 
-		auto [_, entryPoint] = std::accumulate(begin(inputs), end(inputs), std::make_pair(0, context.entryPoint), [&](auto pair, auto input)
+		std::vector<const IIteratable *> iteratables;
+
+		std::transform(begin(inputs), end(inputs), back_inserter(iteratables), [&](auto input)
+		{
+			return input->generate(context.entryPoint);
+		});
+
+		auto indexType = Int64Type::instance();
+
+		auto storageType = indexType->storageType(*llvmContext);
+
+		auto zero = new ScalarValue(indexType
+			, llvm::ConstantInt::get(storageType, 0)
+			);
+
+		auto index = context.entryPoint.alloc(indexType, "index");
+
+		IRBuilderEx builder(context.entryPoint);
+
+		builder.createStore(zero, index);
+
+		auto [_, entryPoint] = std::accumulate(begin(iteratables), end(iteratables), std::make_pair(0, context.entryPoint), [&](auto pair, auto iteratable)
 		{
 			auto [storageIndex, entryPoint] = pair;
 
-			auto block = llvm::BasicBlock::Create(*llvmContext);
-
-			auto iteratable = input->generate(entryPoint);
+			auto block = llvm::BasicBlock::Create(*llvmContext, "merge");
 
 			for (auto [resultEntryPoint, resultValues] : iteratable->accept(*this, { entryPoint, Stack() }))
 			{
@@ -354,18 +594,7 @@ std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitor
 				{
 					auto& storage = results[iteratorEntryPoint.index()];
 
-					auto value = iteratorValues.pop();
-
-					if (auto tuple  = dynamic_cast<const TupleValue *>(value))
-					{
-						auto elements = tuple->values();
-
-						storage[storageIndex] = elements.pop();
-					}
-					else
-					{
-						storage[storageIndex] = value;
-					}
+					storage[storageIndex] = iteratorValues.pop();
 
 					linkBlocks(iteratorEntryPoint.block(), block);
 				}
@@ -374,31 +603,56 @@ std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitor
 			return std::make_pair(storageIndex + 1, entryPoint.withBlock(block));
 		});
 
-		auto firstValue = std::accumulate(begin(results), end(results), static_cast<Node *>(TerminatorNode::instance()), [](auto next, auto pair)
+		std::vector<const Type *> elementTypes;
+
+		std::transform(begin(results), end(results), back_inserter(elementTypes), [](auto pair)
 		{
-			auto [index, values] = pair;
+			std::vector<const Type *> t;
 
-			std::vector<const BaseValue *> elements;
+			auto [i, values] = pair;
 
-			std::transform(rbegin(values), rend(values), back_inserter(elements), [](auto value) -> const BaseValue *
+			auto extract = [](auto r, auto rec) -> const Type *
 			{
-				if (!value)
+				if (auto tuple = dynamic_cast<const TupleType *>(r))
 				{
-					return WithoutValue::instance();
+					auto et = tuple->types();
+
+					return rec(et[0], rec);
 				}
 
-				return value;
+				if (auto expanded = dynamic_cast<const ExpandedType *>(r))
+				{
+					auto tt = expanded->types();
+
+					return rec(tt[1], rec);
+				}
+
+				if (auto array = dynamic_cast<const ArrayType *>(r))
+				{
+					auto tt = array->types();
+
+					return rec(tt[0], rec);
+				}
+
+				return r;
+			};
+
+			std::transform(begin(values), end(values), back_inserter(t), [&](auto value)
+			{
+				return extract(value->type(), extract);
 			});
 
-			auto indexSink = new IndexSinkNode(index, next);
-			auto tupleValue = new TupleValue(elements);
-
-			return new StaticNode(tupleValue, indexSink);
+			return TupleType::get(t);
 		});
 
-		auto arraySink = new ArraySinkNode(results.size(), node->ast, TerminatorNode::instance(), firstValue);
+		auto arrayType = ArrayType::get(elementTypes);
 
-		return arraySink->accept(*this, { entryPoint, context.values });
+		auto generator = new Foo(results, node, arrayType, index);
+		auto lazy = new LazyValue(generator, entryPoint);
+
+		context.values.push(lazy);
+
+		return node->consumer->accept(*this, { entryPoint, context.values });
 	}
 
 	auto operandType = left->type();

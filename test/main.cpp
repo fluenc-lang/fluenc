@@ -5702,6 +5702,70 @@ BOOST_AUTO_TEST_CASE (scenario135)
 	BOOST_TEST(result == 3);
 }
 
+BOOST_AUTO_TEST_CASE (scenario136)
+{
+	auto result = exec(R"(
+		function sub((i32 left, i32 right))
+		{
+			return right - left;
+		}
+
+		function sub(((i32 left, i32 right), ...subValues))
+		{
+			return right - left -> add(...subValues);
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...sumValues))
+		{
+			return tail sum(product + value, ...sumValues);
+		}
+
+		function transform((any item, ...items))
+		{
+			return item -> transform(...items);
+		}
+
+		function transform(any item)
+		{
+			return item;
+		}
+
+		export i32 main()
+		{
+			return sum(0, sub(transform([1, 2]) | transform([4, 5])));
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
+BOOST_AUTO_TEST_CASE (scenario137)
+{
+	auto result = exec(R"(
+		function sum(i32 product, (i32 left, i32 right))
+		{
+			return product + (right - left);
+		}
+
+		function sum(i32 product, ((i32 left, i32 right), ...values))
+		{
+			return tail sum(product + (right - left), ...values);
+		}
+
+		export i32 main()
+		{
+			return sum(0, [1, 2] | [4, 5]);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
