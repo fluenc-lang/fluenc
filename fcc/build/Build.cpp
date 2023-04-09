@@ -283,18 +283,18 @@ bool build(const BuildContext &context)
 
 			return output;
 		}
-		catch (CompilerException *exception)
+		catch (const CompilerException &exception)
 		{
-			std::cout << exception->file() << ":" << exception->row() << ":" << exception->column() << ": error: " << exception->message() << std::endl;
-			std::cout << std::setw(5) << exception->row() << " | ";
+			std::cout << exception.file() << ":" << exception.row() << ":" << exception.column() << ": error: " << exception.message() << std::endl;
+			std::cout << std::setw(5) << exception.row() << " | ";
 
 			std::ifstream stream;
 
-			stream.open(exception->file());
+			stream.open(exception.file());
 
 			std::string line;
 
-			for (size_t i = 0u; i < exception->row(); i++)
+			for (size_t i = 0u; i < exception.row(); i++)
 			{
 				std::getline(stream, line);
 			}
@@ -316,17 +316,17 @@ bool build(const BuildContext &context)
 			{
 				auto tokenSelector = [&]
 				{
-					if (i == begin(line) + exception->column())
+					if (i == begin(line) + exception.column())
 					{
 						return "^";
 					}
 
-					if (i < begin(line) + exception->column())
+					if (i < begin(line) + exception.column())
 					{
 						return " ";
 					}
 
-					if (i > begin(line) + exception->column() + exception->length())
+					if (i > begin(line) + exception.column() + exception.length())
 					{
 						return " ";
 					}
