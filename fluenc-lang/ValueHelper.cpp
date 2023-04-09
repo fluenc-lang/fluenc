@@ -153,7 +153,7 @@ const ScalarValue *ValueHelper::getScalar(const std::shared_ptr<peg::Ast> &ast, 
 	auto &expectedMetadata = ScalarValue::staticMetadata();
 	auto &actualMetadata = value->metadata();
 
-	throw new InvalidTypeException(ast
+	throw InvalidTypeException(ast
 		, expectedMetadata.name()
 		, actualMetadata.name()
 		);

@@ -3254,7 +3254,7 @@ BOOST_AUTO_TEST_CASE (scenario84)
 			return 12;
 		}
 	)")
-	, MissingFieldException *
+	, MissingFieldException
 	);
 }
 
@@ -5739,7 +5739,7 @@ BOOST_AUTO_TEST_CASE (scenario136)
 
 		export i32 main()
 		{
-			return sum(0, sub([1, 2] | transform([4, 5])));
+			return sum(0, sub(transform([1, 2]) | transform([4, 5])));
 		}
 	)");
 

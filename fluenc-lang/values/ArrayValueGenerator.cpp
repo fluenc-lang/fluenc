@@ -82,14 +82,14 @@ const BaseValue *ArrayValueGenerator::elementAt(size_t index) const
 {
 	if (m_values.size() != 1)
 	{
-		throw new std::exception();
+		throw std::exception();
 	}
 
 	auto [_, values] = m_values[0];
 
 	if (index >= values.size())
 	{
-		throw new std::exception();
+		throw std::exception();
 	}
 
 	auto indexed = dynamic_cast<const IndexedValue *>(*(values.rbegin() + index));
@@ -113,7 +113,7 @@ const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoi
 		return new ArrayValueGenerator({{ inputEntryPoint, clonedValues }}, m_ast, m_id, m_size);
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 const ILazyValueGenerator *ArrayValueGenerator::forward(size_t id) const

@@ -180,7 +180,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const BaseValue *
 
 		if (values.size() <= 0)
 		{
-			throw new std::exception();
+			throw std::exception();
 		}
 
 		indexedResults.insert({ resultEntryPoint.index(), values[0] });
@@ -275,7 +275,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 
 		if (values.size() <= 0)
 		{
-			throw new std::exception();
+			throw std::exception();
 		}
 
 		indexedResults.insert({ resultEntryPoint.index(), values[0] });

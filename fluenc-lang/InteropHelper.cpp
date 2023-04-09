@@ -83,7 +83,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 				return new NamedValue { field.name(), value };
 			}
 
-			throw new MissingTypeDeclarationException(ast, type->name(), field.name());
+			throw MissingTypeDeclarationException(ast, type->name(), field.name());
 		});
 
 		return new UserTypeValue { prototype, fieldValues };
@@ -121,7 +121,7 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 			return new ScalarValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
 		}
 
-		throw new std::exception();
+		throw std::exception();
 	});
 
 	std::vector<llvm::Type *> elementTypes;

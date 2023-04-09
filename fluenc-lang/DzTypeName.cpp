@@ -91,7 +91,7 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 		}
 	}
 
-	throw new UnknownTypeException(m_ast, m_names[0]);
+	throw UnknownTypeException(m_ast, m_names[0]);
 }
 
 DzTypeName *DzTypeName::int32()

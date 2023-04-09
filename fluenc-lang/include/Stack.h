@@ -58,7 +58,7 @@ class Stack
 			auto &expectedMetadata = TValue::staticMetadata();
 			auto &actualMetadata = value->metadata();
 
-			throw new InvalidTypeException(ast
+			throw InvalidTypeException(ast
 				, expectedMetadata.name()
 				, actualMetadata.name()
 				);

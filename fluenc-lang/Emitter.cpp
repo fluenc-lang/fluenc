@@ -33,6 +33,7 @@
 #include "types/ExpandedType.h"
 #include "types/ByteType.h"
 #include "types/ArrayType.h"
+#include "types/WithoutType.h"
 
 #include "values/ScalarValue.h"
 #include "values/ExpandedValue.h"
@@ -141,7 +142,7 @@ std::vector<DzResult> Emitter::visit(const BooleanBinaryNode *node, DefaultVisit
 		auto operandType = left->type();
 		auto operandTypeName = operandType->name();
 
-		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+		throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -213,7 +214,7 @@ std::vector<DzResult> Emitter::visit(const FloatBinaryNode *node, DefaultVisitor
 		auto operandType = left->type();
 		auto operandTypeName = operandType->name();
 
-		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+		throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -305,7 +306,7 @@ std::vector<DzResult> Emitter::visit(const IntegerBinaryNode *node, DefaultVisit
 		auto operandType = left->type();
 		auto operandTypeName = operandType->name();
 
-		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+		throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -322,7 +323,7 @@ std::vector<DzResult> Emitter::visit(const StringBinaryNode *node, DefaultVisito
 	auto operandType = operand->type();
 	auto operandTypeName = operandType->name();
 
-	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 #include "nodes/ExpansionNode.h"
@@ -332,13 +333,12 @@ using results_t = std::map<size_t, std::array<const BaseValue *, 2>>;
 class Bar : public IIteratable
 {
 	public:
-		Bar(const ReferenceValue *index, const ArrayBinaryNode *node, const Type *arrayType, const std::vector<const IIteratable *> &iteratables)
+		Bar(const ReferenceValue *index, const ArrayBinaryNode *node, const Type *arrayType, const std::vector<const BaseValue *> &iteratables)
 			: m_index(index)
 			, m_node(node)
 			, m_arrayType(arrayType)
 			, m_iteratables(iteratables)
 		{
-
 		}
 
 		struct ThrowNode : public Node
@@ -362,30 +362,42 @@ class Bar : public IIteratable
 
 			results_t results;
 
-//			auto k = new PreEvaluationNode(TerminatorNode::instance());
+			auto pre = new PreEvaluationNode(TerminatorNode::instance());
+			auto post = new PostEvaluationNode();
 
-			auto [_, ep] = std::accumulate(begin(m_iteratables), end(m_iteratables), std::make_pair(0, context.entryPoint), [&](auto pair, auto iteratable)
+			using kak = std::pair<size_t, DzResult>;
+
+			std::vector<kak> jaj;
+
+			auto kasdjajsd = context.entryPoint;
+
+			for (auto i = 0u; i < m_iteratables.size(); i++)
 			{
-				auto [storageIndex, entryPoint] = pair;
+				auto iter = m_iteratables[i];
 
+				for (auto &r : pre->accept(visitor, { kasdjajsd, iter }))
+				{
+					kasdjajsd = r.entryPoint;
+
+					jaj.push_back({ i, r });
+				}
+			}
+
+			for (auto &[i, r] : jaj)
+			{
 				auto block = llvm::BasicBlock::Create(*llvmContext, "merge");
 
-				for (auto [resultEntryPoint, resultValues] : iteratable->accept(visitor, { entryPoint, Stack() }))
+				for (auto &[prep, prva] : post->accept(visitor, { kasdjajsd, r.values }))
 				{
-					auto iterator = resultValues.template require<Iterator>(m_node->ast);
+					auto& storage = results[prep.index()];
 
-					for (auto [iteratorEntryPoint, iteratorValues] : iterator->generate(visitor, { resultEntryPoint, Stack() }))
-					{
-						auto& storage = results[iteratorEntryPoint.index()];
+					storage[i] = prva.pop();
 
-						storage[storageIndex] = iteratorValues.pop();
+					linkBlocks(prep.block(), block);
 
-						linkBlocks(iteratorEntryPoint.block(), block);
-					}
+					kasdjajsd = prep.withBlock(block);
 				}
-
-				return std::make_pair(storageIndex + 1, entryPoint.withBlock(block));
-			});
+			}
 
 			std::vector<DzResult> res;
 
@@ -393,12 +405,12 @@ class Bar : public IIteratable
 
 			auto ab = llvm::BasicBlock::Create(*llvmContext, "besk");
 
-			linkBlocks(ep.block(), ab);
+			linkBlocks(kasdjajsd.block(), ab);
 
-			auto aep = ep
-				.withName("__array")
-				.withBlock(ab)
-				.markEntry();
+			auto aep = kasdjajsd
+//				.withName("__array")
+				.withBlock(ab);
+//				.markEntry();
 
 			auto lep = std::accumulate(begin(results), prev(end(results)), aep, [&](auto kep, auto pair)
 			{
@@ -415,7 +427,7 @@ class Bar : public IIteratable
 					, new ExpansionNode(new ContinuationNode(ThrowNode::instance(), nullptr), nullptr)
 					);
 
-				auto asdh = std::accumulate(rbegin(values), rend(values), static_cast<const Node *>(init), [&](auto next, auto value) -> const Node *
+				auto asdh = std::accumulate(begin(values), end(values), static_cast<const Node *>(init), [&](auto next, auto value) -> const Node *
 				{
 					if (!value)
 					{
@@ -425,7 +437,7 @@ class Bar : public IIteratable
 					{
 						auto tv = tuple->values();
 
-						kas.push_back(tuple);
+						kas.insert(begin(kas), tuple);
 
 						auto actualValue = tv.pop();
 
@@ -500,7 +512,7 @@ class Bar : public IIteratable
 
 			auto [i, values] = pair;
 
-			std::transform(rbegin(values), rend(values), back_inserter(elements), [](auto value) -> const BaseValue *
+			std::transform(begin(values), end(values), back_inserter(elements), [](auto value) -> const BaseValue *
 			{
 				if (!value)
 				{
@@ -522,15 +534,13 @@ class Bar : public IIteratable
 		const ArrayBinaryNode *m_node;
 		const Type *m_arrayType;
 
-		std::vector<const IIteratable *> m_iteratables;
+		std::vector<const BaseValue *> m_iteratables;
 };
-
-#include "types/WithoutType.h"
 
 class Foo : public ILazyValueGenerator
 {
 	public:
-		Foo(const ArrayBinaryNode *node, const std::vector<const LazyValue *> &input)
+		Foo(const ArrayBinaryNode *node, const std::vector<const BaseValue *> &input)
 			: m_node(node)
 			, m_input(input)
 		{
@@ -541,13 +551,6 @@ class Foo : public ILazyValueGenerator
 			UNUSED(mode);
 
 			auto llvmContext = entryPoint.context();
-
-			std::vector<const IIteratable *> iteratables;
-
-			std::transform(begin(m_input), end(m_input), back_inserter(iteratables), [&](auto input)
-			{
-				return input->generate(entryPoint);
-			});
 
 			auto indexType = Int64Type::instance();
 
@@ -563,7 +566,7 @@ class Foo : public ILazyValueGenerator
 
 			builder.createStore(zero, index);
 
-			return new Bar(index, m_node, type(), iteratables);
+			return new Bar(index, m_node, type(), m_input);
 		}
 
 		const ILazyValueGenerator *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override
@@ -631,7 +634,7 @@ class Foo : public ILazyValueGenerator
 	private:
 		const ArrayBinaryNode *m_node;
 
-		std::vector<const LazyValue *> m_input;
+		std::vector<const BaseValue *> m_input;
 };
 
 std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitorContext context) const
@@ -641,7 +644,7 @@ std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitor
 
 	if (node->op == "|")
 	{
-		auto inputs = { left, right };
+		std::vector<const BaseValue *> inputs({ right, left });
 
 		auto generator = new Foo(node, inputs);
 		auto lazy = new LazyValue(generator, context.entryPoint);
@@ -654,7 +657,7 @@ std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitor
 	auto operandType = left->type();
 	auto operandTypeName = operandType->name();
 
-	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const WithoutBinaryNode *node, DefaultVisitorContext context) const
@@ -685,7 +688,7 @@ std::vector<DzResult> Emitter::visit(const UserBinaryNode *node, DefaultVisitorC
 	auto operandType = left->type();
 	auto operandTypeName = operandType->name();
 
-	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorContext context) const
@@ -700,7 +703,7 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 
 	if (TypeCompatibilityCalculator::calculate(context.entryPoint, leftType, rightType) > 1)
 	{
-		throw new BinaryTypeMismatchException(node->ast
+		throw BinaryTypeMismatchException(node->ast
 			, leftType->name()
 			, rightType->name()
 			);
@@ -712,7 +715,7 @@ std::vector<DzResult> Emitter::visit(const BinaryNode *node, DefaultVisitorConte
 	{
 		auto operandTypeName = leftType->name();
 
-		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+		throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 	}
 
 	auto binary = operators->forBinary(node);
@@ -760,7 +763,7 @@ std::vector<DzResult> Emitter::visit(const ExportedFunctionNode *node, DefaultVi
 
 		if (!standardArgument)
 		{
-			throw new InvalidArgumentTypeException(nullptr);
+			throw InvalidArgumentTypeException(nullptr);
 		}
 
 		auto type = standardArgument->type(context.entryPoint);
@@ -955,7 +958,7 @@ std::vector<DzResult> Emitter::visit(const BooleanLiteralNode *node, DefaultVisi
 			return new ScalarValue { type, llvm::ConstantInt::get(storageType, 0) };
 		}
 
-		throw new std::exception(); // TODO
+		throw std::exception(); // TODO
 	};
 
 	auto value = valueProvider();
@@ -1075,7 +1078,7 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 		}
 	}
 
-	throw new UndeclaredIdentifierException(node->m_ast, node->m_names[0]);
+	throw UndeclaredIdentifierException(node->m_ast, node->m_names[0]);
 }
 
 std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisitorContext context) const
@@ -1375,7 +1378,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 			if (!value)
 			{
-				throw new InvalidFunctionPointerTypeException(node->m_ast, name);
+				throw InvalidFunctionPointerTypeException(node->m_ast, name);
 			}
 
 			return value->functions();
@@ -1414,7 +1417,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 				{
 					std::vector<const CallableNode *> functions = { candidate->second, function };
 
-					throw new AmbiguousFunctionException(node->m_ast
+					throw AmbiguousFunctionException(node->m_ast
 						, functions
 						, context.entryPoint
 						);
@@ -1438,7 +1441,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 	if (score == 0)
 	{
-		throw new MissingTailCallException(node->m_ast);
+		throw MissingTailCallException(node->m_ast);
 	}
 
 	auto llvmContext = context.entryPoint.context();
@@ -1460,7 +1463,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 		if (!function)
 		{
-			throw new FunctionNotFoundException(node->m_ast, node->m_names[0], types);
+			throw FunctionNotFoundException(node->m_ast, node->m_names[0], types);
 		}
 
 		auto functionBlock = createBlock(llvmContext);
@@ -1828,7 +1831,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 		if (!field.defaultValue())
 		{
-			throw new MissingDefaultValueException(node->m_ast, field.name());
+			throw MissingDefaultValueException(node->m_ast, field.name());
 		}
 
 		return new NamedValue { field.name(), field.defaultValue() };
@@ -1836,7 +1839,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 	for (auto &[name, _] : valuesByName)
 	{
-		throw new MissingFieldException(node->m_ast, prototype->name(), name);
+		throw MissingFieldException(node->m_ast, prototype->name(), name);
 	}
 
 	IRBuilderEx builder(context.entryPoint);
@@ -2053,7 +2056,7 @@ std::vector<DzResult> Emitter::visit(const ExpansionNode *node, DefaultVisitorCo
 		return node->m_consumer->accept(*this, { consumerEntryPoint, context.values });
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContext context) const
@@ -2169,7 +2172,7 @@ std::vector<DzResult> Emitter::visit(const BooleanUnaryNode *node, DefaultVisito
 		auto operandType = operand->type();
 		auto operandTypeName = operandType->name();
 
-		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+		throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -2186,7 +2189,7 @@ std::vector<DzResult> Emitter::visit(const FloatUnaryNode *node, DefaultVisitorC
 	auto operandType = operand->type();
 	auto operandTypeName = operandType->name();
 
-	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const IntegerUnaryNode *node, DefaultVisitorContext context) const
@@ -2196,7 +2199,7 @@ std::vector<DzResult> Emitter::visit(const IntegerUnaryNode *node, DefaultVisito
 	auto operandType = operand->type();
 	auto operandTypeName = operandType->name();
 
-	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const StringUnaryNode *node, DefaultVisitorContext context) const
@@ -2213,7 +2216,7 @@ std::vector<DzResult> Emitter::visit(const StringUnaryNode *node, DefaultVisitor
 		auto operandType = operand->type();
 		auto operandTypeName = operandType->name();
 
-		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+		throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 	};
 
 	auto value = valueFactory();
@@ -2230,7 +2233,7 @@ std::vector<DzResult> Emitter::visit(const ArrayUnaryNode *node, DefaultVisitorC
 	auto operandType = operand->type();
 	auto operandTypeName = operandType->name();
 
-	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const WithoutUnaryNode *node, DefaultVisitorContext context) const
@@ -2247,7 +2250,7 @@ std::vector<DzResult> Emitter::visit(const UserUnaryNode *node, DefaultVisitorCo
 	auto operandType = operand->type();
 	auto operandTypeName = operandType->name();
 
-	throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+	throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 }
 
 std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContext context) const
@@ -2261,7 +2264,7 @@ std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContex
 	{
 		auto operandTypeName = operandType->name();
 
-		throw new InvalidOperatorException(node->ast, node->op, operandTypeName);
+		throw InvalidOperatorException(node->ast, node->op, operandTypeName);
 	}
 
 	auto unary = operators->forUnary(node);
@@ -2279,9 +2282,16 @@ std::vector<DzResult> Emitter::visit(const UnaryNode *node, DefaultVisitorContex
 	return results;
 }
 
+#include <iostream>
+
 std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVisitorContext context) const
 {
 	auto [score, tailCallTarget, targetValues] = FunctionHelper::tryCreateTailCall(context.entryPoint, context.values, begin(node->m_names), end(node->m_names));
+
+	for (auto &f : context.values)
+	{
+		std::cout << f->type()->fullName() << std::endl;
+	}
 
 	if (score == 0)
 	{
@@ -2308,7 +2318,7 @@ std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVi
 
 	if (score == 1)
 	{
-		throw new std::exception(); // TODO
+		throw std::exception(); // TODO
 	}
 
 	auto junction = new JunctionNode(node->m_regularCall);
@@ -2374,7 +2384,7 @@ std::vector<DzResult> Emitter::visit(const FunctionNode *node, DefaultVisitorCon
 			return results;
 		}
 
-		throw new std::exception();
+		throw std::exception();
 	};
 
 	std::vector<const Type *> types = { new IteratorType() };
@@ -2474,7 +2484,7 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 		}
 		else
 		{
-			throw new InvalidArgumentTypeException(node->m_ast);
+			throw InvalidArgumentTypeException(node->m_ast);
 		}
 	}
 

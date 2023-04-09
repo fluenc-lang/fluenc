@@ -27,7 +27,7 @@ void guardBranch(llvm::BasicBlock *block)
 	{
 		if (llvm::isa <llvm::BranchInst> (instruction))
 		{
-			throw new std::exception();
+			throw std::exception();
 		}
 	}
 }
