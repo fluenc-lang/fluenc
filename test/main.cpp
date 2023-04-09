@@ -5530,7 +5530,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 
 	auto lazy = functionValues.require<LazyValue>(nullptr);
 
-	BOOST_TEST(lazy->type()->name() == "[Item, Item]");
+	auto type = lazy->type();
+
+	BOOST_TEST(type->name() == "[Item, Item]");
 }
 
 BOOST_AUTO_TEST_CASE (scenario131)
@@ -5737,7 +5739,7 @@ BOOST_AUTO_TEST_CASE (scenario136)
 
 		export i32 main()
 		{
-			return sum(0, sub(transform([1, 2]) | transform([4, 5])));
+			return sum(0, sub([1, 2] | transform([4, 5])));
 		}
 	)");
 
