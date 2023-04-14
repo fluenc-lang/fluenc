@@ -105,96 +105,133 @@ function decreaseCounter(State state)
     };
 }
 
-function application1(State state)
+struct ToolBar : Item
 {
-    return [
-		Row {
+	items
+};
+
+struct ToolBarItem : Item
+{
+	text,
+	image
+};
+
+struct IconSource
+{
+	name
+}
+
+function icon(string source)
+{
+	return IconSource
+	{
+		name: source
+	};
+}
+
+function itemsFor((ToolBarItem item, ...items))
+{
+	return itemsFor(item) -> itemsFor(...items);
+}
+
+function itemsFor(ToolBarItem item)
+{
+	return LayoutItem
+	{
+		minimum: 100,
+		item: Row
+		{
 			children: [
-				LayoutItem {
-					stretch: 0,
-					minimum: 100,
-					item: Rectangle {
-						color: rgb(210, 51, 81),
-						children: [
-							Column
-							{
-								children: [
-									LayoutItem {
-										stretch: 0,
-										minimum: 100,
-										item: Rectangle {
-											color: rgb(210, 51, 81),
-											children: [
-												Image {
-													x: 25,// item.x + ((item.width - 50) / 2),
-													y: 25,
-													width: 50,
-													height: 50,
-													source: "dishes.png"
-												}
-											]
-										}
-									},
-									LayoutItem {
-										stretch: 0,
-										minimum: 100,
-										item: Rectangle {
-											color: rgb(210, 51, 81),
-											children: [
-												Image {
-													x: 25,// item.x + ((item.width - 50) / 2),
-													y: 125,
-													width: 50,
-													height: 50,
-													source: "sign-out.png"
-												}
-											]
-										}
-									}
-								]
-							}
-						]
-					}
-				},
-				LayoutItem {
-					stretch: 1,
-					item: Rectangle {
-						color: rgb(255, 255, 255)
+				LayoutItem
+				{
+					minimum: 30,
+					item: Image
+					{
+						source: item.image
 					}
 				}
 			]
 		}
-    ];
+	};
 }
+
+function expand(ToolBar toolBar)
+{
+	return Rectangle
+	{
+		width: toolBar.width,
+		height: toolBar.height,
+		color: window,
+		children: [
+			Row
+			{
+				children: itemsFor(toolBar.items)
+			}
+		]
+	};
+}
+
+global window: rgb(224, 224, 224)
+global light: rgb(255, 255, 255)
 
 function application(State state)
 {
-    return [
-		Row {
-			children: [
-				LayoutItem {
-					stretch: 0,
-					minimum: 100,
-					item: SideBar {
-						items: [
-							SideBarItem {
-								icon: "dishes.png"
-							},
-							SideBarItem {
-								icon: "sign-out.png"
-							}
-						]
-					}
-				},
-				LayoutItem {
-					stretch: 1,
-					item: Rectangle {
-						color: rgb(255, 255, 255)
-					}
+    return Column
+    {
+		spacing: 0,
+		children: [
+			LayoutItem
+			{
+				minimum: 30,
+				item: ToolBar
+				{
+					items: [
+						ToolBarItem
+						{
+							text: "Save",
+							image: "/usr/share/icons/Adwaita/24x24/actions/document-save-symbolic.symbolic.png"
+						},
+						ToolBarItem
+						{
+							text: "Add actor",
+							image: "/usr/share/icons/Adwaita/24x24/actions/list-add-symbolic.symbolic.png"
+						},
+						ToolBarItem
+						{
+							text: "Create easing",
+							image: "/usr/share/icons/Adwaita/24x24/actions/join-symbolic.symbolic.png"
+						},
+						ToolBarItem
+						{
+							text: "Load guides",
+							image: "/usr/share/icons/Adwaita/24x24/actions/show-guides-symbolic.symbolic.png"
+						},
+						ToolBarItem
+						{
+							text: "Settings",
+							image: "/usr/share/icons/Adwaita/24x24/actions/configure-symbolic.symbolic.png"
+						}
+					]
 				}
-			]
-		}
-    ];
+			},
+			LayoutItem
+			{
+				stretch: 1,
+				item: Rectangle
+				{
+					color: light
+				}
+			},
+			LayoutItem
+			{
+				minimum: 30,
+				item: Rectangle
+				{
+					color: window
+				}
+			}
+		]
+    };
 }
 
 function initState()
