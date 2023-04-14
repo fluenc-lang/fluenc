@@ -15,6 +15,8 @@ class UserTypeValue : public BaseValueWithMetadata<UserTypeValueMetadata>
 	public:
 		UserTypeValue(const IPrototype *type, const std::vector<const NamedValue *> &values);
 
+		ValueId id() const override;
+
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 

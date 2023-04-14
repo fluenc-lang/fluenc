@@ -19,6 +19,11 @@ ExpandableValue::ExpandableValue(bool isArray
 {
 }
 
+ValueId ExpandableValue::id() const
+{
+	return ValueId::Expandable;
+}
+
 bool ExpandableValue::isArray() const
 {
 	return m_isArray;

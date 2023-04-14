@@ -8,6 +8,8 @@ class ForwardedValue : public BaseValue
 	public:
 		ForwardedValue(const BaseValue *subject);
 
+		ValueId id() const override;
+
 		const BaseValue *subject() const;
 
 		const Type *type() const override;

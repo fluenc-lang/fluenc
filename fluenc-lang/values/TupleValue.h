@@ -14,6 +14,8 @@ class TupleValue : public BaseValueWithMetadata<TupleValueMetadata>
 	public:
 		TupleValue(const std::vector<const BaseValue *> &values);
 
+		ValueId id() const override;
+
 		size_t size() const;
 
 		const Type *type() const override;

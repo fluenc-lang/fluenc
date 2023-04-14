@@ -8,6 +8,11 @@ Type *AnyType::instance()
 	return &instance;
 }
 
+TypeId AnyType::id() const
+{
+	return TypeId::Any;
+}
+
 std::string AnyType::name() const
 {
 	return "any";

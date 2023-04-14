@@ -12,6 +12,11 @@ ExpandedType::ExpandedType(const std::vector<const Type *> types)
 {
 }
 
+TypeId ExpandedType::id() const
+{
+	return TypeId::Expanded;
+}
+
 std::string ExpandedType::name() const
 {
 	std::stringstream ss;

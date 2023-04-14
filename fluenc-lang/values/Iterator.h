@@ -19,6 +19,8 @@ class Iterator : public BaseValueWithMetadata<IteratorMetadata>
 	public:
 		Iterator(const Node *node, const Type *type, const EntryPoint &entryPoint, const Stack &values, const std::vector<DzResult> &results);
 
+		ValueId id() const override;
+
 		const Type *type() const;
 		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const;
 

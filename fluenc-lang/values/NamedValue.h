@@ -15,6 +15,8 @@ class NamedValue : public BaseValueWithMetadata<NamedValueMetadata>
 	public:
 		NamedValue(const std::string &name, const BaseValue *value);
 
+		ValueId id() const override;
+
 		std::string name() const;
 
 		const BaseValue *value() const;

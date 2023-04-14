@@ -6,6 +6,11 @@ OpaquePointerType::OpaquePointerType(const IPrototype *subject)
 {
 }
 
+TypeId OpaquePointerType::id() const
+{
+	return TypeId::OpaquePointer;
+}
+
 std::string OpaquePointerType::name() const
 {
 	return m_subject->name();

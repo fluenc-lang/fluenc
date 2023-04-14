@@ -10,6 +10,8 @@ class TupleType : public Type
 	public:
 		TupleType(const std::vector<const Type *> types);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 		std::string fullName() const override;
 

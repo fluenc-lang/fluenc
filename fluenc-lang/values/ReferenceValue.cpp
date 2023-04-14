@@ -9,6 +9,11 @@ ReferenceValue::ReferenceValue(const Type *type, llvm::Value *value)
 {
 }
 
+ValueId ReferenceValue::id() const
+{
+	return ValueId::Reference;
+}
+
 const Type *ReferenceValue::type() const
 {
 	return m_type;

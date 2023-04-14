@@ -8,6 +8,8 @@ class ProxyType : public Type
 	public:
 		ProxyType(llvm::Type *type);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;

@@ -10,6 +10,11 @@ const WithoutValue *WithoutValue::instance()
 	return &instance;
 }
 
+ValueId WithoutValue::id() const
+{
+	return ValueId::Without;
+}
+
 const Type *WithoutValue::type() const
 {
 	return WithoutType::instance();

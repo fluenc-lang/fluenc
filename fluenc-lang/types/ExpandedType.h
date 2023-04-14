@@ -10,6 +10,8 @@ class ExpandedType : public Type
 	public:
 		ExpandedType(const std::vector<const Type *> types);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 		std::string fullName() const override;
 

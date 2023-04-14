@@ -83,7 +83,7 @@ const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor
 		return new StringValue(alloc, 0, string->length());
 	}
 
-	if (dynamic_cast<const WithoutType *>(type))
+	if (type->id() == TypeId::Without)
 	{
 		return WithoutValue::instance();
 	}

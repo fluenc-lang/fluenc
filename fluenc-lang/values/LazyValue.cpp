@@ -25,6 +25,11 @@ LazyValue::LazyValue(const ILazyValueGenerator *generator, const EntryPoint &ent
 {
 }
 
+ValueId LazyValue::id() const
+{
+	return ValueId::Lazy;
+}
+
 ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack values)
 {
 	return accumulate(values.begin(), values.end(), seed, [&](auto accumulated, auto value) -> ElementType

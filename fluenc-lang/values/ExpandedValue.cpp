@@ -16,6 +16,11 @@ ExpandedValue::ExpandedValue(bool isArray, const Type *iteratorType, const Entry
 
 }
 
+ValueId ExpandedValue::id() const
+{
+	return ValueId::Expanded;
+}
+
 bool ExpandedValue::isArray() const
 {
 	return m_isArray;

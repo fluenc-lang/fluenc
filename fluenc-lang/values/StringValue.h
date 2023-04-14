@@ -14,6 +14,8 @@ class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 	public:
 		StringValue(const ReferenceValue *address, size_t id, size_t length);
 
+		ValueId id() const override;
+
 		const ReferenceValue *reference() const;
 		const LazyValue *iterator() const;
 

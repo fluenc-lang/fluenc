@@ -3,6 +3,11 @@
 #include "WithoutType.h"
 #include "WithoutOperatorSet.h"
 
+TypeId WithoutType::id() const
+{
+	return TypeId::Without;
+}
+
 std::string WithoutType::name() const
 {
 	return "without";

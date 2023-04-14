@@ -1,6 +1,11 @@
 #include "types/PlaceholderType.h"
 #include "Utility.h"
 
+TypeId PlaceholderType::id() const
+{
+	return TypeId::Placeholder;
+}
+
 std::string PlaceholderType::name() const
 {
 	return "__placeholder";

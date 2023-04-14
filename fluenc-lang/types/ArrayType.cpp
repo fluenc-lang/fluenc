@@ -13,6 +13,11 @@ ArrayType::ArrayType(std::vector<const Type *> types)
 {
 }
 
+TypeId ArrayType::id() const
+{
+	return TypeId::Array;
+}
+
 std::string ArrayType::name() const
 {
 	std::stringstream ss;

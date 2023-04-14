@@ -14,6 +14,8 @@ class LazyValue : public BaseValueWithMetadata<LazyValueMetadata>
 	public:
 		LazyValue(const ILazyValueGenerator *generator, const EntryPoint &entryPoint);
 
+		ValueId id() const override;
+
 		const Type *type() const override;
 
 		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;

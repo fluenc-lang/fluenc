@@ -6,6 +6,8 @@
 class WithoutType : public BuiltinType<WithoutType>
 {
 	public:
+		TypeId id() const override;
+
 		std::string name() const override;
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;

@@ -10,6 +10,8 @@ class OpaquePointerType : public Type
 	public:
 		OpaquePointerType(const IPrototype *subject);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 		std::string fullName() const override;
 

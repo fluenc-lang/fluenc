@@ -11,6 +11,8 @@ class AggregateType : public Type
 	public:
 		AggregateType(const std::vector<const Type *> &subjects);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 		std::string fullName() const override;
 

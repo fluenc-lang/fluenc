@@ -12,6 +12,11 @@ Iterator::Iterator(const Node *node, const Type *type, const EntryPoint &entryPo
 {
 }
 
+ValueId Iterator::id() const
+{
+	return ValueId::Iterator;
+}
+
 const Type *Iterator::type() const
 {
 	return m_type;

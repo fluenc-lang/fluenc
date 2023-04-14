@@ -13,6 +13,8 @@ class FunctionValue : public BaseValueWithMetadata<FunctionValueMetadata>
 	public:
 		FunctionValue(const std::vector<const CallableNode *> functions, const EntryPoint &entryPoint);
 
+		ValueId id() const override;
+
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 

@@ -7,6 +7,11 @@ TupleValue::TupleValue(const std::vector<const BaseValue *> &values)
 {
 }
 
+ValueId TupleValue::id() const
+{
+	return ValueId::Tuple;
+}
+
 size_t TupleValue::size() const
 {
 	return m_values.size();

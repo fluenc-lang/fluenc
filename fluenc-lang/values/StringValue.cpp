@@ -12,6 +12,11 @@ StringValue::StringValue(const ReferenceValue *address, size_t id, size_t length
 {
 }
 
+ValueId StringValue::id() const
+{
+	return ValueId::String;
+}
+
 const ReferenceValue *StringValue::reference() const
 {
 	return m_address;

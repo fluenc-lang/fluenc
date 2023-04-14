@@ -12,6 +12,11 @@ NamedValue::NamedValue(const std::string &name, const BaseValue *value)
 {
 }
 
+ValueId NamedValue::id() const
+{
+	return ValueId::Named;
+}
+
 std::string NamedValue::name() const
 {
 	return m_name;
