@@ -43,3 +43,20 @@ int floatToInt(float value)
 {
     return (int)value;
 }
+
+int i32toi8(int value)
+{
+    return (char)value;
+}
+
+void assignInt(void *buffer, size_t offset, int32_t value)
+{
+    printf("assignInt: %zu %d\n", offset, value);
+
+    *(((char*)buffer) + offset) = (char)value;
+}
+
+void printBuf(char *buffer)
+{
+    printf("printBuf: %s\n", buffer);
+}

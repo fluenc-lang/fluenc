@@ -23,8 +23,89 @@ function process(ApplicationState state, Image image)
     return state.user;
 }
 
+function getSource(IconSource source)
+{
+	// puts(@"foo");
+
+	let a = toArray(malloc(200), 0, String::concat("/usr/share/icons/Adwaita/24x24/actions/", source.name));
+
+	printBuf(a);
+
+	return a;
+}
+
+struct Buffer;
+
+import Buffer malloc(i32 size);
+import Buffer realloc(Buffer ptr, i32 new_size);
+
+import void assignInt(Buffer dest, i32 offset, i32 value);
+import void printBuf(Buffer buffer);
+
+function toArray(Buffer storage, i32 offset, (any c, ...remaining))
+{
+	printnum(offset);
+
+	assignInt(storage, offset, c);
+
+	return tail toArray(realloc(storage, offset + 3), offset + 1, ...remaining);
+}
+
+function toArray(Buffer storage, i32 offset, any c)
+{
+	puts(@"end");
+
+	assignInt(storage, offset, c);
+	assignInt(storage, offset + 1, 0);
+
+	return storage;
+}
+
+namespace String
+{
+	function concat((i32 x, ...xs), i32 y)
+	{
+		puts(@"a");
+
+		return x -> concat(...xs, y);
+	}
+
+	function concat(i32 x, i32 y)
+	{
+		puts(@"b");
+
+		return x -> concat(y);
+	}
+
+	function concat((i32 x, ...xs), (i32 y, ...ys))
+	{
+		puts(@"c");
+
+		return x -> concat(...xs, (y, ys));
+	}
+
+	function concat(i32 x, (i32 y, ...ys))
+	{
+		puts(@"d");
+
+		printnum(x);
+		printnum(y);
+
+		return x -> concat(y, ...ys);
+	}
+
+	function concat(i32 y)
+	{
+		puts(@"e");
+
+		return y;
+	}
+}
+
 function draw(i64 renderer, any parent, Image image)
 {
+	// puts(@"bar");
+
 	let surface = SDL::Image::IMG_Load(@image.source);
 	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
 
