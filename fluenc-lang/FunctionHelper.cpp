@@ -27,19 +27,13 @@ std::tuple<int8_t, const EntryPoint *> findEntryPoint(const EntryPoint &entryPoi
 	int8_t min = 0;
 	int8_t max = 0;
 
-	std::cout << "Trying to match with:" << std::endl;
-
 	std::transform(targetValues.begin(), targetValues.end(), values.begin(), extremities_iterator(min, max), [=](auto storage, auto value)
 	{
 		auto storageType = storage->type();
 		auto valueType = value->type();
 
-		std::cout << storageType->fullName() << std::endl;
-
 		return TypeCompatibilityCalculator::calculate(entryPoint, valueType, storageType);
 	});
-
-	std::cout << std::endl;
 
 	if (min < 0 || max > 0)
 	{

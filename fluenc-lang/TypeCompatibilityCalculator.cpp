@@ -309,21 +309,6 @@ struct Storage
 		{
 			return 1;
 		});
-
-		add<Type, Type>([](const EntryPoint &, auto left, auto right)
-		{
-			if (left == right)
-			{
-				return 0;
-			}
-
-			if (left->name() == right->name())
-			{
-				return 1;
-			}
-
-			return -1;
-		});
 	}
 
 	template<typename TLeft, typename TRight>
@@ -347,6 +332,16 @@ int8_t TypeCompatibilityCalculator::calculate(const EntryPoint &entryPoint, cons
 		{
 			return *result;
 		}
+	}
+
+	if (left == right)
+	{
+		return 0;
+	}
+
+	if (left->name() == right->name())
+	{
+		return 1;
 	}
 
 	return -1;
