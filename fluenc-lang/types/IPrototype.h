@@ -12,7 +12,7 @@ class IPrototype : public Type
 	public:
 		TypeId id() const override
 		{
-			return TypeId::Prototype;
+			return TypeId::IPrototype;
 		}
 
 		virtual const IPrototype *root() const = 0;

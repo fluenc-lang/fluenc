@@ -10,21 +10,24 @@ class IOperatorSet;
 
 enum class TypeId
 {
-	None = 0,
-	Function,
-	OpaquePointer,
-	Proxy,
-	User,
-	Prototype,
-	Builtin,
-	Iterator,
-	Aggregate,
-	Any,
-	Array,
-	Expanded,
-	Tuple,
-	Placeholder,
-	Without,
+	None = -1,
+	Type = 0,
+	IPrototype = (1 << 0),
+	WithPrototype = (1 << 1) + IPrototype,
+	Prototype= (1 << 2) + IPrototype,
+	Function = (1 << 3),
+	Proxy = Function * 2,
+	User = Proxy * 2,
+	OpaquePointer = User * 2,
+	Builtin = OpaquePointer * 2,
+	Iterator = Builtin * 2,
+	Aggregate = Iterator * 2,
+	Any = Aggregate * 2,
+	Array = Any * 2,
+	Expanded = Array * 2,
+	Tuple = Expanded * 2,
+	Placeholder = Tuple * 2,
+	Without = Placeholder * 2 + Builtin,
 };
 
 template <typename T>
@@ -33,6 +36,7 @@ constexpr TypeId type_id_for = TypeId::None;
 template <typename T>
 class BuiltinType;
 
+class Type;
 class FunctionType;
 class OpaquePointerType;
 class ProxyType;
@@ -46,9 +50,18 @@ class ExpandedType;
 class TupleType;
 class PlaceholderType;
 class WithoutType;
+class IBuiltinType;
+class WithPrototype;
+class Prototype;
+
+template <>
+constexpr TypeId type_id_for<Type> = TypeId::Type;
 
 template <typename T>
 constexpr TypeId type_id_for<BuiltinType<T>> = TypeId::Builtin;
+
+template <>
+constexpr TypeId type_id_for<IBuiltinType> = TypeId::Builtin;
 
 template <>
 constexpr TypeId type_id_for<FunctionType> = TypeId::Function;
@@ -63,7 +76,13 @@ template <>
 constexpr TypeId type_id_for<UserType> = TypeId::User;
 
 template <>
-constexpr TypeId type_id_for<IPrototype> = TypeId::Prototype;
+constexpr TypeId type_id_for<IPrototype> = TypeId::IPrototype;
+
+template <>
+constexpr TypeId type_id_for<WithPrototype> = TypeId::WithPrototype;
+
+template <>
+constexpr TypeId type_id_for<Prototype> = TypeId::Prototype;
 
 template <>
 constexpr TypeId type_id_for<IteratorType> = TypeId::Iterator;
@@ -92,7 +111,9 @@ constexpr TypeId type_id_for<WithoutType> = TypeId::Without;
 template <typename T, typename U>
 T type_cast(U* source)
 {
-	if (source->id() == type_id_for<std::remove_cv_t<std::remove_pointer_t<T>>>)
+	auto id = static_cast<uint64_t>(type_id_for<std::remove_cv_t<std::remove_pointer_t<T>>>);
+
+	if ((static_cast<uint64_t>(source->id()) & id) == id)
 	{
 		return reinterpret_cast<T>(source);
 	}

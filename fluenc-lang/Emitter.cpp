@@ -1976,11 +1976,6 @@ std::vector<DzResult> Emitter::visit(const TailFunctionCallNode *node, DefaultVi
 {
 	auto [score, tailCallTarget, targetValues] = FunctionHelper::tryCreateTailCall(context.entryPoint, context.values, begin(node->m_names), end(node->m_names));
 
-	for (auto &f : context.values)
-	{
-		std::cout << f->type()->fullName() << std::endl;
-	}
-
 	if (score == 0)
 	{
 		std::vector<const BaseValue *> cloned;

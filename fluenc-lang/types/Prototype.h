@@ -14,6 +14,11 @@ class Prototype : public IPrototype
 			, const std::vector<ITypeName *> &parentTypes
 			);
 
+		TypeId id() const override
+		{
+			return TypeId::Prototype;
+		}
+
 		const IPrototype *root() const override;
 
 		std::string name() const override;
