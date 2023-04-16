@@ -30,7 +30,7 @@ AllocatorNode::AllocatorNode(const Type *type, const Node *consumer)
 
 const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor &visitor, const EntryPoint &entryPoint)
 {
-	if (auto userType = dynamic_cast<const UserType *>(type))
+	if (auto userType = type_cast<const UserType *>(type))
 	{
 		auto elementTypes = userType->elementTypes();
 		auto prototype = userType->prototype();
@@ -49,7 +49,7 @@ const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor
 		return new UserTypeValue(userType->prototype(), values);
 	}
 
-	if (auto array = dynamic_cast<const ArrayType *>(type))
+	if (auto array = type_cast<const ArrayType *>(type))
 	{
 		auto types = array->types();
 
@@ -76,7 +76,7 @@ const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor
 		}
 	}
 
-	if (auto string = dynamic_cast<const StringType *>(type))
+	if (auto string = type_cast<const StringType *>(type))
 	{
 		auto alloc = entryPoint.alloc(string);
 

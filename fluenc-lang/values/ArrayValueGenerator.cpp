@@ -92,7 +92,7 @@ const BaseValue *ArrayValueGenerator::elementAt(size_t index) const
 		throw std::exception();
 	}
 
-	auto indexed = dynamic_cast<const IndexedValue *>(*(values.rbegin() + index));
+	auto indexed = value_cast<const IndexedValue *>(*(values.rbegin() + index));
 
 	return indexed->subject();
 }

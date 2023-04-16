@@ -50,7 +50,7 @@ class Stack
 		{
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const TValue *>(value))
+			if (auto casted = value_cast<const TValue *>(value))
 			{
 				return casted;
 			}
@@ -74,7 +74,7 @@ class Stack
 
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const TValue *>(value))
+			if (auto casted = value_cast<const TValue *>(value))
 			{
 				return casted;
 			}

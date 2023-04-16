@@ -106,7 +106,7 @@ std::vector<DzResult> AggregateIteratorValue::accept(const DefaultNodeVisitor &v
 			{
 				elements.push_back(WithoutValue::instance());
 			}
-			else if (auto tuple = dynamic_cast<const TupleValue *>(value))
+			else if (auto tuple = value_cast<const TupleValue *>(value))
 			{
 				dependencies.insert(begin(dependencies), tuple);
 
@@ -116,7 +116,7 @@ std::vector<DzResult> AggregateIteratorValue::accept(const DefaultNodeVisitor &v
 
 				elements.push_back(actualValue);
 
-				auto expandable = tupleElements.require<ExpandableValue>(m_node->ast);
+				auto expandable = tupleElements.template require<ExpandableValue>(m_node->ast);
 
 				return new StaticNode(expandable
 					, new ExpansionNode(next, nullptr)

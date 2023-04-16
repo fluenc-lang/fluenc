@@ -29,7 +29,7 @@ class FunctionHelper
 		{
 			return std::accumulate(container.begin(), container.end(), candidate, [&](const EntryPoint *target, auto value) -> const EntryPoint *
 			{
-				if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
+				if (auto userTypeValue = value_cast<const UserTypeValue *>(value))
 				{
 					auto fields = userTypeValue->fields();
 
@@ -43,14 +43,14 @@ class FunctionHelper
 					return findTailCallTarget(target, values);
 				}
 
-				if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
+				if (auto tupleValue = value_cast<const TupleValue *>(value))
 				{
 					return findTailCallTarget(target
 						, tupleValue->values()
 						);
 				}
 
-				if (auto expandedValue = dynamic_cast<const ExpandedValue *>(value))
+				if (auto expandedValue = value_cast<const ExpandedValue *>(value))
 				{
 					auto provider = findTailCallTarget(expandedValue->provider()
 						, expandedValue->next()

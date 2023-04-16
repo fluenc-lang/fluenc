@@ -65,7 +65,7 @@ const Type *AggregateIteratorValueGenerator::type() const
 	{
 		auto type = m_input[i]->type();
 
-		if (auto array = dynamic_cast<const ArrayType *>(type))
+		if (auto array = type_cast<const ArrayType *>(type))
 		{
 			auto types = array->types();
 

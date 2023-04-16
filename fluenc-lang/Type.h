@@ -8,7 +8,7 @@
 class EntryPoint;
 class IOperatorSet;
 
-enum class TypeId
+enum class TypeId : int64_t
 {
 	None = -1,
 	Type = 0,
@@ -16,18 +16,19 @@ enum class TypeId
 	WithPrototype = (1 << 1) + IPrototype,
 	Prototype= (1 << 2) + IPrototype,
 	Function = (1 << 3),
-	Proxy = Function * 2,
-	User = Proxy * 2,
-	OpaquePointer = User * 2,
-	Builtin = OpaquePointer * 2,
-	Iterator = Builtin * 2,
-	Aggregate = Iterator * 2,
-	Any = Aggregate * 2,
-	Array = Any * 2,
-	Expanded = Array * 2,
-	Tuple = Expanded * 2,
-	Placeholder = Tuple * 2,
-	Without = Placeholder * 2 + Builtin,
+	Proxy = (1 << 4),
+	User = (1 << 5),
+	OpaquePointer = (1 << 6),
+	Builtin = (1 << 7),
+	Iterator = (1 << 8),
+	Aggregate = (1 << 9),
+	Any = (1 << 10),
+	Array = (1 << 11),
+	Expanded = (1 << 12),
+	Tuple = (1 << 13),
+	Placeholder = (1 << 14),
+	Without = (1 << 15) + Builtin,
+	String = (1 << 16),
 };
 
 template <typename T>
@@ -53,6 +54,7 @@ class WithoutType;
 class IBuiltinType;
 class WithPrototype;
 class Prototype;
+class StringType;
 
 template <>
 constexpr TypeId type_id_for<Type> = TypeId::Type;
@@ -108,9 +110,17 @@ constexpr TypeId type_id_for<PlaceholderType> = TypeId::Placeholder;
 template <>
 constexpr TypeId type_id_for<WithoutType> = TypeId::Without;
 
+template <>
+constexpr TypeId type_id_for<StringType> = TypeId::String;
+
 template <typename T, typename U>
 T type_cast(U* source)
 {
+	if (!source)
+	{
+		return nullptr;
+	}
+
 	auto id = static_cast<uint64_t>(type_id_for<std::remove_cv_t<std::remove_pointer_t<T>>>);
 
 	if ((static_cast<uint64_t>(source->id()) & id) == id)

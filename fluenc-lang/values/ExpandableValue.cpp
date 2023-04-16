@@ -54,7 +54,7 @@ const Node *ExpandableValue::chain() const
 
 const ExpandedType *ExpandableValue::expandedType() const
 {
-	return dynamic_cast<const ExpandedType *>(m_iteratorType);
+	return type_cast<const ExpandedType *>(m_iteratorType);
 }
 
 const Stack ExpandableValue::values() const

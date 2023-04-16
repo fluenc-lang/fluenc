@@ -34,12 +34,12 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 {
 	return accumulate(values.begin(), values.end(), seed, [&](auto accumulated, auto value) -> ElementType
 	{
-		if (auto tuple = dynamic_cast<const TupleValue *>(value))
+		if (auto tuple = value_cast<const TupleValue *>(value))
 		{
 			return getElementType({ false, accumulated.second }, entryPoint, tuple->values());
 		}
 
-		if (auto expandable = dynamic_cast<const ExpandableValue *>(value))
+		if (auto expandable = value_cast<const ExpandableValue *>(value))
 		{
 			auto chain = expandable->chain();
 			auto provider = expandable->provider();
@@ -55,7 +55,7 @@ ElementType getElementType(ElementType seed, const EntryPoint &entryPoint, Stack
 			return getElementType(accumulated, *provider, chainValues);
 		}
 
-		if (auto expanded = dynamic_cast<const ExpandedValue *>(value))
+		if (auto expanded = value_cast<const ExpandedValue *>(value))
 		{
 			return { expanded->isArray(), expanded->type() };
 		}
@@ -207,7 +207,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const BaseValue *
 		auto sourceValue = sourceResultValues.pop();
 		auto targetValue = indexedResults[sourceResultEntryPoint.index()];
 
-		auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+		auto sourceTupleValue = value_cast<const TupleValue *>(sourceValue);
 
 		if (sourceTupleValue)
 		{
@@ -310,7 +310,7 @@ EntryPoint LazyValue::assignFrom(const EntryPoint &entryPoint, const LazyValue *
 		auto sourceValue = sourceResultValues.pop();
 		auto targetValue = indexedResults[sourceResultEntryPoint.index()];
 
-		auto sourceTupleValue = dynamic_cast<const TupleValue *>(sourceValue);
+		auto sourceTupleValue = value_cast<const TupleValue *>(sourceValue);
 
 		if (sourceTupleValue)
 		{

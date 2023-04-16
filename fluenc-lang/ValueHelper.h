@@ -28,7 +28,7 @@ class ValueHelper
 
 			for (auto i = container.rbegin(); i != container.rend(); i++)
 			{
-				if (auto tupleValue = dynamic_cast<const TupleValue *>(*i))
+				if (auto tupleValue = value_cast<const TupleValue *>(*i))
 				{
 					auto nested = extractValues<T>(tupleValue->values());
 
@@ -38,7 +38,7 @@ class ValueHelper
 					}
 				}
 
-				if (auto toFind = dynamic_cast<const T *>(*i))
+				if (auto toFind = value_cast<const T *>(*i))
 				{
 					values.push_back(toFind);
 				}

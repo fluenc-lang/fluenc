@@ -12,32 +12,49 @@ enum class CloneStrategy
 	Value
 };
 
-enum class ValueId
+enum class ValueId : int64_t
 {
-	None = 0,
-	Reference,
-	Scalar,
-	User,
-	Named,
-	String,
-	Lazy,
-	Tuple,
-	Expanded,
-	Function,
-	Expandable,
-	Iterator,
-	Indexed,
-	Forwarded,
-	Placeholder,
-	Without,
+	None = -1,
+	BaseValue = 0,
+	Reference = (1 << 0),
+	Scalar = (1 << 2),
+	User = (1 << 3),
+	Named = (1 << 4),
+	String = (1 << 5),
+	Lazy = (1 << 6),
+	Tuple = (1 << 7),
+	Expanded = (1 << 8),
+	Function = (1 << 9),
+	Expandable = (1 << 10),
+	Iterator = (1 << 11),
+	Indexed = (1 << 12),
+	Forwarded = (1 << 13),
+	Placeholder = (1 << 14),
+	Without = (1 << 15),
 };
 
 template <typename T>
 constexpr ValueId value_id_for = ValueId::None;
 
+class BaseValue;
 class ReferenceValue;
 class ScalarValue;
 class TupleValue;
+class WithoutValue;
+class PlaceholderValue;
+class UserTypeValue;
+class NamedValue;
+class StringValue;
+class LazyValue;
+class ExpandedValue;
+class FunctionValue;
+class ExpandableValue;
+class Iterator;
+class IndexedValue;
+class ForwardedValue;
+
+template <>
+constexpr ValueId value_id_for<BaseValue> = ValueId::BaseValue;
 
 template <>
 constexpr ValueId value_id_for<ReferenceValue> = ValueId::Reference;
@@ -48,10 +65,50 @@ constexpr ValueId value_id_for<ScalarValue> = ValueId::Scalar;
 template <>
 constexpr ValueId value_id_for<TupleValue> = ValueId::Tuple;
 
+template <>
+constexpr ValueId value_id_for<WithoutValue> = ValueId::Without;
+
+template <>
+constexpr ValueId value_id_for<PlaceholderValue> = ValueId::Placeholder;
+
+template <>
+constexpr ValueId value_id_for<UserTypeValue> = ValueId::User;
+
+template <>
+constexpr ValueId value_id_for<StringValue> = ValueId::String;
+
+template <>
+constexpr ValueId value_id_for<LazyValue> = ValueId::Lazy;
+
+template <>
+constexpr ValueId value_id_for<ExpandedValue> = ValueId::Expanded;
+
+template <>
+constexpr ValueId value_id_for<FunctionValue> = ValueId::Function;
+
+template <>
+constexpr ValueId value_id_for<ExpandableValue> = ValueId::Expandable;
+
+template <>
+constexpr ValueId value_id_for<Iterator> = ValueId::Iterator;
+
+template <>
+constexpr ValueId value_id_for<IndexedValue> = ValueId::Indexed;
+
+template <>
+constexpr ValueId value_id_for<ForwardedValue> = ValueId::Forwarded;
+
 template <typename T, typename U>
 T value_cast(U* source)
 {
-	if (source->id() == value_id_for<std::remove_cv_t<std::remove_pointer_t<T>>>)
+	if (!source)
+	{
+		return nullptr;
+	}
+
+	auto id = static_cast<uint64_t>(value_id_for<std::remove_cv_t<std::remove_pointer_t<T>>>);
+
+	if ((static_cast<uint64_t>(source->id()) & id) == id)
 	{
 		return reinterpret_cast<T>(source);
 	}

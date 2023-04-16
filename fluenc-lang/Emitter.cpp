@@ -712,7 +712,7 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 
 		if (localsIterator != locals.end())
 		{
-			if (auto referenceValue = dynamic_cast<const ReferenceValue *>(localsIterator->second))
+			if (auto referenceValue = value_cast<const ReferenceValue *>(localsIterator->second))
 			{
 				IRBuilderEx builder(context.entryPoint);
 
@@ -775,7 +775,7 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 	{
 		IRBuilderEx builder(context.entryPoint);
 
-		if (auto typedValue = dynamic_cast<const ScalarValue *>(value))
+		if (auto typedValue = value_cast<const ScalarValue *>(value))
 		{
 			auto argumentType = typedValue->type();
 
@@ -786,12 +786,12 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 			return alloc;
 		}
 
-		if (auto referenceValue = dynamic_cast<const ReferenceValue *>(value))
+		if (auto referenceValue = value_cast<const ReferenceValue *>(value))
 		{
 			return referenceValue->clone(context.entryPoint, CloneStrategy::Value);
 		}
 
-		if (auto tupleValue = dynamic_cast<const TupleValue *>(value))
+		if (auto tupleValue = value_cast<const TupleValue *>(value))
 		{
 			auto tupleValues = tupleValue->values();
 
@@ -805,7 +805,7 @@ std::vector<DzResult> Emitter::visit(const ReferenceSinkNode *node, DefaultVisit
 			return new TupleValue(values);
 		}
 
-		if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
+		if (auto userTypeValue = value_cast<const UserTypeValue *>(value))
 		{
 			auto fields = userTypeValue->fields();
 
@@ -837,7 +837,7 @@ std::vector<DzResult> Emitter::visit(const PreEvaluationNode *node, DefaultVisit
 		{
 			auto value = values.pop();
 
-			if (auto lazy = dynamic_cast<const LazyValue *>(value))
+			if (auto lazy = value_cast<const LazyValue *>(value))
 			{
 				auto iteratable = lazy->generate(entryPoint);
 
@@ -861,7 +861,7 @@ std::vector<DzResult> Emitter::visit(const PreEvaluationNode *node, DefaultVisit
 				return results;
 			}
 
-			if (auto string = dynamic_cast<const StringValue *>(value))
+			if (auto string = value_cast<const StringValue *>(value))
 			{
 				auto iterator =	string->iterator();
 
@@ -917,7 +917,7 @@ std::vector<DzResult> Emitter::visit(const PostEvaluationNode *node, DefaultVisi
 		{
 			auto value = values.pop();
 
-			if (auto iterator = dynamic_cast<const Iterator *>(value))
+			if (auto iterator = value_cast<const Iterator *>(value))
 			{
 				std::vector<DzResult> results;
 
@@ -939,7 +939,7 @@ std::vector<DzResult> Emitter::visit(const PostEvaluationNode *node, DefaultVisi
 				return results;
 			}
 
-			if (auto forwarded = dynamic_cast<const ForwardedValue *>(value))
+			if (auto forwarded = value_cast<const ForwardedValue *>(value))
 			{
 				std::vector<DzResult> results;
 
@@ -962,11 +962,11 @@ std::vector<DzResult> Emitter::visit(const PostEvaluationNode *node, DefaultVisi
 				return results;
 			}
 
-			if (auto tuple = dynamic_cast<const TupleValue *>(value))
+			if (auto tuple = value_cast<const TupleValue *>(value))
 			{
 				for (auto &element : tuple->values())
 				{
-					if (auto expanded = dynamic_cast<const ExpandedValue *>(element))
+					if (auto expanded = value_cast<const ExpandedValue *>(element))
 					{
 						std::vector<DzResult> results;
 
@@ -1062,7 +1062,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 		if (local != locals.end())
 		{
-			auto value = dynamic_cast<const FunctionValue *>(local->second);
+			auto value = value_cast<const FunctionValue *>(local->second);
 
 			if (!value)
 			{
@@ -1268,7 +1268,7 @@ std::vector<DzResult> Emitter::visit(const StackSegmentNode *node, DefaultVisito
 
 			auto returnValue = callValues.peek();
 
-			return dynamic_cast<const TupleValue *>(returnValue) != nullptr;
+			return returnValue->id() == ValueId::Tuple;
 		});
 
 		if (producesIterator)
@@ -1321,7 +1321,7 @@ std::vector<DzResult> Emitter::visit(const FunctionCallProxyNode *node, DefaultV
 
 		auto returnValue = preliminaryValues.peek();
 
-		if (dynamic_cast<const Iterator *>(returnValue))
+		if (returnValue->id() == ValueId::Iterator)
 		{
 			auto subject = new IteratorValueGenerator(new IteratorType(), node->m_regularCall, context.entryPoint);
 			auto generator = new IteratorValueGeneratorProxy(subject, preliminaryEntryPoint, preliminaryResults);
@@ -1374,12 +1374,12 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 				return false;
 			}
 
-			if (dynamic_cast<const TupleType *>(x))
+			if (x->id() == TypeId::Tuple)
 			{
 				return true;
 			}
 
-			if (dynamic_cast<const TupleType *>(y))
+			if (y->id() == TypeId::Tuple)
 			{
 				return false;
 			}
@@ -1493,7 +1493,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 			valuesByName.erase(valueByName);
 
-			if (auto reference = dynamic_cast<const ReferenceValue *>(field.defaultValue()))
+			if (auto reference = value_cast<const ReferenceValue *>(field.defaultValue()))
 			{
 				if (reference->type() != value->type())
 				{
@@ -1538,7 +1538,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 	{
 		auto value = field->value();
 
-		if (auto typedValue = dynamic_cast<const ScalarValue *>(value))
+		if (auto typedValue = value_cast<const ScalarValue *>(value))
 		{
 			auto type = typedValue->type();
 
@@ -1753,7 +1753,7 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 
 	auto value = context.values.pop();
 
-	if (auto userValue = dynamic_cast<const UserTypeValue * >(value))
+	if (auto userValue = value_cast<const UserTypeValue * >(value))
 	{
 		auto fields = userValue->fields();
 
@@ -1768,7 +1768,7 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 		});
 	}
 
-	if (auto lazyValue = dynamic_cast<const LazyValue *>(value))
+	if (auto lazyValue = value_cast<const LazyValue *>(value))
 	{
 		auto type = lazyValue->type();
 
@@ -1776,8 +1776,7 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 		// a new, temporary array and copy the iteration result into it.
 		// This will ensure that multiple iterations are cheap.
 		//
-
-		if (dynamic_cast<const ArrayType *>(type))
+		if (type->id() == TypeId::Array)
 		{
 			auto allocator = new AllocatorNode(type, TerminatorNode::instance());
 
@@ -2029,7 +2028,7 @@ std::vector<DzResult> Emitter::visit(const FunctionNode *node, DefaultVisitorCon
 				{ name, value }
 			};
 
-			if (auto userValue = dynamic_cast<const UserTypeValue * >(value))
+			if (auto userValue = value_cast<const UserTypeValue * >(value))
 			{
 				auto fields = userValue->fields();
 
@@ -2049,7 +2048,7 @@ std::vector<DzResult> Emitter::visit(const FunctionNode *node, DefaultVisitorCon
 
 		if (auto tupleArgument = dynamic_cast<DzTupleArgument *>(argument))
 		{
-			auto tupleValue = dynamic_cast<const TupleValue *>(value);
+			auto tupleValue = value_cast<const TupleValue *>(value);
 
 			auto tupleValues = tupleValue->values();
 			auto arguments = tupleArgument->arguments();
@@ -2146,19 +2145,19 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 
 			auto value = context.values.pop();
 
-			if (auto addressOfArgument = dynamic_cast<const ReferenceValue *>(value))
+			if (auto addressOfArgument = value_cast<const ReferenceValue *>(value))
 			{
 				auto load = builder.createLoad(addressOfArgument, name);
 
 				argumentValues.push_back(*load);
 			}
-			else if (auto stringValue = dynamic_cast<const StringValue *>(value))
+			else if (auto stringValue = value_cast<const StringValue *>(value))
 			{
 				auto load = builder.createLoad(stringValue->reference());
 
 				argumentValues.push_back(*load);
 			}
-			else if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(value))
+			else if (auto userTypeValue = value_cast<const UserTypeValue *>(value))
 			{
 				auto cast = InteropHelper::createWriteProxy(userTypeValue, context.entryPoint);
 
@@ -2198,7 +2197,7 @@ std::vector<DzResult> Emitter::visit(const ReturnNode *node, DefaultVisitorConte
 	{
 		auto value = context.values.pop();
 
-		if (auto typedValue = dynamic_cast<const ScalarValue *>(value))
+		if (auto typedValue = value_cast<const ScalarValue *>(value))
 		{
 			IRBuilderEx builder(context.entryPoint);
 

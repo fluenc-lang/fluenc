@@ -32,7 +32,7 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 
 	IRBuilderEx builder(entryPoint);
 
-	if (auto prototype = dynamic_cast<const IPrototype *>(type))
+	if (auto prototype = type_cast<const IPrototype *>(type))
 	{
 		Emitter emitter;
 
@@ -111,12 +111,12 @@ llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue,
 	{
 		auto fieldValue = field->value();
 
-		if (auto reference = dynamic_cast<const ReferenceValue *>(fieldValue))
+		if (auto reference = value_cast<const ReferenceValue *>(fieldValue))
 		{
 			return builder.createLoad(reference, field->name());
 		}
 
-		if (auto userTypeValue = dynamic_cast<const UserTypeValue *>(fieldValue))
+		if (auto userTypeValue = value_cast<const UserTypeValue *>(fieldValue))
 		{
 			return new ScalarValue { userTypeValue->type(), createWriteProxy(userTypeValue, entryPoint) };
 		}
