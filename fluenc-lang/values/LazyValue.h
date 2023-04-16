@@ -29,6 +29,8 @@ class LazyValue : public BaseValueWithMetadata<LazyValueMetadata>
 	private:
 		const ILazyValueGenerator *m_generator;
 		const EntryPoint *m_entryPoint;
+
+		mutable const Type *m_type;
 };
 
 #endif // LAZYVALUE_H

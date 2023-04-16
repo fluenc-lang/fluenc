@@ -22,6 +22,7 @@ using ElementType = std::pair<bool, const Type *>;
 LazyValue::LazyValue(const ILazyValueGenerator *generator, const EntryPoint &entryPoint)
 	: m_generator(generator)
 	, m_entryPoint(new EntryPoint(entryPoint))
+	, m_type(nullptr)
 {
 }
 
@@ -73,71 +74,81 @@ std::vector<DzResult> expandIterator(const Emitter &emitter, DefaultVisitorConte
 
 const Type *LazyValue::type() const
 {
-	auto context = m_entryPoint->context();
-
-	auto block = createBlock(context);
-	auto alloc = createBlock(context);
-
-	linkBlocks(alloc, block);
-
-	auto entryPoint = (*m_entryPoint)
-		.withBlock(block)
-		.withAlloc(alloc);
-
-	auto iteratable = m_generator->generate(entryPoint, GenerationMode::DryRun);
-
-	Emitter analyzer;
-
-	std::vector<DzResult> results;
-
-	for (auto &[resultEntryPoint, resultValues] : iteratable->accept(analyzer, { entryPoint, Stack() }))
+	if (m_type)
 	{
-		auto resultBlock = createBlock(context);
-
-		auto withBlock = resultEntryPoint.withBlock(resultBlock);
-
-		for (auto &result : expandIterator(analyzer, { withBlock, resultValues }))
-		{
-			results.push_back(result);
-		}
+		return m_type;
 	}
 
-	std::map<int, const Type *> typesByIndex;
-
-	for (auto &[resultEntryPoint, resultValues] : results)
+	auto getType = [&]() -> const Type *
 	{
-		auto resultBlock = createBlock(context);
+		auto context = m_entryPoint->context();
 
-		auto withBlock = resultEntryPoint.withBlock(resultBlock);
+		auto block = createBlock(context);
+		auto alloc = createBlock(context);
 
-		auto [isArrayCompatible, type] = getElementType({ true, nullptr }, withBlock, resultValues);
+		linkBlocks(alloc, block);
 
-		if (!isArrayCompatible)
+		auto entryPoint = (*m_entryPoint)
+			.withBlock(block)
+			.withAlloc(alloc);
+
+		auto iteratable = m_generator->generate(entryPoint, GenerationMode::DryRun);
+
+		Emitter analyzer;
+
+		std::vector<DzResult> results;
+
+		for (auto &[resultEntryPoint, resultValues] : iteratable->accept(analyzer, { entryPoint, Stack() }))
 		{
-			return m_generator->type();
-		}
+			auto resultBlock = createBlock(context);
 
-		auto index = resultEntryPoint.index();
+			auto withBlock = resultEntryPoint.withBlock(resultBlock);
 
-		if (auto existing = typesByIndex.find(index); existing != end(typesByIndex))
-		{
-			if (TypeCompatibilityCalculator::calculate(entryPoint, existing->second, type) != 0)
+			for (auto &result : expandIterator(analyzer, { withBlock, resultValues }))
 			{
-				return m_generator->type();
+				results.push_back(result);
 			}
 		}
 
-		typesByIndex[index] = type;
-	}
+		std::map<int, const Type *> typesByIndex;
 
-	std::vector<const Type *> types;
+		for (auto &[resultEntryPoint, resultValues] : results)
+		{
+			auto resultBlock = createBlock(context);
 
-	transform(begin(typesByIndex), end(typesByIndex), back_inserter(types), [](auto pair)
-	{
-		return pair.second;
-	});
+			auto withBlock = resultEntryPoint.withBlock(resultBlock);
 
-	return ArrayType::get(types);
+			auto [isArrayCompatible, type] = getElementType({ true, nullptr }, withBlock, resultValues);
+
+			if (!isArrayCompatible)
+			{
+				return m_generator->type();
+			}
+
+			auto index = resultEntryPoint.index();
+
+			if (auto existing = typesByIndex.find(index); existing != end(typesByIndex))
+			{
+				if (TypeCompatibilityCalculator::calculate(entryPoint, existing->second, type) != 0)
+				{
+					return m_generator->type();
+				}
+			}
+
+			typesByIndex[index] = type;
+		}
+
+		std::vector<const Type *> types;
+
+		transform(begin(typesByIndex), end(typesByIndex), back_inserter(types), [](auto pair)
+		{
+			return pair.second;
+		});
+
+		return ArrayType::get(types);
+	};
+
+	return m_type = getType();
 }
 
 const BaseValue *LazyValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const
