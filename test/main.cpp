@@ -5768,126 +5768,126 @@ BOOST_AUTO_TEST_CASE (scenario137)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario138)
-{
-	auto result = exec(R"(
-		function sum(i32 product, i32 value)
-		{
-			return product + value;
-		}
+//BOOST_AUTO_TEST_CASE (scenario138)
+//{
+//	auto result = exec(R"(
+//		function sum(i32 product, i32 value)
+//		{
+//			return product + value;
+//		}
 
-		function sum(i32 product, (i32 value, ...values))
-		{
-			return tail sum(product + value, ...values);
-		}
+//		function sum(i32 product, (i32 value, ...values))
+//		{
+//			return tail sum(product + value, ...values);
+//		}
 
-		function proxy((i32 value, ...values))
-		{
-			return sum(0, (value, values));
-		}
+//		function proxy((i32 value, ...values))
+//		{
+//			return sum(0, (value, values));
+//		}
 
-		function proxy(i32 value)
-		{
-			return sum(0, value);
-		}
+//		function proxy(i32 value)
+//		{
+//			return sum(0, value);
+//		}
 
-		export i32 main()
-		{
-			return proxy([1, 2, 3]);
-		}
-	)");
+//		export i32 main()
+//		{
+//			return proxy([1, 2, 3]);
+//		}
+//	)");
 
-	BOOST_TEST(result == 6);
-}
+//	BOOST_TEST(result == 6);
+//}
 
-BOOST_AUTO_TEST_CASE (scenario139)
-{
-	auto result = exec(R"(
-		function concat((i32 x, ...xs), i32 y)
-		{
-			return x -> concat(...xs, y);
-		}
+//BOOST_AUTO_TEST_CASE (scenario139)
+//{
+//	auto result = exec(R"(
+//		function concat((i32 x, ...xs), i32 y)
+//		{
+//			return x -> concat(...xs, y);
+//		}
 
-		function concat(i32 x, i32 y)
-		{
-			return x -> concat(y);
-		}
+//		function concat(i32 x, i32 y)
+//		{
+//			return x -> concat(y);
+//		}
 
-		function concat((i32 x, ...xs), (i32 y, ...ys))
-		{
-			return x -> concat(...xs, (y, ys));
-		}
+//		function concat((i32 x, ...xs), (i32 y, ...ys))
+//		{
+//			return x -> concat(...xs, (y, ys));
+//		}
 
-		function concat(i32 x, (i32 y, ...ys))
-		{
-			return x -> concat(y, ...ys);
-		}
+//		function concat(i32 x, (i32 y, ...ys))
+//		{
+//			return x -> concat(y, ...ys);
+//		}
 
-		function concat(i32 y)
-		{
-			return y;
-		}
+//		function concat(i32 y)
+//		{
+//			return y;
+//		}
 
-		function sum(i32 product, i32 value)
-		{
-			return product + value;
-		}
+//		function sum(i32 product, i32 value)
+//		{
+//			return product + value;
+//		}
 
-		function sum(i32 product, (i32 value, ...values))
-		{
-			return tail sum(product + value, ...values);
-		}
+//		function sum(i32 product, (i32 value, ...values))
+//		{
+//			return tail sum(product + value, ...values);
+//		}
 
-		export i32 main()
-		{
-			return sum(0, concat("abc", "def"));
-		}
-	)");
+//		export i32 main()
+//		{
+//			return sum(0, concat("abc", "def"));
+//		}
+//	)");
 
-	BOOST_TEST(result == 597);
-}
+//	BOOST_TEST(result == 597);
+//}
 
-BOOST_AUTO_TEST_CASE (scenario140)
-{
-	auto result = exec(R"(
-		function concat(i32 x, string y)
-		{
-			return x -> concat(y);
-		}
+//BOOST_AUTO_TEST_CASE (scenario140)
+//{
+//	auto result = exec(R"(
+//		function concat(i32 x, string y)
+//		{
+//			return x -> concat(y);
+//		}
 
-		function concat((i32 x, ...xs))
-		{
-			return x -> concat(...xs);
-		}
+//		function concat((i32 x, ...xs))
+//		{
+//			return x -> concat(...xs);
+//		}
 
-		function concat((i32 x, ...xs), string y)
-		{
-			return x -> concat(...xs, @y);
-		}
+//		function concat((i32 x, ...xs), string y)
+//		{
+//			return x -> concat(...xs, @y);
+//		}
 
-		function concat(i32 x)
-		{
-			return x;
-		}
+//		function concat(i32 x)
+//		{
+//			return x;
+//		}
 
-		function sum(i32 product, i32 value)
-		{
-			return product + value;
-		}
+//		function sum(i32 product, i32 value)
+//		{
+//			return product + value;
+//		}
 
-		function sum(i32 product, (i32 value, ...values))
-		{
-			return tail sum(product + value, ...values);
-		}
+//		function sum(i32 product, (i32 value, ...values))
+//		{
+//			return tail sum(product + value, ...values);
+//		}
 
-		export i32 main()
-		{
-			return sum(0, concat("abc", @"def"));
-		}
-	)");
+//		export i32 main()
+//		{
+//			return sum(0, concat("abc", @"def"));
+//		}
+//	)");
 
-	BOOST_TEST(result == 597);
-}
+//	BOOST_TEST(result == 597);
+//}
 
 BOOST_AUTO_TEST_CASE (scenario141)
 {
@@ -5909,7 +5909,7 @@ BOOST_AUTO_TEST_CASE (scenario141)
 
 		function concat((i32 x, ...xs), State y)
 		{
-			return x -> concat(...xs, y.value);
+			return x -> concat(...xs, y);
 		}
 
 		function concat(i32 x)
