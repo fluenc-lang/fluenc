@@ -972,23 +972,28 @@ std::vector<DzResult> Emitter::visit(const PostEvaluationNode *node, DefaultVisi
 
 						auto node = expanded->node();
 
-						for (auto &[inputEntryPoint, inputValues] : recurse(entryPoint, expanded->values(), recurse))
+						auto pre = new PreEvaluationNode(TerminatorNode::instance());
+
+						for (auto &[rep, rva] : pre->accept(*this, { entryPoint, expanded->values() }))
 						{
-							for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { inputEntryPoint, inputValues }))
+							for (auto &[inputEntryPoint, inputValues] : recurse(rep, rva, recurse))
 							{
-								auto forwardedEntryPoint = entryPoint
-									.withBlock(resultEntryPoint.block());
-
-								for (auto &[finalEntryPoint, finalValues] : recurse(forwardedEntryPoint, resultValues, recurse))
+								for (auto &[resultEntryPoint, resultValues] : node->accept(*this, { inputEntryPoint, inputValues }))
 								{
-									auto forwardedValues = values;
+									auto forwardedEntryPoint = entryPoint
+										.withBlock(resultEntryPoint.block());
 
-									for (auto resultValue : finalValues)
+									for (auto &[finalEntryPoint, finalValues] : recurse(forwardedEntryPoint, resultValues, recurse))
 									{
-										forwardedValues.push(resultValue);
-									}
+										auto forwardedValues = values;
 
-									results.push_back({ finalEntryPoint, forwardedValues });
+										for (auto resultValue : finalValues)
+										{
+											forwardedValues.push(resultValue);
+										}
+
+										results.push_back({ finalEntryPoint, forwardedValues });
+									}
 								}
 							}
 						}
