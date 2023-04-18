@@ -23,11 +23,24 @@ function process(ApplicationState state, Image image)
     return state.user;
 }
 
+struct Wrapper
+{
+	value
+};
+
+function poo(string s)
+{
+	return Wrapper
+	{
+		value: s
+	};
+}
+
 function getSource(IconSource source)
 {
 	// puts(@"foo");
 
-	let a = toArray(malloc(200), 0, String::concat("/usr/share/icons/Adwaita/24x24/actions/", source.name));
+	let a = toArray(malloc(200), 0, String::concat("/usr/share/icons/Adwaita/24x24/actions/", poo(@source.name)));
 
 	printBuf(a);
 
@@ -77,21 +90,28 @@ namespace String
 		return x -> concat(y);
 	}
 
-	function concat((i32 x, ...xs), (i32 y, ...ys))
+	function concat((i32 x, ...xs), Wrapper w)
 	{
 		puts(@"c");
 
-		return x -> concat(...xs, (y, ys));
+		return x -> concat(...xs, w);
 	}
 
-	function concat(i32 x, (i32 y, ...ys))
+	function concat((i32 x, ...xs))
+	{
+		puts(@"c");
+
+		return x -> concat(...xs);
+	}
+
+	function concat(i32 x, Wrapper w)
 	{
 		puts(@"d");
 
 		printnum(x);
-		printnum(y);
+		// printnum(y);
 
-		return x -> concat(y, ...ys);
+		return x -> concat(w.value);
 	}
 
 	function concat(i32 y)
@@ -106,7 +126,7 @@ function draw(i64 renderer, any parent, Image image)
 {
 	// puts(@"bar");
 
-	let surface = SDL::Image::IMG_Load(@image.source);
+	let surface = SDL::Image::IMG_Load(getSource(image.source));
 	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
 
 	SDL::SDL_RenderCopy(renderer, texture, 0i64, boundingRect(image));

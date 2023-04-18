@@ -2,7 +2,7 @@ namespace SDL::Image
 {
     import i32 IMG_Init(u32 flags);
 
-    import SDL::SDL_Surface IMG_Load(string file);
+    import SDL::SDL_Surface IMG_Load(Buffer file);
 
     global INIT_JPG: 0x00000001u32;
     global INIT_PNG: 0x00000002u32;

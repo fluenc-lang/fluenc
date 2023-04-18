@@ -189,28 +189,28 @@ function application(State state)
 						ToolBarItem
 						{
 							text: "Save",
-							image: "/usr/share/icons/Adwaita/24x24/actions/document-save-symbolic.symbolic.png"
+							image: icon(@"document-save-symbolic.symbolic.png")
 						},
-						ToolBarItem
-						{
-							text: "Add actor",
-							image: "/usr/share/icons/Adwaita/24x24/actions/list-add-symbolic.symbolic.png"
-						},
-						ToolBarItem
-						{
-							text: "Create easing",
-							image: "/usr/share/icons/Adwaita/24x24/actions/join-symbolic.symbolic.png"
-						},
-						ToolBarItem
-						{
-							text: "Load guides",
-							image: "/usr/share/icons/Adwaita/24x24/actions/show-guides-symbolic.symbolic.png"
-						},
-						ToolBarItem
-						{
-							text: "Settings",
-							image: "/usr/share/icons/Adwaita/24x24/actions/configure-symbolic.symbolic.png"
-						}
+						// ToolBarItem
+						// {
+						// 	text: "Add actor",
+						// 	image: "/usr/share/icons/Adwaita/24x24/actions/list-add-symbolic.symbolic.png"
+						// },
+						// ToolBarItem
+						// {
+						// 	text: "Create easing",
+						// 	image: "/usr/share/icons/Adwaita/24x24/actions/join-symbolic.symbolic.png"
+						// },
+						// ToolBarItem
+						// {
+						// 	text: "Load guides",
+						// 	image: "/usr/share/icons/Adwaita/24x24/actions/show-guides-symbolic.symbolic.png"
+						// },
+						// ToolBarItem
+						// {
+						// 	text: "Settings",
+						// 	image: "/usr/share/icons/Adwaita/24x24/actions/configure-symbolic.symbolic.png"
+						// }
 					]
 				}
 			},
