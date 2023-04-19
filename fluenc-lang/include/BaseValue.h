@@ -34,7 +34,7 @@ enum class ValueId : int64_t
 };
 
 template <typename T>
-constexpr ValueId value_id_for = ValueId::None;
+static constexpr ValueId value_id_for = ValueId::None;
 
 class BaseValue;
 class ReferenceValue;
