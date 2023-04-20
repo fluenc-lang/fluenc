@@ -4,6 +4,8 @@
 
 #include "iterators/ExtremitiesIterator.h"
 
+#include <iostream>
+
 std::tuple<int8_t, const EntryPoint *> findEntryPoint(const EntryPoint &entryPoint, const std::string &name, const Stack &values)
 {
 	auto tailCallCandidate = entryPoint

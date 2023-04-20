@@ -28,14 +28,14 @@ class TransferStrategy : public ITransferStrategy
 
 		std::optional<EntryPoint> invoke(const EntryPoint &entryPoint, const BaseValue *source, const BaseValue *target, const Emitter &emitter) const override
 		{
-			auto castedSource = dynamic_cast<const TSource *>(source);
+			auto castedSource = value_cast<const TSource *>(source);
 
 			if (!castedSource)
 			{
 				return {};
 			}
 
-			auto castedTarget = dynamic_cast<const TTarget *>(target);
+			auto castedTarget = value_cast<const TTarget *>(target);
 
 			if (!castedTarget)
 			{

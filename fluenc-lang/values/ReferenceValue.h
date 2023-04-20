@@ -12,6 +12,8 @@ class ReferenceValue : public BaseValueWithMetadata<ReferenceValueMetadata>
 	public:
 		ReferenceValue(const Type *type, llvm::Value *value);
 
+		ValueId id() const override;
+
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 

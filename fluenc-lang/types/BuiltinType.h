@@ -11,6 +11,11 @@ template<typename T>
 class BuiltinType : public IBuiltinType
 {
 	public:
+		TypeId id() const override
+		{
+			return TypeId::Builtin;
+		}
+
 		static Type *instance()
 		{
 			static T instance;

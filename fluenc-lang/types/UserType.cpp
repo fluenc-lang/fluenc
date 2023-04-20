@@ -15,6 +15,11 @@ UserType::UserType(const IPrototype *prototype, const std::vector<const Type *> 
 {
 }
 
+TypeId UserType::id() const
+{
+	return TypeId::User;
+}
+
 std::string UserType::name() const
 {
 	return m_prototype->name();

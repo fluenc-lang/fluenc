@@ -6,6 +6,11 @@ IndexedValue::IndexedValue(size_t index, const BaseValue *subject)
 {
 }
 
+ValueId IndexedValue::id() const
+{
+	return ValueId::Indexed;
+}
+
 size_t IndexedValue::index() const
 {
 	return m_index;

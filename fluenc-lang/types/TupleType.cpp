@@ -9,6 +9,11 @@ TupleType::TupleType(const std::vector<const Type *> types)
 {
 }
 
+TypeId TupleType::id() const
+{
+	return TypeId::Tuple;
+}
+
 std::string TupleType::name() const
 {
 	std::stringstream ss;

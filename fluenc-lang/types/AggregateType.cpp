@@ -7,6 +7,11 @@ AggregateType::AggregateType(const std::vector<const Type *> &subjects)
 {
 }
 
+TypeId AggregateType::id() const
+{
+	return TypeId::Aggregate;
+}
+
 std::string AggregateType::name() const
 {
 	std::ostringstream stream;

@@ -14,6 +14,11 @@ FunctionValue::FunctionValue(const std::vector<const CallableNode *> functions, 
 {
 }
 
+ValueId FunctionValue::id() const
+{
+	return ValueId::Function;
+}
+
 const Type *FunctionValue::type() const
 {
 	std::vector<const Type *> functionTypes;

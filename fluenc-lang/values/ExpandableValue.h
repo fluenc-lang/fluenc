@@ -26,6 +26,8 @@ class ExpandableValue : public BaseValueWithMetadata<ExpandableValueMetadata>
 			, const Stack &values
 			);
 
+		ValueId id() const override;
+
 		bool isArray() const;
 
 		const Type *type() const override;

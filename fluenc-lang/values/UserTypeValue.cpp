@@ -10,6 +10,11 @@ UserTypeValue::UserTypeValue(const IPrototype *type, const std::vector<const Nam
 {
 }
 
+ValueId UserTypeValue::id() const
+{
+	return ValueId::User;
+}
+
 const Type *UserTypeValue::type() const
 {
 	std::vector<const Type *> elementTypes;

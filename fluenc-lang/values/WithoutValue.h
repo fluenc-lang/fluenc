@@ -10,6 +10,8 @@ class WithoutValue : public BaseValueWithMetadata<WithoutValueMetadata>
 	public:
 		static const WithoutValue *instance();
 
+		ValueId id() const override;
+
 		const Type *type() const override;
 		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
 };

@@ -5,6 +5,11 @@ ForwardedValue::ForwardedValue(const BaseValue *subject)
 {
 }
 
+ValueId ForwardedValue::id() const
+{
+	return ValueId::Forwarded;
+}
+
 const BaseValue *ForwardedValue::subject() const
 {
 	return m_subject;

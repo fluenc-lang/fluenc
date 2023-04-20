@@ -3254,7 +3254,7 @@ BOOST_AUTO_TEST_CASE (scenario84)
 			return 12;
 		}
 	)")
-	, MissingFieldException *
+	, MissingFieldException
 	);
 }
 
@@ -5530,7 +5530,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 
 	auto lazy = functionValues.require<LazyValue>(nullptr);
 
-	BOOST_TEST(lazy->type()->name() == "[Item, Item]");
+	auto type = lazy->type();
+
+	BOOST_TEST(type->name() == "[Item, Item]");
 }
 
 BOOST_AUTO_TEST_CASE (scenario131)
@@ -5700,6 +5702,244 @@ BOOST_AUTO_TEST_CASE (scenario135)
 	)");
 
 	BOOST_TEST(result == 3);
+}
+
+BOOST_AUTO_TEST_CASE (scenario136)
+{
+	auto result = exec(R"(
+		function sub((i32 left, i32 right))
+		{
+			return right - left;
+		}
+
+		function sub(((i32 left, i32 right), ...subValues))
+		{
+			return right - left -> add(...subValues);
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...sumValues))
+		{
+			return tail sum(product + value, ...sumValues);
+		}
+
+		function transform((any item, ...items))
+		{
+			return item -> transform(...items);
+		}
+
+		function transform(any item)
+		{
+			return item;
+		}
+
+		export i32 main()
+		{
+			return sum(0, sub(transform([1, 2]) | transform([4, 5])));
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
+BOOST_AUTO_TEST_CASE (scenario137)
+{
+	auto result = exec(R"(
+		function sum(i32 product, (i32 left, i32 right))
+		{
+			return product + (right - left);
+		}
+
+		function sum(i32 product, ((i32 left, i32 right), ...values))
+		{
+			return tail sum(product + (right - left), ...values);
+		}
+
+		export i32 main()
+		{
+			return sum(0, [1, 2] | [4, 5]);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
+//BOOST_AUTO_TEST_CASE (scenario138)
+//{
+//	auto result = exec(R"(
+//		function sum(i32 product, i32 value)
+//		{
+//			return product + value;
+//		}
+
+//		function sum(i32 product, (i32 value, ...values))
+//		{
+//			return tail sum(product + value, ...values);
+//		}
+
+//		function proxy((i32 value, ...values))
+//		{
+//			return sum(0, (value, values));
+//		}
+
+//		function proxy(i32 value)
+//		{
+//			return sum(0, value);
+//		}
+
+//		export i32 main()
+//		{
+//			return proxy([1, 2, 3]);
+//		}
+//	)");
+
+//	BOOST_TEST(result == 6);
+//}
+
+//BOOST_AUTO_TEST_CASE (scenario139)
+//{
+//	auto result = exec(R"(
+//		function concat((i32 x, ...xs), i32 y)
+//		{
+//			return x -> concat(...xs, y);
+//		}
+
+//		function concat(i32 x, i32 y)
+//		{
+//			return x -> concat(y);
+//		}
+
+//		function concat((i32 x, ...xs), (i32 y, ...ys))
+//		{
+//			return x -> concat(...xs, (y, ys));
+//		}
+
+//		function concat(i32 x, (i32 y, ...ys))
+//		{
+//			return x -> concat(y, ...ys);
+//		}
+
+//		function concat(i32 y)
+//		{
+//			return y;
+//		}
+
+//		function sum(i32 product, i32 value)
+//		{
+//			return product + value;
+//		}
+
+//		function sum(i32 product, (i32 value, ...values))
+//		{
+//			return tail sum(product + value, ...values);
+//		}
+
+//		export i32 main()
+//		{
+//			return sum(0, concat("abc", "def"));
+//		}
+//	)");
+
+//	BOOST_TEST(result == 597);
+//}
+
+//BOOST_AUTO_TEST_CASE (scenario140)
+//{
+//	auto result = exec(R"(
+//		function concat(i32 x, string y)
+//		{
+//			return x -> concat(y);
+//		}
+
+//		function concat((i32 x, ...xs))
+//		{
+//			return x -> concat(...xs);
+//		}
+
+//		function concat((i32 x, ...xs), string y)
+//		{
+//			return x -> concat(...xs, @y);
+//		}
+
+//		function concat(i32 x)
+//		{
+//			return x;
+//		}
+
+//		function sum(i32 product, i32 value)
+//		{
+//			return product + value;
+//		}
+
+//		function sum(i32 product, (i32 value, ...values))
+//		{
+//			return tail sum(product + value, ...values);
+//		}
+
+//		export i32 main()
+//		{
+//			return sum(0, concat("abc", @"def"));
+//		}
+//	)");
+
+//	BOOST_TEST(result == 597);
+//}
+
+BOOST_AUTO_TEST_CASE (scenario141)
+{
+	auto result = exec(R"(
+		struct State
+		{
+			value
+		};
+
+		function concat(i32 x, State y)
+		{
+			return x -> concat(y.value);
+		}
+
+		function concat((i32 x, ...xs))
+		{
+			return x -> concat(...xs);
+		}
+
+		function concat((i32 x, ...xs), State y)
+		{
+			return x -> concat(...xs, y);
+		}
+
+		function concat(i32 x)
+		{
+			return x;
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		export i32 main()
+		{
+			let state = State
+			{
+				value: "def"
+			};
+
+			return sum(0, concat("abc", state));
+		}
+
+	)");
+
+	BOOST_TEST(result == 597);
 }
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )

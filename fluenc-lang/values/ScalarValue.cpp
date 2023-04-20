@@ -11,6 +11,11 @@ ScalarValue::ScalarValue(const Type *type, llvm::Value *value)
 {
 }
 
+ValueId ScalarValue::id() const
+{
+	return ValueId::Scalar;
+}
+
 const Type *ScalarValue::type() const
 {
 	return m_type;

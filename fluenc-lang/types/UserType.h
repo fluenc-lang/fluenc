@@ -10,6 +10,8 @@ class UserType : public Type
 	public:
 		UserType(const IPrototype *prototype, const std::vector<const Type *> &elementTypes);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 		std::string fullName() const override;
 

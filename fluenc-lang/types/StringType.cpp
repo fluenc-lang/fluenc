@@ -13,6 +13,11 @@ StringType::StringType(size_t length)
 {
 }
 
+TypeId StringType::id() const
+{
+	return TypeId::String;
+}
+
 size_t StringType::length() const
 {
 	return m_length;

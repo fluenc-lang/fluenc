@@ -10,6 +10,8 @@ class IndexedValue : public BaseValueWithMetadata<IndexedValueMetadata>
 	public:
 		IndexedValue(size_t index, const BaseValue *subject);
 
+		ValueId id() const override;
+
 		size_t index() const;
 
 		const Type *type() const override;

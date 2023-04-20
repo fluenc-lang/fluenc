@@ -13,6 +13,11 @@ class WithPrototype : public IPrototype
 	public:
 		WithPrototype(const UserTypeValue *value);
 
+		TypeId id() const override
+		{
+			return TypeId::WithPrototype;
+		}
+
 		const IPrototype *root() const override;
 
 		const UserTypeValue *value() const;

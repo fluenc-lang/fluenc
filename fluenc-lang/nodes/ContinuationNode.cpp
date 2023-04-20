@@ -15,7 +15,7 @@ std::vector<const ExpandedValue *> findExpandedValues(Container container)
 
 	for (auto i = container.rbegin(); i != container.rend(); i++)
 	{
-		if (auto tupleValue = dynamic_cast<const TupleValue *>(*i))
+		if (auto tupleValue = value_cast<const TupleValue *>(*i))
 		{
 			auto nested = findExpandedValues(tupleValue->values());
 
@@ -25,7 +25,7 @@ std::vector<const ExpandedValue *> findExpandedValues(Container container)
 			}
 		}
 
-		if (auto expandedValue = dynamic_cast<const ExpandedValue *>(*i))
+		if (auto expandedValue = value_cast<const ExpandedValue *>(*i))
 		{
 			values.push_back(expandedValue);
 		}

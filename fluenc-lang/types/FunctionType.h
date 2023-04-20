@@ -10,6 +10,8 @@ class FunctionType : public Type
 	public:
 		FunctionType(const std::vector<const Type *> &types, const CallableNode *function);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 		std::string fullName() const override;
 

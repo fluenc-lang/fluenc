@@ -12,6 +12,11 @@ Iterator::Iterator(const Node *node, const Type *type, const EntryPoint &entryPo
 {
 }
 
+ValueId Iterator::id() const
+{
+	return ValueId::Iterator;
+}
+
 const Type *Iterator::type() const
 {
 	return m_type;
@@ -25,14 +30,14 @@ const BaseValue *Iterator::clone(const EntryPoint &entryPoint, CloneStrategy str
 	return this;
 }
 
-std::vector<DzResult> Iterator::generate(const Emitter &emitter, DefaultVisitorContext context) const
+std::vector<DzResult> Iterator::generate(const DefaultNodeVisitor &emitter, DefaultVisitorContext context) const
 {
 	auto strategy = m_strategies.get();
 
 	return (this->*strategy)(emitter, context);
 }
 
-std::vector<DzResult> Iterator::useRendered(const Emitter &emitter, DefaultVisitorContext context) const
+std::vector<DzResult> Iterator::useRendered(const DefaultNodeVisitor &emitter, DefaultVisitorContext context) const
 {
 	UNUSED(emitter);
 
@@ -51,7 +56,7 @@ std::vector<DzResult> Iterator::useRendered(const Emitter &emitter, DefaultVisit
 	return results;
 }
 
-std::vector<DzResult> Iterator::createNew(const Emitter &emitter, DefaultVisitorContext context) const
+std::vector<DzResult> Iterator::createNew(const DefaultNodeVisitor &emitter, DefaultVisitorContext context) const
 {
 	return m_node->accept(emitter, { context.entryPoint, m_values });
 }

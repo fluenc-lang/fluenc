@@ -138,12 +138,12 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 
 const ScalarValue *ValueHelper::getScalar(const std::shared_ptr<peg::Ast> &ast, const EntryPoint &entryPoint, const BaseValue *value)
 {
-	if (auto scalar = dynamic_cast<const ScalarValue *>(value))
+	if (auto scalar = value_cast<const ScalarValue *>(value))
 	{
 		return scalar;
 	}
 
-	if (auto reference = dynamic_cast<const ReferenceValue *>(value))
+	if (auto reference = value_cast<const ReferenceValue *>(value))
 	{
 		IRBuilderEx builder(entryPoint);
 
@@ -153,7 +153,7 @@ const ScalarValue *ValueHelper::getScalar(const std::shared_ptr<peg::Ast> &ast, 
 	auto &expectedMetadata = ScalarValue::staticMetadata();
 	auto &actualMetadata = value->metadata();
 
-	throw new InvalidTypeException(ast
+	throw InvalidTypeException(ast
 		, expectedMetadata.name()
 		, actualMetadata.name()
 		);

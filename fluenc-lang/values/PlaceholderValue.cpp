@@ -10,6 +10,11 @@ PlaceholderValue *PlaceholderValue::instance()
 	return &instance;
 }
 
+ValueId PlaceholderValue::id() const
+{
+	return ValueId::Placeholder;
+}
+
 const Type *PlaceholderValue::type() const
 {
 	static PlaceholderType type;

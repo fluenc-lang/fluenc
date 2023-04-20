@@ -33,8 +33,8 @@ struct TypeCompatibilityCalculator
 
 				for (auto i = 0; i < 2; i++)
 				{
-					auto castedLeft = dynamic_cast<const TLeft *>(types[0]);
-					auto castedRight = dynamic_cast<const TRight *>(types[1]);
+					auto castedLeft = type_cast<const TLeft *>(types[0]);
+					auto castedRight = type_cast<const TRight *>(types[1]);
 
 					if (castedLeft && castedRight)
 					{

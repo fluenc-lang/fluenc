@@ -50,7 +50,7 @@ class Stack
 		{
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const TValue *>(value))
+			if (auto casted = value_cast<const TValue *>(value))
 			{
 				return casted;
 			}
@@ -58,7 +58,7 @@ class Stack
 			auto &expectedMetadata = TValue::staticMetadata();
 			auto &actualMetadata = value->metadata();
 
-			throw new InvalidTypeException(ast
+			throw InvalidTypeException(ast
 				, expectedMetadata.name()
 				, actualMetadata.name()
 				);
@@ -74,7 +74,7 @@ class Stack
 
 			auto value = pop();
 
-			if (auto casted = dynamic_cast<const TValue *>(value))
+			if (auto casted = value_cast<const TValue *>(value))
 			{
 				return casted;
 			}

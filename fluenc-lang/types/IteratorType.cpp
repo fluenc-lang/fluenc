@@ -7,6 +7,11 @@ Type *IteratorType::instance()
 	return &instance;
 }
 
+TypeId IteratorType::id() const
+{
+	return TypeId::Iterator;
+}
+
 std::string IteratorType::name() const
 {
 	return "...";

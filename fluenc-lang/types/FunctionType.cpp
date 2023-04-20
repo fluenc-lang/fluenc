@@ -10,6 +10,11 @@ FunctionType::FunctionType(const std::vector<const Type *> &types, const Callabl
 {
 }
 
+TypeId FunctionType::id() const
+{
+	return TypeId::Function;
+}
+
 std::string FunctionType::name() const
 {
 	std::stringstream ss;

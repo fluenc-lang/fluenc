@@ -39,7 +39,7 @@ const BaseValue *Stack::pop()
 {
 	if (m_values.empty())
 	{
-		throw new std::exception();
+		throw std::exception();
 	}
 
 	auto value = m_values.back();

@@ -10,6 +10,11 @@ class EntryPoint;
 class IPrototype : public Type
 {
 	public:
+		TypeId id() const override
+		{
+			return TypeId::IPrototype;
+		}
+
 		virtual const IPrototype *root() const = 0;
 
 		virtual std::vector<PrototypeField> fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const = 0;

@@ -6,6 +6,11 @@ ProxyType::ProxyType(llvm::Type *type)
 {
 }
 
+TypeId ProxyType::id() const
+{
+	return TypeId::Proxy;
+}
+
 std::string ProxyType::name() const
 {
 	return "__proxy";

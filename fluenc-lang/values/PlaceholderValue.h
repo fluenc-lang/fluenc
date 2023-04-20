@@ -10,6 +10,8 @@ class PlaceholderValue : public BaseValueWithMetadata<PlaceholderValueMetadata>
 	public:
 		static PlaceholderValue *instance();
 
+		ValueId id() const override;
+
 		const Type *type() const override;
 
 		const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;

@@ -23,13 +23,17 @@ void linkBlocks(llvm::BasicBlock *source, llvm::BasicBlock *target)
 
 void guardBranch(llvm::BasicBlock *block)
 {
+#ifdef DEBUG
 	for (auto &instruction : *block)
 	{
 		if (llvm::isa <llvm::BranchInst> (instruction))
 		{
-			throw new std::exception();
+			throw std::exception();
 		}
 	}
+#else
+	UNUSED(block);
+#endif
 }
 
 llvm::BasicBlock *createBlock(llvm::LLVMContext *context)

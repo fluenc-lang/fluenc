@@ -9,6 +9,8 @@ class StringType : public BuiltinType<StringType>
 		StringType();
 		StringType(size_t length);
 
+		TypeId id() const override;
+
 		size_t length() const;
 
 		std::string name() const override;

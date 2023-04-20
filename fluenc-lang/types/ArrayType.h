@@ -8,6 +8,8 @@ class ArrayType : public Type
 	public:
 		ArrayType(std::vector<const Type *> types);
 
+		TypeId id() const override;
+
 		std::string name() const override;
 		std::string fullName() const override;
 

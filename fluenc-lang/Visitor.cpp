@@ -246,7 +246,7 @@ std::any Visitor::visitInstruction(const std::shared_ptr<peg::Ast> &ast) const
 			return visitBlock(ast);
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 std::string Visitor::visitId(const std::shared_ptr<peg::Ast> &ast) const
@@ -373,7 +373,7 @@ Node *Visitor::visitExpression(const std::shared_ptr<peg::Ast> &ast) const
 			return visitTail(ast);
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 Node *Visitor::visitLiteral(const std::shared_ptr<peg::Ast> &ast) const
@@ -404,7 +404,7 @@ Node *Visitor::visitLiteral(const std::shared_ptr<peg::Ast> &ast) const
 			return visitNothingLiteral(ast);
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 Node *Visitor::visitInt32Literal(const std::shared_ptr<peg::Ast> &ast) const
@@ -760,7 +760,7 @@ CallableNode *Visitor::visitFunction(const std::shared_ptr<peg::Ast> &ast) const
 			return visitExportedFunction(ast);
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast) const
@@ -841,7 +841,7 @@ DzBaseArgument *Visitor::visitArgument(const std::shared_ptr<peg::Ast> &ast) con
 			return visitTupleArgument(ast);
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 DzBaseArgument *Visitor::visitStandardArgument(const std::shared_ptr<peg::Ast> &ast) const
@@ -1022,7 +1022,7 @@ PrototypeFieldEmbryo Visitor::visitField(const std::shared_ptr<peg::Ast> &ast) c
 			return visitDecoratedField(ast);
 	}
 
-	throw new std::exception();
+	throw std::exception();
 }
 
 PrototypeFieldEmbryo Visitor::visitStandardField(const std::shared_ptr<peg::Ast> &ast) const
