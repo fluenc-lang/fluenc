@@ -32,7 +32,7 @@ enum class TypeId : int64_t
 };
 
 template <typename T>
-constexpr TypeId type_id_for = TypeId::None;
+static constexpr TypeId type_id_for = TypeId::None;
 
 template <typename T>
 class BuiltinType;
