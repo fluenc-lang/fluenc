@@ -34,7 +34,7 @@ enum class ValueId : int64_t
 };
 
 template <typename T>
-static constexpr ValueId value_id_for = ValueId::None;
+inline constexpr ValueId value_id_for = ValueId::None;
 
 class BaseValue;
 class ReferenceValue;
@@ -54,49 +54,49 @@ class IndexedValue;
 class ForwardedValue;
 
 template <>
-constexpr ValueId value_id_for<BaseValue> = ValueId::BaseValue;
+inline constexpr ValueId value_id_for<BaseValue> = ValueId::BaseValue;
 
 template <>
-constexpr ValueId value_id_for<ReferenceValue> = ValueId::Reference;
+inline constexpr ValueId value_id_for<ReferenceValue> = ValueId::Reference;
 
 template <>
-constexpr ValueId value_id_for<ScalarValue> = ValueId::Scalar;
+inline constexpr ValueId value_id_for<ScalarValue> = ValueId::Scalar;
 
 template <>
-constexpr ValueId value_id_for<TupleValue> = ValueId::Tuple;
+inline constexpr ValueId value_id_for<TupleValue> = ValueId::Tuple;
 
 template <>
-constexpr ValueId value_id_for<WithoutValue> = ValueId::Without;
+inline constexpr ValueId value_id_for<WithoutValue> = ValueId::Without;
 
 template <>
-constexpr ValueId value_id_for<PlaceholderValue> = ValueId::Placeholder;
+inline constexpr ValueId value_id_for<PlaceholderValue> = ValueId::Placeholder;
 
 template <>
-constexpr ValueId value_id_for<UserTypeValue> = ValueId::User;
+inline constexpr ValueId value_id_for<UserTypeValue> = ValueId::User;
 
 template <>
-constexpr ValueId value_id_for<StringValue> = ValueId::String;
+inline constexpr ValueId value_id_for<StringValue> = ValueId::String;
 
 template <>
-constexpr ValueId value_id_for<LazyValue> = ValueId::Lazy;
+inline constexpr ValueId value_id_for<LazyValue> = ValueId::Lazy;
 
 template <>
-constexpr ValueId value_id_for<ExpandedValue> = ValueId::Expanded;
+inline constexpr ValueId value_id_for<ExpandedValue> = ValueId::Expanded;
 
 template <>
-constexpr ValueId value_id_for<FunctionValue> = ValueId::Function;
+inline constexpr ValueId value_id_for<FunctionValue> = ValueId::Function;
 
 template <>
-constexpr ValueId value_id_for<ExpandableValue> = ValueId::Expandable;
+inline constexpr ValueId value_id_for<ExpandableValue> = ValueId::Expandable;
 
 template <>
-constexpr ValueId value_id_for<Iterator> = ValueId::Iterator;
+inline constexpr ValueId value_id_for<Iterator> = ValueId::Iterator;
 
 template <>
-constexpr ValueId value_id_for<IndexedValue> = ValueId::Indexed;
+inline constexpr ValueId value_id_for<IndexedValue> = ValueId::Indexed;
 
 template <>
-constexpr ValueId value_id_for<ForwardedValue> = ValueId::Forwarded;
+inline constexpr ValueId value_id_for<ForwardedValue> = ValueId::Forwarded;
 
 template <typename T, typename U>
 T value_cast(U* source)

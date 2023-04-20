@@ -32,7 +32,7 @@ enum class TypeId : int64_t
 };
 
 template <typename T>
-static constexpr TypeId type_id_for = TypeId::None;
+inline constexpr TypeId type_id_for = TypeId::None;
 
 template <typename T>
 class BuiltinType;
@@ -57,61 +57,61 @@ class Prototype;
 class StringType;
 
 template <>
-constexpr TypeId type_id_for<Type> = TypeId::Type;
+inline constexpr TypeId type_id_for<Type> = TypeId::Type;
 
 template <typename T>
-constexpr TypeId type_id_for<BuiltinType<T>> = TypeId::Builtin;
+inline constexpr TypeId type_id_for<BuiltinType<T>> = TypeId::Builtin;
 
 template <>
-constexpr TypeId type_id_for<IBuiltinType> = TypeId::Builtin;
+inline constexpr TypeId type_id_for<IBuiltinType> = TypeId::Builtin;
 
 template <>
-constexpr TypeId type_id_for<FunctionType> = TypeId::Function;
+inline constexpr TypeId type_id_for<FunctionType> = TypeId::Function;
 
 template <>
-constexpr TypeId type_id_for<OpaquePointerType> = TypeId::OpaquePointer;
+inline constexpr TypeId type_id_for<OpaquePointerType> = TypeId::OpaquePointer;
 
 template <>
-constexpr TypeId type_id_for<ProxyType> = TypeId::Proxy;
+inline constexpr TypeId type_id_for<ProxyType> = TypeId::Proxy;
 
 template <>
-constexpr TypeId type_id_for<UserType> = TypeId::User;
+inline constexpr TypeId type_id_for<UserType> = TypeId::User;
 
 template <>
-constexpr TypeId type_id_for<IPrototype> = TypeId::IPrototype;
+inline constexpr TypeId type_id_for<IPrototype> = TypeId::IPrototype;
 
 template <>
-constexpr TypeId type_id_for<WithPrototype> = TypeId::WithPrototype;
+inline constexpr TypeId type_id_for<WithPrototype> = TypeId::WithPrototype;
 
 template <>
-constexpr TypeId type_id_for<Prototype> = TypeId::Prototype;
+inline constexpr TypeId type_id_for<Prototype> = TypeId::Prototype;
 
 template <>
-constexpr TypeId type_id_for<IteratorType> = TypeId::Iterator;
+inline constexpr TypeId type_id_for<IteratorType> = TypeId::Iterator;
 
 template <>
-constexpr TypeId type_id_for<AggregateType> = TypeId::Aggregate;
+inline constexpr TypeId type_id_for<AggregateType> = TypeId::Aggregate;
 
 template <>
-constexpr TypeId type_id_for<AnyType> = TypeId::Any;
+inline constexpr TypeId type_id_for<AnyType> = TypeId::Any;
 
 template <>
-constexpr TypeId type_id_for<ArrayType> = TypeId::Array;
+inline constexpr TypeId type_id_for<ArrayType> = TypeId::Array;
 
 template <>
-constexpr TypeId type_id_for<ExpandedType> = TypeId::Expanded;
+inline constexpr TypeId type_id_for<ExpandedType> = TypeId::Expanded;
 
 template <>
-constexpr TypeId type_id_for<TupleType> = TypeId::Tuple;
+inline constexpr TypeId type_id_for<TupleType> = TypeId::Tuple;
 
 template <>
-constexpr TypeId type_id_for<PlaceholderType> = TypeId::Placeholder;
+inline constexpr TypeId type_id_for<PlaceholderType> = TypeId::Placeholder;
 
 template <>
-constexpr TypeId type_id_for<WithoutType> = TypeId::Without;
+inline constexpr TypeId type_id_for<WithoutType> = TypeId::Without;
 
 template <>
-constexpr TypeId type_id_for<StringType> = TypeId::String;
+inline constexpr TypeId type_id_for<StringType> = TypeId::String;
 
 template <typename T, typename U>
 T type_cast(U* source)
