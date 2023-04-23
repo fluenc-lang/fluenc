@@ -80,13 +80,13 @@ function run()
 {
     return bind(
         part1(0, -1
-            , nextNumber(0
-                , readChar(fdopen(open(@"input", O_RDONLY), @"r"))
+            , ...nextNumber(0
+                , ...readChar(fdopen(open(@"input", O_RDONLY), @"r"))
                 )
             ),
         part2(0, 0, 0, 0, 0
-            , nextNumber(0
-                , readChar(fdopen(open(@"input", O_RDONLY), @"r"))
+            , ...nextNumber(0
+                , ...readChar(fdopen(open(@"input", O_RDONLY), @"r"))
                 )
             )
     );
@@ -106,5 +106,5 @@ function printNumbers((i32 number, ...numbers))
 
 export i32 main()
 {
-    return printNumbers(run());
+    return printNumbers(...run());
 }

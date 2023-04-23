@@ -313,19 +313,19 @@ function scene1(i64 renderer, i32 episodes)
 
 	SDL::SDL_SetRenderDrawColor(renderer, 55, 55, 72, 255);
 
-	drawSkyscrapers(renderer, -50, cameraPan, 130, seed, backgroundLeft);
-	drawSkyscrapers(renderer, (Width - Target) + 50, cameraPan, 130, seed, backgroundRight);
+	drawSkyscrapers(renderer, -50, cameraPan, 130, seed, ...backgroundLeft);
+	drawSkyscrapers(renderer, (Width - Target) + 50, cameraPan, 130, seed, ...backgroundRight);
 
 	SDL::SDL_SetRenderDrawColor(renderer, 83, 83, 108, 255);
 
-	drawSkyscrapers(renderer, 0, cameraPan, 100, seed, foregroundLeft);
-	drawSkyscrapers(renderer, (Width - Target), cameraPan, 100, seed, foregroundRight);
+	drawSkyscrapers(renderer, 0, cameraPan, 100, seed, ...foregroundLeft);
+	drawSkyscrapers(renderer, (Width - Target), cameraPan, 100, seed, ...foregroundRight);
 
 	SDL::SDL_RenderFillRect(renderer, rect(Target, (Height - 100) + cameraPan, 200, 10));
 
 	let cityStars = stars(2, 0, 15);
 
-	drawStars(renderer, cameraPan, episodes, 0, cityStars);
+	drawStars(renderer, cameraPan, episodes, 0, ...cityStars);
 
 	let birdieStars = [
 		star(942, -806),
@@ -346,9 +346,9 @@ function scene1(i64 renderer, i32 episodes)
 		star(942, -806),
 	];
 
-	drawStars(renderer, cameraPan, episodes, 0, birdieStars);
+	drawStars(renderer, cameraPan, episodes, 0, ...birdieStars);
 
-	strokeStars(renderer, cameraPan, episodes, 0, nothing, birdieStars);
+	strokeStars(renderer, cameraPan, episodes, 0, nothing, ...birdieStars);
 
 	SDL::SDL_SetRenderDrawColor(renderer, 0, 0, 0, fadeIn + fadeOut);
 	SDL::SDL_RenderFillRect(renderer, rect(0, 0, Width, Height));

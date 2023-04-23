@@ -1,2 +1,1 @@
 target = "day2"
-libs = [ "print.o" ]
