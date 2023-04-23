@@ -56,6 +56,7 @@
 #include "values/StringIteratable.h"
 #include "values/IteratorValueGeneratorProxy.h"
 #include "values/Iterator.h"
+#include "values/ExpandedLazyValue.h"
 
 #include "nodes/BinaryNode.h"
 #include "nodes/ExportedFunctionNode.h"
@@ -332,7 +333,7 @@ std::vector<DzResult> Emitter::visit(const ArrayBinaryNode *node, DefaultVisitor
 
 	if (node->op == "|")
 	{
-		std::vector<const BaseValue *> inputs({ right, left });
+		std::vector<const BaseValue *> inputs({ new ExpandedLazyValue(right), new ExpandedLazyValue(left) });
 
 		auto generator = new AggregateIteratorValueGenerator(node, inputs);
 		auto lazy = new LazyValue(generator, context.entryPoint);
@@ -837,9 +838,9 @@ std::vector<DzResult> Emitter::visit(const PreEvaluationNode *node, DefaultVisit
 		{
 			auto value = values.pop();
 
-			if (auto lazy = value_cast<const LazyValue *>(value))
+			if (auto lazy = value_cast<const ExpandedLazyValue *>(value))
 			{
-				auto iteratable = lazy->generate(entryPoint);
+				auto iteratable = lazy->subject()->generate(entryPoint);
 
 				std::vector<DzResult> results;
 
@@ -859,17 +860,6 @@ std::vector<DzResult> Emitter::visit(const PreEvaluationNode *node, DefaultVisit
 				}
 
 				return results;
-			}
-
-			if (auto string = value_cast<const StringValue *>(value))
-			{
-				auto iterator =	string->iterator();
-
-				auto forwardedValues = values;
-
-				forwardedValues.push(iterator);
-
-				return recurse(entryPoint, forwardedValues, recurse);
 			}
 
 			std::vector<DzResult> results;
@@ -1723,33 +1713,54 @@ std::vector<DzResult> Emitter::visit(const ExpansionNode *node, DefaultVisitorCo
 {
 	auto block = context.entryPoint.block();
 
-	auto expandable = context.values.require<ExpandableValue>(node->m_ast);
+	auto value = context.values.pop();
 
-	auto continuation = expandable->chain();
-	auto provider = expandable->provider();
-
-	auto continuationEntryPoint = (*provider)
-		.withBlock(block)
-		.withIteratorType(expandable->expandedType());
-
-	auto result = continuation->accept(*this, { continuationEntryPoint, Stack() });
-
-	for (auto &[targetEntryPoint, continuationValues] : result)
+	if (auto expandable = value_cast<const ExpandableValue *>(value))
 	{
-		auto value = continuationValues
-			.require<ExpandedValue>(nullptr);
+		auto continuation = expandable->chain();
+		auto provider = expandable->provider();
 
-		auto tuple = new TupleValue({ value, PlaceholderValue::instance() });
+		auto continuationEntryPoint = (*provider)
+			.withBlock(block)
+			.withIteratorType(expandable->expandedType());
 
-		context.values.push(tuple);
+		auto result = continuation->accept(*this, { continuationEntryPoint, Stack() });
 
-		auto consumerEntryPoint = context.entryPoint
-			.withBlock(targetEntryPoint.block());
+		for (auto &[targetEntryPoint, continuationValues] : result)
+		{
+			auto value = continuationValues
+				.require<ExpandedValue>(nullptr);
 
-		return node->m_consumer->accept(*this, { consumerEntryPoint, context.values });
+			auto tuple = new TupleValue({ value, PlaceholderValue::instance() });
+
+			context.values.push(tuple);
+
+			auto consumerEntryPoint = context.entryPoint
+				.withBlock(targetEntryPoint.block());
+
+			return node->m_consumer->accept(*this, { consumerEntryPoint, context.values });
+		}
+
+		throw std::exception();
 	}
+	else if (auto lazy = value_cast<const LazyValue *>(value))
+	{
+		context.values.push(new ExpandedLazyValue(lazy));
 
-	throw std::exception();
+		return node->m_consumer->accept(*this, context);
+	}
+	else if (auto string = value_cast<const StringValue *>(value))
+	{
+		context.values.push(new ExpandedLazyValue(string->iterator(context.entryPoint)));
+
+		return node->m_consumer->accept(*this, context);
+	}
+	else
+	{
+		context.values.push(value);
+
+		return node->m_consumer->accept(*this, context);
+	}
 }
 
 std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContext context) const

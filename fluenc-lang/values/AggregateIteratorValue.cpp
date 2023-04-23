@@ -150,12 +150,12 @@ std::vector<DzResult> AggregateIteratorValue::accept(const DefaultNodeVisitor &v
 		builder.createCondBr(comparison , ifTrue, ifFalse);
 
 		auto epIfFalse = entryPoint
-				.withIndex(i)
-				.withBlock(ifFalse);
+			.withIndex(i)
+			.withBlock(ifFalse);
 
 		auto epIfTrue = entryPoint
-				.withIndex(i)
-				.withBlock(ifTrue);
+			.withIndex(i)
+			.withBlock(ifTrue);
 
 		std::vector<const Type *> dependencyTypes =
 		{

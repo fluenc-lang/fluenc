@@ -457,7 +457,7 @@ BOOST_AUTO_TEST_CASE (scenario19)
 
 		export i32 main()
 		{
-			return puts(@"foo");
+			return puts("foo");
 		}
 	)");
 
@@ -878,7 +878,7 @@ BOOST_AUTO_TEST_CASE (scenario33)
 
 		function add(MyStruct s)
 		{
-			return s.x + bar(s.y);
+			return s.x + bar(...s.y);
 		}
 
 		export i32 main()
@@ -1014,7 +1014,7 @@ BOOST_AUTO_TEST_CASE (scenario37)
 
 		export i32 main()
 		{
-			return sum(0, numbersBelow(0, 5));
+			return sum(0, ...numbersBelow(0, 5));
 		}
 	)");
 
@@ -1036,7 +1036,7 @@ BOOST_AUTO_TEST_CASE (scenario38)
 
 		export i32 main()
 		{
-			return sum(0, [1, 2, 3]);
+			return sum(0, ...[1, 2, 3]);
 		}
 	)");
 
@@ -1078,7 +1078,7 @@ BOOST_AUTO_TEST_CASE (scenario39)
 
 		export i32 main()
 		{
-			return sum(0, [
+			return sum(0, ...[
 				Struct1
 				{
 					x: 1
@@ -1114,7 +1114,7 @@ BOOST_AUTO_TEST_CASE (scenario40)
 
 		export i32 main()
 		{
-			return sum(0, createArray());
+			return sum(0, ...createArray());
 		}
 	)");
 
@@ -1175,7 +1175,7 @@ BOOST_AUTO_TEST_CASE (scenario42)
 
 		export i32 main()
 		{
-			return sum(0, add([1, 2, 3]));
+			return sum(0, ...add(...[1, 2, 3]));
 		}
 	)");
 
@@ -1355,17 +1355,17 @@ BOOST_AUTO_TEST_CASE (scenario47)
 
 		function foo1(i32 accumulator, Item item)
 		{
-			return tail foo2(accumulator + item.value, item.children);
+			return tail foo2(accumulator + item.value, ...item.children);
 		}
 
 		function foo1(i32 accumulator, (Item item, ...values))
 		{
-			return tail foo1(foo2(accumulator + item.value, item.children), ...values);
+			return tail foo1(foo2(accumulator + item.value, ...item.children), ...values);
 		}
 
 		export i32 main()
 		{
-			return foo1(0, createStructure());
+			return foo1(0, ...createStructure());
 		}
 	)");
 
@@ -1433,22 +1433,22 @@ BOOST_AUTO_TEST_CASE (scenario48)
 
 		function sumWidth(i32 sum, (Rectangle r, ...items))
 		{
-			return tail sumWidth(sumWidth(sum + r.width, r.children), ...items);
+			return tail sumWidth(sumWidth(sum + r.width, ...r.children), ...items);
 		}
 
 		function sumWidth(i32 sum, Button b)
 		{
-			return tail sumWidth(sum + b.width, b.children);
+			return tail sumWidth(sum + b.width, ...b.children);
 		}
 
 		function sumWidth(i32 sum, (Button b, ...items))
 		{
-			return tail sumWidth(sumWidth(sum + b.width, b.children), ...items);
+			return tail sumWidth(sumWidth(sum + b.width, ...b.children), ...items);
 		}
 
 		export i32 main()
 		{
-			return sumWidth(0, createStructure());
+			return sumWidth(0, ...createStructure());
 		}
 	)");
 
@@ -1634,7 +1634,7 @@ BOOST_AUTO_TEST_CASE (scenario54)
 
 		export i32 main()
 		{
-			return sum(0, draw(application()));
+			return sum(0, ...draw(...application()));
 		}
 	)");
 
@@ -1656,7 +1656,7 @@ BOOST_AUTO_TEST_CASE (scenario55)
 
 		export i32 main()
 		{
-			return sum(0, [1, 2, 3]);
+			return sum(0, ...[1, 2, 3]);
 		}
 	)");
 
@@ -1701,7 +1701,7 @@ BOOST_AUTO_TEST_CASE (scenario56)
 
 		export i32 main()
 		{
-			return sum(0, createStructs());
+			return sum(0, ...createStructs());
 		}
 	)");
 
@@ -1747,7 +1747,7 @@ BOOST_AUTO_TEST_CASE (scenario57)
 
 		export i32 main()
 		{
-			return sum(0, createStructs());
+			return sum(0, ...createStructs());
 		}
 	)");
 
@@ -1928,12 +1928,12 @@ BOOST_AUTO_TEST_CASE (scenario61)
 
 		function foo(Struct s)
 		{
-			if (sum(0, s.values) < 20)
+			if (sum(0, ...s.values) < 20)
 			{
-				return tail foo(s with { values: add(1, s.values) });
+				return tail foo(s with { values: add(1, ...s.values) });
 			}
 
-			return first(s.values);
+			return first(...s.values);
 		}
 
 		export i32 main()
@@ -1983,12 +1983,12 @@ BOOST_AUTO_TEST_CASE (scenario62)
 
 		function foo(Struct s)
 		{
-			if (sum(0, s.values) < 9)
+			if (sum(0, ...s.values) < 9)
 			{
 				return tail foo(s with { values: [2, 3, 4] });
 			}
 
-			return first(s.values);
+			return first(...s.values);
 		}
 
 		export i32 main()
@@ -2066,17 +2066,17 @@ BOOST_AUTO_TEST_CASE (scenario63)
 
 		function foo(Struct s)
 		{
-			if (sum(0, s.values) < 20)
+			if (sum(0, ...s.values) < 20)
 			{
-				return tail foo(s with { values: add(1, s.values) });
+				return tail foo(s with { values: add(1, ...s.values) });
 			}
 
-			return first(s.values);
+			return first(...s.values);
 		}
 
 		export i32 main()
 		{
-			return foo(createStruct());
+			return foo(...createStruct());
 		}
 	)");
 
@@ -2139,7 +2139,7 @@ BOOST_AUTO_TEST_CASE (scenario64)
 
 		export i32 main()
 		{
-			return sum(0, createStructs());
+			return sum(0, ...createStructs());
 		}
 	)");
 
@@ -2232,7 +2232,7 @@ BOOST_AUTO_TEST_CASE (scenario66)
 
 		export i32 main()
 		{
-			return sum(0, foo(3, 4, createStructs()));
+			return sum(0, ...foo(3, 4, ...createStructs()));
 		}
 	)");
 
@@ -2266,7 +2266,7 @@ BOOST_AUTO_TEST_CASE (scenario67)
 
 		export i32 main()
 		{
-			return sum(0, foo(0, [1, 2, 3]));
+			return sum(0, ...foo(0, ...[1, 2, 3]));
 		}
 	)");
 
@@ -2308,7 +2308,7 @@ BOOST_AUTO_TEST_CASE (scenario68)
 
 		export i32 main()
 		{
-			return sum(0, add([1, 2, 3], [4, 5, 6]));
+			return sum(0, ...add(...[1, 2, 3], ...[4, 5, 6]));
 		}
 	)");
 
@@ -2360,7 +2360,7 @@ BOOST_AUTO_TEST_CASE (scenario69)
 
 		export i32 main()
 		{
-			return sum(0, add(addOne([1, 2, 3]), addOne([4, 5, 6])));
+			return sum(0, ...add(...addOne(...[1, 2, 3]), ...addOne(...[4, 5, 6])));
 		}
 	)");
 
@@ -2513,19 +2513,19 @@ BOOST_AUTO_TEST_CASE (scenario70)
 		{
 			let table = [10, 20];
 
-			return product + elementAt(index, 0, table);
+			return product + elementAt(index, 0, ...table);
 		}
 
 		function foo(i32 product, (i32 index, ...indexes))
 		{
 			let table = [10, 20];
 
-			return tail foo(product + elementAt(index, 0, table), ...indexes);
+			return tail foo(product + elementAt(index, 0, ...table), ...indexes);
 		}
 
 		export i32 main()
 		{
-			return foo(0, [1, 0, 1]);
+			return foo(0, ...[1, 0, 1]);
 		}
 	)");
 
@@ -2571,7 +2571,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 		function bar()
 		{
-			return foo([1, 2]);
+			return foo(...[1, 2]);
 		}
 	)");
 
@@ -2614,7 +2614,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 		function bar()
 		{
-			return foo([1, 2, 3]);
+			return foo(...[1, 2, 3]);
 		}
 	)");
 
@@ -2700,7 +2700,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 
 		function bar()
 		{
-			return foo(application());
+			return foo(...application());
 		}
 	)");
 
@@ -2738,7 +2738,7 @@ BOOST_AUTO_TEST_CASE (scenario71)
 
 		export i32 main()
 		{
-			return count(0, "foobar");
+			return count(0, ..."foobar");
 		}
 	)");
 
@@ -3204,7 +3204,7 @@ BOOST_AUTO_TEST_CASE (scenario83)
 		{
 			return item with
 			{
-				children: update(item.children),
+				children: update(...item.children),
 			};
 		}
 
@@ -3217,7 +3217,7 @@ BOOST_AUTO_TEST_CASE (scenario83)
 
 			let as = state with
 			{
-				ui: update(state.ui),
+				ui: update(...state.ui),
 			};
 
 			return tail mainLoop(count + 1, as);
@@ -3397,7 +3397,7 @@ BOOST_AUTO_TEST_CASE (scenario86)
 		{
 			return item with
 			{
-				children: update(state, item.children),
+				children: update(state, ...item.children),
 			};
 		}
 
@@ -3410,7 +3410,7 @@ BOOST_AUTO_TEST_CASE (scenario86)
 
 			let as = state with
 			{
-				ui: update(state, state.ui),
+				ui: update(state, ...state.ui),
 			};
 
 			return tail mainLoop(count + 1, as);
@@ -3526,7 +3526,7 @@ BOOST_AUTO_TEST_CASE (scenario88)
 		{
 			return rectangle with
 			{
-				children: update(rectangle.children, nextItem.children)
+				children: update(...rectangle.children, ...nextItem.children)
 			};
 		}
 
@@ -3549,7 +3549,7 @@ BOOST_AUTO_TEST_CASE (scenario88)
 
 			let s = state with
 			{
-				ui: update(application(), application())
+				ui: update(...application(), ...application())
 			};
 
 			return tail mainLoop(i + 1, s);
@@ -3618,9 +3618,9 @@ BOOST_AUTO_TEST_CASE (scenario90)
 		{
 			let range = generator(3, 0);
 
-			sum(0, range);
+			sum(0, ...range);
 
-			return sum(0, range);
+			return sum(0, ...range);
 		}
 	)");
 
@@ -3654,7 +3654,7 @@ BOOST_AUTO_TEST_CASE (scenario91)
 		{
 			let s = state with
 			{
-				array: process(state.array),
+				array: process(...state.array),
 			};
 
 			if (i < 1)
@@ -3759,7 +3759,7 @@ BOOST_AUTO_TEST_CASE (scenario95)
 		{
 			let values = [1, 2];
 
-			return add(nothing, values);
+			return add(nothing, ...values);
 		}
 	)");
 
@@ -3795,7 +3795,7 @@ BOOST_AUTO_TEST_CASE (scenario96)
 		{
 			let values = [1, 2, 3];
 
-			return add(nothing, values);
+			return add(nothing, ...values);
 		}
 	)");
 
@@ -3837,14 +3837,14 @@ BOOST_AUTO_TEST_CASE (scenario97)
 
 		function mainLoop(Foo foo)
 		{
-			if (sum(0, foo.items) > 10)
+			if (sum(0, ...foo.items) > 10)
 			{
 				return 32;
 			}
 
 			let mut = foo with
 			{
-				items: transform(0, foo.items)
+				items: transform(0, ...foo.items)
 			};
 
 			return tail mainLoop(mut);
@@ -3972,7 +3972,7 @@ BOOST_AUTO_TEST_CASE (scenario101)
 		{
 			let numbers = getNumbers(0, 5);
 
-			return sum(numbers, 0);
+			return sum(...numbers, 0);
 		}
 	)");
 
@@ -4016,9 +4016,9 @@ BOOST_AUTO_TEST_CASE (scenario102)
 
 			let input1 = [1, 2, 3];
 
-			let numbers = add(foo, input1);
+			let numbers = add(foo, ...input1);
 
-			return sum(numbers, 0);
+			return sum(...numbers, 0);
 		}
 	)");
 
@@ -4067,7 +4067,7 @@ BOOST_AUTO_TEST_CASE (scenario103)
 		{
 			return item with
 			{
-				children: layout(item.children, nextItem.children)
+				children: layout(...item.children, ...nextItem.children)
 			};
 		}
 
@@ -4103,7 +4103,7 @@ BOOST_AUTO_TEST_CASE (scenario103)
 
 			let s = state with
 			{
-				ui: update(state.ui, application())
+				ui: update(...state.ui, ...application())
 			};
 
 			return tail foo(s, i + 1);
@@ -4160,7 +4160,7 @@ BOOST_AUTO_TEST_CASE (scenario104)
 		{
 			let state = State
 			{
-				values: foo(foo([1, 2, 3]))
+				values: foo(...foo(...[1, 2, 3]))
 			};
 
 			return bar(0, state);
@@ -4207,7 +4207,7 @@ BOOST_AUTO_TEST_CASE (scenario105)
 		{
 			let state = State
 			{
-				values: foo(array())
+				values: foo(...array())
 			};
 
 			return bar(0, state);
@@ -4254,7 +4254,7 @@ BOOST_AUTO_TEST_CASE (scenario106)
 		{
 			let state = State
 			{
-				values: foo(a())
+				values: foo(...a())
 			};
 
 			return bar(0, state);
@@ -4313,7 +4313,7 @@ BOOST_AUTO_TEST_CASE (scenario107)
 		{
 			let state = State
 			{
-				values: foo([
+				values: foo(...[
 					Rectangle {},
 					Rectangle {}
 				])
@@ -4388,7 +4388,7 @@ BOOST_AUTO_TEST_CASE (scenario108)
 		{
 			let state = State
 			{
-				values: foo(invoke(c.callback))
+				values: foo(...invoke(c.callback))
 			};
 
 			return bar(0, state);
@@ -4457,7 +4457,7 @@ BOOST_AUTO_TEST_CASE (scenario109)
 		{
 			let state = State
 			{
-				values: foo([
+				values: foo(...[
 					Rectangle {},
 					Rectangle {}
 				])
@@ -4627,7 +4627,7 @@ BOOST_AUTO_TEST_CASE (scenario113)
 
 		export i32 main()
 		{
-			return foo(nothing, generator(0, 3));
+			return foo(nothing, ...generator(0, 3));
 		}
 	)");
 
@@ -4727,7 +4727,7 @@ BOOST_AUTO_TEST_CASE (scenario116)
 				func: value1
 			};
 
-			return sum(0, generator(0, init));
+			return sum(0, ...generator(0, init));
 		}
 	)");
 
@@ -4889,9 +4889,9 @@ BOOST_AUTO_TEST_CASE (scenario118)
 		export i32 main()
 		{
 			let ui = application();
-			let res = update(expand(ui), expand(application()));
+			let res = update(...expand(...ui), ...expand(...application()));
 
-			return sum(0, res)
+			return sum(0, ...res)
 		}
 	)");
 
@@ -4953,7 +4953,7 @@ BOOST_AUTO_TEST_CASE (scenario119)
 
 		function foo(Item item)
 		{
-			return sum(0, foo(item.children));
+			return sum(0, ...foo(...item.children));
 		}
 
 		function foo((LayoutItem item, ...items))
@@ -4974,9 +4974,9 @@ BOOST_AUTO_TEST_CASE (scenario119)
 		export i32 main()
 		{
 			let ui = application();
-			let res = foo(ui);
+			let res = foo(...ui);
 
-			return sum(0, res)
+			return sum(0, ...res)
 		}
 	)");
 
@@ -5011,7 +5011,7 @@ BOOST_AUTO_TEST_CASE (scenario120)
 
 		function application()
 		{
-			return item([1, 2, 3]);
+			return item(...[1, 2, 3]);
 		}
 
 		function sum(i32 product, (Item item, ...items))
@@ -5038,9 +5038,9 @@ BOOST_AUTO_TEST_CASE (scenario120)
 		{
 			let items = application();
 
-			consume(items);
+			consume(...items);
 
-			return sum(0, items);
+			return sum(0, ...items);
 		}
 	)");
 
@@ -5095,11 +5095,11 @@ BOOST_AUTO_TEST_CASE (scenario121)
 			let items1 = [1, 2];
 			let items2 = [2, 3];
 
-			let values = foo(init, items1, items2);
+			let values = foo(init, ...items1, ...items2);
 
-			consume(values);
+			consume(...values);
 
-			return sum(0, values);
+			return sum(0, ...values);
 		}
 
 		export i32 main()
@@ -5166,7 +5166,7 @@ BOOST_AUTO_TEST_CASE (scenario122)
 
 		export i32 main()
 		{
-			return sum(0, add(generate1(1, 3), generate2(4, 6)));
+			return sum(0, ...add(...generate1(1, 3), ...generate2(4, 6)));
 		}
 	)");
 
@@ -5220,7 +5220,7 @@ BOOST_AUTO_TEST_CASE (scenario124)
 
 		export i32 main()
 		{
-			if (startsWith("foo", "foo"))
+			if (startsWith(..."foo", ..."foo"))
 			{
 				return 123;
 			}
@@ -5257,7 +5257,7 @@ BOOST_AUTO_TEST_CASE(scenario125)
 
 		export i32 main()
 		{
-			return count(format([1, 2], 12), 0);
+			return count(...format(...[1, 2], 12), 0);
 		}
 	)");
 
@@ -5289,7 +5289,7 @@ BOOST_AUTO_TEST_CASE(scenario126)
 
 		export i32 main()
 		{
-			return count(format("foo", 12), 0);
+			return count(...format(..."foo", 12), 0);
 		}
 	)");
 
@@ -5324,7 +5324,7 @@ BOOST_AUTO_TEST_CASE(scenario127)
 
 		export i32 main()
 		{
-			return count(String::format("foo", 12), 0);
+			return count(...String::format(..."foo", 12), 0);
 		}
 	)");
 
@@ -5382,7 +5382,7 @@ BOOST_AUTO_TEST_CASE(scenario130)
 		{
 			let array = [1, 2];
 
-			return count(array, 0);
+			return count(...array, 0);
 		}
 	)");
 
@@ -5424,7 +5424,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 
 		function bar()
 		{
-			return foo(application(), application());
+			return foo(...application(), ...application());
 		}
 	)");
 
@@ -5464,7 +5464,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 		{
 			let item = item1 with
 			{
-				children: foo(item1.children | item2.children)
+				children: foo(...(item1.children | item2.children))
 			};
 
 			return item -> foo(...items);
@@ -5474,7 +5474,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 		{
 			return item1 with
 			{
-				children: foo(item1.children | item2.children)
+				children: foo(...(item1.children | item2.children))
 			};
 		}
 
@@ -5509,7 +5509,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 		function bar()
 		{
 			return foo(
-				transform(application()) | transform(application())
+				...(transform(...application()) | transform(...application()))
 				);
 		}
 	)");
@@ -5560,7 +5560,7 @@ BOOST_AUTO_TEST_CASE (scenario131)
 
 		export i32 main()
 		{
-			return sum(0, add([1, 2, 3] | [4, 5, 6]));
+			return sum(0, ...add(...([1, 2, 3] | [4, 5, 6])));
 		}
 	)");
 
@@ -5592,7 +5592,7 @@ BOOST_AUTO_TEST_CASE (scenario132)
 
 		export i32 main()
 		{
-			return sum(0, sub([1, 2, 3] | [4, 5, 6]));
+			return sum(0, ...sub(...([1, 2, 3] | [4, 5, 6])));
 		}
 	)");
 
@@ -5739,7 +5739,7 @@ BOOST_AUTO_TEST_CASE (scenario136)
 
 		export i32 main()
 		{
-			return sum(0, sub(transform([1, 2]) | transform([4, 5])));
+			return sum(0, ...sub(...(transform(...[1, 2]) | transform(...[4, 5]))));
 		}
 	)");
 
@@ -5761,51 +5761,113 @@ BOOST_AUTO_TEST_CASE (scenario137)
 
 		export i32 main()
 		{
-			return sum(0, [1, 2] | [4, 5]);
+			return sum(0, ...([1, 2] | [4, 5]));
 		}
 	)");
 
 	BOOST_TEST(result == 6);
 }
 
-//BOOST_AUTO_TEST_CASE (scenario138)
+BOOST_AUTO_TEST_CASE (scenario138)
+{
+	auto result = exec(R"(
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function proxy(...values)
+		{
+			return sum(0, ...values);
+		}
+
+		export i32 main()
+		{
+			return proxy([1, 2, 3]);
+		}
+	)");
+
+	BOOST_TEST(result == 6);
+}
+
+BOOST_AUTO_TEST_CASE (scenario139)
+{
+	auto result = exec(R"(
+		function concatt(string xs, string ys)
+		{
+			return concat(...xs, ys);
+		}
+
+		function concat((i32 x, ...xs), i32 y)
+		{
+			return x -> concat(...xs, y);
+		}
+
+		function concat((i32 x, ...xs))
+		{
+			return x -> concat(...xs);
+		}
+
+		function concat(i32 x, i32 y)
+		{
+			return x -> concat(y);
+		}
+
+		function concat((i32 x, ...xs), string ys)
+		{
+			return x -> concat(...xs, ys);
+		}
+
+		function concat(i32 x, string ys)
+		{
+			return x -> concat(...ys);
+		}
+
+		function concat(i32 y)
+		{
+			return y;
+		}
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		export i32 main()
+		{
+			return sum(0, ...concatt("abc", "def"));
+		}
+	)");
+
+	BOOST_TEST(result == 597);
+}
+
+//BOOST_AUTO_TEST_CASE (scenario140)
 //{
 //	auto result = exec(R"(
-//		function sum(i32 product, i32 value)
+//		function concatt(...xs, ...ys)
 //		{
-//			return product + value;
+//			return concat(...xs, ys);
 //		}
 
-//		function sum(i32 product, (i32 value, ...values))
-//		{
-//			return tail sum(product + value, ...values);
-//		}
-
-//		function proxy((i32 value, ...values))
-//		{
-//			return sum(0, (value, values));
-//		}
-
-//		function proxy(i32 value)
-//		{
-//			return sum(0, value);
-//		}
-
-//		export i32 main()
-//		{
-//			return proxy([1, 2, 3]);
-//		}
-//	)");
-
-//	BOOST_TEST(result == 6);
-//}
-
-//BOOST_AUTO_TEST_CASE (scenario139)
-//{
-//	auto result = exec(R"(
 //		function concat((i32 x, ...xs), i32 y)
 //		{
 //			return x -> concat(...xs, y);
+//		}
+
+//		function concat((i32 x, ...xs))
+//		{
+//			return x -> concat(...xs);
 //		}
 
 //		function concat(i32 x, i32 y)
@@ -5813,14 +5875,14 @@ BOOST_AUTO_TEST_CASE (scenario137)
 //			return x -> concat(y);
 //		}
 
-//		function concat((i32 x, ...xs), (i32 y, ...ys))
+//		function concat((i32 x, ...xs), string ys)
 //		{
-//			return x -> concat(...xs, (y, ys));
+//			return x -> concat(...xs, ys);
 //		}
 
-//		function concat(i32 x, (i32 y, ...ys))
+//		function concat(i32 x, string ys)
 //		{
-//			return x -> concat(y, ...ys);
+//			return x -> concat(...ys);
 //		}
 
 //		function concat(i32 y)
@@ -5840,49 +5902,7 @@ BOOST_AUTO_TEST_CASE (scenario137)
 
 //		export i32 main()
 //		{
-//			return sum(0, concat("abc", "def"));
-//		}
-//	)");
-
-//	BOOST_TEST(result == 597);
-//}
-
-//BOOST_AUTO_TEST_CASE (scenario140)
-//{
-//	auto result = exec(R"(
-//		function concat(i32 x, string y)
-//		{
-//			return x -> concat(y);
-//		}
-
-//		function concat((i32 x, ...xs))
-//		{
-//			return x -> concat(...xs);
-//		}
-
-//		function concat((i32 x, ...xs), string y)
-//		{
-//			return x -> concat(...xs, @y);
-//		}
-
-//		function concat(i32 x)
-//		{
-//			return x;
-//		}
-
-//		function sum(i32 product, i32 value)
-//		{
-//			return product + value;
-//		}
-
-//		function sum(i32 product, (i32 value, ...values))
-//		{
-//			return tail sum(product + value, ...values);
-//		}
-
-//		export i32 main()
-//		{
-//			return sum(0, concat("abc", @"def"));
+//			return sum(0, ...concatt("abc", "def"));
 //		}
 //	)");
 
@@ -5899,7 +5919,7 @@ BOOST_AUTO_TEST_CASE (scenario141)
 
 		function concat(i32 x, State y)
 		{
-			return x -> concat(y.value);
+			return x -> concat(...y.value);
 		}
 
 		function concat((i32 x, ...xs))
@@ -5934,13 +5954,70 @@ BOOST_AUTO_TEST_CASE (scenario141)
 				value: "def"
 			};
 
-			return sum(0, concat("abc", state));
+			return sum(0, ...concat(..."abc", state));
 		}
 
 	)");
 
 	BOOST_TEST(result == 597);
 }
+
+//BOOST_AUTO_TEST_CASE (scenario142)
+//{
+//	auto result = exec(R"(
+//		function concat(...xs, ...ys)
+//		{
+//			return concat(...xs, ys);
+//		}
+
+//		function concat((i32 x, ...xs), i32 y)
+//		{
+//			return x -> concat(...xs, y);
+//		}
+
+//		function concat((i32 x, ...xs))
+//		{
+//			return x -> concat(...xs);
+//		}
+
+//		function concat(i32 x, i32 y)
+//		{
+//			return x -> concat(y);
+//		}
+
+//		function concat((i32 x, ...xs), string ys)
+//		{
+//			return x -> concat(...xs, ys);
+//		}
+
+//		function concat(i32 x, string ys)
+//		{
+//			return x -> concat(...ys);
+//		}
+
+//		function concat(i32 y)
+//		{
+//			return y;
+//		}
+
+//		function sum(i32 product, i32 value)
+//		{
+//			return product + value;
+//		}
+
+//		function sum(i32 product, (i32 value, ...values))
+//		{
+//			return tail sum(product + value, ...values);
+//		}
+
+//		export i32 main()
+//		{
+//			return sum(0, ...concatt("abc", "def"));
+//		}
+//	)");
+
+//	BOOST_TEST(result == 597);
+//}
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {

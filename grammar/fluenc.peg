@@ -15,7 +15,7 @@ Return              <- 'return' Expression ('->' Continuation)?
 Continuation        <- Id '(' List(Expression)? ')'
 Argument            <- StandardArgument / TupleArgument
 TypeName            <- FunctionType / RegularType
-Expression          <- Unary / Binary / Instantiation / Literal / Tuple / Group / Tail / Call / Expansion / Member / Conditional / Array / Local
+Expression          <- Unary / Binary / Instantiation / Literal / Tuple / Group / Tail / Expansion / Call / Member / Conditional / Array / Local
 Comment             <- '//' [^\r\n]*
 Assignment          <- Id ':' Expression
 With                <- 'with' '{' List(Assignment) ','? '}'
