@@ -75,7 +75,7 @@ function square(i32 owner, i32 index)
 
 function application(State state)
 {
-    return square(state.cells, 0);
+    return square(...state.cells, 0);
 }
 
 function bounds(Square square)
@@ -106,7 +106,7 @@ function drawSquare(i64 renderer, Square square)
 {
     let colors = [rgb(255, 0, 0), rgb(0, 255, 0)];
 
-    let color = Array::elementAt(colors, square.owner, 0);
+    let color = Array::elementAt(...colors, square.owner, 0);
 
     setRenderDrawColor(renderer, color);
 
@@ -152,7 +152,7 @@ function updateCell(State state, EventState events, i32 index, Square square)
         return state with
         {
             player: (state.player + 1) % 2,
-            cells: Array::set(state.cells, index, state.player, 0)
+            cells: Array::set(...state.cells, index, state.player, 0)
         };
     }
 
@@ -178,14 +178,14 @@ function mainLoop(i64 renderer, State state)
 
     let ui = application(state);
 
-    draw(renderer, ui);
+    draw(renderer, ...ui);
 
     SDL::SDL_RenderPresent(renderer);
 
     let events = SDL::SDL_WaitEventEx(createEventState());
 
     return tail mainLoop(renderer
-        , update(state, events, 0, ui)
+        , update(state, events, 0, ...ui)
         );
 }
 

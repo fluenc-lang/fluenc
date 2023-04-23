@@ -149,9 +149,9 @@ function getOverflow(any i)
 
 function solve(i32 overflow, EventState events, LayoutInfo info, Layout item, Layout nextItem)
 {
-	let result = layout(events, item, 0, overflow, info, item.children | nextItem.children);
+	let result = layout(events, item, 0, overflow, info, ...(item.children | nextItem.children));
 
-	let remainingOverflow = getOverflow(result);
+	let remainingOverflow = getOverflow(...result);
 
 	if (remainingOverflow != 0)
 	{
@@ -168,7 +168,7 @@ function solve(i32 overflow, EventState events, LayoutInfo info, Layout item, La
 
 function draw(i64 renderer, without parent, Layout item)
 {
-	return draw(renderer, item, item.children);
+	return draw(renderer, item, ...item.children);
 }
 
 function draw(i64 renderer, Item parent, Layout item)
@@ -216,7 +216,7 @@ function update(EventState events, any parent, (Layout item, Layout nextItem))
 		foreign: getForeignSize(adapted),
 	};
 
-	let info = Array::aggregate(item.children, seed, buildLayoutInfo);
+	let info = Array::aggregate(...item.children, seed, buildLayoutInfo);
 
 	let withRemainingStretch = info with
 	{

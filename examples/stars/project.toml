@@ -1,2 +1,2 @@
 target = "stars"
-libs = [ "sdl.o", "-lSDL2" ]
+libs = [ "-lSDL2" ]

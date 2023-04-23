@@ -285,7 +285,7 @@ function toDecimal(i32 accumulation, (i32 value, ...values))
 
 function process(Row gamma, Row epsilon)
 {
-    return toDecimal(0, yield(11, gamma)) * toDecimal(0, yield(11, epsilon));
+    return toDecimal(0, ...yield(11, gamma)) * toDecimal(0, ...yield(11, epsilon));
 }
 
 function part1(i32 i, Row row, i32 number)
@@ -312,8 +312,8 @@ function run()
 {
     return bind(
         part1(0, Row {}
-            , nextLine(0
-                , readChar(fdopen(open(@"input", O_RDONLY), @"r"))
+            , ...nextLine(0
+                , ...readChar(fdopen(open(@"input", O_RDONLY), @"r"))
                 )
             ),
         part2()
@@ -334,5 +334,5 @@ function printNumbers((i32 number, ...numbers))
 
 export i32 main()
 {
-    return printNumbers(run());
+    return printNumbers(...run());
 }

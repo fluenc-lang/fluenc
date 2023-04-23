@@ -53,12 +53,12 @@ function createStruct()
 
 function foo(Struct s)
 {
-	if (sum(0, s.values) < 20)
+	if (sum(0, ...s.values) < 20)
 	{
-		return tail foo(s with { values: add(1, s.values) });
+		return tail foo(s with { values: add(1, ...s.values) });
 	}
 
-	return first(s.values);
+	return first(...s.values);
 }
 
 export i32 main()
