@@ -1800,7 +1800,7 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 			{
 				auto array = result.values.require<LazyValue>(nullptr);
 
-				auto assignmentEntryPoint = array->assignFrom(context.entryPoint, lazyValue, *this);
+				auto assignmentEntryPoint = array->assignFrom(result.entryPoint, lazyValue, *this);
 
 				locals[node->m_name] = array;
 

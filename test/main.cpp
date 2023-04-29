@@ -6044,6 +6044,54 @@ BOOST_AUTO_TEST_CASE (scenario142)
 #endif
 }
 
+BOOST_AUTO_TEST_CASE (scenario143)
+{
+	auto result = exec(R"(
+		import i32 puts(string s);
+
+		struct State
+		{
+			value: puts("foo")
+		};
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function getValue((State state, ...states))
+		{
+			return state.value -> getValue(...states);
+		}
+
+		function getValue(State state)
+		{
+			return state.value;
+		}
+
+		export i32 main()
+		{
+			let states = [
+				State {},
+				State {}
+			];
+
+			return sum(0, ...getValue(...states));
+		}
+	)");
+
+#ifdef _WIN32
+	BOOST_TEST(result == 0);
+#else
+	BOOST_TEST(result == 8);
+#endif
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
