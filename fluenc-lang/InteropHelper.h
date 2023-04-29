@@ -4,18 +4,24 @@
 #include <llvm/IR/Value.h>
 
 #include "TokenInfo.h"
+#include "EntryPoint.h"
 
 class BaseValue;
 class Type;
-class EntryPoint;
 class UserTypeValue;
 
 struct TokenInfo;
 
+struct ReadProxy
+{
+	const EntryPoint entryPoint;
+	const BaseValue *value;
+};
+
 class InteropHelper
 {
 	public:
-		static const BaseValue *createReadProxy(llvm::Value *value
+		static ReadProxy createReadProxy(llvm::Value *value
 			, const Type *type
 			, const EntryPoint &entryPoint
 			, const std::shared_ptr<peg::Ast> &ast

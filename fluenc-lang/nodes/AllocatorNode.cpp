@@ -1,5 +1,7 @@
 #include <numeric>
 
+#include <range/v3/view.hpp>
+
 #include "AllocatorNode.h"
 #include "ArraySinkNode.h"
 #include "IndexIterator.h"
@@ -28,25 +30,33 @@ AllocatorNode::AllocatorNode(const Type *type, const Node *consumer)
 {
 }
 
-const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor &visitor, const EntryPoint &entryPoint)
+AllocatorNode::AllocResult AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor &visitor, const EntryPoint &entryPoint)
 {
 	if (auto userType = type_cast<const UserType *>(type))
 	{
 		auto elementTypes = userType->elementTypes();
 		auto prototype = userType->prototype();
 
-		auto fields = prototype->fields(entryPoint, visitor);
+		auto [fieldsEntryPoint, fields] = prototype->fields(entryPoint, visitor);
 
 		std::vector<const NamedValue *> values;
 
-		transform(begin(fields), end(fields), begin(elementTypes), back_inserter(values), [&](auto field, auto elementType)
+		auto zipped = ranges::views::zip(fields, elementTypes);
+
+		auto accumulatedEntryPoint = std::accumulate(begin(zipped), end(zipped), fieldsEntryPoint, [&](auto currentEntryPoint, auto pair)
 		{
-			return new NamedValue(field.name()
-				, alloc(elementType, visitor, entryPoint)
-				);
+			auto &[field, elementType] = pair;
+
+			auto [allocEntryPoint, allocValue] = alloc(elementType, visitor, currentEntryPoint);
+
+			auto namedValue = new NamedValue(field.name(), allocValue);
+
+			values.push_back(namedValue);
+
+			return allocEntryPoint;
 		});
 
-		return new UserTypeValue(userType->prototype(), values);
+		return { accumulatedEntryPoint, new UserTypeValue(userType->prototype(), values) };
 	}
 
 	if (auto array = type_cast<const ArrayType *>(type))
@@ -72,7 +82,7 @@ const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor
 
 		for (auto &result : sink->accept(visitor, { entryPoint, Stack() }))
 		{
-			return result.values.require<LazyValue>(nullptr);
+			return { result.entryPoint, result.values.require<LazyValue>(nullptr) };
 		}
 	}
 
@@ -80,22 +90,22 @@ const BaseValue *AllocatorNode::alloc(const Type *type, const DefaultNodeVisitor
 	{
 		auto alloc = entryPoint.alloc(string);
 
-		return new StringValue(alloc, 0, string->length());
+		return { entryPoint, new StringValue(alloc, 0, string->length()) };
 	}
 
 	if (type->id() == TypeId::Without)
 	{
-		return WithoutValue::instance();
+		return { entryPoint, WithoutValue::instance() };
 	}
 
-	return entryPoint.alloc(type);
+	return { entryPoint, entryPoint.alloc(type) };
 }
 
 std::vector<DzResult> AllocatorNode::accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const
 {
-	auto value = alloc(m_type, visitor, context.entryPoint);
+	auto [entryPoint, value] = alloc(m_type, visitor, context.entryPoint);
 
 	context.values.push(value);
 
-	return m_consumer->accept(visitor, context);
+	return m_consumer->accept(visitor, { entryPoint, context.values });
 }

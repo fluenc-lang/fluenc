@@ -5,10 +5,16 @@
 
 class AllocatorNode : public Node
 {
+	struct AllocResult
+	{
+		const EntryPoint entryPoint;
+		const BaseValue *value;
+	};
+
 	public:
 		AllocatorNode(const Type *type, const Node *consumer);
 
-		static const BaseValue *alloc(const Type *type, const DefaultNodeVisitor &visitor, const EntryPoint &entryPoint);
+		static AllocResult alloc(const Type *type, const DefaultNodeVisitor &visitor, const EntryPoint &entryPoint);
 
 		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 

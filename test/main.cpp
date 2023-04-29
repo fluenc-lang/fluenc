@@ -5852,62 +5852,62 @@ BOOST_AUTO_TEST_CASE (scenario139)
 	BOOST_TEST(result == 597);
 }
 
-//BOOST_AUTO_TEST_CASE (scenario140)
-//{
-//	auto result = exec(R"(
-//		function concatt(...xs, ...ys)
-//		{
-//			return concat(...xs, ys);
-//		}
+BOOST_AUTO_TEST_CASE (scenario140)
+{
+	auto result = exec(R"(
+		function concatt(...xs, ...ys)
+		{
+			return concat(...xs, ys);
+		}
 
-//		function concat((i32 x, ...xs), i32 y)
-//		{
-//			return x -> concat(...xs, y);
-//		}
+		function concat((i32 x, ...xs), i32 y)
+		{
+			return x -> concat(...xs, y);
+		}
 
-//		function concat((i32 x, ...xs))
-//		{
-//			return x -> concat(...xs);
-//		}
+		function concat((i32 x, ...xs))
+		{
+			return x -> concat(...xs);
+		}
 
-//		function concat(i32 x, i32 y)
-//		{
-//			return x -> concat(y);
-//		}
+		function concat(i32 x, i32 y)
+		{
+			return x -> concat(y);
+		}
 
-//		function concat((i32 x, ...xs), string ys)
-//		{
-//			return x -> concat(...xs, ys);
-//		}
+		function concat((i32 x, ...xs), string ys)
+		{
+			return x -> concat(...xs, ys);
+		}
 
-//		function concat(i32 x, string ys)
-//		{
-//			return x -> concat(...ys);
-//		}
+		function concat(i32 x, string ys)
+		{
+			return x -> concat(...ys);
+		}
 
-//		function concat(i32 y)
-//		{
-//			return y;
-//		}
+		function concat(i32 y)
+		{
+			return y;
+		}
 
-//		function sum(i32 product, i32 value)
-//		{
-//			return product + value;
-//		}
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
 
-//		function sum(i32 product, (i32 value, ...values))
-//		{
-//			return tail sum(product + value, ...values);
-//		}
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
 
-//		export i32 main()
-//		{
-//			return sum(0, ...concatt("abc", "def"));
-//		}
-//	)");
+		export i32 main()
+		{
+			return sum(0, ...concatt("abc", "def"));
+		}
+	)");
 
-//	BOOST_TEST(result == 597);
-//}
+	BOOST_TEST(result == 597);
+}
 
 BOOST_AUTO_TEST_CASE (scenario141)
 {
@@ -6018,6 +6018,31 @@ BOOST_AUTO_TEST_CASE (scenario141)
 
 //	BOOST_TEST(result == 597);
 //}
+
+BOOST_AUTO_TEST_CASE (scenario142)
+{
+	auto result = exec(R"(
+		import i32 puts(string s);
+
+		struct State
+		{
+			value: puts("foo")
+		};
+
+		export i32 main()
+		{
+			let state = State {};
+
+			return state.value;
+		}
+	)");
+
+#ifdef _WIN32
+	BOOST_TEST(result == 0);
+#else
+	BOOST_TEST(result == 4);
+#endif
+}
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {

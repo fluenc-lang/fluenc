@@ -25,7 +25,7 @@ std::string WithPrototype::name() const
 	return m_value->type()->name();
 }
 
-std::vector<PrototypeField> WithPrototype::fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const
+std::pair<EntryPoint, std::vector<PrototypeField> > WithPrototype::fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const
 {
 	UNUSED(entryPoint);
 	UNUSED(visitor);
@@ -39,7 +39,7 @@ std::vector<PrototypeField> WithPrototype::fields(const EntryPoint &entryPoint, 
 		return { field->name(), field->value(), field->type() };
 	});
 
-	return results;
+	return { entryPoint, results };
 }
 
 llvm::Type *WithPrototype::storageType(llvm::LLVMContext &context) const
