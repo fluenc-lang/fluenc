@@ -1474,7 +1474,9 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 	auto prototype = node->m_prototypeProvider->provide(context.entryPoint, context.values);
 
-	auto [prototypeEntryPoint, prototypeFields] = prototype->fields(context.entryPoint, *this);
+	auto [pep, prototypeFields] = prototype->fields(context.entryPoint, *this);
+
+	auto prototypeEntryPoint = pep;
 
 	std::vector<const NamedValue *> namedValues;
 
