@@ -2581,11 +2581,11 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
 
-	BOOST_TEST(functionResults.size() == 1);
+	BOOST_TEST(functionResults1.size() == 1);
 
-	auto [_2, functionValues] = functionResults[0];
+	auto [_2, functionValues] = functionResults1[0];
 
 	BOOST_TEST(functionValues.size() == 1);
 
@@ -2624,11 +2624,11 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
 
-	BOOST_TEST(functionResults.size() == 1);
+	BOOST_TEST(functionResults1.size() == 1);
 
-	auto [_2, functionValues] = functionResults[0];
+	auto [_2, functionValues] = functionResults1[0];
 
 	BOOST_TEST(functionValues.size() == 1);
 
@@ -2662,11 +2662,11 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
 
-	BOOST_TEST(functionResults.size() == 1);
+	BOOST_TEST(functionResults1.size() == 1);
 
-	auto [_2, functionValues] = functionResults[0];
+	auto [_2, functionValues] = functionResults1[0];
 
 	BOOST_TEST(functionValues.size() == 1);
 
@@ -2710,11 +2710,11 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
 
-	BOOST_TEST(functionResults.size() == 1);
+	BOOST_TEST(functionResults1.size() == 1);
 
-	auto [_2, functionValues] = functionResults[0];
+	auto [_2, functionValues] = functionResults1[0];
 
 	BOOST_TEST(functionValues.size() == 1);
 
@@ -5434,11 +5434,11 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
 
-	BOOST_TEST(functionResults.size() == 1);
+	BOOST_TEST(functionResults1.size() == 1);
 
-	auto [_2, functionValues] = functionResults[0];
+	auto [_2, functionValues] = functionResults1[0];
 
 	BOOST_TEST(functionValues.size() == 1);
 
@@ -5520,11 +5520,11 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 
 	Emitter emitter;
 
-	auto functionResults = function->accept(emitter, { entryPoint, Stack() });
+	auto functionResults1 = function->accept(emitter, { entryPoint, Stack() });
 
-	BOOST_TEST(functionResults.size() == 1);
+	BOOST_TEST(functionResults1.size() == 1);
 
-	auto [_2, functionValues] = functionResults[0];
+	auto [_2, functionValues] = functionResults1[0];
 
 	BOOST_TEST(functionValues.size() == 1);
 
@@ -6090,6 +6090,62 @@ BOOST_AUTO_TEST_CASE (scenario143)
 #else
 	BOOST_TEST(result == 8);
 #endif
+}
+
+BOOST_AUTO_TEST_CASE (scenario144)
+{
+	auto entryPoint = compile(R"(
+		struct Buffer;
+
+		import Buffer puts(string s);
+
+		struct State
+		{
+			value: puts("foo")
+		};
+
+		function foo()
+		{
+			return State {};
+		}
+
+		function bar(State s)
+		{
+			return s with
+			{
+				value: puts("b")
+			};
+		}
+	)");
+
+	auto functions = entryPoint.functions();
+
+	auto [_1, function1] = *functions.find("foo");
+	auto [_2, function2] = *functions.find("bar");
+
+	Emitter emitter;
+
+	auto functionResults1 = function1->accept(emitter, { entryPoint, Stack() });
+
+	BOOST_TEST(functionResults1.size() == 1);
+
+	auto [functionEntryPoint, functionValues1] = functionResults1[0];
+
+	BOOST_TEST(functionValues1.size() == 1);
+
+	auto value1 = functionValues1.pop();
+
+	auto functionResults2 = function2->accept(emitter, { functionEntryPoint, value1 });
+
+	BOOST_TEST(functionResults2.size() == 1);
+
+	auto [_3, functionValues2] = functionResults2[0];
+
+	BOOST_TEST(functionValues2.size() == 1);
+
+	auto value2 = functionValues2.pop();
+
+	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, value1->type(), value2->type()) == 0);
 }
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
