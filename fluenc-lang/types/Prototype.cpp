@@ -24,35 +24,43 @@ std::string Prototype::name() const
 	return m_tag;
 }
 
-std::vector<PrototypeField> Prototype::fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const
+std::pair<EntryPoint, std::vector<PrototypeField>> Prototype::fields(const EntryPoint &entryPoint, const DefaultNodeVisitor &visitor) const
 {
 	std::vector<PrototypeField> fields;
 
-	std::transform(begin(m_fields), end(m_fields), std::back_insert_iterator(fields), [&](auto field) -> PrototypeField
+	auto accumulatedEntryPoint = std::accumulate(begin(m_fields), end(m_fields), entryPoint, [&](auto currentEntryPoint, auto field) -> EntryPoint
 	{
 		auto defaultValue = field.defaultValue();
 
 		if (defaultValue)
 		{
-			auto defaultResults = defaultValue->accept(visitor, { entryPoint, Stack() });
+			auto defaultResults = defaultValue->accept(visitor, { currentEntryPoint, Stack() });
 
-			auto &[_, defaultValues] = *defaultResults.begin();
+			auto &[defaultEntryPoint, defaultValues] = *defaultResults.begin();
 
-			return { field.name(), defaultValues.pop(), field.type(entryPoint) };
+			fields.push_back({ field.name(), defaultValues.pop(), field.type(defaultEntryPoint) });
+
+			return defaultEntryPoint;
 		}
+		else
+		{
+			fields.push_back({ field.name(), nullptr, field.type(currentEntryPoint) });
 
-		return { field.name(), nullptr, field.type(entryPoint) };
+			return currentEntryPoint;
+		}
 	});
 
-	for (auto type : m_parentTypes)
+	auto finalEntryPoint = std::accumulate(begin(m_parentTypes), end(m_parentTypes), accumulatedEntryPoint, [&](auto aep, auto type)
 	{
-		auto prototype = (Prototype *)type->resolve(entryPoint);
-		auto parentFields = prototype->fields(entryPoint, visitor);
+		auto prototype = (Prototype *)type->resolve(aep);
+		auto [parentEntryPoint, parentFields] = prototype->fields(aep, visitor);
 
 		fields.insert(end(fields), begin(parentFields), end(parentFields));
-	}
 
-	return fields;
+		return parentEntryPoint;
+	});
+
+	return { finalEntryPoint, fields };
 }
 
 std::vector<ITypeName *> Prototype::parentTypes() const

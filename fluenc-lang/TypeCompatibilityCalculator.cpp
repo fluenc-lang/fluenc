@@ -21,6 +21,11 @@ struct Storage
 {
 	Storage()
 	{
+		add<StringType, IteratorType>([](const EntryPoint &, auto, auto)
+		{
+			return 1;
+		});
+
 		add<ArrayType, ArrayType>([](const EntryPoint &, auto left, auto right)
 		{
 			if (left == right)

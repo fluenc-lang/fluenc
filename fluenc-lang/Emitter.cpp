@@ -1474,7 +1474,9 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 	auto prototype = node->m_prototypeProvider->provide(context.entryPoint, context.values);
 
-	auto prototypeFields = prototype->fields(context.entryPoint, *this);
+	auto [pep, prototypeFields] = prototype->fields(context.entryPoint, *this);
+
+	auto prototypeEntryPoint = pep;
 
 	std::vector<const NamedValue *> namedValues;
 
@@ -1525,7 +1527,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 		throw MissingFieldException(node->m_ast, prototype->name(), name);
 	}
 
-	IRBuilderEx builder(context.entryPoint);
+	IRBuilderEx builder(prototypeEntryPoint);
 
 	std::vector<const NamedValue *> finalValues;
 
@@ -1537,7 +1539,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 		{
 			auto type = typedValue->type();
 
-			auto alloc = context.entryPoint.alloc(type);
+			auto alloc = prototypeEntryPoint.alloc(type);
 
 			builder.createStore(typedValue, alloc);
 
@@ -1551,7 +1553,7 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 	context.values.push(userTypeValue);
 
-	return node->m_consumer->accept(*this, context);
+	return node->m_consumer->accept(*this, { prototypeEntryPoint, context.values });
 }
 
 std::vector<DzResult> Emitter::visit(const ConditionalNode *node, DefaultVisitorContext context) const
@@ -1800,7 +1802,7 @@ std::vector<DzResult> Emitter::visit(const LocalNode *node, DefaultVisitorContex
 			{
 				auto array = result.values.require<LazyValue>(nullptr);
 
-				auto assignmentEntryPoint = array->assignFrom(context.entryPoint, lazyValue, *this);
+				auto assignmentEntryPoint = array->assignFrom(result.entryPoint, lazyValue, *this);
 
 				locals[node->m_name] = array;
 
@@ -2194,9 +2196,11 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 
 	if (returnType != VoidType::instance())
 	{
-		auto returnValue = InteropHelper::createReadProxy(call, returnType, context.entryPoint, node->m_ast);
+		auto [returnEntryPoint, returnValue] = InteropHelper::createReadProxy(call, returnType, context.entryPoint, node->m_ast);
 
 		context.values.push(returnValue);
+
+		return {{ returnEntryPoint, context.values }};
 	}
 
 	return {{ context.entryPoint, context.values }};

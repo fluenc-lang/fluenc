@@ -20,7 +20,7 @@
 
 #include "exceptions/MissingTypeDeclarationException.h"
 
-const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
+ReadProxy InteropHelper::createReadProxy(llvm::Value *value
 	, const Type *type
 	, const EntryPoint &entryPoint
 	, const std::shared_ptr<peg::Ast> &ast
@@ -36,11 +36,11 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 	{
 		Emitter emitter;
 
-		auto fields = prototype->fields(entryPoint, emitter);
+		auto [fieldsEntryPoint, fields] = prototype->fields(entryPoint, emitter);
 
 		if (empty(fields))
 		{
-			return new ScalarValue { new OpaquePointerType(prototype), value };
+			return { fieldsEntryPoint, new ScalarValue { new OpaquePointerType(prototype), value } };
 		}
 
 		std::vector<llvm::Type *> types;
@@ -60,8 +60,10 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 
 		std::vector<const NamedValue *> fieldValues;
 
-		std::transform(begin(fields), end(fields), index_iterator(), std::back_inserter(fieldValues), [&](auto field, auto index)
+		auto [accumulatedEntryPoint, _] = std::accumulate(begin(fields), end(fields), std::make_pair(fieldsEntryPoint, 0), [&](auto pair, auto field)
 		{
+			auto [lastEntryPoint, index] = pair;
+
 			auto fieldType = field.type();
 
 			if (fieldType)
@@ -78,18 +80,22 @@ const BaseValue *InteropHelper::createReadProxy(llvm::Value *value
 
 				auto load = builder.createLoad(gep, field.name());
 
-				auto value = createReadProxy(*load, fieldType, entryPoint, ast);
+				auto [resultEntryPoint, value] = createReadProxy(*load, fieldType, lastEntryPoint, ast);
 
-				return new NamedValue { field.name(), value };
+				auto namedValue = new NamedValue { field.name(), value };
+
+				fieldValues.push_back(namedValue);
+
+				return std::make_pair(resultEntryPoint, index + 1);
 			}
 
 			throw MissingTypeDeclarationException(ast, type->name(), field.name());
 		});
 
-		return new UserTypeValue { prototype, fieldValues };
+		return { accumulatedEntryPoint, new UserTypeValue { prototype, fieldValues } };
 	}
 
-	return new ScalarValue { type, value };
+	return { entryPoint, new ScalarValue { type, value } };
 }
 
 llvm::Value *InteropHelper::createWriteProxy(const UserTypeValue *userTypeValue, const EntryPoint &entryPoint)
