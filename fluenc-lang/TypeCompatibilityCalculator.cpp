@@ -21,6 +21,11 @@ struct Storage
 {
 	Storage()
 	{
+		add<StringType, StringType>([](const EntryPoint &, auto, auto)
+		{
+			return 0;
+		});
+
 		add<StringType, IteratorType>([](const EntryPoint &, auto, auto)
 		{
 			return 1;
