@@ -1,16 +1,36 @@
 struct Image : Item
 {
+	data: Memory::empty(),
     source
 };
 
+import Memory::Buffer boo();
+
+function u(Image image)
+{
+	if (Memory::isEmpty(image.data))
+	{
+		puts("foo");
+
+		return image with
+		{
+			data: Memory::malloc(1)
+		};
+	}
+
+	puts("bar");
+
+	return image;
+}
+
 function update(EventState events, any parent, (Image image, Image nextItem))
 {
-    return image;
+    return u(image);
 }
 
 function update(EventState events, any parent, ((Image image, Image nextItem), ...controls))
 {
-	return image -> update(events, parent, ...controls);
+	return u(image) -> update(events, parent, ...controls);
 }
 
 function process(ApplicationState state, (Image image, ...controls))
@@ -23,110 +43,42 @@ function process(ApplicationState state, Image image)
     return state.user;
 }
 
-struct Wrapper
-{
-	value
-};
-
-function poo(string s)
-{
-	return Wrapper
-	{
-		value: s
-	};
-}
-
 function getSource(IconSource source)
 {
-	// puts(@"foo");
+	let a = toArray(Memory::malloc(200), 0, ...Range::concat(Range::concat("/usr/share/icons/breeze/actions/16/", source.name), ".svg"));
 
-	let a = toArray(malloc(200), 0, ...String::concat(..."/usr/share/icons/Adwaita/24x24/actions/", poo(source.name)));
-
-	printBuf(a);
+	// printBuf(a);
 
 	return a;
 }
 
-struct Buffer;
+import void assignInt(Memory::Buffer dest, i32 offset, i32 value);
+import void printBuf(Memory::Buffer buffer);
 
-import Buffer malloc(i32 size);
-import Buffer realloc(Buffer ptr, i32 new_size);
-
-import void assignInt(Buffer dest, i32 offset, i32 value);
-import void printBuf(Buffer buffer);
-
-function toArray(Buffer storage, i32 offset, (any c, ...remaining))
+function toArray(Memory::Buffer storage, i32 offset, (any c, ...remaining))
 {
-	printnum(offset);
+	// printnum(offset);
 
 	assignInt(storage, offset, c);
 
-	return tail toArray(realloc(storage, offset + 3), offset + 1, ...remaining);
+	return tail toArray(Memory::realloc(storage, offset + 3), offset + 1, ...remaining);
 }
 
-function toArray(Buffer storage, i32 offset, any c)
+function toArray(Memory::Buffer storage, i32 offset, any c)
 {
-	puts(@"end");
-
 	assignInt(storage, offset, c);
 	assignInt(storage, offset + 1, 0);
 
 	return storage;
 }
 
-namespace String
-{
-	function concat((i32 x, ...xs), i32 y)
-	{
-		puts(@"a");
-
-		return x -> concat(...xs, y);
-	}
-
-	function concat(i32 x, i32 y)
-	{
-		puts(@"b");
-
-		return x -> concat(y);
-	}
-
-	function concat((i32 x, ...xs), Wrapper w)
-	{
-		puts(@"c");
-
-		return x -> concat(...xs, w);
-	}
-
-	function concat((i32 x, ...xs))
-	{
-		puts(@"c");
-
-		return x -> concat(...xs);
-	}
-
-	function concat(i32 x, Wrapper w)
-	{
-		puts(@"d");
-
-		printnum(x);
-		// printnum(y);
-
-		return x -> concat(...w.value);
-	}
-
-	function concat(i32 y)
-	{
-		puts(@"e");
-
-		return y;
-	}
-}
-
 function draw(i64 renderer, any parent, Image image)
 {
-	// puts(@"bar");
+	puts(@"bar");
 
-	let surface = SDL::Image::IMG_Load(getSource(image.source));
+	let q = Svg::render(getSource(image.source));
+
+	let surface = SDL::SDL_CreateRGBSurfaceFrom(q.data, q.width, q.height, 32, q.width * 4, 0x000000FFu32, 0x0000FF00u32, 0x00FF0000u32, 0xFF000000u32);
 	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
 
 	SDL::SDL_RenderCopy(renderer, texture, 0i64, boundingRect(image));
