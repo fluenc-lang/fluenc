@@ -50,13 +50,6 @@ const ILazyValueGenerator *AggregateIteratorValueGenerator::clone(const EntryPoi
 	return this;
 }
 
-const ILazyValueGenerator *AggregateIteratorValueGenerator::forward(size_t id) const
-{
-	UNUSED(id);
-
-	return this;
-}
-
 const Type *AggregateIteratorValueGenerator::type() const
 {
 	std::map<size_t, std::array<const Type *, 2>> map;

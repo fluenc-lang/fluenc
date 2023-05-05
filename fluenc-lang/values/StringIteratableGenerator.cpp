@@ -11,9 +11,8 @@
 #include "types/Int64Type.h"
 #include "types/StringType.h"
 
-StringIteratableGenerator::StringIteratableGenerator(llvm::Value *address, size_t id, size_t length)
+StringIteratableGenerator::StringIteratableGenerator(llvm::Value *address, size_t length)
 	: m_address(address)
-	, m_id(id)
 	, m_length(length)
 {
 }
@@ -50,11 +49,6 @@ const ILazyValueGenerator *StringIteratableGenerator::clone(const EntryPoint &en
 	UNUSED(strategy);
 
 	return this;
-}
-
-const ILazyValueGenerator *StringIteratableGenerator::forward(size_t id) const
-{
-	return new StringIteratableGenerator(m_address, id, m_length);
 }
 
 const Type *StringIteratableGenerator::type() const

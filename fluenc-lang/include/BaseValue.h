@@ -131,7 +131,6 @@ class BaseValue
 		virtual const Type *type() const = 0;
 
 		virtual const BaseValue *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const = 0;
-		virtual const BaseValue *forward(size_t id) const;
 
 		virtual const ValueMetadata &metadata() const = 0;
 };

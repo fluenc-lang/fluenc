@@ -671,7 +671,7 @@ std::vector<DzResult> Emitter::visit(const StringLiteralNode *node, DefaultVisit
 
 	builder.createStore(string, alloc);
 
-	context.values.push(new StringValue(alloc, node->id(), node->m_value.size()));
+	context.values.push(new StringValue(alloc, node->m_value.size()));
 
 	return node->m_consumer->accept(*this, context);
 }
@@ -723,9 +723,7 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 			}
 			else if (localsIterator->second)
 			{
-				auto forwarded = localsIterator->second->forward(node->id());
-
-				context.values.push(forwarded);
+				context.values.push(localsIterator->second);
 			}
 
 			return node->m_consumer->accept(*this, context);

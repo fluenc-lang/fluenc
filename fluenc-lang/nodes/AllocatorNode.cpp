@@ -90,7 +90,7 @@ AllocatorNode::AllocResult AllocatorNode::alloc(const Type *type, const DefaultN
 	{
 		auto alloc = entryPoint.alloc(string);
 
-		return { entryPoint, new StringValue(alloc, 0, string->length()) };
+		return { entryPoint, new StringValue(alloc, string->length()) };
 	}
 
 	if (type->id() == TypeId::Without)

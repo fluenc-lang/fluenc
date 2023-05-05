@@ -32,13 +32,6 @@ const ILazyValueGenerator *IteratorValueGeneratorProxy::clone(const EntryPoint &
 	return this;
 }
 
-const ILazyValueGenerator *IteratorValueGeneratorProxy::forward(size_t id) const
-{
-	UNUSED(id);
-
-	return this;
-}
-
 const Type *IteratorValueGeneratorProxy::type() const
 {
 	return m_subject->type();

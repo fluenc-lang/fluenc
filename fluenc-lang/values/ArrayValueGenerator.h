@@ -14,7 +14,6 @@ class ArrayValueGenerator : public ILazyValueGenerator
 		const IIteratable *generate(const EntryPoint &entryPoint, GenerationMode mode) const override;
 
 		const ILazyValueGenerator *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const override;
-		const ILazyValueGenerator *forward(size_t id) const override;
 
 		const Type *type() const override;
 

@@ -21,7 +21,6 @@ class ILazyValueGenerator
 		virtual const IIteratable *generate(const EntryPoint &entryPoint, GenerationMode mode) const = 0;
 
 		virtual const ILazyValueGenerator *clone(const EntryPoint &entryPoint, CloneStrategy strategy) const = 0;
-		virtual const ILazyValueGenerator *forward(size_t id) const = 0;
 
 		virtual const Type *type() const = 0;
 };
