@@ -11,7 +11,7 @@
 #include "types/Int64Type.h"
 #include "types/StringType.h"
 
-StringIteratableGenerator::StringIteratableGenerator(llvm::Value *address, const ReferenceValue *length)
+StringIteratableGenerator::StringIteratableGenerator(const ReferenceValue *address, const ReferenceValue *length)
 	: m_address(address)
 	, m_length(length)
 {

@@ -23,7 +23,7 @@ const ReferenceValue *StringValue::reference() const
 
 const LazyValue *StringValue::iterator(const EntryPoint &entryPoint) const
 {
-	auto generator = new StringIteratableGenerator(*m_address, m_length);
+	auto generator = new StringIteratableGenerator(m_address, m_length);
 
 	return new LazyValue(generator, entryPoint);
 }

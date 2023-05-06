@@ -2393,7 +2393,7 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 
 	auto align = dataLayout.getABITypeAlign(storageType);
 
-	auto load = new llvm::LoadInst(stringType, node->m_address, "strLoad", false, align, iteratorBlock);
+	auto load = new llvm::LoadInst(stringType, *node->m_address, "strLoad", false, align, iteratorBlock);
 
 	auto gep = new ReferenceValue(ByteType::instance()
 		, llvm::GetElementPtrInst::CreateInBounds(characterType, load, { *index }, "stringAccess", iteratorBlock)
