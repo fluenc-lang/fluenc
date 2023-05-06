@@ -5,7 +5,7 @@
 
 #include "types/StringType.h"
 
-StringValue::StringValue(const ReferenceValue *address, size_t length)
+StringValue::StringValue(const ReferenceValue *address, const ReferenceValue *length)
 	: m_address(address)
 	, m_length(length)
 {
@@ -30,7 +30,7 @@ const LazyValue *StringValue::iterator(const EntryPoint &entryPoint) const
 
 const Type *StringValue::type() const
 {
-	return StringType::get(m_length);
+	return StringType::instance();
 }
 
 const BaseValue *StringValue::clone(const EntryPoint &entryPoint, CloneStrategy strategy) const

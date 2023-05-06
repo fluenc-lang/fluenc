@@ -11,7 +11,7 @@
 #include "types/Int64Type.h"
 #include "types/StringType.h"
 
-StringIteratableGenerator::StringIteratableGenerator(llvm::Value *address, size_t length)
+StringIteratableGenerator::StringIteratableGenerator(llvm::Value *address, const ReferenceValue *length)
 	: m_address(address)
 	, m_length(length)
 {
@@ -39,7 +39,7 @@ const IIteratable *StringIteratableGenerator::generate(const EntryPoint &entryPo
 	auto subject = new StringIteratable(index, m_address, m_length);
 
 	return new Iteratable(subject
-		, StringType::get(m_length)
+		, StringType::instance()
 		);
 }
 

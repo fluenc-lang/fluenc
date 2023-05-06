@@ -8,7 +8,7 @@ class StringIteratable : public IIteratable
 	friend class Emitter;
 
 	public:
-		StringIteratable(const ReferenceValue *index, llvm::Value *address, size_t length);
+		StringIteratable(const ReferenceValue *index, llvm::Value *address, const ReferenceValue *length);
 
 		std::vector<DzResult> accept(const DefaultNodeVisitor &visitor, DefaultVisitorContext context) const override;
 
@@ -18,7 +18,7 @@ class StringIteratable : public IIteratable
 
 		llvm::Value *m_address;
 
-		size_t m_length;
+		const ReferenceValue *m_length;
 };
 
 

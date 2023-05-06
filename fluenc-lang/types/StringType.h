@@ -19,8 +19,6 @@ class StringType : public BuiltinType<StringType>
 
 		IOperatorSet *operators() const override;
 
-		static StringType *get(size_t length);
-
 	private:
 		size_t m_length;
 };

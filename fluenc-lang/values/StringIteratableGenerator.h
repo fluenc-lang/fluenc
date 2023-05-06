@@ -10,7 +10,7 @@ class Node;
 class StringIteratableGenerator : public ILazyValueGenerator
 {
 	public:
-		StringIteratableGenerator(llvm::Value *address, size_t length);
+		StringIteratableGenerator(llvm::Value *address, const ReferenceValue *length);
 
 		const IIteratable *generate(const EntryPoint &entryPoint, GenerationMode mode) const override;
 
@@ -21,7 +21,7 @@ class StringIteratableGenerator : public ILazyValueGenerator
 	private:
 		llvm::Value *m_address;
 
-		size_t m_length;
+		const ReferenceValue *m_length;
 };
 
 

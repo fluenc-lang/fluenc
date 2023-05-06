@@ -12,7 +12,7 @@ class LazyValue;
 class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 {
 	public:
-		StringValue(const ReferenceValue *address, size_t length);
+		StringValue(const ReferenceValue *address, const ReferenceValue *length);
 
 		ValueId id() const override;
 
@@ -25,8 +25,7 @@ class StringValue : public BaseValueWithMetadata<StringValueMetadata>
 
 	private:
 		const ReferenceValue *m_address;
-
-		size_t m_length;
+		const ReferenceValue *m_length;
 };
 
 #endif // STRINGVALUE_H

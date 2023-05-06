@@ -39,12 +39,3 @@ IOperatorSet *StringType::operators() const
 
 	return &operators;
 }
-
-StringType *StringType::get(size_t length)
-{
-	static std::unordered_map<size_t, StringType> cache;
-
-	auto [iterator, _] = cache.try_emplace(length, length);
-
-	return &iterator->second;
-}

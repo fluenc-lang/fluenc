@@ -661,17 +661,30 @@ std::vector<DzResult> Emitter::visit(const StringLiteralNode *node, DefaultVisit
 {
 	IRBuilderEx builder(context.entryPoint);
 
-	auto stringType = StringType::get(node->m_value.size());
+	auto llvmContext = context.entryPoint.context();
+
+	auto stringType = StringType::instance();
 
 	auto string = new ScalarValue(stringType
 		, builder.createGlobalStringPtr(node->m_value, "string")
 		);
 
+	auto lengthType = Int64Type::instance();
+	auto lengthStorageType = lengthType->storageType(*llvmContext);
+
 	auto alloc = context.entryPoint.alloc(stringType);
+	auto lengthStorage = context.entryPoint.alloc(lengthType);
+
+	auto length = new ScalarValue(lengthType
+		, llvm::ConstantInt::get(lengthStorageType
+			, node->m_value.size()
+			)
+		);
 
 	builder.createStore(string, alloc);
+	builder.createStore(length, lengthStorage);
 
-	context.values.push(new StringValue(alloc, node->m_value.size()));
+	context.values.push(new StringValue(alloc, lengthStorage));
 
 	return node->m_consumer->accept(*this, context);
 }
@@ -2361,10 +2374,16 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 	auto ifTrue = createBlock(llvmContext);
 	auto ifFalse = createBlock(llvmContext);
 
-	auto length = new ScalarValue(indexType
-		, llvm::ConstantInt::get(storageType, node->m_length - 1)
+	auto lengthType = Int64Type::instance();
+	auto lengthStorageType = lengthType->storageType(*llvmContext);
+
+	auto lengthLoad = builder.createLoad(node->m_length);
+
+	auto constantOne = new ScalarValue(lengthType
+		, llvm::ConstantInt::get(lengthStorageType, 1)
 		);
 
+	auto length = builder.createSub(lengthLoad, constantOne);
 	auto index = builder.createLoad(node->m_index);
 
 	auto characterType = llvm::Type::getInt8Ty(*llvmContext);

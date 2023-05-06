@@ -1,7 +1,7 @@
 #include "values/StringIteratable.h"
 #include "nodes/IteratableNode.h"
 
-StringIteratable::StringIteratable(const ReferenceValue *index, llvm::Value *address, size_t length)
+StringIteratable::StringIteratable(const ReferenceValue *index, llvm::Value *address, const ReferenceValue *length)
 	: m_index(index)
 	, m_node(new IteratableNode(this))
 	, m_address(address)
