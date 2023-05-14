@@ -13,6 +13,7 @@
 #include "types/AnyType.h"
 #include "types/Float32Type.h"
 #include "types/IteratorType.h"
+#include "types/BufferType.h"
 
 #include "exceptions/UnknownTypeException.h"
 
@@ -74,6 +75,11 @@ Type *DzTypeName::resolve(const EntryPoint &entryPoint) const
 		if (name == "any")
 		{
 			return AnyType::instance();
+		}
+
+		if (name == "buffer")
+		{
+			return BufferType::instance();
 		}
 
 		if (name == "...")

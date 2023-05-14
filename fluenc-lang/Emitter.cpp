@@ -57,6 +57,7 @@
 #include "values/IteratorValueGeneratorProxy.h"
 #include "values/Iterator.h"
 #include "values/ExpandedLazyValue.h"
+#include "values/BufferValue.h"
 
 #include "nodes/BinaryNode.h"
 #include "nodes/ExportedFunctionNode.h"
@@ -1768,6 +1769,12 @@ std::vector<DzResult> Emitter::visit(const ExpansionNode *node, DefaultVisitorCo
 
 		return node->m_consumer->accept(*this, context);
 	}
+	else if (auto buffer = value_cast<const BufferValue *>(value))
+	{
+		context.values.push(new ExpandedLazyValue(buffer->iterator(context.entryPoint)));
+
+		return node->m_consumer->accept(*this, context);
+	}
 	else
 	{
 		context.values.push(value);
@@ -2186,6 +2193,12 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 
 				argumentValues.push_back(*load);
 			}
+			else if (auto bufferValue = value_cast<const BufferValue *>(value))
+			{
+				auto address = bufferValue->reference(context.entryPoint);
+
+				argumentValues.push_back(*address);
+			}
 			else if (auto userTypeValue = value_cast<const UserTypeValue *>(value))
 			{
 				auto cast = InteropHelper::createWriteProxy(userTypeValue, context.entryPoint);
@@ -2199,19 +2212,30 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 		}
 	}
 
-	llvm::FunctionType *functionType = llvm::FunctionType::get(returnType->storageType(*llvmContext), argumentTypes, false);
+	auto functionType = llvm::FunctionType::get(returnType->storageType(*llvmContext), argumentTypes, false);
 
 	auto function = module->getOrInsertFunction(node->m_name, functionType);
 
 	auto call = builder.createCall(function, argumentValues);
 
-	if (returnType != VoidType::instance())
+	if (type_cast<const IPrototype *>(returnType))
 	{
 		auto [returnEntryPoint, returnValue] = InteropHelper::createReadProxy(call, returnType, context.entryPoint, node->m_ast);
 
 		context.values.push(returnValue);
+	}
+	else if (returnType->id() == TypeId::Buffer)
+	{
+		auto address = new ReferenceValue(returnType, call);
+		auto buffer = new BufferValue(address);
 
-		return {{ returnEntryPoint, context.values }};
+		context.values.push(buffer);
+	}
+	else if (returnType->id() != TypeId::Void)
+	{
+		auto scalar = new ScalarValue(returnType, call);
+
+		context.values.push(scalar);
 	}
 
 	return {{ context.entryPoint, context.values }};

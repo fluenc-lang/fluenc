@@ -32,6 +32,7 @@ enum class ValueId : int64_t
 	Placeholder = (1 << 14),
 	Without = (1 << 15),
 	ExpandedLazy = (1 << 16),
+	Buffer = (1 << 17),
 };
 
 template <typename T>
@@ -54,6 +55,7 @@ class Iterator;
 class IndexedValue;
 class ForwardedValue;
 class ExpandedLazyValue;
+class BufferValue;
 
 template <>
 inline constexpr ValueId value_id_for<BaseValue> = ValueId::BaseValue;
@@ -102,6 +104,9 @@ inline constexpr ValueId value_id_for<ForwardedValue> = ValueId::Forwarded;
 
 template <>
 inline constexpr ValueId value_id_for<ExpandedLazyValue> = ValueId::ExpandedLazy;
+
+template <>
+inline constexpr ValueId value_id_for<BufferValue> = ValueId::Buffer;
 
 template <typename T, typename U>
 T value_cast(U* source)

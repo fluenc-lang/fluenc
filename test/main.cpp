@@ -6148,6 +6148,43 @@ BOOST_AUTO_TEST_CASE (scenario144)
 	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, value1->type(), value2->type()) == 0);
 }
 
+BOOST_AUTO_TEST_CASE (scenario145)
+{
+	auto result = exec(R"(
+		struct Opaque;
+
+		import buffer memcpy(Opaque destination, string source, i64 num);
+
+		import Opaque calloc(i64 nitems, i64 size);
+
+		import i32 puts(buffer s);
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		export i32 main()
+		{
+			let c = calloc(15i64, 1i64);
+			let b = memcpy(c, "\6\0\0\0\0\0\0\0foobar", 14i64);
+
+			return sum(0, ...b) + puts(b);
+		}
+	)");
+
+#ifdef _WIN32
+	BOOST_TEST(result == 633);
+#else
+	BOOST_TEST(result == 640);
+#endif
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();
