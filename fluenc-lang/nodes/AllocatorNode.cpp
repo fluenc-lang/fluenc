@@ -15,6 +15,7 @@
 #include "types/UserType.h"
 #include "types/IPrototype.h"
 #include "types/WithoutType.h"
+#include "types/Int64Type.h"
 
 #include "values/NamedValue.h"
 #include "values/ScalarValue.h"
@@ -89,8 +90,9 @@ AllocatorNode::AllocResult AllocatorNode::alloc(const Type *type, const DefaultN
 	if (auto string = type_cast<const StringType *>(type))
 	{
 		auto alloc = entryPoint.alloc(string);
+		auto length = entryPoint.alloc(Int64Type::instance());
 
-		return { entryPoint, new StringValue(alloc, 0, string->length()) };
+		return { entryPoint, new StringValue(alloc, length) };
 	}
 
 	if (type->id() == TypeId::Without)

@@ -1,9 +1,9 @@
-#ifndef VOIDTYPE_H
-#define VOIDTYPE_H
+#ifndef BUFFERTYPE_H
+#define BUFFERTYPE_H
 
 #include "BuiltinType.h"
 
-class VoidType : public BuiltinType<VoidType>
+class BufferType : public BuiltinType<BufferType>
 {
 	public:
 		TypeId id() const override;
@@ -13,4 +13,4 @@ class VoidType : public BuiltinType<VoidType>
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 };
 
-#endif // VOIDTYPE_H
+#endif // BUFFERTYPE_H

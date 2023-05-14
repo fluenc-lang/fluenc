@@ -57,6 +57,7 @@
 #include "values/IteratorValueGeneratorProxy.h"
 #include "values/Iterator.h"
 #include "values/ExpandedLazyValue.h"
+#include "values/BufferValue.h"
 
 #include "nodes/BinaryNode.h"
 #include "nodes/ExportedFunctionNode.h"
@@ -661,17 +662,30 @@ std::vector<DzResult> Emitter::visit(const StringLiteralNode *node, DefaultVisit
 {
 	IRBuilderEx builder(context.entryPoint);
 
-	auto stringType = StringType::get(node->m_value.size());
+	auto llvmContext = context.entryPoint.context();
+
+	auto stringType = StringType::instance();
 
 	auto string = new ScalarValue(stringType
 		, builder.createGlobalStringPtr(node->m_value, "string")
 		);
 
+	auto lengthType = Int64Type::instance();
+	auto lengthStorageType = lengthType->storageType(*llvmContext);
+
 	auto alloc = context.entryPoint.alloc(stringType);
+	auto lengthStorage = context.entryPoint.alloc(lengthType);
+
+	auto length = new ScalarValue(lengthType
+		, llvm::ConstantInt::get(lengthStorageType
+			, node->m_value.size()
+			)
+		);
 
 	builder.createStore(string, alloc);
+	builder.createStore(length, lengthStorage);
 
-	context.values.push(new StringValue(alloc, node->id(), node->m_value.size()));
+	context.values.push(new StringValue(alloc, lengthStorage));
 
 	return node->m_consumer->accept(*this, context);
 }
@@ -723,9 +737,7 @@ std::vector<DzResult> Emitter::visit(const MemberAccessNode *node, DefaultVisito
 			}
 			else if (localsIterator->second)
 			{
-				auto forwarded = localsIterator->second->forward(node->id());
-
-				context.values.push(forwarded);
+				context.values.push(localsIterator->second);
 			}
 
 			return node->m_consumer->accept(*this, context);
@@ -1757,6 +1769,12 @@ std::vector<DzResult> Emitter::visit(const ExpansionNode *node, DefaultVisitorCo
 
 		return node->m_consumer->accept(*this, context);
 	}
+	else if (auto buffer = value_cast<const BufferValue *>(value))
+	{
+		context.values.push(new ExpandedLazyValue(buffer->iterator(context.entryPoint)));
+
+		return node->m_consumer->accept(*this, context);
+	}
 	else
 	{
 		context.values.push(value);
@@ -2175,6 +2193,12 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 
 				argumentValues.push_back(*load);
 			}
+			else if (auto bufferValue = value_cast<const BufferValue *>(value))
+			{
+				auto address = bufferValue->reference(context.entryPoint);
+
+				argumentValues.push_back(*address);
+			}
 			else if (auto userTypeValue = value_cast<const UserTypeValue *>(value))
 			{
 				auto cast = InteropHelper::createWriteProxy(userTypeValue, context.entryPoint);
@@ -2188,19 +2212,30 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 		}
 	}
 
-	llvm::FunctionType *functionType = llvm::FunctionType::get(returnType->storageType(*llvmContext), argumentTypes, false);
+	auto functionType = llvm::FunctionType::get(returnType->storageType(*llvmContext), argumentTypes, false);
 
 	auto function = module->getOrInsertFunction(node->m_name, functionType);
 
 	auto call = builder.createCall(function, argumentValues);
 
-	if (returnType != VoidType::instance())
+	if (type_cast<const IPrototype *>(returnType))
 	{
 		auto [returnEntryPoint, returnValue] = InteropHelper::createReadProxy(call, returnType, context.entryPoint, node->m_ast);
 
 		context.values.push(returnValue);
+	}
+	else if (returnType->id() == TypeId::Buffer)
+	{
+		auto address = new ReferenceValue(returnType, call);
+		auto buffer = new BufferValue(address);
 
-		return {{ returnEntryPoint, context.values }};
+		context.values.push(buffer);
+	}
+	else if (returnType->id() != TypeId::Void)
+	{
+		auto scalar = new ScalarValue(returnType, call);
+
+		context.values.push(scalar);
 	}
 
 	return {{ context.entryPoint, context.values }};
@@ -2363,10 +2398,16 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 	auto ifTrue = createBlock(llvmContext);
 	auto ifFalse = createBlock(llvmContext);
 
-	auto length = new ScalarValue(indexType
-		, llvm::ConstantInt::get(storageType, node->m_length - 1)
+	auto lengthType = Int64Type::instance();
+	auto lengthStorageType = lengthType->storageType(*llvmContext);
+
+	auto lengthLoad = builder.createLoad(node->m_length);
+
+	auto constantOne = new ScalarValue(lengthType
+		, llvm::ConstantInt::get(lengthStorageType, 1)
 		);
 
+	auto length = builder.createSub(lengthLoad, constantOne);
 	auto index = builder.createLoad(node->m_index);
 
 	auto characterType = llvm::Type::getInt8Ty(*llvmContext);
@@ -2376,7 +2417,7 @@ std::vector<DzResult> Emitter::visit(const StringIteratable *node, DefaultVisito
 
 	auto align = dataLayout.getABITypeAlign(storageType);
 
-	auto load = new llvm::LoadInst(stringType, node->m_address, "strLoad", false, align, iteratorBlock);
+	auto load = new llvm::LoadInst(stringType, *node->m_address, "strLoad", false, align, iteratorBlock);
 
 	auto gep = new ReferenceValue(ByteType::instance()
 		, llvm::GetElementPtrInst::CreateInBounds(characterType, load, { *index }, "stringAccess", iteratorBlock)

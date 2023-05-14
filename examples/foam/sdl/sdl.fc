@@ -1,6 +1,9 @@
 namespace SDL
 {
     struct SDL_Surface;
+    struct SDL_RWops;
+
+    import SDL_RWops SDL_RWFromMem(Memory::Buffer mem, i32 size);
 
     import i32 SDL_Init(u32 flags);
     import i32 SDL_SetRenderDrawColor(i64 renderer, i32 r, i32 g, i32 b, i32 a);
@@ -15,6 +18,8 @@ namespace SDL
 	import i64 SDL_GetWindowSurface(i64 window);
 	import i64 SDL_RWFromFile(string file, string mode);
 	import i64 SDL_CreateTextureFromSurface(i64 renderer, SDL_Surface surface);
+
+	import SDL_Surface SDL_CreateRGBSurfaceFrom(Memory::Buffer pixels, i32 width, i32 height, i32 depth, i32 pitch, u32 Rmask, u32 Gmask, u32 Bmask, u32 Amask);
 
 	import i32 SDL_LowerBlit(i64 src, i64 srcRect, i64 dst, Rect dstRect);
 	import i32 SDL_UpdateWindowSurface(i64 window);

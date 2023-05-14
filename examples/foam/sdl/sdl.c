@@ -29,11 +29,6 @@ SDL_Rect *SDL_RenderGetViewportEx(SDL_Renderer *renderer, SDL_Rect *rect)
     return rect;
 }
 
-void printnum(int num)
-{
-    printf("%d\n", num);
-}
-
 float intToFloat(int value)
 {
     return (float)value;
@@ -51,7 +46,7 @@ int i32toi8(int value)
 
 void assignInt(void *buffer, size_t offset, int32_t value)
 {
-    printf("assignInt: %zu %d\n", offset, value);
+    // printf("assignInt: %zu %d\n", offset, value);
 
     *(((char*)buffer) + offset) = (char)value;
 }
@@ -59,4 +54,9 @@ void assignInt(void *buffer, size_t offset, int32_t value)
 void printBuf(char *buffer)
 {
     printf("printBuf: %s\n", buffer);
+}
+
+void *boo()
+{
+    return 0;
 }

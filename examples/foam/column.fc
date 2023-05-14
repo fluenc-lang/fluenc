@@ -179,7 +179,7 @@ function draw(i64 renderer, Item parent, Layout item)
 		y: parent.y + item.y
 	};
 
-	return draw(renderer, surrogate, item.children);
+	return draw(renderer, surrogate, ...item.children);
 }
 
 function draw(i64 renderer, any parent, LayoutItem item)

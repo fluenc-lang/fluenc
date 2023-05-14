@@ -115,8 +115,3 @@ const ILazyValueGenerator *ArrayValueGenerator::clone(const EntryPoint &entryPoi
 
 	throw std::exception();
 }
-
-const ILazyValueGenerator *ArrayValueGenerator::forward(size_t id) const
-{
-	return new ArrayValueGenerator(m_values, m_ast, id, m_size);
-}

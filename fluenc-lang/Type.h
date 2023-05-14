@@ -29,6 +29,8 @@ enum class TypeId : int64_t
 	Placeholder = (1 << 14),
 	Without = (1 << 15) + Builtin,
 	String = (1 << 16),
+	Buffer = (1 << 17),
+	Void = (1 << 18),
 };
 
 template <typename T>
@@ -55,6 +57,8 @@ class IBuiltinType;
 class WithPrototype;
 class Prototype;
 class StringType;
+class BufferType;
+class VoidType;
 
 template <>
 inline constexpr TypeId type_id_for<Type> = TypeId::Type;
@@ -112,6 +116,12 @@ inline constexpr TypeId type_id_for<WithoutType> = TypeId::Without;
 
 template <>
 inline constexpr TypeId type_id_for<StringType> = TypeId::String;
+
+template <>
+inline constexpr TypeId type_id_for<BufferType> = TypeId::Buffer;
+
+template <>
+inline constexpr TypeId type_id_for<VoidType> = TypeId::Void;
 
 template <typename T, typename U>
 T type_cast(U* source)

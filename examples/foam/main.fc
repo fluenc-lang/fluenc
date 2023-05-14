@@ -165,7 +165,77 @@ function expand(ToolBar toolBar)
 		children: [
 			Row
 			{
-				children: itemsFor(toolBar.items)
+				children: itemsFor(...toolBar.items)
+			}
+		]
+	};
+}
+
+struct Editor : Item;
+struct Header : Item;
+
+function expand(Header header)
+{
+	return Row
+	{
+		spacing: 1,
+		children: [
+			LayoutItem
+			{
+				minimum: 100,
+				item: Rectangle
+				{
+					color: light
+				}
+			},
+			LayoutItem
+			{
+				stretch: 1,
+				item: Rectangle
+				{
+					color: light
+				}
+			}
+		]
+	};
+}
+
+function expand(Editor editor)
+{
+	return Column
+	{
+		spacing: 1,
+		children: [
+			LayoutItem
+			{
+				minimum: 35,
+				item: Header {}
+			},
+			LayoutItem
+			{
+				stretch: 1,
+				item: Row
+				{
+					spacing: 1,
+					children: [
+						LayoutItem
+						{
+							minimum: 100,
+							item: Rectangle
+							{
+								color: light
+							}
+						},
+						LayoutItem
+						{
+							stretch: 1,
+							item: Rectangle
+							{
+								color: light
+							}
+						}
+					]
+				}
 			}
 		]
 	};
@@ -178,60 +248,72 @@ function application(State state)
 {
     return Column
     {
-		spacing: 0,
 		children: [
-			LayoutItem
-			{
-				minimum: 30,
-				item: ToolBar
-				{
-					items: [
-						ToolBarItem
-						{
-							text: "Save",
-							image: icon(@"document-save-symbolic.symbolic.png")
-						},
-						// ToolBarItem
-						// {
-						// 	text: "Add actor",
-						// 	image: "/usr/share/icons/Adwaita/24x24/actions/list-add-symbolic.symbolic.png"
-						// },
-						// ToolBarItem
-						// {
-						// 	text: "Create easing",
-						// 	image: "/usr/share/icons/Adwaita/24x24/actions/join-symbolic.symbolic.png"
-						// },
-						// ToolBarItem
-						// {
-						// 	text: "Load guides",
-						// 	image: "/usr/share/icons/Adwaita/24x24/actions/show-guides-symbolic.symbolic.png"
-						// },
-						// ToolBarItem
-						// {
-						// 	text: "Settings",
-						// 	image: "/usr/share/icons/Adwaita/24x24/actions/configure-symbolic.symbolic.png"
-						// }
-					]
-				}
-			},
 			LayoutItem
 			{
 				stretch: 1,
 				item: Rectangle
 				{
-					color: light
-				}
-			},
-			LayoutItem
-			{
-				minimum: 30,
-				item: Rectangle
-				{
-					color: window
+					color: window,
+					children: [
+						Column
+						{
+							spacing: 0,
+							children: [
+								LayoutItem
+								{
+									minimum: 30,
+									item: ToolBar
+									{
+										items: [
+											ToolBarItem
+											{
+												text: "Save",
+												image: icon("document-save")
+											},
+											ToolBarItem
+											{
+												text: "Add actor",
+												image: icon("list-add")
+											},
+											ToolBarItem
+											{
+												text: "Create easing",
+												image: icon("join")
+											},
+											ToolBarItem
+											{
+												text: "Load guides",
+												image: icon("show-guides")
+											},
+											ToolBarItem
+											{
+												text: "Settings",
+												image: icon("configure")
+											}
+										]
+									}
+								},
+								LayoutItem
+								{
+									stretch: 1,
+									item: Editor {}
+								},
+								LayoutItem
+								{
+									minimum: 30,
+									item: Rectangle
+									{
+										color: window
+									}
+								}
+							]
+						}
+					]
 				}
 			}
 		]
-    };
+    }
 }
 
 function initState()
