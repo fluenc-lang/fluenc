@@ -97,9 +97,11 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 
 			IRBuilderEx builder(entryPoint);
 
-			auto load = builder.createLoad(source->reference());
+			auto referenceLoad = builder.createLoad(source->reference());
+			auto lengthLoad = builder.createLoad(source->length());
 
-			builder.createStore(load, target->reference());
+			builder.createStore(referenceLoad, target->reference());
+			builder.createStore(lengthLoad, target->length());
 
 			return entryPoint;
 		}),
