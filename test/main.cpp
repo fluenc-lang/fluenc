@@ -6185,6 +6185,85 @@ BOOST_AUTO_TEST_CASE (scenario145)
 #endif
 }
 
+BOOST_AUTO_TEST_CASE (scenario146)
+{
+	auto result = exec(R"(
+		import i32 puts(string s);
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		export i32 main()
+		{
+			let b = "foobar";
+
+			return sum(0, ...b) + puts(b);
+		}
+	)");
+
+#ifdef _WIN32
+	BOOST_TEST(result == 633);
+#else
+	BOOST_TEST(result == 640);
+#endif
+}
+
+BOOST_AUTO_TEST_CASE (scenario147)
+{
+	auto result = exec(R"(
+		import i32 puts(string s);
+
+		struct State
+		{
+			value
+		};
+
+		function sum(i32 product, i32 value)
+		{
+			return product + value;
+		}
+
+		function sum(i32 product, (i32 value, ...values))
+		{
+			return tail sum(product + value, ...values);
+		}
+
+		function loop(i32 i, State s)
+		{
+			if (i < 1)
+			{
+				let ms = s with
+				{
+					value: "foobar"
+				};
+
+				return tail loop(i + 1, ms);
+			}
+
+			return sum(0, ...s.value);
+		}
+
+		export i32 main()
+		{
+			let s = State
+			{
+				value: "f"
+			};
+
+			return loop(0, s);
+		}
+	)");
+
+	BOOST_TEST(result == 633);
+}
+
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
 {
 	llvm::InitializeAllTargetInfos();

@@ -21,6 +21,11 @@ const ReferenceValue *StringValue::reference() const
 	return m_address;
 }
 
+const ReferenceValue *StringValue::length() const
+{
+	return m_length;
+}
+
 const LazyValue *StringValue::iterator(const EntryPoint &entryPoint) const
 {
 	auto generator = new StringIteratableGenerator(m_address, m_length);
