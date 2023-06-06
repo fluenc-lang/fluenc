@@ -24,6 +24,7 @@
 #include "values/WithoutValue.h"
 #include "values/ReferenceValue.h"
 #include "values/StringValue.h"
+#include "values/BufferValue.h"
 
 AllocatorNode::AllocatorNode(const Type *type, const Node *consumer)
 	: m_type(type)
@@ -93,6 +94,13 @@ AllocatorNode::AllocResult AllocatorNode::alloc(const Type *type, const DefaultN
 		auto length = entryPoint.alloc(Int64Type::instance());
 
 		return { entryPoint, new StringValue(alloc, length) };
+	}
+
+	if (auto buffer = type_cast<const BufferType *>(type))
+	{
+		auto alloc = entryPoint.alloc(type);
+
+		return { entryPoint, new BufferValue(alloc) };
 	}
 
 	if (type->id() == TypeId::Without)
