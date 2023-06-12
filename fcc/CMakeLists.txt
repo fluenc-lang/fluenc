@@ -28,7 +28,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	tomlplusplus::tomlplusplus
 	LibArchive::LibArchive
 	CLI11::CLI11
-	unofficial::git2::git2
+	unofficial::git2::libgit2package
 )
 
 if (${CLANG_LINK_CLANG_DYLIB})

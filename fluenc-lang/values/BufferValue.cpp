@@ -37,14 +37,22 @@ const ReferenceValue *BufferValue::reference(const EntryPoint &entryPoint) const
 		llvm::ConstantInt::get(intType, sizeof(size_t))
 	};
 
-	return new ReferenceValue(m_address->type()
-		, llvm::GetElementPtrInst::CreateInBounds(elementType, *m_address, indexes, "bufferLoad", block)
+	IRBuilderEx builder(entryPoint);
+
+	auto buffer = builder.createLoad(m_address);
+
+	return new ReferenceValue(buffer->type()
+		, llvm::GetElementPtrInst::CreateInBounds(elementType, *buffer, indexes, "bufferLoad", block)
 		);
 }
 
 const LazyValue *BufferValue::iterator(const EntryPoint &entryPoint) const
 {
-	auto length = new ReferenceValue(Int64Type::instance(), *m_address);
+	IRBuilderEx builder(entryPoint);
+
+	auto buffer = builder.createLoad(m_address);
+
+	auto length = new ReferenceValue(Int64Type::instance(), *buffer);
 
 	// Create a shared pointer, so that we can reuse the logic of
 	// StringIteratableGenerator & co. It usually expects a pointer
@@ -52,8 +60,6 @@ const LazyValue *BufferValue::iterator(const EntryPoint &entryPoint) const
 	//
 	auto address = reference(entryPoint);
 	auto value = new ScalarValue(address->type(), *address);
-
-	IRBuilderEx builder(entryPoint);
 
 	auto sharedPointer = entryPoint.alloc(address->type());
 

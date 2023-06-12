@@ -3,6 +3,8 @@
 
 #include "ValueMetadata.h"
 
+#include <cstdint>
+
 class Type;
 class EntryPoint;
 

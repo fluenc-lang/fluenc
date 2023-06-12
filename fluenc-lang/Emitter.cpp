@@ -1502,27 +1502,6 @@ std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisit
 
 			valuesByName.erase(valueByName);
 
-			if (auto reference = value_cast<const ReferenceValue *>(field.defaultValue()))
-			{
-				if (reference->type() != value->type())
-				{
-					return new NamedValue { field.name(), value };
-				}
-
-				auto type = reference->type();
-				auto storageType = type->storageType(*llvmContext);
-
-				auto align = dataLayout.getABITypeAlign(storageType);
-
-				auto typedValue = ValueHelper::getScalar(node->m_ast, context.entryPoint, value);
-
-				auto store = new llvm::StoreInst(*typedValue, *reference, false, align, block);
-
-				UNUSED(store);
-
-				return new NamedValue { field.name(), field.defaultValue() };
-			}
-
 			return new NamedValue { field.name(), value };
 		}
 
@@ -2226,8 +2205,15 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 	}
 	else if (returnType->id() == TypeId::Buffer)
 	{
-		auto address = new ReferenceValue(returnType, call);
-		auto buffer = new BufferValue(address);
+		auto alloc = context.entryPoint.alloc(returnType);
+
+		IRBuilderEx builder(context.entryPoint);
+
+		auto address = new ScalarValue(returnType, call);
+
+		builder.createStore(address, alloc);
+
+		auto buffer = new BufferValue(alloc);
 
 		context.values.push(buffer);
 	}

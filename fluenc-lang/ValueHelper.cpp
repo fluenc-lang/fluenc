@@ -16,6 +16,7 @@
 #include "values/StringValue.h"
 #include "values/ExpandedValue.h"
 #include "values/ExpandableValue.h"
+#include "values/BufferValue.h"
 
 EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 	, const BaseValue *value
@@ -122,7 +123,19 @@ EntryPoint ValueHelper::transferValue(const EntryPoint &entryPoint
 					, emitter
 					);
 			});
-		})
+		}),
+		strategyFor<BufferValue, BufferValue>([](auto entryPoint, auto source, auto target, auto& emitter)
+		{
+			UNUSED(emitter);
+
+			IRBuilderEx builder(entryPoint);
+
+			auto referenceLoad = builder.createLoad(source->reference(entryPoint));
+
+			builder.createStore(referenceLoad, target->reference(entryPoint));
+
+			return entryPoint;
+		}),
 	};
 
 	auto resultEntryPoint = std::accumulate(begin(strategies), end(strategies), std::optional<EntryPoint>(), [&](auto accumulated, auto strategy)
