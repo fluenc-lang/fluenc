@@ -9,11 +9,16 @@
 #include "nanosvg.h"
 #include "nanosvgrast.h"
 
+typedef struct buffer
+{
+	size_t size;
+} buffer_t;
+
 typedef struct img
 {
     uint32_t width;
 	uint32_t height;
-    uint8_t* data;
+    buffer_t* data;
 } img_t;
 
 img_t *render(const char *filename)
@@ -39,10 +44,14 @@ img_t *render(const char *filename)
 		return NULL;
 	}
 
-	img_t *img = malloc(sizeof(img_t) + (w * h * 4));
+	img_t *img = malloc(sizeof(img_t) + sizeof(buffer_t) + (w * h * 4));
 	img->width = w;
 	img->height = h;
-	img->data = (uint8_t*)&(img[1]);
+
+	buffer_t* buffer = (buffer_t *)&(img[1]);
+	buffer->size = (w * h * 4);
+
+	img->data = buffer;
 
 	if (img == NULL)
 	{
@@ -52,7 +61,9 @@ img_t *render(const char *filename)
 
 	printf("rasterizing image %d x %d\n", w, h);
 
-	nsvgRasterize(rast, image, 0, 0, 1, img->data, w, h, w * 4);
+	nsvgRasterize(rast, image, 0, 0, 1, (uint8_t*)&(buffer[1]), w, h, w * 4);
+
+	printf("rasterized\n");
 
     return img;
 }

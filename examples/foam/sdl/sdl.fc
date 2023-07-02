@@ -19,7 +19,7 @@ namespace SDL
 	import i64 SDL_RWFromFile(string file, string mode);
 	import i64 SDL_CreateTextureFromSurface(i64 renderer, SDL_Surface surface);
 
-	import SDL_Surface SDL_CreateRGBSurfaceFrom(Memory::Buffer pixels, i32 width, i32 height, i32 depth, i32 pitch, u32 Rmask, u32 Gmask, u32 Bmask, u32 Amask);
+	import SDL_Surface SDL_CreateRGBSurfaceFrom(buffer pixels, i32 width, i32 height, i32 depth, i32 pitch, u32 Rmask, u32 Gmask, u32 Bmask, u32 Amask);
 
 	import i32 SDL_LowerBlit(i64 src, i64 srcRect, i64 dst, Rect dstRect);
 	import i32 SDL_UpdateWindowSurface(i64 window);

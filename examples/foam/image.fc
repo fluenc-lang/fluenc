@@ -8,17 +8,17 @@ import Memory::Buffer boo();
 
 function u(Image image)
 {
-	if (Memory::isEmpty(image.data))
-	{
-		puts("foo");
-
-		return image with
-		{
-			data: Memory::malloc(1)
-		};
-	}
-
-	puts("bar");
+	// if (Memory::isEmpty(image.data))
+	// {
+	// 	puts("foo");
+ //
+	// 	return image with
+	// 	{
+	// 		data: Memory::malloc(1)
+	// 	};
+	// }
+ //
+	// puts("bar");
 
 	return image;
 }
@@ -45,29 +45,29 @@ function process(ApplicationState state, Image image)
 
 function getSource(IconSource source)
 {
-	let a = toArray(Memory::malloc(200), 0, ...Range::concat(Range::concat("/usr/share/icons/breeze/actions/16/", source.name), ".svg"));
+	let a = toArray(Memory::allocate(200i64), 0i64, ...Range::concat(Range::concat("/usr/share/icons/breeze/actions/16/", source.name), ".svg"));
 
 	// printBuf(a);
 
 	return a;
 }
 
-import void assignInt(Memory::Buffer dest, i32 offset, i32 value);
-import void printBuf(Memory::Buffer buffer);
+import void assignInt(buffer dest, i64 offset, i32 value);
+import void printBuf(buffer buffer);
 
-function toArray(Memory::Buffer storage, i32 offset, (any c, ...remaining))
+function toArray(buffer storage, i64 offset, (any c, ...remaining))
 {
 	// printnum(offset);
 
 	assignInt(storage, offset, c);
 
-	return tail toArray(Memory::realloc(storage, offset + 3), offset + 1, ...remaining);
+	return tail toArray(Memory::reallocate(storage, offset + 3i64), offset + 1i64, ...remaining);
 }
 
-function toArray(Memory::Buffer storage, i32 offset, any c)
+function toArray(buffer storage, i64 offset, any c)
 {
 	assignInt(storage, offset, c);
-	assignInt(storage, offset + 1, 0);
+	assignInt(storage, offset + 1i64, 0);
 
 	return storage;
 }

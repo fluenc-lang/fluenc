@@ -4,7 +4,7 @@ OBJ = sdl.o
 	gcc -c $<
 
 target: $(OBJ)
-	../../fcc
+	../../build/fcc/fcc build
 
 clean:
 	rm -f *.o
