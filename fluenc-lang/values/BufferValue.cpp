@@ -23,6 +23,11 @@ ValueId BufferValue::id() const
 	return ValueId::Buffer;
 }
 
+const ReferenceValue *BufferValue::address() const
+{
+	return m_address;
+}
+
 const ReferenceValue *BufferValue::reference(const EntryPoint &entryPoint) const
 {
 	auto llvmContext = entryPoint.context();

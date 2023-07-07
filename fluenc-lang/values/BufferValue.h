@@ -12,6 +12,7 @@ class BufferValue : public BaseValueWithMetadata<BufferValueMetadata>
 
 		ValueId id() const override;
 
+		const ReferenceValue *address() const;
 		const ReferenceValue *reference(const EntryPoint &entryPoint) const;
 		const LazyValue *iterator(const EntryPoint &entryPoint) const;
 
