@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <float.h>
+#include <math.h>
 
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVGRAST_IMPLEMENTATION
@@ -21,7 +22,7 @@ typedef struct img
     buffer_t* data;
 } img_t;
 
-img_t *render(const char *filename)
+img_t *render(const char *filename, int width, int height)
 {
 	printf("parsing %s\n", filename);
 
@@ -33,9 +34,6 @@ img_t *render(const char *filename)
 		return NULL;
 	}
 
-	int w = (int)image->width;
-	int h = (int)image->height;
-
 	NSVGrasterizer *rast = nsvgCreateRasterizer();
 
 	if (rast == NULL)
@@ -44,12 +42,12 @@ img_t *render(const char *filename)
 		return NULL;
 	}
 
-	img_t *img = malloc(sizeof(img_t) + sizeof(buffer_t) + (w * h * 4));
-	img->width = w;
-	img->height = h;
+	img_t *img = malloc(sizeof(img_t) + sizeof(buffer_t) + (width * height * 4));
+	img->width = width;
+	img->height = height;
 
 	buffer_t* buffer = (buffer_t *)&(img[1]);
-	buffer->size = (w * h * 4);
+	buffer->size = (width * height * 4);
 
 	img->data = buffer;
 
@@ -59,9 +57,11 @@ img_t *render(const char *filename)
 		return NULL;
 	}
 
-	printf("rasterizing image %d x %d\n", w, h);
+	printf("rasterizing image %d x %d\n", width, height);
 
-	nsvgRasterize(rast, image, 0, 0, 1, (uint8_t*)&(buffer[1]), w, h, w * 4);
+	float scale = fmin(width / image->width, height / image->height);
+
+	nsvgRasterize(rast, image, 0, 0, scale, (uint8_t*)&(buffer[1]), width, height, width * 4);
 
 	printf("rasterized\n");
 

@@ -3,44 +3,47 @@ struct Image : Item
     source
 };
 
-import Memory::Buffer boo();
-
-function sha(without data, IconSource source)
+function render(without data, IconSource previousSource, IconSource currentSource, Image image)
 {
-	let path = serialize(Range::concat(Range::concat("/usr/share/icons/breeze/actions/16/", source.name), ".svg"));
+	let path = serialize(Range::concat(Range::concat("/usr/share/icons/breeze/actions/16/", previousSource.name), ".svg"));
 
-	return Svg::render(path);
+	return Svg::render(path, image.width, image.height);
 }
 
-function sha(Svg::Image data, IconSource source)
+function render(Svg::Image data, IconSource previousSource, IconSource currentSource, Image image)
 {
-	return data;
-}
-
-function k(IconSource source)
-{
-	return source with
+	if (Range::equals(previousSource.name, currentSource.name))
 	{
-		data: sha(source.data, source)
+		return data;
+	}
+
+	return render(nothing, previousSource, currentSource, image);
+}
+
+function initialize(IconSource previousSource, IconSource currentSource, Image image)
+{
+	return currentSource with
+	{
+		data: render(previousSource.data, previousSource, currentSource, image)
 	};
 }
 
-function u(Image image)
+function update(Image previousImage, Image currentImage)
 {
-	return image with
+	return previousImage with
 	{
-		source: k(image.source)
+		source: initialize(previousImage.source, currentImage.source, previousImage)
 	};
 }
 
 function update(EventState events, any parent, (Image image, Image nextItem))
 {
-    return u(image);
+    return update(image, nextItem);
 }
 
 function update(EventState events, any parent, ((Image image, Image nextItem), ...controls))
 {
-	return u(image) -> update(events, parent, ...controls);
+	return update(image, nextItem) -> update(events, parent, ...controls);
 }
 
 function process(ApplicationState state, (Image image, ...controls))
@@ -94,8 +97,7 @@ function surfaceFrom(IconSource source)
 
 function draw(i64 renderer, any parent, Image image)
 {
-	let q = kosk(image.source);
-	let surface = surfaceFrom(q);
+	let surface = surfaceFrom(image.source);
 
 	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
 
