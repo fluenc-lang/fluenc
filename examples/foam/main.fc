@@ -118,7 +118,8 @@ struct ToolBarItem : Item
 
 struct IconSource
 {
-	name
+	name,
+	data: nothing
 }
 
 function icon(string source)

@@ -1,26 +1,36 @@
 struct Image : Item
 {
-	data: Memory::empty(),
     source
 };
 
 import Memory::Buffer boo();
 
+function sha(without data, IconSource source)
+{
+	let path = serialize(Range::concat(Range::concat("/usr/share/icons/breeze/actions/16/", source.name), ".svg"));
+
+	return Svg::render(path);
+}
+
+function sha(Svg::Image data, IconSource source)
+{
+	return data;
+}
+
+function k(IconSource source)
+{
+	return source with
+	{
+		data: sha(source.data, source)
+	};
+}
+
 function u(Image image)
 {
-	// if (Memory::isEmpty(image.data))
-	// {
-	// 	puts("foo");
- //
-	// 	return image with
-	// 	{
-	// 		data: Memory::malloc(1)
-	// 	};
-	// }
- //
-	// puts("bar");
-
-	return image;
+	return image with
+	{
+		source: k(image.source)
+	};
 }
 
 function update(EventState events, any parent, (Image image, Image nextItem))
@@ -43,42 +53,50 @@ function process(ApplicationState state, Image image)
     return state.user;
 }
 
-function getSource(IconSource source)
+function serialize(...range)
 {
-	let a = toArray(Memory::allocate(200i64), 0i64, ...Range::concat(Range::concat("/usr/share/icons/breeze/actions/16/", source.name), ".svg"));
-
-	// printBuf(a);
-
-	return a;
+	return serialize(Memory::allocate(200i64), 0i64, ...range);
 }
 
-import void assignInt(buffer dest, i64 offset, i32 value);
+import void ses(buffer dest, i64 offset, i32 value);
 import void printBuf(buffer buffer);
+import void printBufLen(buffer buffer);
 
-function toArray(buffer storage, i64 offset, (any c, ...remaining))
+function serialize(buffer storage, i64 offset, (any c, ...remaining))
 {
-	// printnum(offset);
+	ses(storage, offset, c);
 
-	assignInt(storage, offset, c);
-
-	return tail toArray(Memory::reallocate(storage, offset + 3i64), offset + 1i64, ...remaining);
+	return tail serialize(Memory::reallocate(storage, offset + 3i64), offset + 1i64, ...remaining);
 }
 
-function toArray(buffer storage, i64 offset, any c)
+function serialize(buffer storage, i64 offset, any c)
 {
-	assignInt(storage, offset, c);
-	assignInt(storage, offset + 1i64, 0);
+	ses(storage, offset, c);
+	ses(storage, offset + 1i64, 0);
 
 	return storage;
 }
 
+function kosk(IconSource source)
+{
+	return source.data;
+}
+
+function surfaceFrom(Svg::Image image)
+{
+	return SDL::SDL_CreateRGBSurfaceFrom(image.data, image.width, image.height, 32, image.width * 4, 0x000000FFu32, 0x0000FF00u32, 0x00FF0000u32, 0xFF000000u32);
+}
+
+function surfaceFrom(IconSource source)
+{
+	return surfaceFrom(source.data);
+}
+
 function draw(i64 renderer, any parent, Image image)
 {
-	puts(@"bar");
+	let q = kosk(image.source);
+	let surface = surfaceFrom(q);
 
-	let q = Svg::render(getSource(image.source));
-
-	let surface = SDL::SDL_CreateRGBSurfaceFrom(q.data, q.width, q.height, 32, q.width * 4, 0x000000FFu32, 0x0000FF00u32, 0x00FF0000u32, 0xFF000000u32);
 	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
 
 	SDL::SDL_RenderCopy(renderer, texture, 0i64, boundingRect(image));

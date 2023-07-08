@@ -17,6 +17,7 @@
 #include "values/ScalarValue.h"
 #include "values/UserTypeValue.h"
 #include "values/ReferenceValue.h"
+#include "values/BufferValue.h"
 
 #include "exceptions/MissingTypeDeclarationException.h"
 
@@ -93,6 +94,18 @@ ReadProxy InteropHelper::createReadProxy(llvm::Value *value
 		});
 
 		return { accumulatedEntryPoint, new UserTypeValue { prototype, fieldValues } };
+	}
+	else if (type->id() == TypeId::Buffer)
+	{
+		auto alloc = entryPoint.alloc(type);
+
+		IRBuilderEx builder(entryPoint);
+
+		auto address = new ScalarValue(type, value);
+
+		builder.createStore(address, alloc);
+
+		return { entryPoint, new BufferValue(alloc) };
 	}
 
 	return { entryPoint, new ScalarValue { type, value } };

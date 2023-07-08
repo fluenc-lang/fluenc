@@ -2,7 +2,6 @@
 
 #include "ScalarValue.h"
 #include "ReferenceValue.h"
-#include "Utility.h"
 #include "EntryPoint.h"
 
 ScalarValue::ScalarValue(const Type *type, llvm::Value *value)

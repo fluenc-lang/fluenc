@@ -16,6 +16,7 @@
 #include "types/IPrototype.h"
 #include "types/WithoutType.h"
 #include "types/Int64Type.h"
+#include "types/BufferType.h"
 
 #include "values/NamedValue.h"
 #include "values/ScalarValue.h"
@@ -98,7 +99,7 @@ AllocatorNode::AllocResult AllocatorNode::alloc(const Type *type, const DefaultN
 
 	if (auto buffer = type_cast<const BufferType *>(type))
 	{
-		auto alloc = entryPoint.alloc(type);
+		auto alloc = entryPoint.alloc(buffer);
 
 		return { entryPoint, new BufferValue(alloc) };
 	}

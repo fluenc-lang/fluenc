@@ -44,11 +44,17 @@ int i32toi8(int value)
     return (char)value;
 }
 
-void assignInt(void *buffer, size_t offset, int32_t value)
+void ses(void *buffer, size_t offset, int32_t value)
 {
     // printf("assignInt: %zu %d\n", offset, value);
 
     *(((char*)buffer) + offset) = (char)value;
+}
+
+void printBufLen(void *buffer)
+{
+    printf("%p\n", buffer - sizeof(size_t));
+    printf("bufLen: %lu\n", *(size_t*)(buffer - sizeof(size_t)));
 }
 
 void printBuf(char *buffer)

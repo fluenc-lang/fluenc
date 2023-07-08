@@ -15,6 +15,26 @@ class IRBuilderEx
 
 		llvm::Value *createStore(const ScalarValue *value, const ReferenceValue *address);
 
+		template <std::same_as<llvm::Value *> ...T>
+		llvm::Value *createPrintf(const std::string &format, T... arguments)
+		{
+			auto getType = [](auto value) {
+				return value->getType();
+			};
+
+			auto llvmContext = m_entryPoint.context();
+			auto module = m_entryPoint.module();
+
+			auto formatString = createGlobalStringPtr(format, "format");
+
+			auto returnType = llvm::Type::getInt32Ty(*llvmContext);
+			auto functionType = llvm::FunctionType::get(returnType, { formatString->getType(), getType(arguments)... }, false);
+
+			auto function = module->getOrInsertFunction("printf", functionType);
+
+			return createCall(function, { formatString, arguments... });
+		}
+
 		const ScalarValue *createLoad(const ReferenceValue *address, const llvm::Twine &name = "") const;
 		const ScalarValue *createAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
 		const ScalarValue *createFAdd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;

@@ -2197,31 +2197,11 @@ std::vector<DzResult> Emitter::visit(const ImportedFunctionNode *node, DefaultVi
 
 	auto call = builder.createCall(function, argumentValues);
 
-	if (type_cast<const IPrototype *>(returnType))
+	if (returnType->id() != TypeId::Void)
 	{
 		auto [returnEntryPoint, returnValue] = InteropHelper::createReadProxy(call, returnType, context.entryPoint, node->m_ast);
 
 		context.values.push(returnValue);
-	}
-	else if (returnType->id() == TypeId::Buffer)
-	{
-		auto alloc = context.entryPoint.alloc(returnType);
-
-		IRBuilderEx builder(context.entryPoint);
-
-		auto address = new ScalarValue(returnType, call);
-
-		builder.createStore(address, alloc);
-
-		auto buffer = new BufferValue(alloc);
-
-		context.values.push(buffer);
-	}
-	else if (returnType->id() != TypeId::Void)
-	{
-		auto scalar = new ScalarValue(returnType, call);
-
-		context.values.push(scalar);
 	}
 
 	return {{ context.entryPoint, context.values }};
