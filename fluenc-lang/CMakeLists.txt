@@ -9,7 +9,7 @@ find_package(range-v3 CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
-add_library(${PROJECT_NAME} OBJECT ${SOURCE_FILES})
+add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 
