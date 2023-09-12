@@ -31,7 +31,6 @@ int main(int argc, char **argv)
 	llvm::initializeAnalysis(registry);
 	llvm::initializeTransformUtils(registry);
 	llvm::initializeInstCombine(registry);
-	llvm::initializeInstrumentation(registry);
 	llvm::initializeTarget(registry);
 
 	CLI::App app("Fluenc compiler", "fcc");
