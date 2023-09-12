@@ -20,10 +20,13 @@ class FunctionNode : public CallableNode
 	};
 
 	public:
-		FunctionNode(const std::string &name
+		FunctionNode(const std::shared_ptr<peg::Ast> ast
+			, const std::string &name
 			, const std::vector<DzBaseArgument *> &arguments
 			, const IBlockInstruction *block
 			);
+
+		const std::shared_ptr<peg::Ast> ast() const override;
 
 		ITypeName *returnType() const override;
 
@@ -38,6 +41,8 @@ class FunctionNode : public CallableNode
 
 	private:
 		std::vector<Argument> handleArgument(DzBaseArgument *argument, const EntryPoint &entryPoint, const BaseValue *value) const;
+
+		const std::shared_ptr<peg::Ast> m_ast;
 
 		std::string m_name;
 		std::vector<DzBaseArgument *> m_arguments;

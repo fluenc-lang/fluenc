@@ -9,14 +9,21 @@
 #include "Type.h"
 #include "TypeCompatibilityCalculator.h"
 
-FunctionNode::FunctionNode(const std::string &name
+FunctionNode::FunctionNode(const std::shared_ptr<peg::Ast> ast
+	, const std::string &name
 	, const std::vector<DzBaseArgument *> &arguments
 	, const IBlockInstruction *block
 	)
-	: m_name(name)
+	: m_ast(ast)
+	, m_name(name)
 	, m_arguments(arguments)
 	, m_block(block)
 {
+}
+
+const std::shared_ptr<peg::Ast> FunctionNode::ast() const
+{
+	return m_ast;
 }
 
 ITypeName *FunctionNode::returnType() const

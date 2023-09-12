@@ -792,7 +792,7 @@ CallableNode *Visitor::visitRegularFunction(const std::shared_ptr<peg::Ast> &ast
 
 	auto block = visitor.visitBlock(*ast->nodes.rbegin());
 
-	return new FunctionNode(name, arguments, block);
+	return new FunctionNode(ast, name, arguments, block);
 }
 
 CallableNode *Visitor::visitExportedFunction(const std::shared_ptr<peg::Ast> &ast) const

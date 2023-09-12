@@ -13,6 +13,8 @@ class Node : public Visitable<DefaultNodeVisitor>
 
 		virtual int order(const EntryPoint &entryPoint) const;
 
+		virtual const std::shared_ptr<peg::Ast> ast() const;
+
 	private:
 		size_t m_id;
 };

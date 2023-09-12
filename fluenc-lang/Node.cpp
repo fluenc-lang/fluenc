@@ -19,3 +19,8 @@ int Node::order(const EntryPoint &entryPoint) const
 
 	return -1;
 }
+
+const std::shared_ptr<peg::Ast> Node::ast() const
+{
+	return {};
+}
