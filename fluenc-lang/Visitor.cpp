@@ -877,7 +877,7 @@ Prototype *Visitor::visitStructure(const std::shared_ptr<peg::Ast> &ast) const
 	auto parentTypes = visitTypeList(ast->nodes[1]);
 	auto fields = visitFieldList(ast->nodes[2]);
 
-	return new Prototype(name, fields, parentTypes);
+	return new Prototype(ast, name, fields, parentTypes);
 }
 
 GlobalNode *Visitor::visitGlobal(const std::shared_ptr<peg::Ast> &ast) const
@@ -887,7 +887,8 @@ GlobalNode *Visitor::visitGlobal(const std::shared_ptr<peg::Ast> &ast) const
 	auto literal = visitor
 		.visitExpression(ast->nodes[1]);
 
-	return new GlobalNode(literal
+	return new GlobalNode(ast
+		, literal
 		, visitId(ast->nodes[0])
 		);
 }

@@ -4,14 +4,21 @@
 #include "ITypeName.h"
 #include "Node.h"
 
-Prototype::Prototype(const std::string &tag
+Prototype::Prototype(const std::shared_ptr<peg::Ast> &ast
+	, const std::string &tag
 	, const std::vector<PrototypeFieldEmbryo> &fields
 	, const std::vector<ITypeName *> &parentTypes
 	)
-	: m_tag(tag)
+	: m_ast(ast)
+	, m_tag(tag)
 	, m_fields(fields)
 	, m_parentTypes(parentTypes)
 {
+}
+
+const std::shared_ptr<peg::Ast> Prototype::ast() const
+{
+	return m_ast;
 }
 
 const IPrototype *Prototype::root() const

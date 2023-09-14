@@ -9,7 +9,8 @@ class ITypeName;
 class Prototype : public IPrototype
 {
 	public:
-		Prototype(const std::string &tag
+		Prototype(const std::shared_ptr<peg::Ast> &ast
+			, const std::string &tag
 			, const std::vector<PrototypeFieldEmbryo> &fields
 			, const std::vector<ITypeName *> &parentTypes
 			);
@@ -18,6 +19,8 @@ class Prototype : public IPrototype
 		{
 			return TypeId::Prototype;
 		}
+
+		const std::shared_ptr<peg::Ast> ast() const;
 
 		const IPrototype *root() const override;
 
@@ -28,6 +31,8 @@ class Prototype : public IPrototype
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
 	private:
+		const std::shared_ptr<peg::Ast> m_ast;
+
 		std::pair<bool, int8_t> compatibility(int8_t score, const Type *type, const EntryPoint &entryPoint) const;
 
 		std::string m_tag;
