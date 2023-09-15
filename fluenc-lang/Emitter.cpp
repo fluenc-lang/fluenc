@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 
 #include "Emitter.h"
 #include "ValueHelper.h"
@@ -21,13 +22,13 @@
 #include "DzTupleArgument.h"
 #include "InteropHelper.h"
 #include "TypeCompatibilityCalculator.h"
+#include "IPrototype.h"
 
 #include "types/IOperatorSet.h"
 #include "types/Int64Type.h"
 #include "types/BooleanType.h"
 #include "types/StringType.h"
 #include "types/Int32Type.h"
-#include "types/IPrototype.h"
 #include "types/VoidType.h"
 #include "types/ExpandedType.h"
 #include "types/ByteType.h"
@@ -1091,8 +1092,10 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 		return result;
 	};
 
-	auto findFunction = [&](const std::vector<const Type *> &types) -> const CallableNode *
+	auto findFunction = [&](const std::vector<const Type *> &types) -> std::pair<const CallableNode *, tried_t>
 	{
+		tried_t tried;
+
 		for (auto &name : node->m_names)
 		{
 			std::map<int8_t, const CallableNode *> candidates;
@@ -1103,6 +1106,8 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 				if (score < 0)
 				{
+					tried.push_back({ score, function });
+
 					continue;
 				}
 
@@ -1123,13 +1128,13 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 
 			if (candidates.size() > 0)
 			{
-				auto [_, function] = *candidates.begin();
+				auto [score, function] = *candidates.begin();
 
-				return function;
+				return { function, tried };
 			}
 		}
 
-		return nullptr;
+		return { nullptr, tried };
 	};
 
 	auto [score, _1, _2] = FunctionHelper::tryCreateTailCall(context.entryPoint, context.values, begin(node->m_names), end(node->m_names));
@@ -1154,11 +1159,32 @@ std::vector<DzResult> Emitter::visit(const FunctionCallNode *node, DefaultVisito
 			return value->type();
 		});
 
-		auto function = findFunction(types);
+		auto [function, tried] = findFunction(types);
 
 		if (!function)
 		{
-			throw FunctionNotFoundException(node->m_ast, node->m_names[0], types);
+			for (auto &[score, callable] : tried)
+			{
+				std::cout << static_cast<int32_t>(score) << " " << callable->name() << "(";
+
+				auto arguments = callable->arguments();
+
+				for (auto i = begin(arguments); i != end(arguments); i++)
+				{
+					if (i != begin(arguments))
+					{
+						std::cout << ", ";
+					}
+
+					auto argumentType = (*i)->type(context.entryPoint);
+
+					std::cout << argumentType->name();
+				}
+
+				std::cout << ")" << std::endl;
+			}
+
+			throw FunctionNotFoundException(node->m_ast, node->m_names[0], types, tried);
 		}
 
 		auto functionBlock = createBlock(llvmContext);
@@ -1470,13 +1496,6 @@ std::vector<DzResult> Emitter::visit(const JunctionNode *node, DefaultVisitorCon
 
 std::vector<DzResult> Emitter::visit(const InstantiationNode *node, DefaultVisitorContext context) const
 {
-	auto llvmContext = context.entryPoint.context();
-	auto module = context.entryPoint.module();
-
-	auto block = context.entryPoint.block();
-
-	auto dataLayout = module->getDataLayout();
-
 	std::unordered_map<std::string, const BaseValue *> valuesByName;
 
 	std::transform(begin(node->m_fields), end(node->m_fields), std::inserter(valuesByName, begin(valuesByName)), [&](auto field)

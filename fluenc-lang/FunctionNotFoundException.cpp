@@ -7,10 +7,12 @@
 FunctionNotFoundException::FunctionNotFoundException(const std::shared_ptr<peg::Ast> &ast
 	, const std::string &name
 	, const std::vector<const Type *> &values
+	, const tried_t &tried
 	)
 	: CompilerException(ast)
 	, m_name(name)
 	, m_values(values)
+	, m_tried(tried)
 {
 }
 

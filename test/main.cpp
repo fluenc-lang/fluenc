@@ -2,11 +2,11 @@
 
 #include "TestHelpers.h"
 #include "TypeCompatibilityCalculator.h"
+#include "Prototype.h"
 
 #include "values/LazyValue.h"
 
 #include "types/AnyType.h"
-#include "types/Prototype.h"
 #include "types/Int32Type.h"
 #include "types/Int64Type.h"
 #include "types/UserType.h"
@@ -6262,6 +6262,52 @@ BOOST_AUTO_TEST_CASE (scenario147)
 	)");
 
 	BOOST_TEST(result == 633);
+}
+
+BOOST_AUTO_TEST_CASE (scenario148)
+{
+	auto result = exec(R"(
+		struct Foo
+		{
+			func
+		};
+
+		function foo()
+		{
+			return 2;
+		}
+
+		function invoke(function () callback)
+		{
+			return callback();
+		}
+
+		function call(Foo f)
+		{
+			return invoke(f.func);
+		}
+
+		function call((any f, ...next))
+		{
+			return call(f);
+		}
+
+		export i32 main()
+		{
+			let q = [
+				Foo {
+					func: foo
+				},
+				Foo {
+					func: foo
+				}
+			];
+
+			return call(...q);
+		}
+	)");
+
+	BOOST_TEST(result == 2);
 }
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )

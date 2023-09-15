@@ -30,3 +30,12 @@ llvm::Type *OpaquePointerType::storageType(llvm::LLVMContext &context) const
 {
 	return m_subject->storageType(context);
 }
+
+OpaquePointerType *OpaquePointerType::get(const IPrototype *subject)
+{
+	static std::unordered_map<const IPrototype *, OpaquePointerType> cache;
+
+	auto [iterator, _] = cache.try_emplace(subject, subject);
+
+	return &iterator->second;
+}

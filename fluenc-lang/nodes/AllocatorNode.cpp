@@ -9,14 +9,17 @@
 #include "Indexed.h"
 #include "TerminatorNode.h"
 #include "BaseValue.h"
+#include "InvalidTypeException.h"
+#include "IPrototype.h"
 
 #include "types/ArrayType.h"
 #include "types/StringType.h"
 #include "types/UserType.h"
-#include "types/IPrototype.h"
 #include "types/WithoutType.h"
 #include "types/Int64Type.h"
 #include "types/BufferType.h"
+#include "types/FunctionType.h"
+#include "types/AggregateType.h"
 
 #include "values/NamedValue.h"
 #include "values/ScalarValue.h"
@@ -26,6 +29,7 @@
 #include "values/ReferenceValue.h"
 #include "values/StringValue.h"
 #include "values/BufferValue.h"
+#include "values/FunctionValue.h"
 
 AllocatorNode::AllocatorNode(const Type *type, const Node *consumer)
 	: m_type(type)
@@ -107,6 +111,25 @@ AllocatorNode::AllocResult AllocatorNode::alloc(const Type *type, const DefaultN
 	if (type->id() == TypeId::Without)
 	{
 		return { entryPoint, WithoutValue::instance() };
+	}
+
+	if (auto aggregate = type_cast<const AggregateType *>(type))
+	{
+		std::vector<const CallableNode *> functions;
+
+		std::ranges::transform(aggregate->subjects(), back_inserter(functions), [](const Type *subject)
+		{
+			if (auto function = type_cast<const FunctionType *>(subject))
+			{
+				return function->function();
+			}
+			else
+			{
+				throw InvalidTypeException(nullptr, "function", subject->name());
+			}
+		});
+
+		return { entryPoint, new FunctionValue(functions, entryPoint) };
 	}
 
 	return { entryPoint, entryPoint.alloc(type) };

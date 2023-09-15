@@ -1,5 +1,6 @@
 #include "DzTypeName.h"
 #include "EntryPoint.h"
+#include "Prototype.h"
 
 #include "types/Int32Type.h"
 #include "types/Int64Type.h"
@@ -8,7 +9,6 @@
 #include "types/StringType.h"
 #include "types/VoidType.h"
 #include "types/WithoutType.h"
-#include "types/Prototype.h"
 #include "types/ByteType.h"
 #include "types/AnyType.h"
 #include "types/Float32Type.h"
