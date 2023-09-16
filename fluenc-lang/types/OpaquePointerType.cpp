@@ -1,6 +1,8 @@
 #include "OpaquePointerType.h"
 #include "IPrototype.h"
 
+#include <unordered_map>
+
 OpaquePointerType::OpaquePointerType(const IPrototype *subject)
 	: m_subject(subject)
 {
@@ -29,4 +31,13 @@ const IPrototype *OpaquePointerType::subject() const
 llvm::Type *OpaquePointerType::storageType(llvm::LLVMContext &context) const
 {
 	return m_subject->storageType(context);
+}
+
+OpaquePointerType *OpaquePointerType::get(const IPrototype *subject)
+{
+	static std::unordered_map<const IPrototype *, OpaquePointerType> cache;
+
+	auto [iterator, _] = cache.try_emplace(subject, subject);
+
+	return &iterator->second;
 }

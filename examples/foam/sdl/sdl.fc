@@ -31,12 +31,17 @@ namespace SDL
     import EventState SDL_WaitEventEx(EventState events);
 	import Rect SDL_RenderGetViewportEx(i64 renderer, Rect rect);
 
+	import i32 GetSurfaceWidth(SDL_Surface surface);
+	import i32 GetSurfaceHeight(SDL_Surface surface);
+
     global INIT_VIDEO: 0x00000020u32;
     global WINDOWPOS_UNDEFINED: 0x1FFF0000u32;
 	global WINDOW_RESIZABLE: 0x00000020;
     global KEYDOWN: 0x300u32;
     global KEYUP: 0x301u32;
     global MOUSEBUTTONDOWN: 0x401u32;
+
+    global SDL_QUIT: 0x100u32;
 
 //     global SDLK_a: 0x61u32;
 //     global SDLK_d: 0x64u32;

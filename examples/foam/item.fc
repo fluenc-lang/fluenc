@@ -1,0 +1,54 @@
+struct Item
+{
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    state: 0,
+    children: [],
+    name: ""
+};
+
+// Update
+
+function update(EventState events, any parent, (Item item, Item nextItem))
+{
+	return item with
+    {
+        children: update(events, item, ...(expand(...item.children) | expand(...nextItem.children)))
+    };
+}
+
+function update(EventState events, any parent, ((Item item, Item nextItem), ...controls))
+{
+    let r = item with
+    {
+        children: update(events, item, ...(expand(...item.children) | expand(...nextItem.children)))
+    };
+
+	return r -> update(events, parent, ...controls);
+}
+
+// Process
+
+function process(ApplicationState state, (Item item, ...controls))
+{
+	let s = state with
+	{
+		user: process(state, item)
+	};
+
+    return tail process(s, ...controls);
+}
+
+function process(ApplicationState state, Item item)
+{
+    return state.user;
+}
+
+// Draw
+
+function draw(i64 renderer, any parent, Item item)
+{
+    return tail draw(renderer, item, ...item.children);
+}

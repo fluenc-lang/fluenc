@@ -1,0 +1,9 @@
+namespace SDL::TTF
+{
+    struct Font;
+
+    import i32 TTF_Init();
+    import Font TTF_OpenFont(string file, i32 ptsize);
+
+    import SDL::SDL_Surface RenderText_Solid(Font font, string text, i32 r, i32 g, i32 b);
+}

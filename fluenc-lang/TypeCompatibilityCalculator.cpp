@@ -1,5 +1,6 @@
 #include "TypeCompatibilityCalculator.h"
 #include "ITypeName.h"
+#include "Prototype.h"
 
 #include "types/AnyType.h"
 #include "types/AggregateType.h"
@@ -7,7 +8,6 @@
 #include "types/IteratorType.h"
 #include "types/ExpandedType.h"
 #include "types/FunctionType.h"
-#include "types/Prototype.h"
 #include "types/WithPrototype.h"
 #include "types/OpaquePointerType.h"
 #include "types/PlaceholderType.h"
@@ -127,7 +127,7 @@ struct Storage
 
 		add<OpaquePointerType, OpaquePointerType>([](const EntryPoint &entryPoint, const auto left, auto right) -> int8_t
 		{
-			if (left->name() == right->name())
+			if (left->subject() == right->subject())
 			{
 				return 0;
 			}
@@ -135,8 +135,13 @@ struct Storage
 			return TypeCompatibilityCalculator::calculate(entryPoint, left->subject(), right->subject());
 		});
 
-		add<OpaquePointerType, Type>([](const EntryPoint &entryPoint, const auto left, auto right)
+		add<OpaquePointerType, Type>([](const EntryPoint &entryPoint, const auto left, auto right) -> int8_t
 		{
+			if (left->subject() == right)
+			{
+				return 0;
+			}
+
 			return TypeCompatibilityCalculator::calculate(entryPoint, left->subject(), right);
 		});
 

@@ -1,0 +1,68 @@
+struct Cloak : Item
+{
+	enabled: false,
+	cloak: true
+};
+
+// Update
+
+function update(EventState events, any parent, (Cloak cloak, Cloak nextItem))
+{
+	return cloak with
+    {
+        cloak: evaluate(cloak.enabled, events, cloak),
+        children: update(events, cloak, ...(expand(...cloak.children) | expand(...nextItem.children)))
+    };
+}
+
+function update(EventState events, any parent, ((Cloak cloak, Cloak nextItem), ...controls))
+{
+    let r = cloak with
+    {
+        cloak: evaluate(cloak.enabled, events, cloak),
+        children: update(events, cloak, ...(expand(...cloak.children) | expand(...nextItem.children)))
+    };
+
+	return r -> update(events, parent, ...controls);
+}
+
+// Process
+
+function process(ApplicationState state, (Cloak cloak, ...controls))
+{
+	let s = state with
+	{
+		user: process(state, cloak)
+	};
+
+    return tail process(s, ...controls);
+}
+
+function process(ApplicationState state, Cloak cloak)
+{
+    return process(state, cloak);
+}
+
+// Evaluate
+
+function evaluate(function (EventState, any) callback, EventState state, any item)
+{
+    return callback(state, item);
+}
+
+function evaluate(any value, EventState state, any item)
+{
+    return value;
+}
+
+// Draw
+
+function draw(i64 renderer, any parent, Cloak cloak)
+{
+    if (cloak.cloak)
+    {
+        return nothing;
+    }
+
+    return tail draw(renderer, cloak, ...cloak.children);
+}

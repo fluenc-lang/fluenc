@@ -8,8 +8,8 @@
 #include "EntryPoint.h"
 #include "VoidIterator.h"
 #include "IRBuilderEx.h"
+#include "IPrototype.h"
 
-#include "types/IPrototype.h"
 #include "types/ProxyType.h"
 #include "types/OpaquePointerType.h"
 
@@ -41,7 +41,7 @@ ReadProxy InteropHelper::createReadProxy(llvm::Value *value
 
 		if (empty(fields))
 		{
-			return { fieldsEntryPoint, new ScalarValue { new OpaquePointerType(prototype), value } };
+			return { fieldsEntryPoint, new ScalarValue { OpaquePointerType::get(prototype), value } };
 		}
 
 		std::vector<llvm::Type *> types;

@@ -1,0 +1,58 @@
+function defaultIndexSelector(EventState state, Conditional item)
+{
+	return 0;
+}
+
+struct Conditional : Item
+{
+	indexSelector: defaultIndexSelector,
+    index: 0
+};
+
+function update(EventState events, Conditional previousConditional, Conditional currentConditional)
+{
+    return previousConditional with
+    {
+        index: invoke(currentConditional.indexSelector, events, previousConditional),
+        children: update(events, previousConditional, ...(expand(...previousConditional.children) | expand(...currentConditional.children)))
+    };
+}
+
+function update(EventState events, any parent, (Conditional conditional, Conditional nextItem))
+{
+    return update(events, conditional, nextItem);
+}
+
+function update(EventState events, any parent, ((Conditional conditional, Conditional nextItem), ...controls))
+{
+	return update(events, conditional, nextItem) -> update(events, parent, ...controls);
+}
+
+function process(ApplicationState state, (Conditional image, ...controls))
+{
+    return tail process(state, ...controls);
+}
+
+function process(ApplicationState state, Conditional image)
+{
+    return state.user;
+}
+
+function printName(Item item)
+{
+    return puts(item.name);
+}
+
+function printName(without item)
+{
+    return puts("nothing");
+}
+
+function draw(i64 renderer, any parent, Conditional conditional)
+{
+    let child = Range::elementAt(...conditional.children, conditional.index, 0);
+
+    printName(child);
+
+    return draw(renderer, conditional, child);
+}

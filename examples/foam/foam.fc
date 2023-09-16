@@ -1,18 +1,6 @@
-use "sdl.fc"
-
 global Normal: 0;
 global MouseOver: 1;
 global Pressed: 2;
-
-struct Item
-{
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-    state: 0,
-    children: []
-};
 
 struct Color
 {
@@ -30,6 +18,8 @@ struct ControlTemplate
 
 struct EventState
 {
+    u32 type: 0u32,
+
     SDL::KeyboardEvent key,
     SDL::MouseMotionEvent motion,
     SDL::MouseButtonEvent button
@@ -85,6 +75,11 @@ function invoke(without callback, State state)
 function invoke(function (State) callback, State state)
 {
     return callback(state);
+}
+
+function invoke(function (EventState, any) callback, EventState state, any item)
+{
+    return callback(state, item);
 }
 
 function invoke(function () callback)
@@ -214,13 +209,19 @@ function mainLoop(i64 renderer, ApplicationState state, ApplicationDefinition de
 	};
 
     let events = SDL::SDL_WaitEventEx(createEventState());
-    let ui = update(events, window, state.ui | expand(invoke(definition.ui, state.user)));
 
-    draw(renderer, nothing, ui);
+    if (events.type == SDL::SDL_QUIT)
+    {
+        return 0;
+    }
+
+    let ui = update(events, window, ...(state.ui | expand(...invoke(definition.ui, state.user))));
+
+    draw(renderer, nothing, ...ui);
 
     SDL::SDL_RenderPresent(renderer);
 
-    let user = process(state, ui);
+    let user = process(state, ...ui);
 
     let as = state with
     {
@@ -238,6 +239,7 @@ namespace Foam
     {
         SDL::SDL_Init(SDL::INIT_VIDEO);
         SDL::Image::IMG_Init(SDL::Image::INIT_PNG);
+        SDL::TTF::TTF_Init();
 
         let window = SDL::SDL_CreateWindow(@"test", 0, 0, 800, 600, SDL::WINDOW_RESIZABLE);
         let renderer = SDL::SDL_CreateRenderer(window, 0, 0);
@@ -247,7 +249,7 @@ namespace Foam
         let state = ApplicationState
         {
             user: user,
-            ui: expand(invoke(definition.ui, user)),
+            ui: expand(...invoke(definition.ui, user)),
             events: SDL::SDL_WaitEventEx(createEventState()),
         };
 

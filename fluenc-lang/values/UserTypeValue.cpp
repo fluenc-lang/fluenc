@@ -1,8 +1,8 @@
-#include "values/UserTypeValue.h"
-#include "values/NamedValue.h"
+#include "UserTypeValue.h"
+#include "NamedValue.h"
+#include "Prototype.h"
 
 #include "types/UserType.h"
-#include "types/Prototype.h"
 
 UserTypeValue::UserTypeValue(const IPrototype *type, const std::vector<const NamedValue *> &values)
 	: m_type(type)

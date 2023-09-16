@@ -18,6 +18,7 @@
 #include "IndexIterator.h"
 #include "WithPrototypeProvider.h"
 #include "CallableNode.h"
+#include "Prototype.h"
 
 #include "nodes/GlobalNode.h"
 #include "nodes/TerminatorNode.h"
@@ -56,7 +57,6 @@
 #include "nodes/BlockStackFrameNode.h"
 #include "nodes/TupleSinkNode.h"
 
-#include "types/Prototype.h"
 #include "types/IteratorType.h"
 
 class CallableNode;

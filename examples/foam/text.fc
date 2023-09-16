@@ -1,1 +1,94 @@
- 
+struct Text : Item
+{
+    fontSize: 18,
+    fontName: "",
+    text: "",
+    font: nothing,
+    color: rgb(0, 0, 0)
+}
+
+// Update
+
+function initialize(Text previousItem, Text currentItem, without font)
+{
+    return SDL::TTF::TTF_OpenFont(currentItem.fontName, currentItem.fontSize);
+}
+
+function initialize(Text previousItem, Text currentItem, SDL::TTF::Font font)
+{
+    if (Range::equals(previousItem.fontName, currentItem.fontName) && (previousItem.fontSize == currentItem.fontSize))
+    {
+        return font;
+    }
+
+    return initialize(previousItem, currentItem, nothing);
+}
+
+function update(EventState events, any parent, (Text text, Text nextItem))
+{
+	return text with
+    {
+        font: initialize(text, nextItem, text.font),
+        children: update(events, text, ...(expand(...text.children) | expand(...nextItem.children)))
+    };
+}
+
+function update(EventState events, any parent, ((Text text, Text nextItem), ...controls))
+{
+    let r = text with
+    {
+        font: initialize(text, nextItem, text.font),
+        children: update(events, text, ...(expand(...text.children) | expand(...nextItem.children)))
+    };
+
+	return r -> update(events, parent, ...controls);
+}
+
+// Draw
+
+function draw(i64 renderer, any parent, Text text)
+{
+    puts(text.text);
+
+    let surface = SDL::TTF::RenderText_Solid(text.font, text.text, 0, 0, 0);
+
+	let texture = SDL::SDL_CreateTextureFromSurface(renderer, surface);
+
+    let rect = SDL::Rect
+    {
+        x: text.x,
+        y: text.y,
+        width: SDL::GetSurfaceWidth(surface),
+        height: SDL::GetSurfaceHeight(surface)
+    };
+
+	SDL::SDL_RenderCopy(renderer, texture, 0i64, rect);
+	SDL::SDL_FreeSurface(surface);
+
+    return tail draw(renderer, text, ...text.children);
+}
+
+function getImplicitSize(without font, string text)
+{
+    return Size {};
+}
+
+function getImplicitSize(SDL::TTF::Font font, string text)
+{
+    let surface = SDL::TTF::RenderText_Solid(font, text, 0, 0, 0);
+    let width = SDL::GetSurfaceWidth(surface);
+    let height = SDL::GetSurfaceWidth(surface);
+
+    SDL::SDL_FreeSurface(surface);
+
+    return Size
+    {
+        width: width,
+        height: height
+    };
+}
+
+function getImplicitSize(Text text)
+{
+    return getImplicitSize(text.font, text.text);
+}

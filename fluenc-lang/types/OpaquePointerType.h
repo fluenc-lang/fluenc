@@ -19,6 +19,8 @@ class OpaquePointerType : public Type
 
 		llvm::Type *storageType(llvm::LLVMContext &context) const override;
 
+		static OpaquePointerType *get(const IPrototype *subject);
+
 	private:
 		const IPrototype *m_subject;
 };
