@@ -1,5 +1,4 @@
 #include <numeric>
-#include <algorithm>
 
 #include <range/v3/view.hpp>
 
@@ -118,7 +117,9 @@ AllocatorNode::AllocResult AllocatorNode::alloc(const Type *type, const DefaultN
 	{
 		std::vector<const CallableNode *> functions;
 
-		std::ranges::transform(aggregate->subjects(), back_inserter(functions), [](const Type *subject)
+		auto subjects = aggregate->subjects();
+
+		std::transform(begin(subjects), end(subjects), back_inserter(functions), [](const Type *subject)
 		{
 			if (auto function = type_cast<const FunctionType *>(subject))
 			{
