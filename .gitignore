@@ -10,6 +10,7 @@ moc_*
 
 # C++ stuff
 *.o
+*.a
 
 # Build
 /Makefile
@@ -20,3 +21,6 @@ moc_*
 
 # vcpkg
 vcpkg
+
+# CMake
+CMakeFiles
