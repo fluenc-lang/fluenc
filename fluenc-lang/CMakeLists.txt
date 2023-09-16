@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+include(GNUInstallDirs)
+
 project(fluenc-lang LANGUAGES C CXX)
 
 find_package(LLVM REQUIRED CONFIG)
@@ -41,9 +43,27 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "include"
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 
     ${LLVM_INCLUDE_DIR}
 
     "/usr/include/llvm-c-13"
+)
+
+install(TARGETS fluenc-lang
+	EXPORT fluenc-lang-config
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+file(GLOB INCLUDE_FILES "include/*.h")
+
+install(FILES ${INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fluenc-lang)
+
+install(EXPORT fluenc-lang-config
+	FILE fluenc-lang-config.cmake
+	NAMESPACE fluenc::
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/fluenc
 )
