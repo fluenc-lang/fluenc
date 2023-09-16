@@ -1,6 +1,8 @@
 #include "OpaquePointerType.h"
 #include "IPrototype.h"
 
+#include <unordered_map>
+
 OpaquePointerType::OpaquePointerType(const IPrototype *subject)
 	: m_subject(subject)
 {
