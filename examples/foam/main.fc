@@ -130,25 +130,55 @@ function icon(string source)
 	};
 }
 
-function itemsFor((ToolBarItem item, ...items))
+function itemsFor((ToolBarItem item, ...items), i32 index)
 {
-	return itemsFor(item) -> itemsFor(...items);
+	return itemsFor(item, index) -> itemsFor(...items, index + 1);
 }
 
-function itemsFor(ToolBarItem item)
+function poo(EventState state, Conditional item)
+{
+	if (containsMouse(item, state.motion))
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
+function isCloaked(EventState state, Cloak item)
+{
+	if (containsMouse(item, state.motion))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+function itemsFor(ToolBarItem item, i32 index)
 {
 	return LayoutItem
 	{
-		minimum: 100,
 		item: Row
 		{
+			name: "row",
+			spacing: 0,
 			children: [
 				LayoutItem
 				{
-					minimum: 30,
+					minimum: 20,
 					item: Image
 					{
 						source: item.image
+					}
+				},
+				LayoutItem
+				{
+					item: Text
+					{
+						fontName: "/usr/share/fonts/noto/NotoSans-Regular.ttf",
+						fontSize: 12,
+						text: item.text
 					}
 				}
 			]
@@ -163,12 +193,11 @@ function expand(ToolBar toolBar)
 		width: toolBar.width,
 		height: toolBar.height,
 		color: window,
-		children: [
-			Row
-			{
-				children: itemsFor(...toolBar.items)
-			}
-		]
+		children: Row
+		{
+			spacing: 0,
+			children: itemsFor(...toolBar.items, 0)
+		}
 	};
 }
 
@@ -295,11 +324,11 @@ function application(State state)
 										]
 									}
 								},
-								LayoutItem
-								{
-									stretch: 1,
-									item: Editor {}
-								},
+								// LayoutItem
+								// {
+								// 	stretch: 1,
+								// 	item: Editor {}
+								// },
 								LayoutItem
 								{
 									minimum: 30,

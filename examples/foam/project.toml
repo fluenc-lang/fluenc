@@ -1,9 +1,10 @@
 target = "foam"
-libs = [ "-lSDL2", "-lSDL2_image", "-lm" ]
+libs = [ "-lSDL2", "-lSDL2_image", "-lSDL2_ttf", "-lm" ]
 
 [modules]
 'std/range' = '1.0'
 'std/memory' = '1.0'
+'std/math' = '1.0'
 
 [repos]
 std = 'https://github.com/Znurre/fluenc-modules'

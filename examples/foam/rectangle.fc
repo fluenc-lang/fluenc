@@ -9,7 +9,7 @@ function update(EventState events, any parent, (Rectangle rectangle, Rectangle n
 {
 	return rectangle with
     {
-        children: update(events, rectangle, expand(rectangle.children) | expand(nextItem.children))
+        children: update(events, rectangle, ...(expand(...rectangle.children) | expand(...nextItem.children)))
     };
 }
 
@@ -17,7 +17,7 @@ function update(EventState events, any parent, ((Rectangle rectangle, Rectangle 
 {
     let r = rectangle with
     {
-        children: update(events, rectangle, expand(rectangle.children) | expand(nextItem.children))
+        children: update(events, rectangle, ...(expand(...rectangle.children) | expand(...nextItem.children)))
     };
 
 	return r -> update(events, parent, ...controls);
@@ -53,5 +53,5 @@ function draw(i64 renderer, any parent, Rectangle rectangle)
 
     SDL::SDL_RenderFillRect(renderer, boundingRect(rectangle));
 
-    return tail draw(renderer, rectangle, rectangle.children);
+    return tail draw(renderer, rectangle, ...rectangle.children);
 }

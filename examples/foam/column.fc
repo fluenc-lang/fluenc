@@ -54,6 +54,16 @@ function getForeignSize(Row row)
 	return row.height;
 }
 
+function getNativeSize(Row row, Size size)
+{
+	return size.width;
+}
+
+function getNativeSize(Column column, Size size)
+{
+	return size.height;
+}
+
 // Layouting
 
 struct LayoutInfo
@@ -73,6 +83,12 @@ struct LayoutSize
 	stretch
 };
 
+struct Size
+{
+	width: 0,
+	height: 0
+};
+
 function buildLayoutInfo(LayoutInfo info, LayoutItem item)
 {
 	return info with
@@ -82,7 +98,42 @@ function buildLayoutInfo(LayoutInfo info, LayoutItem item)
 	};
 }
 
-function calculateNativeItemSize(LayoutItem item, i32 overflow, LayoutInfo info)
+namespace Math
+{
+	function pax(Size x, Size y)
+	{
+		return Size
+		{
+			width: max(x.width, y.width),
+			height: max(x.height, y.height)
+		};
+	}
+}
+
+function getMaxImplicitSize(Size accumulated, Item item)
+{
+	let is = getImplicitSize(item);
+
+	let size = Size
+	{
+		width: item.x + is.width,
+		height: item.y + is.height
+	};
+
+	return Math::pax(accumulated, size);
+}
+
+function getMaxImplicitSize(Size accumulated, without item)
+{
+	return accumulated;
+}
+
+function getImplicitSize(Item item)
+{
+	return Range::aggregate(...item.children, Size {}, getMaxImplicitSize);
+}
+
+function calculateNativeItemSize(Layout layout, LayoutItem item, i32 overflow, LayoutInfo info)
 {
 	if (item.stretch > 0)
 	{
@@ -127,9 +178,91 @@ function calculateNativeItemSize(LayoutItem item, i32 overflow, LayoutInfo info)
 	return LayoutSize
 	{
 		allocated: 0,
-		actual: item.minimum,
+		actual: Math::max(item.minimum, getNativeSize(layout, getImplicitSize(item.item))),
 		stretch: info.remainingStretch,
 	};
+}
+
+struct Klegg
+{
+	layout,
+	size
+}
+
+function createSize(Row layout, i32 value)
+{
+	return Size
+	{
+		width: value
+	};
+}
+
+function createSize(Column layout, i32 value)
+{
+	return Size
+	{
+		height: value
+	};
+}
+
+function sumImplicitSize(Row row, Size accumulated, LayoutItem item)
+{
+	let is = getImplicitSize(item.item);
+
+	return Klegg
+	{
+		layout: row,
+		size: Size
+		{
+			width: accumulated.width + Math::max(is.width, item.minimum),
+			height: Math::max(accumulated.height, is.height)
+		}
+	};
+}
+
+function sumImplicitSize(Column column, Size accumulated, LayoutItem item)
+{
+	let is = getImplicitSize(item.item);
+
+	return Klegg
+	{
+		layout: column,
+		size: Size
+		{
+			width: Math::max(accumulated.width, is.width),
+			height: accumulated.height + Math::max(is.height, item.minimum)
+		}
+	};
+}
+
+function sumImplicitSize(Klegg accumulated, LayoutItem item)
+{
+	return sumImplicitSize(accumulated.layout, accumulated.size, item);
+}
+
+function size(i32 value)
+{
+	return Size
+	{
+		width: value,
+		height: value
+	};
+}
+
+function getImplicitSize(Layout layout)
+{
+	// let count = Range::size(...layout.children, 0);
+	// let spacing = (count - 1) * layout.spacing;
+
+	let ssize = Klegg
+	{
+		layout: layout,
+		size: Size {}//createSize(layout, spacing)
+	};
+
+	let k = Range::aggregate(...layout.children, ssize, sumImplicitSize);
+
+	return k.size;
 }
 
 function getOverflow((any i, ...items))
@@ -173,6 +306,8 @@ function draw(i64 renderer, without parent, Layout item)
 
 function draw(i64 renderer, Item parent, Layout item)
 {
+	puts("Draw layout");
+
 	let surrogate = parent with
 	{
 		x: parent.x + item.x,
@@ -228,14 +363,14 @@ function update(EventState events, any parent, (Layout item, Layout nextItem))
 
 function update(EventState events, any parent, ((Layout item, Layout nextItem), ...controls))
 {
-	return update(events, parent, item, nextItem) -> update(events, parent, ...controls);
+	return update(events, parent, (item, nextItem)) -> update(events, parent, ...controls);
 }
 
 // Column
 
 function layout(EventState events, Column column, i32 offset, i32 overflow, LayoutInfo info, (LayoutItem item, LayoutItem nextItem))
 {
-	let nis = calculateNativeItemSize(item, overflow, info);
+	let nis = calculateNativeItemSize(column, item, overflow, info);
 
 	let layouted = item.item with
 	{
@@ -266,7 +401,7 @@ function layout(EventState events, Column column, i32 offset, i32 overflow, Layo
 
 function layout(EventState events, Column column, i32 offset, i32 overflow, LayoutInfo info, ((LayoutItem item, LayoutItem nextItem), ...items))
 {
-	let nis = calculateNativeItemSize(item, overflow, info);
+	let nis = calculateNativeItemSize(column, item, overflow, info);
 
 	let layouted = item.item with
 	{
@@ -302,7 +437,7 @@ function layout(EventState events, Column column, i32 offset, i32 overflow, Layo
 
 function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo info, (LayoutItem item, LayoutItem nextItem))
 {
-	let nis = calculateNativeItemSize(item, overflow, info);
+	let nis = calculateNativeItemSize(row, item, overflow, info);
 
 	let layouted = item.item with
 	{
@@ -327,7 +462,7 @@ function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo
 
 function layout(EventState events, Row row, i32 offset, i32 overflow, LayoutInfo info, ((LayoutItem item, LayoutItem nextItem), ...items))
 {
-	let nis = calculateNativeItemSize(item, overflow, info);
+	let nis = calculateNativeItemSize(row, item, overflow, info);
 
 	let layouted = item.item with
 	{

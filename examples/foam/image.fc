@@ -80,11 +80,6 @@ function serialize(buffer storage, i64 offset, any c)
 	return storage;
 }
 
-function kosk(IconSource source)
-{
-	return source.data;
-}
-
 function surfaceFrom(Svg::Image image)
 {
 	return SDL::SDL_CreateRGBSurfaceFrom(image.data, image.width, image.height, 32, image.width * 4, 0x000000FFu32, 0x0000FF00u32, 0x00FF0000u32, 0xFF000000u32);
