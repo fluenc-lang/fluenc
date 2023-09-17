@@ -65,5 +65,5 @@ install(FILES ${INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fluenc-la
 install(EXPORT fluenc-lang-config
 	FILE fluenc-lang-config.cmake
 	NAMESPACE fluenc::
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/fluenc
+	DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/fluenc/cmake
 )
