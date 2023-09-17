@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(grammar LANGUAGES C CXX)
+project(fluenc-grammar LANGUAGES C CXX)
 
 add_library(${PROJECT_NAME} STATIC
 	grammar.cpp
@@ -12,9 +12,27 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-	incbin
+	$<BUILD_INTERFACE:incbin>
 )
 
 add_custom_command(OUTPUT data.c COMMAND incbin-exe -I${CMAKE_CURRENT_LIST_DIR} grammar.cpp)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ".")
+target_include_directories(${PROJECT_NAME} PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+install(TARGETS fluenc-grammar
+	EXPORT fluenc-grammar-config
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(FILES "grammar.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fluenc-grammar)
+
+install(EXPORT fluenc-grammar-config
+	FILE fluenc-grammar-config.cmake
+	NAMESPACE fluenc::
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/fluenc
+)

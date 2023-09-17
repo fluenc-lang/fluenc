@@ -21,6 +21,7 @@ moc_*
 
 # vcpkg
 vcpkg
+vcpkg_installed
 
 # CMake
 CMakeFiles
