@@ -34,5 +34,5 @@ install(FILES "grammar.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fluenc-grammar
 install(EXPORT fluenc-grammar-config
 	FILE fluenc-grammar-config.cmake
 	NAMESPACE fluenc::
-	DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/fluenc/cmake
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/fluenc
 )

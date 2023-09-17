@@ -16,10 +16,10 @@ add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:DEBUG>")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    immer
-    range-v3
+	immer
+	range-v3
 
-    fmt::fmt
+	fmt::fmt
 )
 
 if (${LLVM_LINK_LLVM_DYLIB})
@@ -27,7 +27,7 @@ if (${LLVM_LINK_LLVM_DYLIB})
 		LLVM
 	)
 
-    install(IMPORTED_RUNTIME_ARTIFACTS LLVM)
+install(IMPORTED_RUNTIME_ARTIFACTS LLVM)
 else()
 	target_link_libraries(${PROJECT_NAME} PUBLIC
 		${LLVM_AVAILABLE_LIBS}
@@ -35,19 +35,17 @@ else()
 endif()
 
 target_link_directories(${PROJECT_NAME} PUBLIC
-    ${LLVM_LIBRARY_DIR}
+	${LLVM_LIBRARY_DIR}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    "."
+	"."
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 
-    ${LLVM_INCLUDE_DIR}
-
-    "/usr/include/llvm-c-13"
+	${LLVM_INCLUDE_DIR}
 )
 
 install(TARGETS fluenc-lang
@@ -65,5 +63,5 @@ install(FILES ${INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fluenc-la
 install(EXPORT fluenc-lang-config
 	FILE fluenc-lang-config.cmake
 	NAMESPACE fluenc::
-	DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/fluenc/cmake
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/fluenc
 )
