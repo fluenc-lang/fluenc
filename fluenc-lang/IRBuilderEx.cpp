@@ -263,6 +263,32 @@ const ScalarValue *IRBuilderEx::createNot(const ScalarValue *value, const llvm::
 		);
 }
 
+const ScalarValue *IRBuilderEx::createLeftShift(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
+{
+	auto block = m_entryPoint.block();
+
+	guardBranch(block);
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(lhs->type()
+		, builder.CreateShl(*lhs, *rhs, name)
+		);
+}
+
+const ScalarValue *IRBuilderEx::createRightShift(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name) const
+{
+	auto block = m_entryPoint.block();
+
+	guardBranch(block);
+
+	llvm::IRBuilder<> builder(block);
+
+	return new ScalarValue(lhs->type()
+		, builder.CreateLShr(*lhs, *rhs, name)
+		);
+}
+
 llvm::Value *IRBuilderEx::createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse)
 {
 	auto block = m_entryPoint.block();

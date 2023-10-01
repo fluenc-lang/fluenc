@@ -52,6 +52,8 @@ class IRBuilderEx
 		const ScalarValue *createLogicalAnd(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
 		const ScalarValue *createXor(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
 		const ScalarValue *createNot(const ScalarValue *value, const llvm::Twine &name = "") const;
+		const ScalarValue *createLeftShift(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
+		const ScalarValue *createRightShift(const ScalarValue *lhs, const ScalarValue *rhs, const llvm::Twine &name = "") const;
 
 		llvm::Value *createCondBr(const ScalarValue *condition, llvm::BasicBlock *ifTrue, llvm::BasicBlock *ifFalse);
 		llvm::Value *createRet(llvm::Value *value);

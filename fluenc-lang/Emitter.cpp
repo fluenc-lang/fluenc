@@ -305,6 +305,16 @@ std::vector<DzResult> Emitter::visit(const IntegerBinaryNode *node, DefaultVisit
 			return builder.createXor(left, right);
 		}
 
+		if (node->op == "<<")
+		{
+			return builder.createLeftShift(left, right);
+		}
+
+		if (node->op == ">>")
+		{
+			return builder.createRightShift(left, right);
+		}
+
 		auto operandType = left->type();
 		auto operandTypeName = operandType->name();
 

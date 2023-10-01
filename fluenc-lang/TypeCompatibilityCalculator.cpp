@@ -31,6 +31,11 @@ struct Storage
 			return 1;
 		});
 
+		add<BufferType, IteratorType>([](const EntryPoint &, auto, auto)
+		{
+			return 1;
+		});
+
 		add<ArrayType, ArrayType>([](const EntryPoint &, auto left, auto right)
 		{
 			if (left == right)

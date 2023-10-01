@@ -6,8 +6,9 @@ if (NOT ${FLUENC_BUILD_COMPILER})
 	return()
 endif ()
 
-find_package(LLD REQUIRED CONFIG)
+
 find_package(tomlplusplus CONFIG REQUIRED)
+find_package(LLD REQUIRED CONFIG)
 find_package(LibArchive REQUIRED)
 find_package(Clang REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
