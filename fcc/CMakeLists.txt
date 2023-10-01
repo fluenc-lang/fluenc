@@ -6,12 +6,16 @@ if (NOT ${FLUENC_BUILD_COMPILER})
 	return()
 endif ()
 
+
+find_package(PkgConfig REQUIRED)
 find_package(LLD REQUIRED CONFIG)
 find_package(tomlplusplus CONFIG REQUIRED)
 find_package(LibArchive REQUIRED)
 find_package(Clang REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(unofficial-git2 CONFIG REQUIRED)
+
+pkg_check_modules(tomlplusplus REQUIRED IMPORTED_TARGET tomlplusplus)
 
 find_path(CPP_PEGLIB_INCLUDE_DIRS "peglib.h")
 
@@ -25,7 +29,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	fluenc-lang
 	fluenc-grammar
 
-	tomlplusplus::tomlplusplus
+	PkgConfig::tomlplusplus
 	LibArchive::LibArchive
 	CLI11::CLI11
 	unofficial::git2::libgit2package
