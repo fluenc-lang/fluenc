@@ -8,7 +8,7 @@ endif ()
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
-file(GLOB_RECURSE SOURCE_FILES *.cpp *.h)
+file(GLOB_RECURSE SOURCE_FILES *.cpp *.h *.hpp)
 
 add_executable(${PROJECT_NAME}
     ${SOURCE_FILES}
@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     fluenc-lang
 	fluenc-grammar
+	fluenc-code-generation
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

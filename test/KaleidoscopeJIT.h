@@ -93,8 +93,9 @@ public:
 	return CompileLayer.add(RT, std::move(TSM));
   }
 
-  Expected<JITEvaluatedSymbol> lookup(StringRef Name) {
-	return ES->lookup({&MainJD}, Mangle(Name.str()));
+  Expected<ExecutorSymbolDef> lookup(StringRef Name)
+  {
+      return ES->lookup({&MainJD}, Mangle(Name.str()));
   }
 };
 

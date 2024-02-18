@@ -1,5 +1,4 @@
-#ifndef SEQUENCE_H
-#define SEQUENCE_H
+#pragma once
 
 #include <vector>
 
@@ -22,5 +21,3 @@ class sequence
 		std::size_t m_index;
 		std::vector<T> m_values;
 };
-
-#endif // SEQUENCE_H

@@ -1,12 +1,11 @@
 Program             <- Instruction*
-Instruction         <- Function / Structure / Global / Namespace / Use
+Instruction         <- Function / Structure / Global / Namespace
 
 # Instructions
 Function            <- RegularFunction / ImportedFunction / ExportedFunction
 Structure           <- 'struct' Id TypeList FieldList
 Global              <- 'global' Id ':' Expression
 Namespace           <- 'namespace' Id '{' Instruction* '}'
-Use                 <- 'use' String
 
 # Constructs
 Block               <- '{' (Local / Call / Conditional)* Return '}'
@@ -15,7 +14,7 @@ Return              <- 'return' Expression ('->' Continuation)?
 Continuation        <- Id '(' List(Expression)? ')'
 Argument            <- StandardArgument / TupleArgument
 TypeName            <- FunctionType / RegularType
-Expression          <- Unary / Binary / Instantiation / Literal / Tuple / Group / Tail / Expansion / Call / Member / Conditional / Array / Local
+Expression          <- Unary / Binary / Instantiation / Literal / Tuple / Group / Expansion / Call / Member / Conditional / Array / Local
 Comment             <- '//' [^\r\n]*
 Assignment          <- Id ':' Expression
 With                <- 'with' '{' List(Assignment) ','? '}'
@@ -47,8 +46,7 @@ Literal             <- ByteLiteral / Float32Literal / Uint32Literal / Int64Liter
 Binary              <- (Group BinaryOperator Expression) / (Literal BinaryOperator Expression) / (Member BinaryOperator Expression) / (Call BinaryOperator Expression) / (Array BinaryOperator Expression)
 Unary               <- (UnaryOperator Group) / (UnaryOperator Literal) / (UnaryOperator Member) / (UnaryOperator Call)
 Member              <- IdList With?
-Tail                <- 'tail' Id '(' List(Expression)? ')'
-Call                <- Id '(' List(Expression)? ')'
+Call                <- 'tail'? Id '(' List(Expression)? ')'
 Instantiation       <- TypeName '{' (List(Assignment) ','?)? '}'
 Conditional         <- 'if' '(' Expression ')' Block
 Array               <- '[' (List(Expression) ','?)? ']'

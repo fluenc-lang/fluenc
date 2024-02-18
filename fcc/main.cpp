@@ -9,8 +9,8 @@
 
 #include <git2.h>
 
-#include "build/Build.h"
-#include "init/Init.h"
+#include "build/build.hpp"
+#include "init/init.hpp"
 
 int main(int argc, char **argv)
 {
@@ -35,17 +35,17 @@ int main(int argc, char **argv)
 
 	CLI::App app("Fluenc compiler", "fcc");
 
-	auto buildCommand = app.add_subcommand("build");
-	auto initCommand = app.add_subcommand("init");
+	auto build_command = app.add_subcommand("build");
+	auto init_command = app.add_subcommand("init");
 
-	auto dotCfg = buildCommand->add_flag("--dot-cfg", "Creates a DOT file of the resulting LLVM module");
+	auto dot_cfg = build_command->add_flag("--dot-cfg", "Creates a DOT file of the resulting LLVM module");
 	auto verbose = app.add_flag("--v", "Use verbose output");
 
 	try
 	{
 		app.parse(argc, argv);
 
-		if (buildCommand->parsed())
+		if (build_command->parsed())
 		{
 			BuildEnvironment environment = {
 				.source = std::filesystem::current_path(),
@@ -54,14 +54,14 @@ int main(int argc, char **argv)
 			};
 
 			BuildOptions options = {
-				.generateDotCfg = !dotCfg->empty(),
-				.verbose = !verbose->empty()
+				.generateDotCfg = !dot_cfg->empty(),
+				.verbose = !verbose->empty(),
 			};
 
-			return bootstrapBuild(argv, environment, options);
+			return bootstrap_build(argv, environment, options);
 		}
 
-		if (initCommand->parsed())
+		if (init_command->parsed())
 		{
 			return init();
 		}

@@ -25,6 +25,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	fluenc-lang
 	fluenc-grammar
+	fluenc-code-generation
 
 	tomlplusplus::tomlplusplus
 	LibArchive::LibArchive
