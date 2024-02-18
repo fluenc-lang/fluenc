@@ -1,12 +1,11 @@
 Program             <- Instruction*
-Instruction         <- Function / Structure / Global / Namespace / Use
+Instruction         <- Function / Structure / Global / Namespace
 
 # Instructions
 Function            <- RegularFunction / ImportedFunction / ExportedFunction
 Structure           <- 'struct' Id TypeList FieldList
 Global              <- 'global' Id ':' Expression
 Namespace           <- 'namespace' Id '{' Instruction* '}'
-Use                 <- 'use' String
 
 # Constructs
 Block               <- '{' (Local / Call / Conditional)* Return '}'
