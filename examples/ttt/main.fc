@@ -1,6 +1,3 @@
-use "array.fc"
-use "sdl.fc"
-
 import i32 puts(string str);
 import void printnum(i32 num);
 

@@ -23,14 +23,16 @@
 #include <grammar.h>
 
 #include "KaleidoscopeJIT.h"
-#include "Visitor.h"
+#include "ast_transformer.hpp"
 #include "EntryPoint.h"
-#include "ModuleInfo.h"
-#include "Visitor.h"
-#include "CallableNode.h"
-#include "Utility.h"
+#include "utility.hpp"
+#include "ast.hpp"
+#include "Emitter.h"
 
-const CallableNode *compileFunction(std::string source)
+#include "ast/function_node.hpp"
+#include "ast/module_node.hpp"
+
+const fluenc::function_node *compileFunction(std::string source)
 {
 	peg::parser parser(grammar());
 
@@ -41,11 +43,11 @@ const CallableNode *compileFunction(std::string source)
 
 	parser.parse(source, ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
+	fluenc::ast_transformer transformer(std::vector<std::string>(), nullptr, {}, {}, {});
 
-	auto moduleInfo = visitor.visit(ast);
+	auto module_info = transformer.transform(ast);
 
-	for (auto &[_, function] : moduleInfo.functions)
+	for (auto &[_, function] : module_info.functions)
 	{
 		return function;
 	}
@@ -69,11 +71,11 @@ const BaseValue *compileValue(std::string source)
 
 	parser.parse(stream.str(), ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
+	fluenc::ast_transformer transformer(std::vector<std::string>(), nullptr, {}, {}, {});
 
-	auto moduleInfo = visitor.visit(ast);
+	auto module_info = transformer.transform(ast);
 
-	for (auto &[name, global] : moduleInfo.globals)
+	for (auto &[name, global] : module_info.globals)
 	{
 		auto context = new llvm::LLVMContext();
 		auto module = new llvm::Module("dz", *context);
@@ -96,18 +98,18 @@ const BaseValue *compileValue(std::string source)
 			, module
 			, context
 			, "entry"
-			, moduleInfo.functions
-			, moduleInfo.locals
-			, moduleInfo.globals
-			, moduleInfo.types
-			, moduleInfo.roots
+			, module_info.functions
+			, module_info.locals
+			, module_info.globals
+			, module_info.types
+			, module_info.roots
 			, Stack()
 			, nullptr
 			);
 
 		Emitter emitter;
 
-		for (auto &[_, values] : global->accept(emitter, { entryPoint, Stack() }))
+		for (auto &[_, values] : fluenc::accept(global, emitter, { entryPoint, Stack() }))
 		{
 			return *values.begin();
 		}
@@ -127,10 +129,10 @@ EntryPoint compile(std::string source)
 
 	parser.parse(source, ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
+	fluenc::ast_transformer transformer(std::vector<std::string>(), nullptr, {}, {}, {});
 
-	auto moduleInfo = visitor
-		.visit(ast);
+	auto module_info = transformer
+		.transform(ast);
 
 	auto context = new llvm::LLVMContext();
 	auto module = new llvm::Module("dz", *context);
@@ -151,11 +153,11 @@ EntryPoint compile(std::string source)
 		, module
 		, context
 		, "entry"
-		, moduleInfo.functions
-		, moduleInfo.locals
-		, moduleInfo.globals
-		, moduleInfo.types
-		, moduleInfo.roots
+		, module_info.functions
+		, module_info.locals
+		, module_info.globals
+		, module_info.types
+		, module_info.roots
 		, Stack()
 		, nullptr
 		);
@@ -172,13 +174,12 @@ int exec(std::string source)
 
 	parser.parse(source, ast);
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
+	fluenc::ast_transformer transformer(std::vector<std::string>(), nullptr, {}, {}, {});
 
 	auto llvmContext = std::make_unique<llvm::LLVMContext>();
 	auto module = std::make_unique<llvm::Module>("dz", *llvmContext);
 
-	auto moduleInfo = visitor
-		.visit(ast);
+	auto module_info = transformer.transform(ast);
 
 	EntryPoint entryPoint(0
 		, -1
@@ -190,20 +191,20 @@ int exec(std::string source)
 		, module.get()
 		, llvmContext.get()
 		, "entry"
-		, moduleInfo.functions
-		, moduleInfo.locals
-		, moduleInfo.globals
-		, moduleInfo.types
-		, moduleInfo.roots
+		, module_info.functions
+		, module_info.locals
+		, module_info.globals
+		, module_info.types
+		, module_info.roots
 		, Stack()
 		, nullptr
 		);
 
 	Emitter emitter;
 
-	for (auto root : moduleInfo.roots)
+	for (auto root : module_info.roots)
 	{
-		root->accept(emitter, { entryPoint, Stack() });
+		emitter.visit(root, { entryPoint, Stack() });
 	}
 
 #ifdef DEBUG

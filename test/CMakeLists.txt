@@ -8,7 +8,7 @@ endif ()
 
 find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
-file(GLOB_RECURSE SOURCE_FILES *.cpp *.h)
+file(GLOB_RECURSE SOURCE_FILES *.cpp *.h *.hpp)
 
 add_executable(${PROJECT_NAME}
     ${SOURCE_FILES}

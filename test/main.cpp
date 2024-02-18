@@ -2,7 +2,6 @@
 
 #include "TestHelpers.h"
 #include "TypeCompatibilityCalculator.h"
-#include "Prototype.h"
 
 #include "values/LazyValue.h"
 
@@ -12,6 +11,7 @@
 #include "types/UserType.h"
 #include "types/ArrayType.h"
 #include "types/WithoutType.h"
+#include "types/structure_type.hpp"
 
 #include "exceptions/MissingFieldException.h"
 
@@ -1874,10 +1874,10 @@ BOOST_AUTO_TEST_CASE (scenario60)
 		}
 	)");
 
-	BOOST_TEST((regularFunction->attribute() == FunctionAttribute::None));
-	BOOST_TEST((iteratorFunction1->attribute() == FunctionAttribute::Iterator));
-	BOOST_TEST((iteratorFunction2->attribute() == FunctionAttribute::Iterator));
-	BOOST_TEST((iteratorFunction3->attribute() == FunctionAttribute::Iterator));
+	BOOST_TEST((attribute(regularFunction) == fluenc::function_attribute::none));
+	BOOST_TEST((attribute(iteratorFunction1) == fluenc::function_attribute::iterator));
+	BOOST_TEST((attribute(iteratorFunction2) == fluenc::function_attribute::iterator));
+	BOOST_TEST((attribute(iteratorFunction3) == fluenc::function_attribute::iterator));
 }
 
 BOOST_AUTO_TEST_CASE (scenario61)
@@ -2465,25 +2465,23 @@ BOOST_AUTO_TEST_CASE (compatibility)
 		}
 	)");
 
-	auto types = entryPoint.types();
-
-	auto unrelatedType = types["Unrelated"];
-	auto childType = types["Child"];
-	auto fatherType = types["Father"];
-	auto motherType = types["Mother"];
-	auto ancestorType = types["Ancestor"];
+	auto unrelatedType = entryPoint.resolve("Unrelated");
+	auto childType = entryPoint.resolve("Child");
+	auto fatherType = entryPoint.resolve("Father");
+	auto motherType = entryPoint.resolve("Mother");
+	auto ancestorType = entryPoint.resolve("Ancestor");
 
 	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, childType) == 1);
 	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, fatherType) == 2);
 	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, motherType) == 2);
 	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, ancestorType) == 3);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, AnyType::instance()) == 4);
+        BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, any_type::instance()) == 4);
 	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, unrelatedType) == -1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, Int32Type::instance()) == -1);
+        BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, int32_type::instance()) == -1);
 
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), Int32Type::instance()) == 0);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), Int64Type::instance()) == -1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), AnyType::instance()) == 1);
+        BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, int32_type::instance(), int32_type::instance()) == 0);
+        BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, int32_type::instance(), int64_type::instance()) == -1);
+        BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, int32_type::instance(), any_type::instance()) == 1);
 }
 
 BOOST_AUTO_TEST_CASE (scenario70)
@@ -2581,7 +2579,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	Emitter emitter;
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2589,7 +2587,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+        auto lazy = functionValues.require<lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32]");
 }
@@ -2624,7 +2622,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	Emitter emitter;
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2632,7 +2630,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+        auto lazy = functionValues.require<lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[bool, bool, i32]");
 }
@@ -2662,7 +2660,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	Emitter emitter;
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2670,7 +2668,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+        auto lazy = functionValues.require<lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "...");
 }
@@ -2710,7 +2708,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 
 	Emitter emitter;
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2718,7 +2716,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+        auto lazy = functionValues.require<lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
@@ -3073,12 +3071,10 @@ BOOST_AUTO_TEST_CASE (compatibility_3)
 		}
 	)");
 
-	auto types = result.types();
+	auto itemType = static_cast<const structure_type*>(result.resolve("Item"));
 
-	auto itemType = types["Item"];
-
-	auto userType1 = UserType::get(itemType, { ArrayType::get({ itemType }) });
-	auto userType2 = UserType::get(itemType, { WithoutType::instance() });
+        auto userType1 = user_type::get(itemType, { array_type::get({ itemType }) });
+        auto userType2 = user_type::get(itemType, { without_type::instance() });
 
 	// Both have the same tag
 	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, userType1, userType2) == 1);
@@ -4488,7 +4484,7 @@ BOOST_AUTO_TEST_CASE (scenario110)
 
 	for (auto &root : result.roots())
 	{
-		root->accept(emitter, { result, Stack() });
+		emitter.visit(root, { result, Stack() });
 	}
 
 	auto module = result.module();
@@ -4513,7 +4509,7 @@ BOOST_AUTO_TEST_CASE (scenario111)
 
 	for (auto &[name, global] : result.globals())
 	{
-		for (auto &[ep, values] : global->accept(emitter, { result, Stack() }))
+		for (auto &[ep, values] : fluenc::accept(global, emitter, { result, Stack() }))
 		{
 			for (auto &value : values)
 			{
@@ -4569,7 +4565,7 @@ BOOST_AUTO_TEST_CASE (scenario112)
 
 	for (auto &[name, global] : result.globals())
 	{
-		for (auto &[ep, values] : global->accept(emitter, { result, Stack() }))
+		for (auto &[ep, values] : fluenc::accept(global, emitter, { result, Stack() }))
 		{
 			for (auto &value : values)
 			{
@@ -5434,7 +5430,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 
 	Emitter emitter;
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, Stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -5442,7 +5438,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+        auto lazy = functionValues.require<lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
@@ -5520,7 +5516,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 
 	Emitter emitter;
 
-	auto functionResults1 = function->accept(emitter, { entryPoint, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoint, Stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -5528,7 +5524,7 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+        auto lazy = functionValues.require<lazy_value>(nullptr);
 
 	auto type = lazy->type();
 
@@ -6125,7 +6121,7 @@ BOOST_AUTO_TEST_CASE (scenario144)
 
 	Emitter emitter;
 
-	auto functionResults1 = function1->accept(emitter, { entryPoint, Stack() });
+	auto functionResults1 = emitter.visit(function1, { entryPoint, Stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -6135,7 +6131,7 @@ BOOST_AUTO_TEST_CASE (scenario144)
 
 	auto value1 = functionValues1.pop();
 
-	auto functionResults2 = function2->accept(emitter, { functionEntryPoint, value1 });
+	auto functionResults2 = emitter.visit(function2, { functionEntryPoint, value1 });
 
 	BOOST_TEST(functionResults2.size() == 1);
 
@@ -6308,6 +6304,38 @@ BOOST_AUTO_TEST_CASE (scenario148)
 	)");
 
 	BOOST_TEST(result == 2);
+}
+
+BOOST_AUTO_TEST_CASE (scenario149)
+{
+	auto result = exec(R"(
+		function numbersBelow(i32 i, i32 number)
+		{
+			if (i == number)
+			{
+				return i;
+			}
+
+			return i -> numbersBelow(i + 1, number);
+		}
+
+		function sum(i32 number, i32 value)
+		{
+			return value + number;
+		}
+
+		function sum((i32 number, ...numbers), i32 value)
+		{
+			return tail sum(...numbers, value + number);
+		}
+
+		export i32 main()
+		{
+			return sum(...numbersBelow(0, 5), 0);
+		}
+	)");
+
+	BOOST_TEST(result == 15);
 }
 
 test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )

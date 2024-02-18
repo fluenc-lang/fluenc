@@ -35,10 +35,10 @@
 
 #include "ProjectFileParser.h"
 #include "CompilerException.h"
-#include "Visitor.h"
-#include "ModuleInfo.h"
+#include "ast_transformer.hpp"
 #include "Emitter.h"
-#include "CallableNode.h"
+
+#include "ast/module_node.hpp"
 
 #include "exceptions/ParserException.h"
 
@@ -61,7 +61,7 @@ std::string getClangPath(std::filesystem::path exe)
 	return clangExe.string();
 }
 
-ModuleInfo analyze(const std::string &file, const std::string &source, peg::parser &parser)
+fluenc::module_node analyze(const std::string &file, const std::string &source, peg::parser &parser)
 {
 	std::shared_ptr<peg::Ast> ast;
 
@@ -72,12 +72,9 @@ ModuleInfo analyze(const std::string &file, const std::string &source, peg::pars
 
 	parser.parse(source, ast, file.c_str());
 
-	Visitor visitor(std::vector<std::string>(), nullptr, nullptr, nullptr, nullptr);
+	fluenc::ast_transformer visitor(std::vector<std::string>(), nullptr, {}, {}, {});
 
-	auto moduleInfo = visitor
-		.visit(ast);
-
-	return moduleInfo;
+	return visitor.transform(ast);
 }
 
 llvm::ArrayRef<const char *> arrayRef(const std::vector<std::string> &input)
@@ -158,7 +155,7 @@ bool build(const BuildContext &context)
 
 		try
 		{
-			auto baseModule = std::accumulate(begin(configuration->modules), end(configuration->modules), ModuleInfo {}, [&](auto accumulated, auto moduleName)
+			auto baseModule = std::accumulate(begin(configuration->modules), end(configuration->modules), fluenc::module_node {}, [&](auto accumulated, auto moduleName)
 			{
 				auto moduleFileName = context.environment.root / ".fluenc" / "modules" / fmt::format("{}.fcm", moduleName);
 
@@ -191,7 +188,7 @@ bool build(const BuildContext &context)
 
 					if (path.extension() == ".fc")
 					{
-						module = ModuleInfo::merge(module, analyze(path.string(), std::string(buffer, size), parser), true);
+						module = fluenc::module_node::merge(module, analyze(path.string(), std::string(buffer, size), parser), true);
 					}
 
 					if (path.extension() == ".o")
@@ -220,7 +217,7 @@ bool build(const BuildContext &context)
 
 				auto module = analyze(file.string(), buffer.str(), parser);
 
-				return ModuleInfo::merge(accumulated, module, false);
+				return fluenc::module_node::merge(accumulated, module, false);
 			});
 
 			if (!module.roots.empty())
@@ -254,7 +251,7 @@ bool build(const BuildContext &context)
 
 				for (auto &root : module.roots)
 				{
-					root->accept(emitter, { entryPoint, values });
+					emitter.visit(root, { entryPoint, values });
 				}
 
 //				llvmModule->print(llvm::errs(), nullptr);
