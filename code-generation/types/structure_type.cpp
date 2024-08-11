@@ -3,6 +3,8 @@
 
 #include "ast/struct_node.hpp"
 
+#include <unordered_map>
+
 namespace fluenc::code_generation::types
 {
 	structure_type::structure_type(const struct_node* subject)
