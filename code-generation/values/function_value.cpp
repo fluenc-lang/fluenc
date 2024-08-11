@@ -28,9 +28,14 @@ namespace fluenc::code_generation::values
 		std::transform(begin(functions_), end(functions_), back_inserter(function_types), [this](auto function) {
 			std::vector<const base_type*> argument_types;
 
-			std::ranges::transform(function->signature.arguments, back_inserter(argument_types), [this](auto argument) {
-				return arg_type(argument, *entry_point_);
-			});
+			std::transform(
+				begin(function->signature.arguments),
+				end(function->signature.arguments),
+				back_inserter(argument_types),
+				[this](auto argument) {
+					return arg_type(argument, *entry_point_);
+				}
+			);
 
 			return types::function_type::get(argument_types, function);
 		});
