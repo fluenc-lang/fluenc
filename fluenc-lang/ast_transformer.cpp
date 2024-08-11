@@ -626,6 +626,7 @@ namespace fluenc
 
 		return new function_node {
 			.signature = {
+				.return_type = {},
 				.arguments = arguments,
 				.name = name,
 			},
