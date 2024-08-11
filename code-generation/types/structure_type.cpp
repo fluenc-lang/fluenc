@@ -33,7 +33,7 @@ namespace fluenc::code_generation::types
 
 		for (auto& field : subject_->fields)
 		{
-			results.emplace_back(field.name, type_for(field.type, type_resolver));
+			results.push_back({ field.name, type_for(field.type, type_resolver) });
 		}
 
 		return results;
