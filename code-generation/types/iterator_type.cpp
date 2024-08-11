@@ -1,5 +1,7 @@
 #include "iterator_type.hpp"
 
+#include <unordered_map>
+
 namespace fluenc::code_generation::types
 {
 	base_type* iterator_type::instance()
