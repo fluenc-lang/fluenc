@@ -4,6 +4,7 @@
 #include <llvm/IR/Module.h>
 
 #include <map>
+#include <optional>
 
 #include "immer/box.hpp"
 
