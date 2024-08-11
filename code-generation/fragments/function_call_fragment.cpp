@@ -19,6 +19,7 @@
 #include <range/v3/view/zip.hpp>
 
 #include <iostream>
+#include <string>
 
 namespace fluenc::code_generation::fragments
 {

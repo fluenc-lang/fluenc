@@ -42,7 +42,7 @@ namespace fluenc::code_generation
 	namespace types
 	{
 		template <typename T>
-		class builtin_type;
+		struct builtin_type;
 
 		struct function_type;
 		struct opaque_pointer_type;
