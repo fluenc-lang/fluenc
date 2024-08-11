@@ -25,3 +25,9 @@ vcpkg_installed
 
 # CMake
 CMakeFiles
+
+# Examples
+examples/foam/.fluenc
+examples/foo/.fluenc
+examples/hello_world/.fluenc
+examples/stdlib/.fluenc

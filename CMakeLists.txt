@@ -35,6 +35,7 @@ else()
 endif()
 
 add_subdirectory("fluenc-lang")
+add_subdirectory("code-generation")
 add_subdirectory("fcc")
 add_subdirectory("incbin")
 add_subdirectory("grammar")

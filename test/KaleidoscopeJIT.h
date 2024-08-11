@@ -93,8 +93,13 @@ public:
 	return CompileLayer.add(RT, std::move(TSM));
   }
 
-  Expected<JITEvaluatedSymbol> lookup(StringRef Name) {
-	return ES->lookup({&MainJD}, Mangle(Name.str()));
+#if LLVM_VERSION_MAJOR >= 17
+  Expected<ExecutorSymbolDef> lookup(StringRef Name)
+#else
+  Expected<JITEvaluatedSymbol> lookup(StringRef Name)
+#endif
+  {
+      return ES->lookup({&MainJD}, Mangle(Name.str()));
   }
 };
 

@@ -1,23 +1,24 @@
 #include <boost/test/included/unit_test.hpp>
 
-#include "TestHelpers.h"
-#include "TypeCompatibilityCalculator.h"
-#include "Prototype.h"
+#include "test_helpers.hpp"
+#include "type_compatibility_calculator.hpp"
 
-#include "values/LazyValue.h"
+#include "values/pre_lazy_value.hpp"
 
-#include "types/AnyType.h"
-#include "types/Int32Type.h"
-#include "types/Int64Type.h"
-#include "types/UserType.h"
-#include "types/ArrayType.h"
-#include "types/WithoutType.h"
+#include "types/any_type.hpp"
+#include "types/array_type.hpp"
+#include "types/int32_type.hpp"
+#include "types/int64_type.hpp"
+#include "types/structure_type.hpp"
+#include "types/user_type.hpp"
+#include "types/without_type.hpp"
 
-#include "exceptions/MissingFieldException.h"
+#include "exceptions/missing_field_exception.hpp"
 
 using namespace boost::unit_test;
+using namespace fluenc::code_generation;
 
-BOOST_AUTO_TEST_CASE (scenario1)
+BOOST_AUTO_TEST_CASE(scenario1)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -29,7 +30,7 @@ BOOST_AUTO_TEST_CASE (scenario1)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario2)
+BOOST_AUTO_TEST_CASE(scenario2)
 {
 	auto result = exec(R"(
 		function foo()
@@ -46,7 +47,7 @@ BOOST_AUTO_TEST_CASE (scenario2)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario3)
+BOOST_AUTO_TEST_CASE(scenario3)
 {
 	auto result = exec(R"(
 		function addFive(i32 v)
@@ -63,7 +64,7 @@ BOOST_AUTO_TEST_CASE (scenario3)
 	BOOST_TEST(result == 13);
 }
 
-BOOST_AUTO_TEST_CASE (scenario4)
+BOOST_AUTO_TEST_CASE(scenario4)
 {
 	auto result = exec(R"(
 		function addFive(i32 v)
@@ -85,7 +86,7 @@ BOOST_AUTO_TEST_CASE (scenario4)
 	BOOST_TEST(result == 15);
 }
 
-BOOST_AUTO_TEST_CASE (scenario5)
+BOOST_AUTO_TEST_CASE(scenario5)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -97,7 +98,7 @@ BOOST_AUTO_TEST_CASE (scenario5)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario6)
+BOOST_AUTO_TEST_CASE(scenario6)
 {
 	auto result = exec(R"(
 		function producer()
@@ -119,7 +120,7 @@ BOOST_AUTO_TEST_CASE (scenario6)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario7)
+BOOST_AUTO_TEST_CASE(scenario7)
 {
 	auto result = exec(R"(
 		function fn(i32 v)
@@ -146,7 +147,7 @@ BOOST_AUTO_TEST_CASE (scenario7)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (scenario8)
+BOOST_AUTO_TEST_CASE(scenario8)
 {
 	auto result = exec(R"(
 		function bar(i32 v)
@@ -178,7 +179,7 @@ BOOST_AUTO_TEST_CASE (scenario8)
 	BOOST_TEST(result == 52);
 }
 
-BOOST_AUTO_TEST_CASE (scenario9)
+BOOST_AUTO_TEST_CASE(scenario9)
 {
 	auto result = exec(R"(
 		function func(i64 v)
@@ -205,7 +206,7 @@ BOOST_AUTO_TEST_CASE (scenario9)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario10)
+BOOST_AUTO_TEST_CASE(scenario10)
 {
 	auto result = exec(R"(
 		function func(i64 v)
@@ -232,7 +233,7 @@ BOOST_AUTO_TEST_CASE (scenario10)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (scenario11)
+BOOST_AUTO_TEST_CASE(scenario11)
 {
 	auto result = exec(R"(
 		function sign(i32 v)
@@ -254,7 +255,7 @@ BOOST_AUTO_TEST_CASE (scenario11)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario12)
+BOOST_AUTO_TEST_CASE(scenario12)
 {
 	auto result = exec(R"(
 		function sign(i32 v)
@@ -276,7 +277,7 @@ BOOST_AUTO_TEST_CASE (scenario12)
 	BOOST_TEST(result == -5);
 }
 
-BOOST_AUTO_TEST_CASE (scenario13)
+BOOST_AUTO_TEST_CASE(scenario13)
 {
 	auto result = exec(R"(
 		function timesFive(i32 v)
@@ -303,7 +304,7 @@ BOOST_AUTO_TEST_CASE (scenario13)
 	BOOST_TEST(result == -5);
 }
 
-BOOST_AUTO_TEST_CASE (scenario14)
+BOOST_AUTO_TEST_CASE(scenario14)
 {
 	auto result = exec(R"(
 		function max(i32 x, i32 y)
@@ -322,10 +323,10 @@ BOOST_AUTO_TEST_CASE (scenario14)
 		}
 	)");
 
-	BOOST_TEST(result == 3 );
+	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario15)
+BOOST_AUTO_TEST_CASE(scenario15)
 {
 	auto result = exec(R"(
 		function loop(i32 i, i32 count)
@@ -347,7 +348,7 @@ BOOST_AUTO_TEST_CASE (scenario15)
 	BOOST_TEST(result == 7);
 }
 
-BOOST_AUTO_TEST_CASE (fibonacci)
+BOOST_AUTO_TEST_CASE(fibonacci)
 {
 	auto result = exec(R"(
 		function fibonacci(i32 current, i32 previous, i32 i, i32 count)
@@ -369,7 +370,7 @@ BOOST_AUTO_TEST_CASE (fibonacci)
 	BOOST_TEST(result == 6765);
 }
 
-BOOST_AUTO_TEST_CASE (scenario16)
+BOOST_AUTO_TEST_CASE(scenario16)
 {
 	auto result = exec(R"(
 		function consumer(i32 v)
@@ -401,7 +402,7 @@ BOOST_AUTO_TEST_CASE (scenario16)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario17)
+BOOST_AUTO_TEST_CASE(scenario17)
 {
 	auto result = exec(R"(
 		function isPositive(i32 v)
@@ -428,7 +429,7 @@ BOOST_AUTO_TEST_CASE (scenario17)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario18)
+BOOST_AUTO_TEST_CASE(scenario18)
 {
 	auto result = exec(R"(
 		function numberPlz(bool positive)
@@ -450,7 +451,7 @@ BOOST_AUTO_TEST_CASE (scenario18)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario19)
+BOOST_AUTO_TEST_CASE(scenario19)
 {
 	auto result = exec(R"(
 		import i32 puts(string s);
@@ -468,7 +469,7 @@ BOOST_AUTO_TEST_CASE (scenario19)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE (scenario20)
+BOOST_AUTO_TEST_CASE(scenario20)
 {
 	auto result = exec(R"(
 		struct DeStruct
@@ -500,7 +501,7 @@ BOOST_AUTO_TEST_CASE (scenario20)
 	BOOST_TEST(result == 10);
 }
 
-BOOST_AUTO_TEST_CASE (scenario21)
+BOOST_AUTO_TEST_CASE(scenario21)
 {
 	auto result = exec(R"(
 		struct DeStruct
@@ -540,7 +541,7 @@ BOOST_AUTO_TEST_CASE (scenario21)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (scenario22)
+BOOST_AUTO_TEST_CASE(scenario22)
 {
 	auto result = exec(R"(
 		struct DeStruct
@@ -578,7 +579,7 @@ BOOST_AUTO_TEST_CASE (scenario22)
 	BOOST_TEST(result == 200);
 }
 
-BOOST_AUTO_TEST_CASE (scenario23)
+BOOST_AUTO_TEST_CASE(scenario23)
 {
 	compile(R"(
 		function foo(long renderer)
@@ -602,7 +603,7 @@ BOOST_AUTO_TEST_CASE (scenario23)
 	BOOST_TEST(true);
 }
 
-BOOST_AUTO_TEST_CASE (scenario24)
+BOOST_AUTO_TEST_CASE(scenario24)
 {
 	auto result = exec(R"(
 		function foo()
@@ -624,7 +625,7 @@ BOOST_AUTO_TEST_CASE (scenario24)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario25)
+BOOST_AUTO_TEST_CASE(scenario25)
 {
 	auto result = exec(R"(
 		function bar()
@@ -653,7 +654,7 @@ BOOST_AUTO_TEST_CASE (scenario25)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (scenario26)
+BOOST_AUTO_TEST_CASE(scenario26)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -665,7 +666,7 @@ BOOST_AUTO_TEST_CASE (scenario26)
 	BOOST_TEST(result == 255);
 }
 
-BOOST_AUTO_TEST_CASE (scenario27)
+BOOST_AUTO_TEST_CASE(scenario27)
 {
 	auto result = exec(R"(
 		global Constant1: 12;
@@ -690,7 +691,7 @@ BOOST_AUTO_TEST_CASE (scenario27)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario28)
+BOOST_AUTO_TEST_CASE(scenario28)
 {
 	auto result = exec(R"(
 		function conditional1(i32 v)
@@ -722,7 +723,7 @@ BOOST_AUTO_TEST_CASE (scenario28)
 	BOOST_TEST(result == 32);
 }
 
-BOOST_AUTO_TEST_CASE (scenario29)
+BOOST_AUTO_TEST_CASE(scenario29)
 {
 	auto result = exec(R"(
 		struct MyStruct
@@ -754,7 +755,7 @@ BOOST_AUTO_TEST_CASE (scenario29)
 	BOOST_TEST(result == -10);
 }
 
-BOOST_AUTO_TEST_CASE (scenario30)
+BOOST_AUTO_TEST_CASE(scenario30)
 {
 	auto result = exec(R"(
 		struct MyStruct
@@ -786,7 +787,7 @@ BOOST_AUTO_TEST_CASE (scenario30)
 	BOOST_TEST(result == -10);
 }
 
-BOOST_AUTO_TEST_CASE (scenario31)
+BOOST_AUTO_TEST_CASE(scenario31)
 {
 	auto result = exec(R"(
 		// This is a comment
@@ -800,7 +801,7 @@ BOOST_AUTO_TEST_CASE (scenario31)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario32)
+BOOST_AUTO_TEST_CASE(scenario32)
 {
 	auto result = exec(R"(
 		struct MyStruct
@@ -840,7 +841,7 @@ BOOST_AUTO_TEST_CASE (scenario32)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario33)
+BOOST_AUTO_TEST_CASE(scenario33)
 {
 	auto result = exec(R"(
 		struct MyStruct
@@ -890,7 +891,7 @@ BOOST_AUTO_TEST_CASE (scenario33)
 	BOOST_TEST(result == 31);
 }
 
-BOOST_AUTO_TEST_CASE (scenario34)
+BOOST_AUTO_TEST_CASE(scenario34)
 {
 	auto result = exec(R"(
 		function foo()
@@ -912,7 +913,7 @@ BOOST_AUTO_TEST_CASE (scenario34)
 	BOOST_TEST(result == 20);
 }
 
-BOOST_AUTO_TEST_CASE (scenario35)
+BOOST_AUTO_TEST_CASE(scenario35)
 {
 	auto result = exec(R"(
 		struct Bar
@@ -948,7 +949,7 @@ BOOST_AUTO_TEST_CASE (scenario35)
 	BOOST_TEST(result == -1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario36)
+BOOST_AUTO_TEST_CASE(scenario36)
 {
 	auto result = exec(R"(
 		struct Bar
@@ -989,7 +990,7 @@ BOOST_AUTO_TEST_CASE (scenario36)
 	BOOST_TEST(result == -1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario37)
+BOOST_AUTO_TEST_CASE(scenario37)
 {
 	auto result = exec(R"(
 		function numbersBelow(i32 i, i32 number)
@@ -1021,7 +1022,7 @@ BOOST_AUTO_TEST_CASE (scenario37)
 	BOOST_TEST(result == 15);
 }
 
-BOOST_AUTO_TEST_CASE (scenario38)
+BOOST_AUTO_TEST_CASE(scenario38)
 {
 	auto result = exec(R"(
 		function sum(i32 value, i32 number)
@@ -1043,7 +1044,7 @@ BOOST_AUTO_TEST_CASE (scenario38)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario39)
+BOOST_AUTO_TEST_CASE(scenario39)
 {
 	auto result = exec(R"(
 		struct Struct1
@@ -1094,7 +1095,7 @@ BOOST_AUTO_TEST_CASE (scenario39)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario40)
+BOOST_AUTO_TEST_CASE(scenario40)
 {
 	auto result = exec(R"(
 		function createArray()
@@ -1121,7 +1122,7 @@ BOOST_AUTO_TEST_CASE (scenario40)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario41)
+BOOST_AUTO_TEST_CASE(scenario41)
 {
 	auto result = exec(R"(
 		function foo()
@@ -1150,7 +1151,7 @@ BOOST_AUTO_TEST_CASE (scenario41)
 	BOOST_TEST(result == 32);
 }
 
-BOOST_AUTO_TEST_CASE (scenario42)
+BOOST_AUTO_TEST_CASE(scenario42)
 {
 	auto result = exec(R"(
 		function add(i32 value)
@@ -1182,7 +1183,7 @@ BOOST_AUTO_TEST_CASE (scenario42)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario43)
+BOOST_AUTO_TEST_CASE(scenario43)
 {
 	auto result = exec(R"(
 		struct Child
@@ -1219,7 +1220,7 @@ BOOST_AUTO_TEST_CASE (scenario43)
 	BOOST_TEST(result == 100);
 }
 
-BOOST_AUTO_TEST_CASE (scenario44)
+BOOST_AUTO_TEST_CASE(scenario44)
 {
 	auto result = exec(R"(
 		function foo(without item)
@@ -1236,7 +1237,7 @@ BOOST_AUTO_TEST_CASE (scenario44)
 	BOOST_TEST(result == 23);
 }
 
-BOOST_AUTO_TEST_CASE (scenario45)
+BOOST_AUTO_TEST_CASE(scenario45)
 {
 	auto result = exec(R"(
 		struct Foo
@@ -1268,7 +1269,7 @@ BOOST_AUTO_TEST_CASE (scenario45)
 	BOOST_TEST(result == 23);
 }
 
-BOOST_AUTO_TEST_CASE (scenario46)
+BOOST_AUTO_TEST_CASE(scenario46)
 {
 	auto result = exec(R"(
 		function bar(i32 value)
@@ -1290,7 +1291,7 @@ BOOST_AUTO_TEST_CASE (scenario46)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario47)
+BOOST_AUTO_TEST_CASE(scenario47)
 {
 	auto result = exec(R"(
 		struct Item
@@ -1372,7 +1373,7 @@ BOOST_AUTO_TEST_CASE (scenario47)
 	BOOST_TEST(result == 21);
 }
 
-BOOST_AUTO_TEST_CASE (scenario48)
+BOOST_AUTO_TEST_CASE(scenario48)
 {
 	auto result = exec(R"(
 		struct Item
@@ -1455,7 +1456,7 @@ BOOST_AUTO_TEST_CASE (scenario48)
 	BOOST_TEST(result == 100);
 }
 
-BOOST_AUTO_TEST_CASE (scenario49)
+BOOST_AUTO_TEST_CASE(scenario49)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -1467,7 +1468,7 @@ BOOST_AUTO_TEST_CASE (scenario49)
 	BOOST_TEST(result == 'a');
 }
 
-BOOST_AUTO_TEST_CASE (scenario50)
+BOOST_AUTO_TEST_CASE(scenario50)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -1479,7 +1480,7 @@ BOOST_AUTO_TEST_CASE (scenario50)
 	BOOST_TEST(result == ' ');
 }
 
-BOOST_AUTO_TEST_CASE (scenario51)
+BOOST_AUTO_TEST_CASE(scenario51)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -1491,7 +1492,7 @@ BOOST_AUTO_TEST_CASE (scenario51)
 	BOOST_TEST(result == '\n');
 }
 
-BOOST_AUTO_TEST_CASE (scenario52)
+BOOST_AUTO_TEST_CASE(scenario52)
 {
 	auto result = exec(R"(
 		struct Row
@@ -1518,7 +1519,7 @@ BOOST_AUTO_TEST_CASE (scenario52)
 	BOOST_TEST(result == 5);
 }
 
-BOOST_AUTO_TEST_CASE (scenario53)
+BOOST_AUTO_TEST_CASE(scenario53)
 {
 	auto result = exec(R"(
 		struct Row
@@ -1551,7 +1552,7 @@ BOOST_AUTO_TEST_CASE (scenario53)
 	BOOST_TEST(result == 20);
 }
 
-BOOST_AUTO_TEST_CASE (scenario54)
+BOOST_AUTO_TEST_CASE(scenario54)
 {
 	auto result = exec(R"(
 		struct Item
@@ -1641,7 +1642,7 @@ BOOST_AUTO_TEST_CASE (scenario54)
 	BOOST_TEST(result == 30);
 }
 
-BOOST_AUTO_TEST_CASE (scenario55)
+BOOST_AUTO_TEST_CASE(scenario55)
 {
 	auto result = exec(R"(
 		function sum(i32 product, i32 value)
@@ -1663,7 +1664,7 @@ BOOST_AUTO_TEST_CASE (scenario55)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario56)
+BOOST_AUTO_TEST_CASE(scenario56)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -1708,7 +1709,7 @@ BOOST_AUTO_TEST_CASE (scenario56)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario57)
+BOOST_AUTO_TEST_CASE(scenario57)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -1754,7 +1755,7 @@ BOOST_AUTO_TEST_CASE (scenario57)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario58)
+BOOST_AUTO_TEST_CASE(scenario58)
 {
 	auto result = exec(R"(
 		struct Child
@@ -1807,7 +1808,7 @@ BOOST_AUTO_TEST_CASE (scenario58)
 	BOOST_TEST(result == 41);
 }
 
-BOOST_AUTO_TEST_CASE (scenario59)
+BOOST_AUTO_TEST_CASE(scenario59)
 {
 	auto result = exec(R"(
 		function loop(i32 v1, i32 v2)
@@ -1829,9 +1830,9 @@ BOOST_AUTO_TEST_CASE (scenario59)
 	BOOST_TEST(result == 41);
 }
 
-BOOST_AUTO_TEST_CASE (scenario60)
+BOOST_AUTO_TEST_CASE(scenario60)
 {
-	auto regularFunction = compileFunction(R"(
+	auto regularFunction = compile_function(R"(
 		function loop(i32 v1, i32 v2)
 		{
 			if ((v1 - v2) == -1)
@@ -1843,7 +1844,7 @@ BOOST_AUTO_TEST_CASE (scenario60)
 		}
 	)");
 
-	auto iteratorFunction1 = compileFunction(R"(
+	auto iteratorFunction1 = compile_function(R"(
 		function loop(i32 v1, i32 v2)
 		{
 			if ((v1 - v2) == -1)
@@ -1855,14 +1856,14 @@ BOOST_AUTO_TEST_CASE (scenario60)
 		}
 	)");
 
-	auto iteratorFunction2 = compileFunction(R"(
+	auto iteratorFunction2 = compile_function(R"(
 		function generator(i32 i)
 		{
 			return i -> generator(i + 1);
 		}
 	)");
 
-	auto iteratorFunction3 = compileFunction(R"(
+	auto iteratorFunction3 = compile_function(R"(
 		function generator(i32 i)
 		{
 			if (i < 20)
@@ -1874,13 +1875,13 @@ BOOST_AUTO_TEST_CASE (scenario60)
 		}
 	)");
 
-	BOOST_TEST((regularFunction->attribute() == FunctionAttribute::None));
-	BOOST_TEST((iteratorFunction1->attribute() == FunctionAttribute::Iterator));
-	BOOST_TEST((iteratorFunction2->attribute() == FunctionAttribute::Iterator));
-	BOOST_TEST((iteratorFunction3->attribute() == FunctionAttribute::Iterator));
+	BOOST_TEST((attribute(regularFunction) == fluenc::function_attribute::none));
+	BOOST_TEST((attribute(iteratorFunction1) == fluenc::function_attribute::iterator));
+	BOOST_TEST((attribute(iteratorFunction2) == fluenc::function_attribute::iterator));
+	BOOST_TEST((attribute(iteratorFunction3) == fluenc::function_attribute::iterator));
 }
 
-BOOST_AUTO_TEST_CASE (scenario61)
+BOOST_AUTO_TEST_CASE(scenario61)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -1945,7 +1946,7 @@ BOOST_AUTO_TEST_CASE (scenario61)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario62)
+BOOST_AUTO_TEST_CASE(scenario62)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -2000,7 +2001,7 @@ BOOST_AUTO_TEST_CASE (scenario62)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (scenario63)
+BOOST_AUTO_TEST_CASE(scenario63)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -2083,7 +2084,7 @@ BOOST_AUTO_TEST_CASE (scenario63)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario64)
+BOOST_AUTO_TEST_CASE(scenario64)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -2146,7 +2147,7 @@ BOOST_AUTO_TEST_CASE (scenario64)
 	BOOST_TEST(result == 21);
 }
 
-BOOST_AUTO_TEST_CASE (scenario65)
+BOOST_AUTO_TEST_CASE(scenario65)
 {
 	auto result = exec(R"(
 		function add(i32 v1, i32 v2)
@@ -2173,7 +2174,7 @@ BOOST_AUTO_TEST_CASE (scenario65)
 	BOOST_TEST(result == 19);
 }
 
-BOOST_AUTO_TEST_CASE (scenario66)
+BOOST_AUTO_TEST_CASE(scenario66)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -2239,7 +2240,7 @@ BOOST_AUTO_TEST_CASE (scenario66)
 	BOOST_TEST(result == 19);
 }
 
-BOOST_AUTO_TEST_CASE (scenario67)
+BOOST_AUTO_TEST_CASE(scenario67)
 {
 	auto result = exec(R"(
 		function sum(i32 product, i32 value)
@@ -2273,7 +2274,7 @@ BOOST_AUTO_TEST_CASE (scenario67)
 	BOOST_TEST(result == 10);
 }
 
-BOOST_AUTO_TEST_CASE (scenario68)
+BOOST_AUTO_TEST_CASE(scenario68)
 {
 	auto result = exec(R"(
 		function add(i32 left, i32 right)
@@ -2315,7 +2316,7 @@ BOOST_AUTO_TEST_CASE (scenario68)
 	BOOST_TEST(result == 21);
 }
 
-BOOST_AUTO_TEST_CASE (scenario69)
+BOOST_AUTO_TEST_CASE(scenario69)
 {
 	auto result = exec(R"(
 		function add(i32 left, i32 right)
@@ -2367,7 +2368,7 @@ BOOST_AUTO_TEST_CASE (scenario69)
 	BOOST_TEST(result == 27);
 }
 
-BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_1)
+BOOST_AUTO_TEST_CASE(selectsTheCorrectOverload_1)
 {
 	auto result = exec(R"(
 		struct Parent
@@ -2404,7 +2405,7 @@ BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_1)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_2)
+BOOST_AUTO_TEST_CASE(selectsTheCorrectOverload_2)
 {
 	auto result = exec(R"(
 		struct Parent
@@ -2436,7 +2437,7 @@ BOOST_AUTO_TEST_CASE (selectsTheCorrectOverload_2)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (compatibility)
+BOOST_AUTO_TEST_CASE(compatibility)
 {
 	auto entryPoint = compile(R"(
 		struct Unrelated
@@ -2465,28 +2466,35 @@ BOOST_AUTO_TEST_CASE (compatibility)
 		}
 	)");
 
-	auto types = entryPoint.types();
+	auto unrelatedType = entryPoint.resolve("Unrelated");
+	auto childType = entryPoint.resolve("Child");
+	auto fatherType = entryPoint.resolve("Father");
+	auto motherType = entryPoint.resolve("Mother");
+	auto ancestorType = entryPoint.resolve("Ancestor");
 
-	auto unrelatedType = types["Unrelated"];
-	auto childType = types["Child"];
-	auto fatherType = types["Father"];
-	auto motherType = types["Mother"];
-	auto ancestorType = types["Ancestor"];
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, childType, childType) == 1);
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, childType, fatherType) == 2);
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, childType, motherType) == 2);
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, childType, ancestorType) == 3);
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, childType, types::any_type::instance()) == 4);
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, childType, unrelatedType) == -1);
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, childType, types::int32_type::instance()) == -1);
 
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, childType) == 1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, fatherType) == 2);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, motherType) == 2);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, ancestorType) == 3);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, AnyType::instance()) == 4);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, unrelatedType) == -1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, childType, Int32Type::instance()) == -1);
-
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), Int32Type::instance()) == 0);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), Int64Type::instance()) == -1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, Int32Type::instance(), AnyType::instance()) == 1);
+	BOOST_TEST(
+		type_compatibility_calculator::calculate(entryPoint, types::int32_type::instance(), types::int32_type::instance()) ==
+		0
+	);
+	BOOST_TEST(
+		type_compatibility_calculator::calculate(entryPoint, types::int32_type::instance(), types::int64_type::instance()) ==
+		-1
+	);
+	BOOST_TEST(
+		type_compatibility_calculator::calculate(entryPoint, types::int32_type::instance(), types::any_type::instance()) ==
+		1
+	);
 }
 
-BOOST_AUTO_TEST_CASE (scenario70)
+BOOST_AUTO_TEST_CASE(scenario70)
 {
 	auto result = exec(R"(
 		function elementAt(i32 index, i32 i, i32 item)
@@ -2532,31 +2540,31 @@ BOOST_AUTO_TEST_CASE (scenario70)
 	BOOST_TEST(result == 50);
 }
 
-BOOST_AUTO_TEST_CASE (arrayType_1)
+BOOST_AUTO_TEST_CASE(arrayType_1)
 {
-	auto value1 = compileValue("[1, 2, 3]");
-	auto value2 = compileValue("[1, 2i64, \"foo\"]");
+	auto value1 = compile_value("[1, 2, 3]");
+	auto value2 = compile_value("[1, 2i64, \"foo\"]");
 
 	BOOST_TEST(value1->type()->name() == "[i32, i32, i32]");
 	BOOST_TEST(value2->type()->name() == "[i32, i64, string]");
 }
 
-BOOST_AUTO_TEST_CASE (arrayType_2)
+BOOST_AUTO_TEST_CASE(arrayType_2)
 {
-	auto value1 = compileValue("[1, 2, 3]");
-	auto value2 = compileValue("[1, 2i64, \"foo\"]");
-	auto value3 = compileValue("[7, 5, 34]");
+	auto value1 = compile_value("[1, 2, 3]");
+	auto value2 = compile_value("[1, 2i64, \"foo\"]");
+	auto value3 = compile_value("[7, 5, 34]");
 
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value1->type(), value1->type()) == 0);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value2->type(), value2->type()) == 0);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value1->type(), value3->type()) == 0);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value3->type(), value1->type()) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(entry_point(), value1->type(), value1->type()) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(entry_point(), value2->type(), value2->type()) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(entry_point(), value1->type(), value3->type()) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(entry_point(), value3->type(), value1->type()) == 0);
 
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value1->type(), value2->type()) == -1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(EntryPoint(), value2->type(), value1->type()) == -1);
+	BOOST_TEST(type_compatibility_calculator::calculate(entry_point(), value1->type(), value2->type()) == -1);
+	BOOST_TEST(type_compatibility_calculator::calculate(entry_point(), value2->type(), value1->type()) == -1);
 }
 
-BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
+BOOST_AUTO_TEST_CASE(arrayTypePropagation1)
 {
 	auto entryPoi32 = compile(R"(
 		function foo((i32 value, ...values))
@@ -2579,9 +2587,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	auto [_1, function] = *functions.find("bar");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2589,12 +2597,12 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation1)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32]");
 }
 
-BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
+BOOST_AUTO_TEST_CASE(arrayTypePropagation2)
 {
 	auto entryPoi32 = compile(R"(
 		function foo((i32 value, ...values))
@@ -2622,9 +2630,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	auto [_1, function] = *functions.find("bar");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2632,12 +2640,12 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation2)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[bool, bool, i32]");
 }
 
-BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
+BOOST_AUTO_TEST_CASE(arrayTypePropagation3)
 {
 	auto entryPoi32 = compile(R"(
 		function foo(i32 i, i32 count)
@@ -2660,9 +2668,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	auto [_1, function] = *functions.find("bar");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2670,12 +2678,12 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation3)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "...");
 }
 
-BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
+BOOST_AUTO_TEST_CASE(arrayTypePropagation4)
 {
 	auto entryPoi32 = compile(R"(
 		function foo((any item, ...items))
@@ -2708,9 +2716,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 
 	auto [_1, function] = *functions.find("bar");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2718,12 +2726,12 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation4)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
 
-BOOST_AUTO_TEST_CASE (scenario71)
+BOOST_AUTO_TEST_CASE(scenario71)
 {
 	auto result = exec(R"(
 		function count(i32 product, i32 c)
@@ -2745,7 +2753,7 @@ BOOST_AUTO_TEST_CASE (scenario71)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario72)
+BOOST_AUTO_TEST_CASE(scenario72)
 {
 	auto result = exec(R"(
 		namespace Foo
@@ -2775,7 +2783,7 @@ BOOST_AUTO_TEST_CASE (scenario72)
 	BOOST_TEST(result == 23);
 }
 
-BOOST_AUTO_TEST_CASE (scenario73)
+BOOST_AUTO_TEST_CASE(scenario73)
 {
 	auto result = exec(R"(
 		namespace Foo
@@ -2810,7 +2818,7 @@ BOOST_AUTO_TEST_CASE (scenario73)
 	BOOST_TEST(result == 15);
 }
 
-BOOST_AUTO_TEST_CASE (scenario74)
+BOOST_AUTO_TEST_CASE(scenario74)
 {
 	auto result = exec(R"(
 		namespace Foo
@@ -2845,7 +2853,7 @@ BOOST_AUTO_TEST_CASE (scenario74)
 	BOOST_TEST(result == 23);
 }
 
-BOOST_AUTO_TEST_CASE (scenario75)
+BOOST_AUTO_TEST_CASE(scenario75)
 {
 	auto result = exec(R"(
 		global MyGlobal: 16
@@ -2869,7 +2877,7 @@ BOOST_AUTO_TEST_CASE (scenario75)
 	BOOST_TEST(result == 33);
 }
 
-BOOST_AUTO_TEST_CASE (scenario76)
+BOOST_AUTO_TEST_CASE(scenario76)
 {
 	auto result = exec(R"(
 		global MyGlobal: 33
@@ -2891,7 +2899,7 @@ BOOST_AUTO_TEST_CASE (scenario76)
 	BOOST_TEST(result == 33);
 }
 
-BOOST_AUTO_TEST_CASE (scenario77)
+BOOST_AUTO_TEST_CASE(scenario77)
 {
 	auto result = exec(R"(
 		global MyGlobal: 16
@@ -2915,7 +2923,7 @@ BOOST_AUTO_TEST_CASE (scenario77)
 	BOOST_TEST(result == 16);
 }
 
-BOOST_AUTO_TEST_CASE (scenario78)
+BOOST_AUTO_TEST_CASE(scenario78)
 {
 	auto result = exec(R"(
 		struct MyStruct
@@ -2950,7 +2958,7 @@ BOOST_AUTO_TEST_CASE (scenario78)
 	BOOST_TEST(result == 33);
 }
 
-BOOST_AUTO_TEST_CASE (scenario79)
+BOOST_AUTO_TEST_CASE(scenario79)
 {
 	auto result = exec(R"(
 		struct MyStruct
@@ -2980,7 +2988,7 @@ BOOST_AUTO_TEST_CASE (scenario79)
 	BOOST_TEST(result == 13);
 }
 
-BOOST_AUTO_TEST_CASE (scenario80)
+BOOST_AUTO_TEST_CASE(scenario80)
 {
 	auto result = exec(R"(
 		struct MyStruct
@@ -3015,7 +3023,7 @@ BOOST_AUTO_TEST_CASE (scenario80)
 	BOOST_TEST(result == 13);
 }
 
-BOOST_AUTO_TEST_CASE (scenario81)
+BOOST_AUTO_TEST_CASE(scenario81)
 {
 	auto result = exec(R"(
 		struct Item
@@ -3064,7 +3072,7 @@ BOOST_AUTO_TEST_CASE (scenario81)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (compatibility_3)
+BOOST_AUTO_TEST_CASE(compatibility_3)
 {
 	auto result = compile(R"(
 		struct Item
@@ -3073,18 +3081,16 @@ BOOST_AUTO_TEST_CASE (compatibility_3)
 		}
 	)");
 
-	auto types = result.types();
+	auto itemType = static_cast<const types::structure_type*>(result.resolve("Item"));
 
-	auto itemType = types["Item"];
-
-	auto userType1 = UserType::get(itemType, { ArrayType::get({ itemType }) });
-	auto userType2 = UserType::get(itemType, { WithoutType::instance() });
+	auto userType1 = types::user_type::get(itemType, { types::array_type::get({ itemType }) });
+	auto userType2 = types::user_type::get(itemType, { types::without_type::instance() });
 
 	// Both have the same tag
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, userType1, userType2) == 1);
+	BOOST_TEST(type_compatibility_calculator::calculate(result, userType1, userType2) == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario82)
+BOOST_AUTO_TEST_CASE(scenario82)
 {
 	auto result = exec(R"(
 		struct Item
@@ -3156,7 +3162,7 @@ BOOST_AUTO_TEST_CASE (scenario82)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario83)
+BOOST_AUTO_TEST_CASE(scenario83)
 {
 	auto result = exec(R"(
 		struct Item
@@ -3237,9 +3243,10 @@ BOOST_AUTO_TEST_CASE (scenario83)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario84)
+BOOST_AUTO_TEST_CASE(scenario84)
 {
-	BOOST_REQUIRE_THROW(exec(R"(
+	BOOST_REQUIRE_THROW(
+		exec(R"(
 		struct Item;
 
 		export i32 main()
@@ -3253,12 +3260,12 @@ BOOST_AUTO_TEST_CASE (scenario84)
 
 			return 12;
 		}
-	)")
-	, MissingFieldException
+	)"),
+		missing_field_exception
 	);
 }
 
-BOOST_AUTO_TEST_CASE (scenario85)
+BOOST_AUTO_TEST_CASE(scenario85)
 {
 	auto result = exec(R"(
 		global Normal: 0;
@@ -3349,7 +3356,7 @@ BOOST_AUTO_TEST_CASE (scenario85)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario86)
+BOOST_AUTO_TEST_CASE(scenario86)
 {
 	auto result = exec(R"(
 		struct Item
@@ -3430,7 +3437,7 @@ BOOST_AUTO_TEST_CASE (scenario86)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario87)
+BOOST_AUTO_TEST_CASE(scenario87)
 {
 	auto result = exec(R"(
 		struct Item
@@ -3477,7 +3484,7 @@ BOOST_AUTO_TEST_CASE (scenario87)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario88)
+BOOST_AUTO_TEST_CASE(scenario88)
 {
 	auto result = exec(R"(
 		struct Item
@@ -3569,7 +3576,7 @@ BOOST_AUTO_TEST_CASE (scenario88)
 	BOOST_TEST(result == 21);
 }
 
-BOOST_AUTO_TEST_CASE (scenario89)
+BOOST_AUTO_TEST_CASE(scenario89)
 {
 	auto result = exec(R"(
 		function getBool()
@@ -3591,7 +3598,7 @@ BOOST_AUTO_TEST_CASE (scenario89)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario90)
+BOOST_AUTO_TEST_CASE(scenario90)
 {
 	auto result = exec(R"(
 		function generator(i32 count, i32 i)
@@ -3627,7 +3634,7 @@ BOOST_AUTO_TEST_CASE (scenario90)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario91)
+BOOST_AUTO_TEST_CASE(scenario91)
 {
 	auto result = exec(R"(
 		struct State
@@ -3679,7 +3686,7 @@ BOOST_AUTO_TEST_CASE (scenario91)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario92)
+BOOST_AUTO_TEST_CASE(scenario92)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -3696,7 +3703,7 @@ BOOST_AUTO_TEST_CASE (scenario92)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario93)
+BOOST_AUTO_TEST_CASE(scenario93)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -3713,7 +3720,7 @@ BOOST_AUTO_TEST_CASE (scenario93)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario94)
+BOOST_AUTO_TEST_CASE(scenario94)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -3730,7 +3737,7 @@ BOOST_AUTO_TEST_CASE (scenario94)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario95)
+BOOST_AUTO_TEST_CASE(scenario95)
 {
 	auto result = exec(R"(
 		function add1(without previous, i32 value)
@@ -3766,7 +3773,7 @@ BOOST_AUTO_TEST_CASE (scenario95)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario96)
+BOOST_AUTO_TEST_CASE(scenario96)
 {
 	auto result = exec(R"(
 		function add1(without previous, i32 value)
@@ -3802,7 +3809,7 @@ BOOST_AUTO_TEST_CASE (scenario96)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario97)
+BOOST_AUTO_TEST_CASE(scenario97)
 {
 	auto result = exec(R"(
 		struct Foo
@@ -3864,7 +3871,7 @@ BOOST_AUTO_TEST_CASE (scenario97)
 	BOOST_TEST(result == 32);
 }
 
-BOOST_AUTO_TEST_CASE (scenario98)
+BOOST_AUTO_TEST_CASE(scenario98)
 {
 	auto result = exec(R"(
 		function foo(f32 f)
@@ -3886,7 +3893,7 @@ BOOST_AUTO_TEST_CASE (scenario98)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario99)
+BOOST_AUTO_TEST_CASE(scenario99)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -3908,7 +3915,7 @@ BOOST_AUTO_TEST_CASE (scenario99)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (scenario100)
+BOOST_AUTO_TEST_CASE(scenario100)
 {
 	auto result = exec(R"(
 		struct Struct
@@ -3940,7 +3947,7 @@ BOOST_AUTO_TEST_CASE (scenario100)
 	BOOST_TEST(result == 4);
 }
 
-BOOST_AUTO_TEST_CASE (scenario101)
+BOOST_AUTO_TEST_CASE(scenario101)
 {
 	auto result = exec(R"(
 		function f(i32 value)
@@ -3979,7 +3986,7 @@ BOOST_AUTO_TEST_CASE (scenario101)
 	BOOST_TEST(result == 150);
 }
 
-BOOST_AUTO_TEST_CASE (scenario102)
+BOOST_AUTO_TEST_CASE(scenario102)
 {
 	auto result = exec(R"(
 		struct Foo
@@ -4025,7 +4032,7 @@ BOOST_AUTO_TEST_CASE (scenario102)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario103)
+BOOST_AUTO_TEST_CASE(scenario103)
 {
 	auto result = exec(R"(
 		struct Item
@@ -4123,7 +4130,7 @@ BOOST_AUTO_TEST_CASE (scenario103)
 	BOOST_TEST(result == 22);
 }
 
-BOOST_AUTO_TEST_CASE (scenario104)
+BOOST_AUTO_TEST_CASE(scenario104)
 {
 	auto result = exec(R"(
 		struct State
@@ -4170,7 +4177,7 @@ BOOST_AUTO_TEST_CASE (scenario104)
 	BOOST_TEST(result == 22);
 }
 
-BOOST_AUTO_TEST_CASE (scenario105)
+BOOST_AUTO_TEST_CASE(scenario105)
 {
 	auto result = exec(R"(
 		struct State
@@ -4217,7 +4224,7 @@ BOOST_AUTO_TEST_CASE (scenario105)
 	BOOST_TEST(result == 22);
 }
 
-BOOST_AUTO_TEST_CASE (scenario106)
+BOOST_AUTO_TEST_CASE(scenario106)
 {
 	auto result = exec(R"(
 		struct State
@@ -4269,7 +4276,7 @@ BOOST_AUTO_TEST_CASE (scenario106)
 	BOOST_TEST(result == 22);
 }
 
-BOOST_AUTO_TEST_CASE (scenario107)
+BOOST_AUTO_TEST_CASE(scenario107)
 {
 	auto result = exec(R"(
 		struct State
@@ -4326,7 +4333,7 @@ BOOST_AUTO_TEST_CASE (scenario107)
 	BOOST_TEST(result == 45);
 }
 
-BOOST_AUTO_TEST_CASE (scenario108)
+BOOST_AUTO_TEST_CASE(scenario108)
 {
 	auto result = exec(R"(
 		struct Callbacks
@@ -4408,7 +4415,7 @@ BOOST_AUTO_TEST_CASE (scenario108)
 	BOOST_TEST(result == 45);
 }
 
-BOOST_AUTO_TEST_CASE (scenario109)
+BOOST_AUTO_TEST_CASE(scenario109)
 {
 	auto result = exec(R"(
 		struct State
@@ -4470,7 +4477,7 @@ BOOST_AUTO_TEST_CASE (scenario109)
 	BOOST_TEST(result == 45);
 }
 
-BOOST_AUTO_TEST_CASE (scenario110)
+BOOST_AUTO_TEST_CASE(scenario110)
 {
 	auto result = compile(R"(
 		function loop()
@@ -4484,11 +4491,11 @@ BOOST_AUTO_TEST_CASE (scenario110)
 		}
 	)");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	for (auto &root : result.roots())
+	for (auto& root : result.roots())
 	{
-		root->accept(emitter, { result, Stack() });
+		emitter.visit(root, { result, value_stack() });
 	}
 
 	auto module = result.module();
@@ -4496,7 +4503,7 @@ BOOST_AUTO_TEST_CASE (scenario110)
 	BOOST_TEST(module->getFunction("main"));
 }
 
-BOOST_AUTO_TEST_CASE (scenario111)
+BOOST_AUTO_TEST_CASE(scenario111)
 {
 	auto result = compile(R"(
 		struct Stage;
@@ -4507,15 +4514,15 @@ BOOST_AUTO_TEST_CASE (scenario111)
 		global moon: Moon {};
 	)");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	std::vector<const Type *> types;
+	std::vector<const base_type*> types;
 
-	for (auto &[name, global] : result.globals())
+	for (auto& [name, global] : result.globals())
 	{
-		for (auto &[ep, values] : global->accept(emitter, { result, Stack() }))
+		for (auto& [ep, values] : fluenc::accept(global, emitter, { result, value_stack() }))
 		{
-			for (auto &value : values)
+			for (auto& value : values)
 			{
 				auto type = value->type();
 
@@ -4529,12 +4536,12 @@ BOOST_AUTO_TEST_CASE (scenario111)
 	auto type1 = types[0];
 	auto type2 = types[1];
 
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type2) == -1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type1) == 0);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type2, type2) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(result, type1, type2) == -1);
+	BOOST_TEST(type_compatibility_calculator::calculate(result, type1, type1) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(result, type2, type2) == 0);
 }
 
-BOOST_AUTO_TEST_CASE (scenario112)
+BOOST_AUTO_TEST_CASE(scenario112)
 {
 	auto result = compile(R"(
 		struct State
@@ -4563,15 +4570,15 @@ BOOST_AUTO_TEST_CASE (scenario112)
 		}
 	)");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	std::vector<const Type *> types;
+	std::vector<const base_type*> types;
 
-	for (auto &[name, global] : result.globals())
+	for (auto& [name, global] : result.globals())
 	{
-		for (auto &[ep, values] : global->accept(emitter, { result, Stack() }))
+		for (auto& [ep, values] : fluenc::accept(global, emitter, { result, value_stack() }))
 		{
-			for (auto &value : values)
+			for (auto& value : values)
 			{
 				auto type = value->type();
 
@@ -4585,12 +4592,12 @@ BOOST_AUTO_TEST_CASE (scenario112)
 	auto type1 = types[0];
 	auto type2 = types[1];
 
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type2) == 1);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type1, type1) == 0);
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(result, type2, type2) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(result, type1, type2) == 1);
+	BOOST_TEST(type_compatibility_calculator::calculate(result, type1, type1) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(result, type2, type2) == 0);
 }
 
-BOOST_AUTO_TEST_CASE (scenario113)
+BOOST_AUTO_TEST_CASE(scenario113)
 {
 	auto result = exec(R"(
 		function generator(i32 i, i32 count)
@@ -4634,7 +4641,7 @@ BOOST_AUTO_TEST_CASE (scenario113)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario114)
+BOOST_AUTO_TEST_CASE(scenario114)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -4653,7 +4660,7 @@ BOOST_AUTO_TEST_CASE (scenario114)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario115)
+BOOST_AUTO_TEST_CASE(scenario115)
 {
 	auto result = exec(R"(
 		export i32 main()
@@ -4672,7 +4679,7 @@ BOOST_AUTO_TEST_CASE (scenario115)
 	BOOST_TEST(result == 1);
 }
 
-BOOST_AUTO_TEST_CASE (scenario116)
+BOOST_AUTO_TEST_CASE(scenario116)
 {
 	auto result = exec(R"(
 		struct State
@@ -4734,7 +4741,7 @@ BOOST_AUTO_TEST_CASE (scenario116)
 	BOOST_TEST(result == 12);
 }
 
-BOOST_AUTO_TEST_CASE (scenario117)
+BOOST_AUTO_TEST_CASE(scenario117)
 {
 	auto result = exec(R"(
 		struct State
@@ -4817,7 +4824,7 @@ BOOST_AUTO_TEST_CASE (scenario117)
 	BOOST_TEST(result == 32);
 }
 
-BOOST_AUTO_TEST_CASE (scenario118)
+BOOST_AUTO_TEST_CASE(scenario118)
 {
 	auto result = exec(R"(
 		struct State
@@ -4898,7 +4905,7 @@ BOOST_AUTO_TEST_CASE (scenario118)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario119)
+BOOST_AUTO_TEST_CASE(scenario119)
 {
 	auto result = exec(R"(
 		struct State
@@ -4983,7 +4990,7 @@ BOOST_AUTO_TEST_CASE (scenario119)
 	BOOST_TEST(result == 30);
 }
 
-BOOST_AUTO_TEST_CASE (scenario120)
+BOOST_AUTO_TEST_CASE(scenario120)
 {
 	auto result = exec(R"(
 		struct Item
@@ -5047,7 +5054,7 @@ BOOST_AUTO_TEST_CASE (scenario120)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario121)
+BOOST_AUTO_TEST_CASE(scenario121)
 {
 	auto result = exec(R"(
 		function foo(i32 counter, any value, (any nextValue, ...nextValues))
@@ -5111,7 +5118,7 @@ BOOST_AUTO_TEST_CASE (scenario121)
 	BOOST_TEST(result == 9);
 }
 
-BOOST_AUTO_TEST_CASE (scenario122)
+BOOST_AUTO_TEST_CASE(scenario122)
 {
 	auto result = exec(R"(
 		function add(i32 left, i32 right)
@@ -5173,7 +5180,7 @@ BOOST_AUTO_TEST_CASE (scenario122)
 	BOOST_TEST(result == 21);
 }
 
-BOOST_AUTO_TEST_CASE (scenario123)
+BOOST_AUTO_TEST_CASE(scenario123)
 {
 	auto result = exec(R"(
 		export i32 foo(i32 value)
@@ -5190,7 +5197,7 @@ BOOST_AUTO_TEST_CASE (scenario123)
 	BOOST_TEST(result == 246);
 }
 
-BOOST_AUTO_TEST_CASE (scenario124)
+BOOST_AUTO_TEST_CASE(scenario124)
 {
 	auto result = exec(R"(
 		function startsWith((any value, ...values), (any needle, ...pattern))
@@ -5389,7 +5396,7 @@ BOOST_AUTO_TEST_CASE(scenario130)
 	BOOST_TEST(result == 2);
 }
 
-BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
+BOOST_AUTO_TEST_CASE(arrayTypePropagation5)
 {
 	auto entryPoi32 = compile(R"(
 		function foo((any item1, ...items1), (any item2, ...items2))
@@ -5432,9 +5439,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 
 	auto [_1, function] = *functions.find("bar");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	auto functionResults1 = function->accept(emitter, { entryPoi32, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -5442,12 +5449,12 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation5)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
 
-BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
+BOOST_AUTO_TEST_CASE(arrayTypePropagation6)
 {
 	auto entryPoint = compile(R"(
 		struct Item
@@ -5518,9 +5525,9 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 
 	auto [_1, function] = *functions.find("bar");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	auto functionResults1 = function->accept(emitter, { entryPoint, Stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoint, value_stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -5528,14 +5535,14 @@ BOOST_AUTO_TEST_CASE (arrayTypePropagation6)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<LazyValue>(nullptr);
+	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
 
 	auto type = lazy->type();
 
 	BOOST_TEST(type->name() == "[Item, Item]");
 }
 
-BOOST_AUTO_TEST_CASE (scenario131)
+BOOST_AUTO_TEST_CASE(scenario131)
 {
 	auto result = exec(R"(
 		function add((i32 left, i32 right))
@@ -5567,7 +5574,7 @@ BOOST_AUTO_TEST_CASE (scenario131)
 	BOOST_TEST(result == 21);
 }
 
-BOOST_AUTO_TEST_CASE (scenario132)
+BOOST_AUTO_TEST_CASE(scenario132)
 {
 	auto result = exec(R"(
 		function sub((i32 left, i32 right))
@@ -5599,7 +5606,7 @@ BOOST_AUTO_TEST_CASE (scenario132)
 	BOOST_TEST(result == 9);
 }
 
-BOOST_AUTO_TEST_CASE (scenario133)
+BOOST_AUTO_TEST_CASE(scenario133)
 {
 	auto result = exec(R"(
 		struct Item
@@ -5634,7 +5641,7 @@ BOOST_AUTO_TEST_CASE (scenario133)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario134)
+BOOST_AUTO_TEST_CASE(scenario134)
 {
 	auto result = exec(R"(
 		struct Item
@@ -5664,7 +5671,7 @@ BOOST_AUTO_TEST_CASE (scenario134)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario135)
+BOOST_AUTO_TEST_CASE(scenario135)
 {
 	auto result = exec(R"(
 		struct Item
@@ -5704,7 +5711,7 @@ BOOST_AUTO_TEST_CASE (scenario135)
 	BOOST_TEST(result == 3);
 }
 
-BOOST_AUTO_TEST_CASE (scenario136)
+BOOST_AUTO_TEST_CASE(scenario136)
 {
 	auto result = exec(R"(
 		function sub((i32 left, i32 right))
@@ -5746,7 +5753,7 @@ BOOST_AUTO_TEST_CASE (scenario136)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario137)
+BOOST_AUTO_TEST_CASE(scenario137)
 {
 	auto result = exec(R"(
 		function sum(i32 product, (i32 left, i32 right))
@@ -5768,7 +5775,7 @@ BOOST_AUTO_TEST_CASE (scenario137)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario138)
+BOOST_AUTO_TEST_CASE(scenario138)
 {
 	auto result = exec(R"(
 		function sum(i32 product, i32 value)
@@ -5795,7 +5802,7 @@ BOOST_AUTO_TEST_CASE (scenario138)
 	BOOST_TEST(result == 6);
 }
 
-BOOST_AUTO_TEST_CASE (scenario139)
+BOOST_AUTO_TEST_CASE(scenario139)
 {
 	auto result = exec(R"(
 		function concatt(string xs, string ys)
@@ -5852,7 +5859,7 @@ BOOST_AUTO_TEST_CASE (scenario139)
 	BOOST_TEST(result == 597);
 }
 
-BOOST_AUTO_TEST_CASE (scenario140)
+BOOST_AUTO_TEST_CASE(scenario140)
 {
 	auto result = exec(R"(
 		function concatt(...xs, ...ys)
@@ -5909,7 +5916,7 @@ BOOST_AUTO_TEST_CASE (scenario140)
 	BOOST_TEST(result == 597);
 }
 
-BOOST_AUTO_TEST_CASE (scenario141)
+BOOST_AUTO_TEST_CASE(scenario141)
 {
 	auto result = exec(R"(
 		struct State
@@ -5962,7 +5969,7 @@ BOOST_AUTO_TEST_CASE (scenario141)
 	BOOST_TEST(result == 597);
 }
 
-//BOOST_AUTO_TEST_CASE (scenario142)
+// BOOST_AUTO_TEST_CASE (scenario142)
 //{
 //	auto result = exec(R"(
 //		function concat(...xs, ...ys)
@@ -6019,7 +6026,7 @@ BOOST_AUTO_TEST_CASE (scenario141)
 //	BOOST_TEST(result == 597);
 //}
 
-BOOST_AUTO_TEST_CASE (scenario142)
+BOOST_AUTO_TEST_CASE(scenario142)
 {
 	auto result = exec(R"(
 		import i32 puts(string s);
@@ -6044,7 +6051,7 @@ BOOST_AUTO_TEST_CASE (scenario142)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE (scenario143)
+BOOST_AUTO_TEST_CASE(scenario143)
 {
 	auto result = exec(R"(
 		import i32 puts(string s);
@@ -6092,7 +6099,7 @@ BOOST_AUTO_TEST_CASE (scenario143)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE (scenario144)
+BOOST_AUTO_TEST_CASE(scenario144)
 {
 	auto entryPoint = compile(R"(
 		struct Buffer;
@@ -6123,9 +6130,9 @@ BOOST_AUTO_TEST_CASE (scenario144)
 	auto [_1, function1] = *functions.find("foo");
 	auto [_2, function2] = *functions.find("bar");
 
-	Emitter emitter;
+	emitter emitter({});
 
-	auto functionResults1 = function1->accept(emitter, { entryPoint, Stack() });
+	auto functionResults1 = emitter.visit(function1, { entryPoint, value_stack() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -6135,7 +6142,7 @@ BOOST_AUTO_TEST_CASE (scenario144)
 
 	auto value1 = functionValues1.pop();
 
-	auto functionResults2 = function2->accept(emitter, { functionEntryPoint, value1 });
+	auto functionResults2 = emitter.visit(function2, { functionEntryPoint, value1 });
 
 	BOOST_TEST(functionResults2.size() == 1);
 
@@ -6145,10 +6152,10 @@ BOOST_AUTO_TEST_CASE (scenario144)
 
 	auto value2 = functionValues2.pop();
 
-	BOOST_TEST(TypeCompatibilityCalculator::calculate(entryPoint, value1->type(), value2->type()) == 0);
+	BOOST_TEST(type_compatibility_calculator::calculate(entryPoint, value1->type(), value2->type()) == 0);
 }
 
-BOOST_AUTO_TEST_CASE (scenario145)
+BOOST_AUTO_TEST_CASE(scenario145)
 {
 	auto result = exec(R"(
 		struct Opaque;
@@ -6185,7 +6192,7 @@ BOOST_AUTO_TEST_CASE (scenario145)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE (scenario146)
+BOOST_AUTO_TEST_CASE(scenario146)
 {
 	auto result = exec(R"(
 		import i32 puts(string s);
@@ -6215,7 +6222,7 @@ BOOST_AUTO_TEST_CASE (scenario146)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE (scenario147)
+BOOST_AUTO_TEST_CASE(scenario147)
 {
 	auto result = exec(R"(
 		import i32 puts(string s);
@@ -6264,7 +6271,7 @@ BOOST_AUTO_TEST_CASE (scenario147)
 	BOOST_TEST(result == 633);
 }
 
-BOOST_AUTO_TEST_CASE (scenario148)
+BOOST_AUTO_TEST_CASE(scenario148)
 {
 	auto result = exec(R"(
 		struct Foo
@@ -6310,7 +6317,39 @@ BOOST_AUTO_TEST_CASE (scenario148)
 	BOOST_TEST(result == 2);
 }
 
-test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[] )
+BOOST_AUTO_TEST_CASE(scenario149)
+{
+	auto result = exec(R"(
+		function numbersBelow(i32 i, i32 number)
+		{
+			if (i == number)
+			{
+				return i;
+			}
+
+			return i -> numbersBelow(i + 1, number);
+		}
+
+		function sum(i32 number, i32 value)
+		{
+			return value + number;
+		}
+
+		function sum((i32 number, ...numbers), i32 value)
+		{
+			return tail sum(...numbers, value + number);
+		}
+
+		export i32 main()
+		{
+			return sum(...numbersBelow(0, 5), 0);
+		}
+	)");
+
+	BOOST_TEST(result == 15);
+}
+
+test_suite* init_unit_test_suite(int /*argc*/, char* /*argv*/[])
 {
 	llvm::InitializeAllTargetInfos();
 	llvm::InitializeAllTargets();
