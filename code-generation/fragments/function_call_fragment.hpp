@@ -4,6 +4,7 @@
 #include "token_info.hpp"
 
 #include <memory>
+#include <string>
 
 namespace fluenc::code_generation::fragments
 {
