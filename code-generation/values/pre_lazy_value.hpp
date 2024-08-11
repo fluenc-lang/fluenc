@@ -9,7 +9,7 @@ namespace fluenc::code_generation
 {
 	namespace generators
 	{
-		class base_generator;
+		struct base_generator;
 	}
 
 	struct fragment;

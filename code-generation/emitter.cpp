@@ -947,7 +947,8 @@ namespace fluenc::code_generation
 
 		using argument_result_t = std::pair<std::string, const base_value*>;
 
-		auto handle_argument = [&](const fluenc::argument_t& argument, const base_value* value, auto& recurse) {
+		auto handle_argument = [&](const fluenc::argument_t& argument, const base_value* value, auto& recurse
+							   ) -> std::vector<argument_result_t> {
 			return std::visit(
 				[&](auto* arg) {
 					using type = decltype(arg);
