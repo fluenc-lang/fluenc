@@ -243,5 +243,9 @@ int exec(std::string source)
 
 	auto main = main_symbol->getAddress();
 
+#if LLVM_VERSION_MAJOR >= 17
 	return main.toPtr<int (*)()>()();
+#else
+	return reinterpret_cast<int (*)()>(main)();
+#endif
 }
