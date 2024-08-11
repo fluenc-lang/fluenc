@@ -323,49 +323,80 @@ namespace fluenc
 
 	expression_t ast_transformer::visit_int32_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new integral_literal_node(*alpha_, default_type_name::int32(), visit_integer(ast->nodes[0]));
+		return new integral_literal_node {
+			.consumer = *alpha_,
+			.type = default_type_name::int32(),
+			.value = visit_integer(ast->nodes[0]),
+		};
 	}
 
 	expression_t ast_transformer::visit_int64_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new integral_literal_node(*alpha_, default_type_name::int64(), visit_integer(ast->nodes[0]));
+		return new integral_literal_node {
+			.consumer = *alpha_,
+			.type = default_type_name::int64(),
+			.value = visit_integer(ast->nodes[0]),
+		};
 	}
 
 	expression_t ast_transformer::visit_float32_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new float_literal_node(*alpha_, default_type_name::f32(), ast->token_to_string());
+		return new float_literal_node {
+			.consumer = *alpha_,
+			.type = default_type_name::f32(),
+			.value = ast->token_to_string(),
+		};
 	}
 
 	expression_t ast_transformer::visit_boolean_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new boolean_literal_node(*alpha_, ast->token_to_string());
+		return new boolean_literal_node {
+			.consumer = *alpha_,
+			.value = ast->token_to_string(),
+		};
 	}
 
 	expression_t ast_transformer::visit_string_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new string_literal_node(*alpha_, visit_string(ast->nodes[0]));
+		return new string_literal_node {
+			.consumer = *alpha_,
+			.value = visit_string(ast->nodes[0]),
+		};
 	}
 
 	expression_t ast_transformer::visit_uint32_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new integral_literal_node(*alpha_, default_type_name::uint32(), visit_integer(ast->nodes[0]));
+		return new integral_literal_node {
+			.consumer = *alpha_,
+			.type = default_type_name::uint32(),
+			.value = visit_integer(ast->nodes[0]),
+		};
 	}
 
 	expression_t ast_transformer::visit_char_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new character_literal_node(*alpha_, visit_string(ast));
+		return new character_literal_node {
+			.consumer = *alpha_,
+			.value = visit_string(ast),
+		};
 	}
 
 	expression_t ast_transformer::visit_byte_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		return new integral_literal_node(*alpha_, default_type_name::byte(), visit_integer(ast->nodes[0]));
+		return new integral_literal_node {
+			.consumer = *alpha_,
+			.type = default_type_name::byte(),
+			.value = visit_integer(ast->nodes[0]),
+		};
 	}
 
 	expression_t ast_transformer::visit_nothing_literal(const std::shared_ptr<peg::Ast>& ast) const
 	{
 		UNUSED(ast);
 
-		return new nothing_node(*alpha_);
+		return new nothing_node {
+			.consumer = *alpha_,
+		};
 	}
 
 	expression_t ast_transformer::visit_binary(const std::shared_ptr<peg::Ast>& ast) const
@@ -401,10 +432,18 @@ namespace fluenc
 		{
 			auto with = visit_with(ast->nodes[1]);
 
-			return new member_access_node(with, ast, qualified_path);
+			return new member_access_node {
+				.consumer = with,
+				.ast = ast,
+				.names = qualified_path,
+			};
 		}
 
-		return new member_access_node(*alpha_, ast, qualified_path);
+		return new member_access_node {
+			.consumer = *alpha_,
+			.ast = ast,
+			.names = qualified_path,
+		};
 	}
 
 	expression_t ast_transformer::visit_call(const std::shared_ptr<peg::Ast>& ast) const
@@ -421,7 +460,13 @@ namespace fluenc
 
 			auto names = qualified_names(namespaces_, visit_id(ast->nodes[1]));
 
-			return new function_call_node(function_call_type::tail, ast, values, names, *alpha_);
+			return new function_call_node {
+				.type = function_call_type::tail,
+				.ast = ast,
+				.values = values,
+				.names = names,
+				.consumer = *alpha_,
+			};
 		}
 		else
 		{
@@ -431,7 +476,13 @@ namespace fluenc
 
 			auto names = qualified_names(namespaces_, visit_id(ast->nodes[0]));
 
-			return new function_call_node(function_call_type::regular, ast, values, names, *alpha_);
+			return new function_call_node {
+				.type = function_call_type::regular,
+				.ast = ast,
+				.values = values,
+				.names = names,
+				.consumer = *alpha_,
+			};
 		}
 	}
 
@@ -464,20 +515,29 @@ namespace fluenc
 
 		auto block = block_visitor.visit_block(ast->nodes[1]);
 
-		auto conditional = new conditional_node(ast, block, *alpha_);
+		auto conditional = new conditional_node {
+			.ast = ast,
+			.if_true = block,
+			.if_false = *alpha_,
+		};
 
 		ast_transformer expression_visitor(namespaces_, iterator_, parent_, conditional, {});
 
 		auto condition = expression_visitor.visit_expression(ast->nodes[0]);
 
-		return new block_instruction_node(condition, block->contains_iterator);
+		return new block_instruction_node {
+			.subject = condition,
+			.contains_iterator = block->contains_iterator,
+		};
 	}
 
 	expression_t ast_transformer::visit_array(const std::shared_ptr<peg::Ast>& ast) const
 	{
 		if (ast->nodes.empty())
 		{
-			return new nothing_node(*alpha_);
+			return new nothing_node {
+				.consumer = *alpha_,
+			};
 		}
 
 		if (ast->nodes.size() == 1)
@@ -499,12 +559,19 @@ namespace fluenc
 			}
 		);
 
-		return new array_node(ast, elements, *alpha_);
+		return new array_node {
+			.ast = ast,
+			.elements = elements,
+			.consumer = *alpha_,
+		};
 	}
 
 	expression_t ast_transformer::visit_tuple(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		auto sink = new tuple_sink_node(ast->nodes.size(), *alpha_);
+		auto sink = new tuple_sink_node {
+			.size = ast->nodes.size(),
+			.consumer = *alpha_,
+		};
 
 		return std::accumulate(begin(ast->nodes), end(ast->nodes), expression_t { sink }, [&](auto consumer, auto value) {
 			ast_transformer visitor(namespaces_, iterator_, parent_, consumer, {});
@@ -520,7 +587,10 @@ namespace fluenc
 
 	expression_t ast_transformer::visit_expansion(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		auto expansion = new expansion_node(*alpha_, ast);
+		auto expansion = new expansion_node {
+			.consumer = *alpha_,
+			.ast = ast,
+		};
 
 		ast_transformer visitor(namespaces_, iterator_, parent_, expansion, {});
 
@@ -529,7 +599,10 @@ namespace fluenc
 
 	expression_t ast_transformer::visit_local(const std::shared_ptr<peg::Ast>& ast) const
 	{
-		auto local = new local_node(*alpha_, visit_id(ast->nodes[0]));
+		auto local = new local_node {
+			.consumer = *alpha_,
+			.name = visit_id(ast->nodes[0]),
+		};
 
 		ast_transformer visitor(namespaces_, iterator_, parent_, local, {});
 
@@ -700,7 +773,10 @@ namespace fluenc
 		auto type = visit_type_name(ast->nodes[0]);
 		auto name = visit_id(ast->nodes[1]);
 
-		return new default_argument(name, type);
+		return new default_argument {
+			.name = name,
+			.type = type,
+		};
 	}
 
 	argument_t ast_transformer::visit_tuple_argument(const std::shared_ptr<peg::Ast>& ast) const
@@ -711,7 +787,9 @@ namespace fluenc
 			return visit_argument(node);
 		});
 
-		return new tuple_argument(arguments);
+		return new tuple_argument {
+			.arguments = arguments,
+		};
 	}
 
 	struct_node* ast_transformer::visit_structure(const std::shared_ptr<peg::Ast>& ast) const
@@ -730,7 +808,11 @@ namespace fluenc
 
 		auto literal = visitor.visit_expression(ast->nodes[1]);
 
-		return new global_node(ast, literal, visit_id(ast->nodes[0]));
+		return new global_node {
+			.ast = ast,
+			.value = literal,
+			.name = visit_id(ast->nodes[0]),
+		};
 	}
 
 	namespace_t* ast_transformer::visit_namespace(const std::shared_ptr<peg::Ast>& ast) const
@@ -748,7 +830,10 @@ namespace fluenc
 			return visitor.visit_instruction(instruction);
 		});
 
-		return new namespace_t(children, name);
+		return new namespace_t {
+			.children = children,
+			.name = name,
+		};
 	}
 
 	block_instruction_node* ast_transformer::visit_return(const std::shared_ptr<peg::Ast>& ast) const
@@ -757,22 +842,36 @@ namespace fluenc
 		{
 			auto continuation = visit_continuation(ast->nodes[1]);
 
-			auto ret = new return_node(iterator_, continuation, *alpha_);
+			auto ret = new return_node {
+				.iterator = iterator_,
+				.chained = continuation,
+				.consumer = *alpha_,
+			};
 
 			ast_transformer visitor(namespaces_, {}, parent_, ret, {});
 
 			auto value = visitor.visit_expression(ast->nodes[0]);
 
-			return new block_instruction_node(value, true);
+			return new block_instruction_node {
+				.subject = value,
+				.contains_iterator = true,
+			};
 		}
 
-		auto ret = new return_node(iterator_, {}, *alpha_);
+		auto ret = new return_node {
+			.iterator = iterator_,
+			.chained = {},
+			.consumer = *alpha_,
+		};
 
 		ast_transformer visitor(namespaces_, {}, parent_, ret, {});
 
 		auto value = visitor.visit_expression(ast->nodes[0]);
 
-		return new block_instruction_node(value, false);
+		return new block_instruction_node {
+			.subject = value,
+			.contains_iterator = false,
+		};
 	}
 
 	block_instruction_node* ast_transformer::visit_block(const std::shared_ptr<peg::Ast>& ast) const
@@ -790,10 +889,16 @@ namespace fluenc
 
 			if (auto instruction = ast_cast<block_instruction_node>(value))
 			{
-				return new block_instruction_node(value, instruction->contains_iterator || consumer->contains_iterator);
+				return new block_instruction_node {
+					.subject = value,
+					.contains_iterator = instruction->contains_iterator || consumer->contains_iterator,
+				};
 			}
 
-			return new block_instruction_node(value, consumer->contains_iterator);
+			return new block_instruction_node {
+				.subject = value,
+				.contains_iterator = consumer->contains_iterator,
+			};
 		});
 	}
 
