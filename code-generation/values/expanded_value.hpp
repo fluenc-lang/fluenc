@@ -47,7 +47,6 @@ namespace fluenc::code_generation
 			const base_type* iterator_type_;
 			const entry_point* provider_;
 			const fragment* node_;
-			const fragment* chain_;
 
 			std::vector<const expanded_value*> next_;
 
