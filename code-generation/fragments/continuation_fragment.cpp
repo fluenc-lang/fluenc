@@ -33,6 +33,8 @@ namespace fluenc::code_generation::fragments
 		{
 			for (auto [entry_point, values] : reference_sink.build(visitor, { subject_entry_point, subject_values }))
 			{
+				auto local_entry_point = entry_point;
+
 				auto tail_call_values = entry_point.values();
 				auto iterator_type = entry_point.iterator_type();
 
@@ -45,7 +47,7 @@ namespace fluenc::code_generation::fragments
 				std::vector<const base_value*> cloned;
 
 				std::transform(begin(values), end(values), back_inserter(cloned), [&](auto value) {
-					return value->clone(entry_point, clone_strategy::value);
+					return value->clone(local_entry_point, clone_strategy::value);
 				});
 
 				auto next = value_helper::extract_values<values::expanded_value>(values);
