@@ -501,8 +501,7 @@ int bootstrap_build(char** argv, const BuildEnvironment& environment, const Buil
 
 	clang::driver::Driver clang_driver(clang_path, target_triple, *diagnostics, "fluenc");
 
-	auto reloc_model = std::optional<llvm::Reloc::Model>();
-	auto target_machine = target->createTargetMachine(target_triple, "generic", "", llvm::TargetOptions(), reloc_model);
+	auto target_machine = target->createTargetMachine(target_triple, "generic", "", llvm::TargetOptions(), {});
 
 	BuildContext context = {
 		.options = options,
