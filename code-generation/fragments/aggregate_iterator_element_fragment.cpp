@@ -16,7 +16,10 @@ namespace fluenc::code_generation::fragments
 
 		std::vector<emitter_result> results;
 
-		fluenc::expansion_node consumer(fluenc::terminator_node::instance(), nullptr);
+		fluenc::expansion_node consumer {
+			.consumer = fluenc::terminator_node::instance(),
+			.ast = {},
+		};
 
 		for (auto& [entryPoint, values] : accept(&consumer, visitor, context))
 		{
