@@ -39,15 +39,13 @@ namespace fluenc::code_generation::fragments
 		std::vector<emitter_result> result;
 		std::vector<emitter_result> input = { { context.entryPoint.with_index(-1), value_stack() } };
 
-		std::vector<fluenc::indexed<fluenc::expression_t>> orderedValues;
-
-		std::span<const base_value* const> v(context.values.begin(), values_.size());
+		std::vector<fluenc::indexed<fluenc::expression_t>> ordered_values;
 
 		std::transform(
 			begin(values_),
 			end(values_),
 			fluenc::index_iterator(),
-			std::back_inserter(orderedValues),
+			std::back_inserter(ordered_values),
 			[](auto value, auto index) -> fluenc::indexed<fluenc::expression_t> {
 				return { index, value };
 			}
@@ -57,27 +55,27 @@ namespace fluenc::code_generation::fragments
 		auto pre_evaluation = new pre_evaluation_fragment(reference_sink);
 
 		auto subject_results = std::
-			accumulate(begin(orderedValues), end(orderedValues), input, [&](auto accumulator, auto argument) {
+			accumulate(begin(ordered_values), end(ordered_values), input, [&](auto accumulator, auto argument) {
 				std::vector<emitter_result> results;
 
-				for (auto& [accumulatorEntryPoint, accumulatorValues] : accumulator)
+				for (auto& [accumulator_entry_point, accumulator_values] : accumulator)
 				{
-					auto result = accept(argument.value, visitor, { accumulatorEntryPoint, value_stack() });
+					auto result = accept(argument.value, visitor, { accumulator_entry_point, value_stack() });
 
 					for (auto& [resultEntryPoint, resultValues] : result)
 					{
 						for (auto& [rep, rva] : pre_evaluation->build(visitor, { resultEntryPoint, resultValues }))
 						{
-							auto scopedReturnValues = accumulatorValues;
+							auto scoped_return_values = accumulator_values;
 
-							for (auto resultValue : rva)
+							for (auto result_value : rva)
 							{
-								auto returnValue = new values::indexed_value { argument.index, resultValue };
+								auto returnValue = new values::indexed_value { argument.index, result_value };
 
-								scopedReturnValues.push(returnValue);
+								scoped_return_values.push(returnValue);
 							}
 
-							results.push_back({ rep, scopedReturnValues });
+							results.push_back({ rep, scoped_return_values });
 						}
 					}
 				}

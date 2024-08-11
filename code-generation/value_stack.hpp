@@ -16,7 +16,7 @@ namespace fluenc::code_generation
 	{
 	private:
 #ifndef DEBUG
-		immer::vector<const BaseValue*> values_;
+		immer::vector<const base_value*> values_;
 #else
 		std::vector<const base_value*> values_;
 #endif
