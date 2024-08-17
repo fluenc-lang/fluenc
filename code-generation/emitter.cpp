@@ -1097,4 +1097,12 @@ namespace fluenc::code_generation
 
 		return fluenc::accept(node->consumer, *this, context);
 	}
+
+	std::vector<emitter_result> emitter::visit(const struct_node* node, emitter_context context) const
+	{
+		UNUSED(node);
+		UNUSED(context);
+
+		return {};
+	}
 }

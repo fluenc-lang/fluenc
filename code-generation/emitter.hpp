@@ -66,6 +66,7 @@ namespace fluenc::code_generation
 		std::vector<emitter_result> visit(const return_node* node, emitter_context context) const;
 		std::vector<emitter_result> visit(const terminator_node* node, emitter_context context) const;
 		std::vector<emitter_result> visit(const tuple_sink_node* node, emitter_context context) const;
+		std::vector<emitter_result> visit(const struct_node* node, emitter_context context) const;
 
 	private:
 		std::vector<std::string> function_;

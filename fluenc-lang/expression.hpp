@@ -25,6 +25,7 @@ namespace fluenc
 	struct block_instruction_node;
 	struct function_node;
 	struct array_node;
+	struct struct_node;
 
 	using expression_t = std::variant<
 		const binary_node*,
@@ -47,5 +48,6 @@ namespace fluenc
 		const global_node*,
 		const function_node*,
 		const tuple_sink_node*,
-		const array_node*>;
+		const array_node*,
+		const struct_node*>;
 }
