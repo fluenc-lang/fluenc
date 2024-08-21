@@ -400,7 +400,7 @@ namespace fluenc::code_generation
 
 				if constexpr (std::is_same_v<type, fluenc::with_prototype>)
 				{
-					auto address_of_value = context.values.require<values::user_type_value>(nullptr);
+					auto address_of_value = require<values::user_type_value>(context.values, nullptr);
 
 					auto fields = address_of_value->fields();
 
@@ -537,7 +537,7 @@ namespace fluenc::code_generation
 				continue;
 			}
 
-			auto value = result_values.request<values::scalar_value>();
+			auto value = request<values::scalar_value>(result_values);
 
 			if (value)
 			{
@@ -593,7 +593,7 @@ namespace fluenc::code_generation
 
 	std::vector<emitter_result> emitter::visit(const fluenc::block_instruction_node* node, emitter_context context) const
 	{
-		return fluenc::accept(node->subject, *this, { context.entryPoint, value_stack() });
+		return fluenc::accept(node->subject, *this, { context.entryPoint, value_stack_t() });
 	}
 
 	std::vector<emitter_result> emitter::visit(const array_node* node, emitter_context context) const
@@ -601,7 +601,7 @@ namespace fluenc::code_generation
 		auto array_contents = std::accumulate(
 			rbegin(node->elements),
 			rend(node->elements),
-			std::vector<emitter_result> { { context.entryPoint, value_stack() } },
+			std::vector<emitter_result> { { context.entryPoint, value_stack_t() } },
 			[&](auto previous, fluenc::indexed<expression_t> expression) -> std::vector<emitter_result> {
 				std::vector<emitter_result> results;
 
@@ -656,11 +656,11 @@ namespace fluenc::code_generation
 
 			auto continuation_entry_point = (*provider).with_block(block).with_iterator_type(expandable->expandedType());
 
-			auto result = continuation->build(*this, { continuation_entry_point, value_stack() });
+			auto result = continuation->build(*this, { continuation_entry_point, value_stack_t() });
 
 			for (auto& [target_entry_point, continuation_values] : result)
 			{
-				auto value = continuation_values.require<values::expanded_value>(nullptr);
+				auto value = require<values::expanded_value>(continuation_values, nullptr);
 
 				auto tuple = new values::tuple_value({ value, values::placeholder_value::instance() });
 
@@ -731,9 +731,9 @@ namespace fluenc::code_generation
 			{
 				auto allocator = new fragments::default_fragment(type, fragments::terminator_fragment::instance());
 
-				for (auto& result : allocator->build(*this, { context.entryPoint, value_stack() }))
+				for (auto& result : allocator->build(*this, { context.entryPoint, value_stack_t() }))
 				{
-					auto array = result.values.require<values::pre_lazy_value>(nullptr);
+					auto array = require<values::pre_lazy_value>(result.values, nullptr);
 
 					auto assignment_entry_point = array->assign_from(result.entryPoint, lazy_value, *this);
 

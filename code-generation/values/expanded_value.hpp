@@ -1,7 +1,6 @@
 #pragma once
 
 #include "base_value.hpp"
-#include "value_stack.hpp"
 
 #include "metadata/expanded_value_metadata.hpp"
 
@@ -24,7 +23,7 @@ namespace fluenc::code_generation
 				const entry_point& provider,
 				const fragment* node,
 				const std::vector<const expanded_value*>& next,
-				const value_stack& values
+				const value_stack_t& values
 			);
 
 			value_id id() const override;
@@ -39,7 +38,7 @@ namespace fluenc::code_generation
 
 			std::vector<const expanded_value*> next() const;
 
-			const value_stack& values() const;
+			const value_stack_t& values() const;
 
 		private:
 			bool is_array_;
@@ -50,7 +49,7 @@ namespace fluenc::code_generation
 
 			std::vector<const expanded_value*> next_;
 
-			value_stack values_;
+			value_stack_t values_;
 		};
 	}
 }

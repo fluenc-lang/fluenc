@@ -16,7 +16,7 @@ namespace fluenc::code_generation::fragments
 
 	std::vector<emitter_result> index_repeater_fragment::build(const emitter& visitor, emitter_context context) const
 	{
-		auto index = context.values.require<values::scalar_value>(nullptr);
+		auto index = require<values::scalar_value>(context.values, nullptr);
 		auto alloc = context.entryPoint.alloc(types::int64_type::instance());
 
 		ir_builder builder(context.entryPoint);

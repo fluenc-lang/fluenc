@@ -1,6 +1,9 @@
 #pragma once
 
+#include "comfy_stack.hpp"
 #include "value_metadata.hpp"
+
+#include "exceptions/invalid_type_exception.hpp"
 
 #include <cstdint>
 
@@ -161,4 +164,40 @@ namespace fluenc::code_generation
 			return static_metadata();
 		}
 	};
+
+	using value_stack_t = comfy_stack<const base_value*>;
+
+	template <typename TValue>
+	const TValue* require(value_stack_t& stack, const std::shared_ptr<peg::Ast>& ast)
+	{
+		auto value = stack.pop();
+
+		if (auto casted = value_cast<const TValue*>(value))
+		{
+			return casted;
+		}
+
+		auto& expectedMetadata = TValue::static_metadata();
+		auto& actualMetadata = value->metadata();
+
+		throw invalid_type_exception(ast, expectedMetadata.name(), actualMetadata.name());
+	}
+
+	template <typename TValue>
+	const TValue* request(value_stack_t& stack)
+	{
+		if (stack.size() <= 0)
+		{
+			return nullptr;
+		}
+
+		auto value = stack.pop();
+
+		if (auto casted = value_cast<const TValue*>(value))
+		{
+			return casted;
+		}
+
+		return nullptr;
+	}
 }

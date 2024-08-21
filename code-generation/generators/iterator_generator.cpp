@@ -39,7 +39,7 @@ namespace fluenc::code_generation::generators
 
 		auto ep = context.entryPoint.with_locals(locals);
 
-		return { strategy, strategy.node->build(emitter, { ep, value_stack() }) };
+		return { strategy, strategy.node->build(emitter, { ep, value_stack_t() }) };
 	}
 
 	iterator_generator::iterator_generator(

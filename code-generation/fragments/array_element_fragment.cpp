@@ -32,15 +32,15 @@ namespace fluenc::code_generation::fragments
 
 	std::vector<emitter_result> array_element_fragment::build(const emitter& visitor, emitter_context context) const
 	{
-		value_stack values_if_true;
+		value_stack_t values_if_true;
 
 		auto llvmContext = context.entryPoint.context();
 		auto module = context.entryPoint.module();
 
 		auto dataLayout = module->getDataLayout();
 
-		auto index = context.values.require<values::reference_value>(ast_);
-		auto value = context.values.require<values::indexed_value>(ast_);
+		auto index = require<values::reference_value>(context.values, ast_);
+		auto value = require<values::indexed_value>(context.values, ast_);
 
 		if (next_)
 		{

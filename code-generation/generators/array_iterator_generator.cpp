@@ -58,7 +58,7 @@ namespace fluenc::code_generation::generators
 
 		auto results = subject->build(visitor, { iterator_entry_point, context.values });
 
-		auto iterator = new values::post_lazy_value(subject, type(), iterator_entry_point, value_stack(), results);
+		auto iterator = new values::post_lazy_value(subject, type(), iterator_entry_point, value_stack_t(), results);
 
 		context.values.push(iterator);
 

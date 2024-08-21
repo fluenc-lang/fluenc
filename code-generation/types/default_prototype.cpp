@@ -25,7 +25,7 @@ namespace fluenc::code_generation::types
 			[&](auto current_entry_point, auto field) -> entry_point {
 				if (auto default_value = field.default_value)
 				{
-					auto default_results = accept(*default_value, visitor, { current_entry_point, value_stack() });
+					auto default_results = accept(*default_value, visitor, { current_entry_point, value_stack_t() });
 
 					auto& [default_entry_point, default_values] = *default_results.begin();
 

@@ -2589,7 +2589,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation1)
 
 	emitter emitter({});
 
-	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack_t() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2597,7 +2597,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation1)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
+	auto lazy = require<values::pre_lazy_value>(functionValues, nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32]");
 }
@@ -2632,7 +2632,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation2)
 
 	emitter emitter({});
 
-	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack_t() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2640,7 +2640,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation2)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
+	auto lazy = require<values::pre_lazy_value>(functionValues, nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[bool, bool, i32]");
 }
@@ -2670,7 +2670,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation3)
 
 	emitter emitter({});
 
-	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack_t() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2678,7 +2678,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation3)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
+	auto lazy = require<values::pre_lazy_value>(functionValues, nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "...");
 }
@@ -2718,7 +2718,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation4)
 
 	emitter emitter({});
 
-	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack_t() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -2726,7 +2726,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation4)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
+	auto lazy = require<values::pre_lazy_value>(functionValues, nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
@@ -4495,7 +4495,7 @@ BOOST_AUTO_TEST_CASE(scenario110)
 
 	for (auto& root : result.roots())
 	{
-		emitter.visit(root, { result, value_stack() });
+		emitter.visit(root, { result, value_stack_t() });
 	}
 
 	auto module = result.module();
@@ -4520,7 +4520,7 @@ BOOST_AUTO_TEST_CASE(scenario111)
 
 	for (auto& [name, global] : result.globals())
 	{
-		for (auto& [ep, values] : fluenc::accept(global, emitter, { result, value_stack() }))
+		for (auto& [ep, values] : fluenc::accept(global, emitter, { result, value_stack_t() }))
 		{
 			for (auto& value : values)
 			{
@@ -4576,7 +4576,7 @@ BOOST_AUTO_TEST_CASE(scenario112)
 
 	for (auto& [name, global] : result.globals())
 	{
-		for (auto& [ep, values] : fluenc::accept(global, emitter, { result, value_stack() }))
+		for (auto& [ep, values] : fluenc::accept(global, emitter, { result, value_stack_t() }))
 		{
 			for (auto& value : values)
 			{
@@ -5441,7 +5441,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation5)
 
 	emitter emitter({});
 
-	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoi32, value_stack_t() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -5449,7 +5449,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation5)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
+	auto lazy = require<values::pre_lazy_value>(functionValues, nullptr);
 
 	BOOST_TEST(lazy->type()->name() == "[i32, i32, i32]");
 }
@@ -5527,7 +5527,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation6)
 
 	emitter emitter({});
 
-	auto functionResults1 = emitter.visit(function, { entryPoint, value_stack() });
+	auto functionResults1 = emitter.visit(function, { entryPoint, value_stack_t() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 
@@ -5535,7 +5535,7 @@ BOOST_AUTO_TEST_CASE(arrayTypePropagation6)
 
 	BOOST_TEST(functionValues.size() == 1);
 
-	auto lazy = functionValues.require<values::pre_lazy_value>(nullptr);
+	auto lazy = require<values::pre_lazy_value>(functionValues, nullptr);
 
 	auto type = lazy->type();
 
@@ -6132,7 +6132,7 @@ BOOST_AUTO_TEST_CASE(scenario144)
 
 	emitter emitter({});
 
-	auto functionResults1 = emitter.visit(function1, { entryPoint, value_stack() });
+	auto functionResults1 = emitter.visit(function1, { entryPoint, value_stack_t() });
 
 	BOOST_TEST(functionResults1.size() == 1);
 

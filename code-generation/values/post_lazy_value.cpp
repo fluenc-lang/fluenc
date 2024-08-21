@@ -30,11 +30,10 @@ namespace fluenc::code_generation::values
 		return { strategy, strategy.node->build(emitter, { context.entryPoint, strategy.values }) };
 	}
 
-	post_lazy_value::post_lazy_value(
-		const fragment* node,
+	post_lazy_value::post_lazy_value(const fragment* node,
 		const base_type* type,
 		const entry_point& entryPoint,
-		const value_stack& values,
+		const value_stack_t &values,
 		const std::vector<emitter_result>& results
 	)
 		: type_(type)

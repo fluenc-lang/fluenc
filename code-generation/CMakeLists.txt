@@ -13,7 +13,6 @@ set(SOURCE_FILES
 	emitter.cpp
 	entry_point.cpp
 	function_helper.cpp
-	value_stack.cpp
 	type_compatibility_calculator.cpp
 	interop_helper.cpp
 	value_helper.cpp
@@ -140,7 +139,7 @@ set(SOURCE_FILES
 set(PUBLIC_HEADERS
 	emitter.hpp
 	entry_point.hpp
-	value_stack.hpp
+	comfy_stack.hpp
 	base_value.hpp
 	type.hpp
 

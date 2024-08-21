@@ -1,7 +1,6 @@
 #pragma once
 
 #include "base_value.hpp"
-#include "value_stack.hpp"
 
 #include "metadata/expandable_value_metadata.hpp"
 
@@ -25,7 +24,7 @@ namespace fluenc::code_generation
 				const base_type* iterator_type,
 				const entry_point& provider,
 				const fragment* chain,
-				const value_stack& values
+				const value_stack_t& values
 			);
 
 			value_id id() const override;
@@ -38,7 +37,7 @@ namespace fluenc::code_generation
 			const entry_point* provider() const;
 			const fragment* chain() const;
 			const types::expanded_type* expandedType() const;
-			const value_stack values() const;
+			const value_stack_t values() const;
 
 		private:
 			bool is_array_;
@@ -46,7 +45,7 @@ namespace fluenc::code_generation
 			const base_type* iterator_type_;
 			const entry_point* provider_;
 			const fragment* chain_;
-			const value_stack values_;
+			const value_stack_t values_;
 		};
 	}
 }

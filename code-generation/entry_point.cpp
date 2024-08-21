@@ -21,8 +21,7 @@
 
 namespace fluenc::code_generation
 {
-	entry_point::entry_point(
-		int depth,
+	entry_point::entry_point(int depth,
 		int index,
 		const entry_point* parent,
 		const entry_point* entry,
@@ -37,7 +36,7 @@ namespace fluenc::code_generation
 		immer::box<std::map<std::string, expression_t>> globals,
 		immer::box<std::map<std::string, struct_node*>> types,
 		immer::box<std::vector<const function_node*>> roots,
-		immer::box<value_stack> values,
+		immer::box<value_stack_t> values,
 		const types::expanded_type* iteratorType
 	)
 		: depth_(depth)
@@ -247,7 +246,7 @@ namespace fluenc::code_generation
 		return roots_.get();
 	}
 
-	const value_stack& entry_point::values() const
+	const value_stack_t &entry_point::values() const
 	{
 		return values_.get();
 	}
@@ -405,7 +404,7 @@ namespace fluenc::code_generation
 		);
 	}
 
-	entry_point entry_point::with_values(const value_stack& values) const
+	entry_point entry_point::with_values(const value_stack_t &values) const
 	{
 		return entry_point(
 			depth_ + 1,

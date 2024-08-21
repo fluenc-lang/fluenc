@@ -20,7 +20,7 @@ namespace fluenc::code_generation
 			{
 				const fragment* node;
 
-				value_stack values;
+				value_stack_t values;
 			};
 
 			struct use_rendered
@@ -38,7 +38,7 @@ namespace fluenc::code_generation
 				const fragment* node,
 				const base_type* type,
 				const entry_point& entryPoint,
-				const value_stack& values,
+				const value_stack_t& values,
 				const std::vector<emitter_result>& results
 			);
 

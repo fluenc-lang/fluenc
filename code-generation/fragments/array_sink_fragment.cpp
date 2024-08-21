@@ -29,7 +29,7 @@ namespace fluenc::code_generation::fragments
 		auto array_contents = std::accumulate(
 			rbegin(elements_),
 			rend(elements_),
-			std::vector<emitter_result> { { context.entryPoint, value_stack() } },
+			std::vector<emitter_result> { { context.entryPoint, value_stack_t() } },
 			[&](auto accumulated_results, fluenc::indexed<expression_t> expression) -> std::vector<emitter_result> {
 				index_sink_fragment index_sink(expression.index, terminator_fragment::instance());
 				reference_sink_fragment reference_sink(&index_sink);

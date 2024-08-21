@@ -32,7 +32,7 @@ namespace fluenc::code_generation::values
 		return value_id::pre_lazy;
 	}
 
-	element_type get_element_type(element_type seed, const entry_point& entryPoint, value_stack values)
+	element_type get_element_type(element_type seed, const entry_point& entryPoint, value_stack_t values)
 	{
 		return accumulate(values.begin(), values.end(), seed, [&](auto accumulated, auto value) -> element_type {
 			if (auto tuple = value_cast<const tuple_value*>(value))
@@ -49,7 +49,7 @@ namespace fluenc::code_generation::values
 
 				emitter analyzer({});
 
-				auto chain_result = chain->build(analyzer, { continuation_entry_point, value_stack() });
+				auto chain_result = chain->build(analyzer, { continuation_entry_point, value_stack_t() });
 
 				auto [_, chain_values] = *chain_result.begin();
 
@@ -94,7 +94,7 @@ namespace fluenc::code_generation::values
 			std::vector<emitter_result> results;
 
 			for (auto& [result_entry_point, result_values] :
-				 generator_->generate(analyzer, { entryPoint, value_stack() }, generators::generation_mode::dry_run))
+				 generator_->generate(analyzer, { entryPoint, value_stack_t() }, generators::generation_mode::dry_run))
 			{
 				auto result_block = create_block(context);
 
@@ -165,7 +165,7 @@ namespace fluenc::code_generation::values
 		std::vector<emitter_result> target_results;
 
 		for (auto& [result_entry_point, result_values] :
-			 generator_->generate(emitter, { entryPoint, value_stack() }, generators::generation_mode::regular))
+			 generator_->generate(emitter, { entryPoint, value_stack_t() }, generators::generation_mode::regular))
 		{
 			for (auto& result : expand_iterator(emitter, { result_entry_point, result_values }))
 			{
@@ -213,7 +213,7 @@ namespace fluenc::code_generation::values
 				auto result_entry_point = value_helper::
 					transfer_value(source_result_entry_point, source_tuple_values.pop(), target_value, emitter);
 
-				auto source_continuation = source_tuple_values.require<expandable_value>(nullptr);
+				auto source_continuation = require<expandable_value>(source_tuple_values, nullptr);
 
 				auto source_chain = source_continuation->chain();
 				auto source_provider = source_continuation->provider();
@@ -221,11 +221,11 @@ namespace fluenc::code_generation::values
 				auto source_continuation_entry_point = source_provider->with_block(result_entry_point.block());
 
 				for (auto& [chain_entry_point, chain_values] :
-					 source_chain->build(emitter, { source_continuation_entry_point, value_stack() }))
+					 source_chain->build(emitter, { source_continuation_entry_point, value_stack_t() }))
 				{
-					auto source_value = chain_values.require<expanded_value>(nullptr);
+					auto source_value = require<expanded_value>(chain_values, nullptr);
 
-					auto loop_target = function_helper::find_tail_call_target(&chain_entry_point, value_stack(source_value));
+					auto loop_target = function_helper::find_tail_call_target(&chain_entry_point, comfy_stack(source_value));
 					auto result_entry_point = value_helper::
 						transfer_value(chain_entry_point, source_value, source_continuation, emitter);
 
@@ -253,7 +253,7 @@ namespace fluenc::code_generation::values
 		std::vector<emitter_result> target_results;
 
 		for (auto& [result_entry_point, result_values] :
-			 generator_->generate(emitter, { entryPoint, value_stack() }, generators::generation_mode::regular))
+			 generator_->generate(emitter, { entryPoint, value_stack_t() }, generators::generation_mode::regular))
 		{
 			for (auto& result : expand_iterator(emitter, { result_entry_point, result_values }))
 			{
@@ -286,7 +286,7 @@ namespace fluenc::code_generation::values
 		std::vector<emitter_result> source_results;
 
 		for (auto& [result_entry_point, result_values] :
-			 source->generate(emitter, { source_entry_point, value_stack() }))
+			 source->generate(emitter, { source_entry_point, value_stack_t() }))
 		{
 			for (auto& result : expand_iterator(emitter, { result_entry_point, result_values }))
 			{
@@ -310,7 +310,7 @@ namespace fluenc::code_generation::values
 				auto result_entry_point = value_helper::
 					transfer_value(source_result_entry_point, source_tuple_values.pop(), target_value, emitter);
 
-				auto source_continuation = source_tuple_values.require<expandable_value>(nullptr);
+				auto source_continuation = require<expandable_value>(source_tuple_values, nullptr);
 
 				auto source_cain = source_continuation->chain();
 				auto source_provider = source_continuation->provider();
@@ -318,11 +318,12 @@ namespace fluenc::code_generation::values
 				auto source_continuation_entry_point = source_provider->with_block(result_entry_point.block());
 
 				for (auto& [chain_entry_point, chain_values] :
-					 source_cain->build(emitter, { source_continuation_entry_point, value_stack() }))
+					 source_cain->build(emitter, { source_continuation_entry_point, value_stack_t() }))
 				{
-					auto source_value = chain_values.require<expanded_value>(nullptr);
+					auto source_value = require<expanded_value>(chain_values, nullptr);
 
-					auto loop_target = function_helper::find_tail_call_target(&chain_entry_point, value_stack(source_value));
+					auto loop_target = function_helper::
+						find_tail_call_target(&chain_entry_point, value_stack_t(source_value));
 					auto result_entry_point = value_helper::
 						transfer_value(chain_entry_point, source_value, source_continuation, emitter);
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "base_value.hpp"
-#include "value_stack.hpp"
 
 #include "metadata/tuple_value_metadata.hpp"
 
@@ -20,7 +19,7 @@ namespace fluenc::code_generation::values
 
 		const base_type* iteratorType() const;
 
-		value_stack values() const;
+		value_stack_t values() const;
 
 	private:
 		std::vector<const base_value*> values_;

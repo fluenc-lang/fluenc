@@ -33,7 +33,7 @@ namespace fluenc::code_generation::fragments
 
 		std::vector<emitter_result> results;
 
-		auto index = context.values.require<values::reference_value>(ast_);
+		auto index = require<values::reference_value>(context.values, ast_);
 
 		auto iterator = std::accumulate(
 			fluenc::index_iterator(0u),

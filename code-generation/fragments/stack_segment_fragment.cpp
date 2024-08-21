@@ -8,7 +8,6 @@
 #include "reference_sink_fragment.hpp"
 #include "terminator_fragment.hpp"
 #include "utility.hpp"
-#include "value_stack.hpp"
 
 #include "iterators/index_iterator.hpp"
 
@@ -37,7 +36,7 @@ namespace fluenc::code_generation::fragments
 	std::vector<emitter_result> stack_segment_fragment::build(const emitter& visitor, emitter_context context) const
 	{
 		std::vector<emitter_result> result;
-		std::vector<emitter_result> input = { { context.entryPoint.with_index(-1), value_stack() } };
+		std::vector<emitter_result> input = { { context.entryPoint.with_index(-1), value_stack_t() } };
 
 		std::vector<fluenc::indexed<fluenc::expression_t>> ordered_values;
 
@@ -60,7 +59,7 @@ namespace fluenc::code_generation::fragments
 
 				for (auto& [accumulator_entry_point, accumulator_values] : accumulator)
 				{
-					auto result = accept(argument.value, visitor, { accumulator_entry_point, value_stack() });
+					auto result = accept(argument.value, visitor, { accumulator_entry_point, value_stack_t() });
 
 					for (auto& [resultEntryPoint, resultValues] : result)
 					{
@@ -94,7 +93,7 @@ namespace fluenc::code_generation::fragments
 				indexed_values.insert({ indexed->index(), indexed->subject() });
 			}
 
-			value_stack pointers_to_values;
+			value_stack_t pointers_to_values;
 
 			for (auto [_, value] : indexed_values)
 			{

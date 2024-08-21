@@ -100,14 +100,14 @@ const fluenc::code_generation::base_value* compile_value(std::string source)
 			module_info.globals,
 			module_info.types,
 			module_info.roots,
-			fluenc::code_generation::value_stack(),
+			fluenc::code_generation::value_stack_t(),
 			nullptr
 		);
 
 		fluenc::code_generation::emitter emitter({});
 
 		for (auto& [_, values] :
-			 fluenc::accept(global, emitter, { entry_point, fluenc::code_generation::value_stack() }))
+			 fluenc::accept(global, emitter, { entry_point, fluenc::code_generation::value_stack_t() }))
 		{
 			return *values.begin();
 		}
@@ -156,7 +156,7 @@ fluenc::code_generation::entry_point compile(std::string source)
 		module_info.globals,
 		module_info.types,
 		module_info.roots,
-		fluenc::code_generation::value_stack(),
+		fluenc::code_generation::value_stack_t(),
 		nullptr
 	);
 }
@@ -195,7 +195,7 @@ int exec(std::string source)
 		module_info.globals,
 		module_info.types,
 		module_info.roots,
-		fluenc::code_generation::value_stack(),
+		fluenc::code_generation::value_stack_t(),
 		nullptr
 	);
 
@@ -203,7 +203,7 @@ int exec(std::string source)
 
 	for (auto root : module_info.roots)
 	{
-		emitter.visit(root, { entryPoint, fluenc::code_generation::value_stack() });
+		emitter.visit(root, { entryPoint, fluenc::code_generation::value_stack_t() });
 	}
 
 #ifdef DEBUG

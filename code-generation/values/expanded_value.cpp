@@ -4,13 +4,12 @@
 
 namespace fluenc::code_generation::values
 {
-	expanded_value::expanded_value(
-		bool isArray,
+	expanded_value::expanded_value(bool isArray,
 		const base_type* iterator_type,
 		const entry_point& provider,
 		const fragment* node,
 		const std::vector<const expanded_value*>& next,
-		const value_stack& values
+		const value_stack_t &values
 	)
 		: is_array_(isArray)
 		, iterator_type_(iterator_type)
@@ -59,7 +58,7 @@ namespace fluenc::code_generation::values
 		return next_;
 	}
 
-	const value_stack& expanded_value::values() const
+	const value_stack_t &expanded_value::values() const
 	{
 		return values_;
 	}
