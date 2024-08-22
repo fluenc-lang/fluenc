@@ -18,6 +18,7 @@ set(PUBLIC_HEADERS
 	indexed.hpp
 	token_info.hpp
 	utility.hpp
+	comfy_stack.hpp
 	ast_transformer.hpp
 	ast/struct_field_node.hpp
 	ast/struct_node.hpp

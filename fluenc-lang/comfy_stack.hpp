@@ -6,7 +6,7 @@
 #include "immer/vector.hpp"
 #endif
 
-namespace fluenc::code_generation
+namespace fluenc
 {
 	template <typename T>
 	class comfy_stack

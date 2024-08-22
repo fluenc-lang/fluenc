@@ -139,7 +139,6 @@ set(SOURCE_FILES
 set(PUBLIC_HEADERS
 	emitter.hpp
 	entry_point.hpp
-	comfy_stack.hpp
 	base_value.hpp
 	type.hpp
 
