@@ -4,7 +4,6 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/FileSystem.h>
-#include <llvm/Support/Host.h>
 #include <llvm/Support/raw_ostream.h>
 #if LLVM_VERSION_MAJOR >= 14
 #include <llvm/MC/TargetRegistry.h>

@@ -169,6 +169,6 @@ namespace fluenc::code_generation
 			return builder.create_store(field, gep);
 		});
 
-		return builder.create_bit_cast(*alloc, llvm::Type::getInt8PtrTy(*context), "cast");
+		return builder.create_bit_cast(*alloc, llvm::PointerType::get(*context, 0), "cast");
 	}
 }

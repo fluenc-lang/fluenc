@@ -23,7 +23,7 @@ namespace fluenc::code_generation::types
 
 	llvm::Type* iterator_type::storage_type(llvm::LLVMContext& context) const
 	{
-		return llvm::Type::getInt8PtrTy(context);
+		return llvm::PointerType::get(context, 0);
 	}
 
 	base_type* iterator_type::get(uint64_t it)

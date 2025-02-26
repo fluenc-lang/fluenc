@@ -53,7 +53,7 @@ namespace fluenc::code_generation::types
 
 	llvm::Type* user_type::storage_type(llvm::LLVMContext& context) const
 	{
-		return llvm::Type::getInt8PtrTy(context);
+		return llvm::PointerType::get(context, 0);
 	}
 
 	const structure_type* user_type::prototype() const

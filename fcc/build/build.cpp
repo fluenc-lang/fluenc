@@ -22,7 +22,11 @@
 #include <llvm/Support/TargetRegistry.h>
 #endif
 #include <llvm/Support/FileSystem.h>
+#if LLVM_VERSION_MAJOR >= 19
+#include <llvm/TargetParser/Host.h>
+#else
 #include <llvm/Support/Host.h>
+#endif
 #include <llvm/Target/TargetOptions.h>
 
 #include <clang/Basic/DiagnosticOptions.h>
@@ -82,7 +86,7 @@ llvm::ArrayRef<const char*> arrayRef(const std::vector<std::string>& input)
 		return strcpy(new char[argument.size() + 1], argument.c_str());
 	});
 
-	return llvm::makeArrayRef(result, input.size());
+	return { result, input.size() };
 }
 
 bool build(const BuildContext& context)
@@ -266,12 +270,17 @@ bool build(const BuildContext& context)
 				llvm::raw_fd_ostream destination(object_file_name_string.c_str(), error);
 				llvm::legacy::PassManager pass_manager;
 
+#if LLVM_VERSION_MAJOR < 19
 				if (context.options.generateDotCfg)
 				{
 					pass_manager.add(llvm::createCFGPrinterLegacyPassPass());
 				}
 
 				context.targetMachine->addPassesToEmitFile(pass_manager, destination, nullptr, llvm::CGFT_ObjectFile);
+#else
+				context.targetMachine
+					->addPassesToEmitFile(pass_manager, destination, nullptr, llvm::CodeGenFileType::ObjectFile);
+#endif
 
 				pass_manager.run(*llvm_module);
 

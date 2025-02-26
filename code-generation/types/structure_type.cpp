@@ -24,7 +24,7 @@ namespace fluenc::code_generation::types
 
 	llvm::Type* structure_type::storage_type(llvm::LLVMContext& context) const
 	{
-		return llvm::Type::getInt8PtrTy(context);
+		return llvm::PointerType::get(context, 0);
 	}
 
 	std::vector<structure_field> structure_type::fields(const entry_point& type_resolver) const
