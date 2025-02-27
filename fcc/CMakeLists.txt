@@ -6,7 +6,6 @@ if (NOT ${FLUENC_BUILD_COMPILER})
 	return()
 endif ()
 
-
 find_package(tomlplusplus CONFIG REQUIRED)
 find_package(LLD REQUIRED CONFIG)
 find_package(LibArchive REQUIRED)
@@ -27,7 +26,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	fluenc-grammar
 	fluenc-code-generation
 
-	tomlplusplus::tomlplusplus
 	LibArchive::LibArchive
 	CLI11::CLI11
 	unofficial::git2::libgit2package

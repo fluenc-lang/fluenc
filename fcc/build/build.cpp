@@ -67,9 +67,9 @@ fluenc::module_node analyze(const std::string& file, const std::string& source, 
 {
 	std::shared_ptr<peg::Ast> ast;
 
-	parser.log = [&](size_t line, size_t col, const std::string& message) {
+	parser.set_logger([&](size_t line, size_t col, const std::string& message) {
 		throw parser_exception(file, line, col, message);
-	};
+	});
 
 	parser.parse(source, ast, file.c_str());
 
@@ -111,9 +111,9 @@ bool build(const BuildContext& context)
 
 	peg::parser parser(grammar());
 
-	parser.log = [](size_t line, size_t col, const std::string& msg) {
+	parser.set_logger([](size_t line, size_t col, const std::string& msg) {
 		std::cerr << line << ":" << col << ": " << msg << "\n";
-	};
+	});
 
 	parser.enable_ast();
 	parser.enable_packrat_parsing();
