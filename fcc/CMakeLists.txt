@@ -6,7 +6,6 @@ if (NOT ${FLUENC_BUILD_COMPILER})
 	return()
 endif ()
 
-find_package(tomlplusplus CONFIG REQUIRED)
 find_package(LLD REQUIRED CONFIG)
 find_package(LibArchive REQUIRED)
 find_package(Clang REQUIRED)
@@ -56,5 +55,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${CPP_PEGLIB_INCLUDE_DIRS}
 )
 
-install(TARGETS fcc COMPONENT tomlplusplus::tomlplusplus)
 install(IMPORTED_RUNTIME_ARTIFACTS clang)
