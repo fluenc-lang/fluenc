@@ -48,7 +48,7 @@ namespace fluenc::code_generation::fragments
 	{
 		using std::begin, std::end, std::size;
 
-		using values_t = std::vector<std::pair<size_t, value_stack>>;
+		using values_t = std::vector<std::pair<size_t, value_stack_t>>;
 		using results_t = std::map<size_t, std::array<const base_value*, 2>>;
 
 		auto llvm_context = context.entryPoint.context();
@@ -130,7 +130,7 @@ namespace fluenc::code_generation::fragments
 
 							elements.push_back(actual_value);
 
-							auto expandable = tuple_elements.template require<values::expandable_value>(nullptr);
+							auto expandable = require<values::expandable_value>(tuple_elements, nullptr);
 
 							return new aggregate_iterator_element_fragment(expandable, next);
 						}

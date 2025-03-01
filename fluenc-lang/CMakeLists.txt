@@ -18,6 +18,7 @@ set(PUBLIC_HEADERS
 	indexed.hpp
 	token_info.hpp
 	utility.hpp
+	comfy_stack.hpp
 	ast_transformer.hpp
 	ast/struct_field_node.hpp
 	ast/struct_node.hpp
@@ -95,7 +96,10 @@ install(TARGETS fluenc-lang
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(FILES ${PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fluenc-lang)
+foreach (FILE ${PUBLIC_HEADERS})
+	get_filename_component(DIR ${FILE} DIRECTORY)
+	install(FILES ${FILE} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fluenc-lang/${DIR})
+endforeach()
 
 install(EXPORT fluenc-lang-config
 	FILE fluenc-lang-config.cmake

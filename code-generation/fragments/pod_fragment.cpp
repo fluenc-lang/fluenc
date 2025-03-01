@@ -3,7 +3,7 @@
 
 namespace fluenc::code_generation::fragments
 {
-	pod_fragment::pod_fragment(fragment* subject, const value_stack& output_values)
+	pod_fragment::pod_fragment(fragment* subject, const value_stack_t& output_values)
 		: subject_(subject)
 		, output_values_(output_values)
 	{

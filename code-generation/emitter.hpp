@@ -1,7 +1,6 @@
 #pragma once
 
 #include "entry_point.hpp"
-#include "value_stack.hpp"
 
 struct boolean_binary_fragment;
 struct float_binary_fragment;
@@ -25,14 +24,14 @@ namespace fluenc::code_generation
 	struct emitter_result
 	{
 		entry_point entryPoint;
-		value_stack values;
+		value_stack_t values;
 	};
 
 	struct emitter_context
 	{
 		const entry_point& entryPoint;
 
-		value_stack values;
+		value_stack_t values;
 	};
 
 	struct emitter
@@ -66,6 +65,7 @@ namespace fluenc::code_generation
 		std::vector<emitter_result> visit(const return_node* node, emitter_context context) const;
 		std::vector<emitter_result> visit(const terminator_node* node, emitter_context context) const;
 		std::vector<emitter_result> visit(const tuple_sink_node* node, emitter_context context) const;
+		std::vector<emitter_result> visit(const struct_node* node, emitter_context context) const;
 
 	private:
 		std::vector<std::string> function_;

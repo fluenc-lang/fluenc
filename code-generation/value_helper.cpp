@@ -174,10 +174,9 @@ namespace fluenc::code_generation
 		throw invalid_type_exception(ast, expected_metadata.name(), actual_metadata.name());
 	}
 
-	const values::scalar_value* value_helper::get_scalar(
-		const std::shared_ptr<peg::Ast>& ast,
+	const values::scalar_value* value_helper::get_scalar(const std::shared_ptr<peg::Ast>& ast,
 		const entry_point& entryPoint,
-		value_stack& values
+		value_stack_t &values
 	)
 	{
 		auto value = values.pop();

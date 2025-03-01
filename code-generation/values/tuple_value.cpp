@@ -41,7 +41,7 @@ namespace fluenc::code_generation::values
 		return new tuple_value(values);
 	}
 
-	value_stack tuple_value::values() const
+	value_stack_t tuple_value::values() const
 	{
 		return values_;
 	}

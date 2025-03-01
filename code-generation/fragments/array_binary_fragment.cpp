@@ -9,8 +9,8 @@ namespace fluenc::code_generation::fragments
 {
 	std::vector<emitter_result> array_binary_fragment::build(const emitter& visitor, emitter_context context) const
 	{
-		auto left = context.values.require<values::pre_lazy_value>(binary_->ast);
-		auto right = context.values.require<values::pre_lazy_value>(binary_->ast);
+		auto left = require<values::pre_lazy_value>(context.values, binary_->ast);
+		auto right = require<values::pre_lazy_value>(context.values, binary_->ast);
 
 		if (binary_->op == "|")
 		{

@@ -87,7 +87,7 @@ namespace fluenc::code_generation::fragments
 			auto array_contents = std::accumulate(
 				rbegin(indexed),
 				rend(indexed),
-				std::vector<emitter_result> { { entryPoint, value_stack() } },
+				std::vector<emitter_result> { { entryPoint, value_stack_t() } },
 				[&](auto previous, fluenc::indexed<const base_type*> expression) {
 					index_sink_fragment index_sink(expression.index, terminator_fragment::instance());
 

@@ -1,8 +1,8 @@
 #include "post_evaluation_fragment.hpp"
+#include "comfy_stack.hpp"
 #include "emitter.hpp"
 #include "pre_evaluation_fragment.hpp"
 #include "terminator_fragment.hpp"
-#include "value_stack.hpp"
 
 #include "values/expanded_value.hpp"
 #include "values/forwarded_value.hpp"
@@ -11,7 +11,11 @@
 
 namespace fluenc::code_generation::fragments
 {
-	std::vector<emitter_result> post_digest_depth(const emitter& visitor, const entry_point& entryPoint, value_stack values)
+	std::vector<emitter_result> post_digest_depth(
+		const emitter& visitor,
+		const entry_point& entryPoint,
+		value_stack_t values
+	)
 	{
 		for (auto i = 0u; i < values.size(); i++)
 		{
@@ -22,7 +26,7 @@ namespace fluenc::code_generation::fragments
 				std::vector<emitter_result> results;
 
 				for (auto& [result_entry_point, result_values] :
-					 iterator->generate(visitor, { entryPoint, value_stack() }))
+					 iterator->generate(visitor, { entryPoint, value_stack_t() }))
 				{
 					auto forwarded_values = values;
 

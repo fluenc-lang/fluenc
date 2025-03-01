@@ -31,7 +31,7 @@ namespace fluenc::code_generation
 		static const values::scalar_value* get_scalar(
 			const std::shared_ptr<peg::Ast>& ast,
 			const entry_point& entryPoint,
-			value_stack& values
+			value_stack_t& values
 		);
 
 		template <typename T, typename TContainer>

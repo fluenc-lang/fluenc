@@ -8,8 +8,8 @@
 
 #include "immer/box.hpp"
 
+#include "base_value.hpp"
 #include "expression.hpp"
-#include "value_stack.hpp"
 
 #include "types/function_type.hpp"
 #include "types/structure_type.hpp"
@@ -54,7 +54,7 @@ namespace fluenc
 				immer::box<std::map<std::string, expression_t>> globals,
 				immer::box<std::map<std::string, struct_node*>> types,
 				immer::box<std::vector<const function_node*>> roots,
-				immer::box<value_stack> values,
+				immer::box<value_stack_t> values,
 				const types::expanded_type* iteratorType
 			);
 
@@ -86,7 +86,7 @@ namespace fluenc
 			const std::map<std::string, struct_node*>& types() const;
 			const std::vector<const function_node*>& roots() const;
 
-			const value_stack& values() const;
+			const value_stack_t& values() const;
 
 			const entry_point* by_name(const std::string& name) const;
 			const entry_point* entry() const;
@@ -101,7 +101,7 @@ namespace fluenc
 			entry_point with_locals(const std::map<std::string, const base_value*>& locals) const;
 			entry_point with_name(const std::string& name) const;
 			entry_point with_return_value_address(llvm::Value* address) const;
-			entry_point with_values(const value_stack& values) const;
+			entry_point with_values(const value_stack_t& values) const;
 			entry_point with_depth(int depth) const;
 			entry_point with_index(int index) const;
 			entry_point with_iterator_type(const types::expanded_type* iteratorType) const;
@@ -132,7 +132,7 @@ namespace fluenc
 			immer::box<std::map<std::string, expression_t>> globals_;
 			immer::box<std::map<std::string, struct_node*>> types_;
 			immer::box<std::vector<const function_node*>> roots_;
-			immer::box<value_stack> values_;
+			immer::box<value_stack_t> values_;
 
 			const types::expanded_type* iterator_type_;
 		};

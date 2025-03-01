@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 
+#include "base_value.hpp"
 #include "entry_point.hpp"
 
 #include "values/expanded_value.hpp"
@@ -13,13 +14,11 @@
 
 namespace fluenc::code_generation
 {
-	class value_stack;
-
 	struct function_helper
 	{
-		static std::tuple<int8_t, const entry_point*, value_stack> try_create_tail_call(
+		static std::tuple<int8_t, const entry_point*, value_stack_t> try_create_tail_call(
 			const entry_point& entry_point,
-			const value_stack& values,
+			const value_stack_t& values,
 			const std::vector<std::string>::const_iterator& name,
 			const std::vector<std::string>::const_iterator& end
 		);

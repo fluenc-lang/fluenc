@@ -229,7 +229,7 @@ bool build(const BuildContext& context)
 
 				fmt::print("Building '{}'...\n", configuration->target);
 
-				fluenc::code_generation::value_stack values;
+				fluenc::code_generation::value_stack_t values;
 
 				fluenc::code_generation::entry_point entryPoint(
 					0,

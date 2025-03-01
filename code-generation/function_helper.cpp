@@ -9,7 +9,7 @@ namespace fluenc::code_generation
 	std::tuple<int8_t, const entry_point*> find_entry_point(
 		const entry_point& entryPoint,
 		const std::string& name,
-		const value_stack& values
+		const value_stack_t& values
 	)
 	{
 		auto tail_call_candidate = entryPoint.by_name(name);
@@ -53,16 +53,15 @@ namespace fluenc::code_generation
 		return { 0, tail_call_candidate };
 	}
 
-	std::tuple<int8_t, const entry_point*, value_stack> function_helper::try_create_tail_call(
-		const entry_point& entry_point,
-		const value_stack& values,
+	std::tuple<int8_t, const entry_point *, value_stack_t> function_helper::try_create_tail_call(const entry_point& entry_point,
+		const value_stack_t &values,
 		const std::vector<std::string>::const_iterator& name,
 		const std::vector<std::string>::const_iterator& end
 	)
 	{
 		if (name == end)
 		{
-			return { -1, nullptr, value_stack() };
+			return { -1, nullptr, value_stack_t() };
 		}
 
 		auto [score, tail_call_candidate] = find_entry_point(entry_point, *name, values);
