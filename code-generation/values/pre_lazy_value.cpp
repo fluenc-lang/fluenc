@@ -312,13 +312,13 @@ namespace fluenc::code_generation::values
 
 				auto source_continuation = require<expandable_value>(source_tuple_values, nullptr);
 
-				auto source_cain = source_continuation->chain();
+				auto source_chain = source_continuation->chain();
 				auto source_provider = source_continuation->provider();
 
 				auto source_continuation_entry_point = source_provider->with_block(result_entry_point.block());
 
 				for (auto& [chain_entry_point, chain_values] :
-					 source_cain->build(emitter, { source_continuation_entry_point, value_stack_t() }))
+					 source_chain->build(emitter, { source_continuation_entry_point, value_stack_t() }))
 				{
 					auto source_value = require<expanded_value>(chain_values, nullptr);
 
