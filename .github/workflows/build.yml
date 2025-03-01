@@ -20,7 +20,7 @@ jobs:
             cmake-prefix-path: /usr/lib/llvm-16
             cmake-args: ""
           - os: macos-14
-            cmake-prefix-path: /usr/local/opt/llvm@15
+            cmake-prefix-path: /opt/homebrew/opt/llvm@15
             cmake-args: ""
           - os: windows-2022
             cmake-prefix-path: c:\llvm-14.0.6-windows-amd64-msvc17-msvcrt
