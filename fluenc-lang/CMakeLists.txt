@@ -35,6 +35,7 @@ set(PUBLIC_HEADERS
 	ast/boolean_literal_node.hpp
 	ast/character_literal_node.hpp
 	ast/integral_literal_node.hpp
+	ast/member_access_node.hpp
 	ast/return_node.hpp
 	ast/binary_node.hpp
 	ast/unary_node.hpp
