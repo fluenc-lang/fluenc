@@ -30,7 +30,7 @@ namespace fluenc::code_generation::types
 
 	llvm::Type* string_type::storage_type(llvm::LLVMContext& context) const
 	{
-		return llvm::Type::getInt8PtrTy(context);
+		return llvm::PointerType::get(context, 0);
 	}
 
 	operator_set* string_type::operators() const

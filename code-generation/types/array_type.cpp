@@ -61,7 +61,7 @@ namespace fluenc::code_generation::types
 
 	llvm::Type* array_type::storage_type(llvm::LLVMContext& context) const
 	{
-		return llvm::Type::getInt8PtrTy(context);
+		return llvm::PointerType::get(context, 0);
 	}
 
 	operator_set* array_type::operators() const

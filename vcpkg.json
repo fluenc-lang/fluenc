@@ -8,7 +8,10 @@
     "fmt",
     "range-v3",
 	"boost-test",
-	"libarchive",
+	{
+		"name": "libarchive",
+		"default-features": false
+	},
 	"cli11",
 	"libgit2"
   ]

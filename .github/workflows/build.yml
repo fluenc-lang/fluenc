@@ -14,13 +14,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-22.04, macos-12, windows-2022 ]
+        os: [ ubuntu-24.04, macos-14, windows-2022 ]
         include:
-          - os: ubuntu-22.04
-            cmake-prefix-path: /usr/lib/llvm-14
+          - os: ubuntu-24.04
+            cmake-prefix-path: /usr/lib/llvm-16
             cmake-args: ""
-          - os: macos-12
-            cmake-prefix-path: /usr/local/opt/llvm@15
+          - os: macos-14
+            cmake-prefix-path: /opt/homebrew/opt/llvm@15
             cmake-args: ""
           - os: windows-2022
             cmake-prefix-path: c:\llvm-14.0.6-windows-amd64-msvc17-msvcrt
@@ -37,7 +37,7 @@ jobs:
           7z x -y c:\\llvm-14.0.6-windows-amd64-msvcrt-Release.zip -oc:\\ &&
           7z x -y c:\\llvm-14.0.6-windows-amd64-msvc17-msvcrt.7z -oc:\\
         elif [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get update && sudo apt-get install liblld-14-dev libclang-14-dev
+          sudo apt-get update && sudo apt-get install liblld-16-dev libclang-16-dev libzstd-dev libcurl4-openssl-dev
         fi
       shell: bash
 
@@ -57,7 +57,7 @@ jobs:
         fi
       shell: bash
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: ${{runner.os}}-fcc
         path: ${{github.workspace}}/install

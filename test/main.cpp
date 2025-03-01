@@ -582,12 +582,12 @@ BOOST_AUTO_TEST_CASE(scenario22)
 BOOST_AUTO_TEST_CASE(scenario23)
 {
 	compile(R"(
-		function foo(long renderer)
+		function foo(i64 renderer)
 		{
 			return 2;
 		}
 
-		function mainLoop(i32 init, long renderer)
+		function mainLoop(i32 init, i64 renderer)
 		{
 			return mainLoop(foo(renderer)
 				, renderer
@@ -596,7 +596,7 @@ BOOST_AUTO_TEST_CASE(scenario23)
 
 		export i32 main()
 		{
-			return mainLoop(0, 1L);
+			return mainLoop(0, 1i64);
 		}
 	)");
 

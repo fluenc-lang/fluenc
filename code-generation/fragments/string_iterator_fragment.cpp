@@ -65,7 +65,7 @@ namespace fluenc::code_generation::fragments
 		auto index = builder.create_load(index_);
 
 		auto character_type = llvm::Type::getInt8Ty(*llvm_context);
-		auto string_type = llvm::Type::getInt8PtrTy(*llvm_context);
+		auto string_type = llvm::PointerType::get(*llvm_context, 0);
 
 		auto data_layout = module->getDataLayout();
 

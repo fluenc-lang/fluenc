@@ -22,7 +22,11 @@
 #include <llvm/Support/TargetRegistry.h>
 #endif
 #include <llvm/Support/FileSystem.h>
+#if LLVM_VERSION_MAJOR >= 19
+#include <llvm/TargetParser/Host.h>
+#else
 #include <llvm/Support/Host.h>
+#endif
 #include <llvm/Target/TargetOptions.h>
 
 #include <clang/Basic/DiagnosticOptions.h>
@@ -63,9 +67,9 @@ fluenc::module_node analyze(const std::string& file, const std::string& source, 
 {
 	std::shared_ptr<peg::Ast> ast;
 
-	parser.log = [&](size_t line, size_t col, const std::string& message) {
+	parser.set_logger([&](size_t line, size_t col, const std::string& message) {
 		throw parser_exception(file, line, col, message);
-	};
+	});
 
 	parser.parse(source, ast, file.c_str());
 
@@ -82,7 +86,7 @@ llvm::ArrayRef<const char*> arrayRef(const std::vector<std::string>& input)
 		return strcpy(new char[argument.size() + 1], argument.c_str());
 	});
 
-	return llvm::makeArrayRef(result, input.size());
+	return { result, input.size() };
 }
 
 bool build(const BuildContext& context)
@@ -107,9 +111,9 @@ bool build(const BuildContext& context)
 
 	peg::parser parser(grammar());
 
-	parser.log = [](size_t line, size_t col, const std::string& msg) {
+	parser.set_logger([](size_t line, size_t col, const std::string& msg) {
 		std::cerr << line << ":" << col << ": " << msg << "\n";
-	};
+	});
 
 	parser.enable_ast();
 	parser.enable_packrat_parsing();
@@ -266,12 +270,17 @@ bool build(const BuildContext& context)
 				llvm::raw_fd_ostream destination(object_file_name_string.c_str(), error);
 				llvm::legacy::PassManager pass_manager;
 
+#if LLVM_VERSION_MAJOR < 19
 				if (context.options.generateDotCfg)
 				{
 					pass_manager.add(llvm::createCFGPrinterLegacyPassPass());
 				}
 
 				context.targetMachine->addPassesToEmitFile(pass_manager, destination, nullptr, llvm::CGFT_ObjectFile);
+#else
+				context.targetMachine
+					->addPassesToEmitFile(pass_manager, destination, nullptr, llvm::CodeGenFileType::ObjectFile);
+#endif
 
 				pass_manager.run(*llvm_module);
 
